@@ -1,0 +1,137 @@
+<svg width="128" height="128" viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- Gradientes futuristas -->
+    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0f0f23;stop-opacity:1" />
+      <stop offset="30%" style="stop-color:#1a1a3a;stop-opacity:1" />
+      <stop offset="70%" style="stop-color:#2d1b69;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#0f0f23;stop-opacity:1" />
+    </linearGradient>
+    
+    <linearGradient id="coreGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#00d4ff;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#0099cc;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#0066ff;stop-opacity:1" />
+    </linearGradient>
+    
+    <linearGradient id="accentGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#ff6b35;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#f7931e;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#ffcc02;stop-opacity:1" />
+    </linearGradient>
+    
+    <radialGradient id="glowGradient" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" style="stop-color:#00d4ff;stop-opacity:0.8" />
+      <stop offset="70%" style="stop-color:#0099cc;stop-opacity:0.3" />
+      <stop offset="100%" style="stop-color:#0066ff;stop-opacity:0" />
+    </radialGradient>
+    
+    <!-- Filtros de efectos -->
+    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="4" result="coloredBlur"/>
+      <feMerge> 
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    
+    <filter id="innerGlow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+      <feMerge> 
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  
+  <!-- Fondo principal -->
+  <circle cx="64" cy="64" r="62" fill="url(#bgGradient)" stroke="url(#coreGradient)" stroke-width="2"/>
+  
+  <!-- Anillos orbitales futuristas -->
+  <circle cx="64" cy="64" r="55" fill="none" stroke="url(#coreGradient)" stroke-width="1" opacity="0.3" stroke-dasharray="5,3"/>
+  <circle cx="64" cy="64" r="48" fill="none" stroke="url(#coreGradient)" stroke-width="1" opacity="0.5" stroke-dasharray="3,2"/>
+  
+  <!-- Núcleo central de IA -->
+  <circle cx="64" cy="64" r="20" fill="url(#glowGradient)" filter="url(#glow)"/>
+  <circle cx="64" cy="64" r="15" fill="url(#coreGradient)" opacity="0.9"/>
+  
+  <!-- Símbolo de IA central -->
+  <g transform="translate(64,64)">
+    <!-- Cerebro neural -->
+    <path d="M-8,-8 Q0,-12 8,-8 Q12,0 8,8 Q0,12 -8,8 Q-12,0 -8,-8 Z" 
+          fill="none" stroke="#ffffff" stroke-width="2" opacity="0.9"/>
+    
+    <!-- Conexiones neuronales -->
+    <g stroke="#00d4ff" stroke-width="1.5" fill="#00d4ff" opacity="0.8">
+      <line x1="-6" y1="-6" x2="6" y2="6"/>
+      <line x1="6" y1="-6" x2="-6" y2="6"/>
+      <line x1="0" y1="-8" x2="0" y2="8"/>
+      <line x1="-8" y1="0" x2="8" y2="0"/>
+      
+      <!-- Nodos neuronales -->
+      <circle cx="-6" cy="-6" r="1.5"/>
+      <circle cx="6" cy="-6" r="1.5"/>
+      <circle cx="-6" cy="6" r="1.5"/>
+      <circle cx="6" cy="6" r="1.5"/>
+      <circle cx="0" cy="0" r="2"/>
+    </g>
+  </g>
+  
+  <!-- Elementos orbitales -->
+  <g transform="translate(64,64)">
+    <!-- Partículas de datos -->
+    <g fill="url(#accentGradient)" opacity="0.8">
+      <circle cx="35" cy="0" r="2" filter="url(#innerGlow)">
+        <animateTransform attributeName="transform" type="rotate" values="0;360" dur="8s" repeatCount="indefinite"/>
+      </circle>
+      <circle cx="-35" cy="0" r="2" filter="url(#innerGlow)">
+        <animateTransform attributeName="transform" type="rotate" values="360;0" dur="8s" repeatCount="indefinite"/>
+      </circle>
+      <circle cx="0" cy="35" r="1.5" filter="url(#innerGlow)">
+        <animateTransform attributeName="transform" type="rotate" values="0;360" dur="6s" repeatCount="indefinite"/>
+      </circle>
+      <circle cx="0" cy="-35" r="1.5" filter="url(#innerGlow)">
+        <animateTransform attributeName="transform" type="rotate" values="360;0" dur="6s" repeatCount="indefinite"/>
+      </circle>
+    </g>
+    
+    <!-- Elementos de datos hexagonales -->
+    <g fill="none" stroke="url(#coreGradient)" stroke-width="1" opacity="0.6">
+      <polygon points="25,-4 29,0 25,4 21,0" transform="rotate(45)"/>
+      <polygon points="25,-4 29,0 25,4 21,0" transform="rotate(135)"/>
+      <polygon points="25,-4 29,0 25,4 21,0" transform="rotate(225)"/>
+      <polygon points="25,-4 29,0 25,4 21,0" transform="rotate(315)"/>
+    </g>
+  </g>
+  
+  <!-- Efectos de energía en las esquinas -->
+  <g fill="url(#accentGradient)" opacity="0.7">
+    <!-- Esquina superior izquierda -->
+    <path d="M15,15 L20,12 L17,17 Z"/>
+    <path d="M12,20 L15,15 L10,18 Z"/>
+    
+    <!-- Esquina superior derecha -->
+    <path d="M113,15 L108,12 L111,17 Z"/>
+    <path d="M116,20 L113,15 L118,18 Z"/>
+    
+    <!-- Esquina inferior izquierda -->
+    <path d="M15,113 L20,116 L17,111 Z"/>
+    <path d="M12,108 L15,113 L10,110 Z"/>
+    
+    <!-- Esquina inferior derecha -->
+    <path d="M113,113 L108,116 L111,111 Z"/>
+    <path d="M116,108 L113,113 L118,110 Z"/>
+  </g>
+  
+  <!-- Líneas de conexión futuristas -->
+  <g stroke="url(#coreGradient)" stroke-width="1" fill="none" opacity="0.4">
+    <path d="M20,20 Q64,30 108,20"/>
+    <path d="M20,108 Q64,98 108,108"/>
+    <path d="M20,20 Q30,64 20,108"/>
+    <path d="M108,20 Q98,64 108,108"/>
+  </g>
+  
+  <!-- Borde exterior con efecto -->
+  <circle cx="64" cy="64" r="62" fill="none" stroke="url(#coreGradient)" stroke-width="2" opacity="0.8"/>
+  <circle cx="64" cy="64" r="60" fill="none" stroke="#ffffff" stroke-width="1" opacity="0.3"/>
+</svg>

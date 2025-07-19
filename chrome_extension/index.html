@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gemini AI Chatbot</title>
+    <style>
+        body {
+            width: 350px;
+            height: 500px;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: #ffffff;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .logo {
+            width: 64px;
+            height: 64px;
+            margin: 0 auto 10px;
+            background: linear-gradient(135deg, #00d4ff, #0099cc);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            font-weight: bold;
+        }
+        
+        h1 {
+            margin: 0;
+            font-size: 18px;
+            color: #00d4ff;
+        }
+        
+        .description {
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 14px;
+            opacity: 0.8;
+        }
+        
+        .button {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            background: linear-gradient(135deg, #00d4ff, #0099cc);
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: bold;
+            transition: transform 0.2s;
+        }
+        
+        .button:hover {
+            transform: translateY(-2px);
+        }
+        
+        .features {
+            margin-top: 20px;
+        }
+        
+        .feature {
+            display: flex;
+            align-items: center;
+            margin: 8px 0;
+            font-size: 12px;
+        }
+        
+        .feature-icon {
+            margin-right: 8px;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="logo">G</div>
+        <h1>Gemini AI Chatbot</h1>
+    </div>
+    
+    <div class="description">
+        Asistente de IA avanzado con Google Gemini
+    </div>
+    
+    <a href="https://127.0.0.1:5000" target="_blank" class="button">
+        🚀 Abrir Aplicación
+    </a>
+    
+    <a href="https://127.0.0.1:5000/auth/login" target="_blank" class="button">
+        🔐 Iniciar Sesión
+    </a>
+    
+    <div class="features">
+        <div class="feature">
+            <span class="feature-icon">🤖</span>
+            Chat inteligente con IA
+        </div>
+        <div class="feature">
+            <span class="feature-icon">📄</span>
+            Análisis de documentos
+        </div>
+        <div class="feature">
+            <span class="feature-icon">🎵</span>
+            Transcripción de audio
+        </div>
+        <div class="feature">
+            <span class="feature-icon">🔒</span>
+            Seguro y privado
+        </div>
+    </div>
+    
+    <script>
+        // Abrir enlaces en nueva pestaña
+        document.querySelectorAll('a').forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                chrome.tabs.create({ url: link.href });
+            });
+        });
+    </script>
+</body>
+</html>

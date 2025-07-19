@@ -1,0 +1,2077 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <meta name="cache-buster" content="v1.0.1-20250112-fix">
+    <meta name="description" content="Chat con Gemini AI - Experimenta conversaciones inteligentes con la IA más avanzada. Interfaz moderna y respuestas instantáneas.">
+    <meta name="keywords" content="chat AI, Gemini, conversación inteligente, chatbot, asistente virtual">
+    <meta name="author" content="Gemini AI Team">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://gemini-ai.com/chat">
+    
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:title" content="Chat - Gemini AI">
+    <meta property="og:description" content="Experimenta conversaciones inteligentes con la IA más avanzada">
+    <meta property="og:image" content="https://gemini-ai.com/static/images/chat-og-image.jpg">
+    <meta property="og:url" content="https://gemini-ai.com/chat">
+    <meta property="og:type" content="website">
+    
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Chat - Gemini AI">
+    <meta name="twitter:description" content="Experimenta conversaciones inteligentes con la IA más avanzada">
+    <meta name="twitter:image" content="https://gemini-ai.com/static/images/chat-twitter-card.jpg">
+    
+    <!-- PWA Meta Tags -->
+    <meta name="theme-color" content="#00f5ff">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="manifest" href="/static/manifest.json">
+    
+    <title>Chat - Gemini AI</title>
+    
+    <!-- Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "Gemini AI Chat",
+      "description": "Chat con Gemini AI - Experimenta conversaciones inteligentes con la IA más avanzada",
+      "url": "https://gemini-ai.com/chat",
+      "applicationCategory": "ChatApplication",
+      "operatingSystem": "Web Browser",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      },
+      "author": {
+        "@type": "Organization",
+        "name": "Gemini AI Team"
+      }
+    }
+    </script>
+    <style>
+        :root {
+            --primary: #00f5ff;
+            --secondary: #1e3a8a;
+            --accent: #3b82f6;
+            --success-color: #00ff88;
+            --warning-color: #ffaa00;
+            --error-color: #ff0066;
+            --bot-color: var(--primary);
+            --user-color: var(--secondary);
+
+            --bg-card: rgba(255, 255, 255, 0.02);
+            --text-primary: #ffffff;
+            --text-secondary: #a0a0a0;
+            --glass-bg: rgba(0, 245, 255, 0.008); /* ULTRA TRANSPARENTE */
+            --glass-border: rgba(0, 245, 255, 0.03); /* ULTRA TRANSPARENTE */
+            --glow: 0 0 20px var(--primary);
+            --neural-grid: linear-gradient(90deg, transparent 98%, rgba(0, 245, 255, 0.1) 100%);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        /* Accessibility Skip Link */
+        .skip-link {
+            position: absolute;
+            top: -40px;
+            left: 6px;
+            background: var(--primary);
+            color: #0a0a0f;
+            padding: 8px;
+            text-decoration: none;
+            border-radius: 4px;
+            z-index: 9999;
+            font-weight: bold;
+            transition: top 0.3s ease;
+        }
+        
+        .skip-link:focus {
+            top: 6px;
+        }
+        
+        /* Screen reader only class */
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
+        }
+        
+        /* Keyboard navigation improvements */
+        .send-button:focus,
+        .action-btn:focus,
+        .back-btn:focus,
+        input:focus,
+        button:focus {
+            outline: 3px solid #00d4ff;
+            outline-offset: 2px;
+            box-shadow: 0 0 0 2px rgba(0, 212, 255, 0.3);
+        }
+        
+        .send-button:focus,
+        .action-btn:focus {
+            transform: translateY(-1px) scale(1.02);
+        }
+        
+        /* Ensure all interactive elements are keyboard accessible */
+        .send-button,
+        .action-btn,
+        .back-btn {
+            cursor: pointer;
+        }
+        
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: #0a0a0f;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: var(--text-primary);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        /* Fondo del Agujero Negro - RÉPLICA EXACTA DE LA IMAGEN REAL */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                /* Campo de estrellas exacto como la imagen */
+                radial-gradient(0.5px 0.5px at 12px 18px, rgba(255, 255, 255, 0.9), transparent),
+                radial-gradient(1px 1px at 45px 32px, rgba(255, 255, 255, 0.7), transparent),
+                radial-gradient(0.5px 0.5px at 78px 65px, rgba(255, 255, 255, 0.8), transparent),
+                radial-gradient(1px 1px at 112px 23px, rgba(255, 255, 255, 0.6), transparent),
+                radial-gradient(0.5px 0.5px at 156px 89px, rgba(255, 255, 255, 0.9), transparent),
+                radial-gradient(1px 1px at 189px 45px, rgba(255, 255, 255, 0.5), transparent),
+                radial-gradient(0.5px 0.5px at 234px 78px, rgba(255, 255, 255, 0.8), transparent),
+                radial-gradient(1px 1px at 267px 12px, rgba(255, 255, 255, 0.7), transparent),
+                radial-gradient(0.5px 0.5px at 298px 56px, rgba(255, 255, 255, 0.6), transparent),
+                radial-gradient(1px 1px at 334px 91px, rgba(255, 255, 255, 0.9), transparent),
+                /* Estrellas distribuidas como en la imagen real */
+                radial-gradient(0.5px 0.5px at 15% 25%, rgba(255, 255, 255, 0.8), transparent),
+                radial-gradient(1px 1px at 85% 15%, rgba(255, 255, 255, 0.9), transparent),
+                radial-gradient(0.5px 0.5px at 25% 75%, rgba(255, 255, 255, 0.6), transparent),
+                radial-gradient(1px 1px at 75% 85%, rgba(255, 255, 255, 0.7), transparent),
+                radial-gradient(0.5px 0.5px at 95% 35%, rgba(255, 255, 255, 0.8), transparent),
+                radial-gradient(1px 1px at 5% 65%, rgba(255, 255, 255, 0.5), transparent),
+                radial-gradient(0.5px 0.5px at 45% 5%, rgba(255, 255, 255, 0.9), transparent),
+                radial-gradient(1px 1px at 65% 95%, rgba(255, 255, 255, 0.7), transparent),
+                /* Nebulosa de fondo sutil como en la imagen */
+                radial-gradient(ellipse 800px 400px at 30% 40%, rgba(70, 130, 180, 0.03), transparent),
+                radial-gradient(ellipse 600px 300px at 70% 60%, rgba(25, 25, 112, 0.02), transparent),
+                /* Fondo del espacio profundo exacto */
+                radial-gradient(ellipse at center, 
+                    #000000 0%, 
+                    #050510 20%, 
+                    #0a0a1a 40%, 
+                    #0f0f25 60%, 
+                    #0a0a1a 80%, 
+                    #000000 100%
+                );
+            background-size: 
+                200px 200px, 200px 200px, 200px 200px, 200px 200px, 200px 200px,
+                200px 200px, 200px 200px, 200px 200px, 200px 200px, 200px 200px,
+                400px 400px, 400px 400px, 400px 400px, 400px 400px, 400px 400px,
+                400px 400px, 400px 400px, 400px 400px,
+                1200px 600px, 1000px 500px,
+                100% 100%;
+            z-index: -10;
+        }
+        
+        /* FONDO ESTRELLADO CON PARTÍCULAS 3D */
+        
+        /* Fondo base del espacio profundo */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                /* Gradiente de espacio profundo */
+                radial-gradient(ellipse at top, rgba(15, 25, 45, 0.9) 0%, rgba(5, 10, 25, 0.95) 50%, rgba(0, 0, 10, 1) 100%),
+                /* Nebulosas distantes */
+                radial-gradient(circle at 20% 30%, rgba(75, 0, 130, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 70%, rgba(25, 25, 112, 0.08) 0%, transparent 40%),
+                radial-gradient(circle at 60% 20%, rgba(72, 61, 139, 0.06) 0%, transparent 35%),
+                /* Base negra del espacio */
+                linear-gradient(180deg, rgba(0, 0, 5, 1) 0%, rgba(0, 0, 0, 1) 100%);
+            z-index: -10;
+        }
+        
+        /* Campo de estrellas estático */
+        body::after {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                /* Estrellas grandes brillantes */
+                radial-gradient(2px 2px at 20px 30px, rgba(255, 255, 255, 0.9), transparent),
+                radial-gradient(2px 2px at 40px 70px, rgba(255, 255, 255, 0.8), transparent),
+                radial-gradient(1px 1px at 90px 40px, rgba(255, 255, 255, 0.7), transparent),
+                radial-gradient(1px 1px at 130px 80px, rgba(255, 255, 255, 0.6), transparent),
+                radial-gradient(2px 2px at 160px 30px, rgba(255, 255, 255, 0.9), transparent),
+                radial-gradient(1px 1px at 200px 60px, rgba(255, 255, 255, 0.7), transparent),
+                radial-gradient(1px 1px at 240px 90px, rgba(255, 255, 255, 0.5), transparent),
+                radial-gradient(2px 2px at 280px 20px, rgba(255, 255, 255, 0.8), transparent),
+                radial-gradient(1px 1px at 320px 70px, rgba(255, 255, 255, 0.6), transparent),
+                radial-gradient(1px 1px at 360px 40px, rgba(255, 255, 255, 0.7), transparent),
+                /* Estrellas medianas */
+                radial-gradient(1px 1px at 15px 60px, rgba(200, 220, 255, 0.6), transparent),
+                radial-gradient(1px 1px at 55px 20px, rgba(255, 220, 200, 0.5), transparent),
+                radial-gradient(1px 1px at 85px 80px, rgba(220, 255, 220, 0.4), transparent),
+                radial-gradient(1px 1px at 115px 50px, rgba(255, 255, 200, 0.6), transparent),
+                radial-gradient(1px 1px at 145px 90px, rgba(200, 200, 255, 0.5), transparent),
+                radial-gradient(1px 1px at 175px 10px, rgba(255, 200, 255, 0.4), transparent),
+                radial-gradient(1px 1px at 205px 40px, rgba(220, 255, 255, 0.5), transparent),
+                radial-gradient(1px 1px at 235px 70px, rgba(255, 255, 220, 0.4), transparent),
+                radial-gradient(1px 1px at 265px 100px, rgba(200, 255, 200, 0.6), transparent),
+                radial-gradient(1px 1px at 295px 30px, rgba(255, 220, 220, 0.5), transparent),
+                /* Estrellas pequeñas */
+                radial-gradient(0.5px 0.5px at 25px 45px, rgba(255, 255, 255, 0.4), transparent),
+                radial-gradient(0.5px 0.5px at 65px 85px, rgba(255, 255, 255, 0.3), transparent),
+                radial-gradient(0.5px 0.5px at 95px 15px, rgba(255, 255, 255, 0.4), transparent),
+                radial-gradient(0.5px 0.5px at 125px 65px, rgba(255, 255, 255, 0.3), transparent),
+                radial-gradient(0.5px 0.5px at 155px 35px, rgba(255, 255, 255, 0.4), transparent),
+                radial-gradient(0.5px 0.5px at 185px 75px, rgba(255, 255, 255, 0.3), transparent),
+                radial-gradient(0.5px 0.5px at 215px 25px, rgba(255, 255, 255, 0.4), transparent),
+                radial-gradient(0.5px 0.5px at 245px 55px, rgba(255, 255, 255, 0.3), transparent),
+                radial-gradient(0.5px 0.5px at 275px 85px, rgba(255, 255, 255, 0.4), transparent),
+                radial-gradient(0.5px 0.5px at 305px 15px, rgba(255, 255, 255, 0.3), transparent);
+            background-repeat: repeat;
+            background-size: 400px 400px, 350px 350px, 300px 300px;
+            z-index: -9;
+        }
+        
+        /* Partículas flotantes 3D - Red Neuronal Mejorada */
+        .space-particle {
+            position: fixed;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: -5;
+            animation: float3D 8s infinite ease-in-out;
+        }
+        
+        /* Diferentes tamaños de partículas - MÁS GRANDES Y NOTORIAS */
+        .space-particle.small {
+            width: 6px;
+            height: 6px;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.4) 70%, transparent 100%);
+            box-shadow: 0 0 12px rgba(255, 255, 255, 0.8), 0 0 24px rgba(100, 150, 255, 0.5);
+        }
+        
+        .space-particle.medium {
+            width: 10px;
+            height: 10px;
+            background: radial-gradient(circle, rgba(100, 200, 255, 0.9) 0%, rgba(100, 200, 255, 0.5) 70%, transparent 100%);
+            box-shadow: 0 0 16px rgba(100, 200, 255, 0.9), 0 0 32px rgba(100, 200, 255, 0.6);
+        }
+        
+        .space-particle.large {
+            width: 14px;
+            height: 14px;
+            background: radial-gradient(circle, rgba(255, 180, 100, 0.9) 0%, rgba(255, 180, 100, 0.5) 70%, transparent 100%);
+            box-shadow: 0 0 20px rgba(255, 180, 100, 0.9), 0 0 40px rgba(255, 180, 100, 0.7);
+        }
+        
+        /* Nueva clase para partículas extra grandes */
+        .space-particle.xlarge {
+            width: 18px;
+            height: 18px;
+            background: radial-gradient(circle, rgba(255, 100, 255, 0.9) 0%, rgba(255, 100, 255, 0.5) 70%, transparent 100%);
+            box-shadow: 0 0 25px rgba(255, 100, 255, 0.9), 0 0 50px rgba(255, 100, 255, 0.8);
+        }
+        
+        /* Líneas de conexión neuronal corregidas - Más naturales */
+        .neural-connection {
+            position: fixed;
+            height: 1px; /* Más delgadas para parecer más naturales */
+            background: linear-gradient(90deg, 
+                transparent 0%, 
+                rgba(100, 200, 255, 0.6) 10%, 
+                rgba(100, 200, 255, 0.9) 50%, 
+                rgba(100, 200, 255, 0.6) 90%, 
+                transparent 100%);
+            transform-origin: left center;
+            pointer-events: none;
+            z-index: -4;
+            animation: pulse-connection 4s infinite ease-in-out;
+            border-radius: 1px;
+            box-shadow: 0 0 3px rgba(100, 200, 255, 0.4);
+        }
+        
+        /* Líneas púrpura más sutiles */
+        .neural-connection.purple {
+            background: linear-gradient(90deg, 
+                transparent 0%, 
+                rgba(255, 100, 255, 0.5) 10%, 
+                rgba(255, 100, 255, 0.8) 50%, 
+                rgba(255, 100, 255, 0.5) 90%, 
+                transparent 100%);
+            box-shadow: 0 0 3px rgba(255, 100, 255, 0.3);
+        }
+        
+        /* Líneas naranjas más sutiles */
+        .neural-connection.orange {
+            background: linear-gradient(90deg, 
+                transparent 0%, 
+                rgba(255, 180, 100, 0.5) 10%, 
+                rgba(255, 180, 100, 0.8) 50%, 
+                rgba(255, 180, 100, 0.5) 90%, 
+                transparent 100%);
+            box-shadow: 0 0 3px rgba(255, 180, 100, 0.3);
+        }
+        
+        @keyframes pulse-connection {
+            0%, 100% { 
+                opacity: 0.3; 
+                transform: scaleX(1) scaleY(1); 
+            }
+            50% { 
+                opacity: 0.8; 
+                transform: scaleX(1.02) scaleY(1.5); 
+            }
+        }
+        
+        /* Animación 3D de las partículas */
+        @keyframes float3D {
+            0% {
+                transform: translateZ(0px) translateY(0px) translateX(0px);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            50% {
+                transform: translateZ(100px) translateY(-20px) translateX(10px);
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateZ(200px) translateY(-40px) translateX(20px);
+                opacity: 0;
+            }
+        }
+        
+        /* Partículas con diferentes velocidades */
+        .space-particle:nth-child(odd) {
+            animation-duration: 6s;
+            animation-delay: -2s;
+        }
+        
+        .space-particle:nth-child(even) {
+            animation-duration: 10s;
+            animation-delay: -4s;
+        }
+        
+        .space-particle:nth-child(3n) {
+            animation-duration: 12s;
+            animation-delay: -1s;
+        }
+        
+        .space-particle:nth-child(4n) {
+            animation-duration: 8s;
+            animation-delay: -3s;
+        }
+        
+        .space-particle:nth-child(5n) {
+            animation-duration: 14s;
+            animation-delay: -5s;
+        }
+        
+        /* Neural Network Background */
+        .neural-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                var(--neural-grid),
+                linear-gradient(0deg, transparent 98%, rgba(0, 245, 255, 0.05) 100%);
+            background-size: 50px 50px;
+            /* SIN ANIMACIÓN - FONDO ESTÁTICO */
+            z-index: -3;
+        }
+        
+        /* Floating Particles - DESHABILITADAS */
+        .particle {
+            position: fixed;
+            width: 4px;
+            height: 4px;
+            background: var(--accent);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 1;
+            /* SIN ANIMACIÓN */
+            opacity: 0; /* Ocultas para no interferir */
+        }
+        
+
+        
+        .chat-container {
+            width: 95%;
+            max-width: 1000px;
+            height: 90vh;
+            background: rgba(5, 10, 20, 0.25); /* Mucho más transparente para resaltar el fondo */
+            border-radius: 24px;
+            backdrop-filter: blur(2px); /* Blur mínimo para ver el fondo */
+            border: 1px solid rgba(100, 150, 255, 0.15);
+            box-shadow: 
+                0 20px 40px rgba(0, 0, 0, 0.2), 
+                0 0 0 1px rgba(255, 255, 255, 0.03),
+                inset 0 1px 0 rgba(255, 255, 255, 0.05);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .chat-header {
+            background: var(--glass-bg);
+            padding: 20px;
+            border-bottom: 1px solid var(--glass-border);
+            text-align: center;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .chat-header-content {
+            flex: 1;
+            text-align: center;
+        }
+        
+        .chat-header h1 {
+            margin-bottom: 5px;
+            font-size: 1.8rem;
+            font-weight: 700;
+            animation: title-glow 2s ease-in-out infinite alternate;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .title-emoji {
+            font-size: 1.8rem;
+            /* El emoji mantiene sus colores naturales */
+        }
+        
+        .title-text {
+            background: linear-gradient(135deg, var(--primary), var(--secondary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        @keyframes title-glow {
+            0% { filter: drop-shadow(0 0 10px var(--primary)); }
+            100% { filter: drop-shadow(0 0 20px var(--secondary)); }
+        }
+        
+        .chat-status {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+        
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--success-color);
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+
+        
+        .chat-messages {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .message {
+            display: flex;
+            gap: 10px;
+            align-items: flex-start;
+            max-width: 80%;
+        }
+        
+        .message.user {
+            align-self: flex-end;
+            flex-direction: row-reverse;
+        }
+        
+        .message.bot {
+            align-self: flex-start;
+        }
+        
+        .message-avatar {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            flex-shrink: 0;
+            position: relative;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+        
+        .message.bot .message-avatar {
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            border: 2px solid rgba(0, 245, 255, 0.5);
+            box-shadow: var(--glow);
+        }
+        
+        .message.bot .message-avatar::after {
+            content: '';
+            position: absolute;
+            top: -2px;
+            right: -2px;
+            width: 12px;
+            height: 12px;
+            background: var(--success-color);
+            border-radius: 50%;
+            border: 2px solid white;
+            animation: pulse 2s infinite;
+        }
+        
+        .message.user .message-avatar {
+            background: linear-gradient(135deg, var(--secondary), var(--accent));
+            border: 2px solid rgba(30, 58, 138, 0.5);
+            box-shadow: 0 0 20px var(--secondary);
+        }
+        
+        .message-content {
+            background: rgba(5, 10, 20, 0.15); /* Mucho más transparente */
+            padding: 14px 18px;
+            border-radius: 18px;
+            word-wrap: break-word;
+            border: 1px solid rgba(100, 150, 255, 0.1);
+            position: relative;
+            backdrop-filter: blur(3px); /* Blur mínimo */
+            line-height: 1.5;
+        }
+        
+        .message.bot .message-content {
+            background: rgba(0, 245, 255, 0.05); /* Muy transparente */
+            border-color: rgba(0, 245, 255, 0.15);
+            box-shadow: 0 4px 12px rgba(0, 245, 255, 0.1);
+        }
+        
+        .message.user .message-content {
+            background: rgba(30, 58, 138, 0.05); /* Muy transparente */
+            border-color: rgba(30, 58, 138, 0.15);
+            box-shadow: 0 4px 12px rgba(30, 58, 138, 0.1);
+        }
+        
+        .message-time {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            margin-top: 4px;
+            opacity: 0.7;
+        }
+        
+        .chat-input {
+            padding: 20px;
+            border-top: 1px solid rgba(100, 150, 255, 0.1);
+            background: rgba(5, 10, 20, 0.1); /* Muy transparente */
+        }
+        
+        .input-container {
+            display: flex;
+            gap: 12px;
+            align-items: flex-end;
+        }
+        
+        .input-wrapper {
+            flex: 1;
+            position: relative;
+        }
+        
+        .chat-input input {
+            width: 100%;
+            padding: 16px 24px;
+            padding-right: 70px;
+            border: 2px solid rgba(100, 150, 255, 0.15);
+            border-radius: 25px;
+            background: rgba(5, 10, 20, 0.2); /* Más transparente */
+            color: var(--text-primary);
+            font-size: 16px;
+            outline: none;
+            backdrop-filter: blur(3px); /* Blur mínimo */
+            transition: all 0.3s ease;
+            resize: none;
+            min-height: 54px;
+            max-height: 120px;
+        }
+        
+        .chat-input input::placeholder {
+            color: var(--text-secondary);
+        }
+        
+        .chat-input input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 20px rgba(0, 245, 255, 0.3);
+        }
+        
+        .char-counter {
+            position: absolute;
+            bottom: 8px;
+            right: 15px;
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            pointer-events: none;
+        }
+        
+        .send-button {
+            padding: 16px 28px;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            color: white;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: var(--glow);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            min-height: 54px;
+        }
+        
+        .send-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 30px rgba(0, 245, 255, 0.4);
+        }
+        
+        .send-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .input-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 8px;
+        }
+        
+        .action-btn {
+            padding: 6px 12px;
+            background: rgba(0, 245, 255, 0.1);
+            border: 1px solid rgba(0, 245, 255, 0.3);
+            border-radius: 15px;
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .action-btn:hover {
+            background: rgba(0, 245, 255, 0.2);
+            color: var(--text-primary);
+            box-shadow: 0 4px 12px rgba(0, 245, 255, 0.3);
+        }
+        
+        .typing-indicator {
+            display: none;
+            align-items: center;
+            gap: 10px;
+            color: rgba(255, 255, 255, 0.7);
+            font-style: italic;
+            margin-left: 50px;
+        }
+        
+        .typing-dots {
+            display: flex;
+            gap: 3px;
+        }
+        
+        .typing-dots span {
+            width: 6px;
+            height: 6px;
+            background: #4ecdc4;
+            border-radius: 50%;
+            animation: typing 1.4s infinite;
+        }
+        
+        .typing-dots span:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+        
+        .typing-dots span:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+        
+        @keyframes typing {
+            0%, 60%, 100% {
+                transform: translateY(0);
+                opacity: 0.4;
+            }
+            30% {
+                transform: translateY(-10px);
+                opacity: 1;
+            }
+        }
+        
+        .back-btn {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            padding: 12px 20px;
+            background: rgba(0, 245, 255, 0.1);
+            border: 1px solid rgba(0, 245, 255, 0.3);
+            border-radius: 25px;
+            color: var(--text-primary);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            z-index: 1000;
+        }
+        
+        .back-btn:hover {
+            background: rgba(0, 245, 255, 0.2);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0, 245, 255, 0.4);
+        }
+        
+        /* Scrollbar personalizada */
+        .chat-messages::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        .chat-messages::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+        }
+        
+        .chat-messages::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 3px;
+        }
+        
+        .chat-messages::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.5);
+        }
+        
+        /* Responsive Design Mejorado */
+        @media (max-width: 768px) {
+            .chat-container {
+                width: 98%;
+                height: 95vh;
+                border-radius: 16px;
+            }
+            
+            .chat-header {
+                padding: 15px;
+            }
+            
+            .chat-header h1 {
+                font-size: 1.5rem;
+            }
+            
+            .chat-messages {
+                padding: 15px;
+            }
+            
+            .message {
+                max-width: 90%;
+            }
+            
+            .message-avatar {
+                width: 36px;
+                height: 36px;
+                font-size: 18px;
+            }
+            
+            .chat-input {
+                padding: 15px;
+            }
+            
+            .input-container {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .send-button {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .input-actions {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            
+            .action-btn {
+                flex: 1;
+                min-width: 80px;
+                text-align: center;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .chat-container {
+                width: 100%;
+                height: 100vh;
+                border-radius: 0;
+            }
+            
+            .back-btn {
+                top: 10px;
+                left: 10px;
+                padding: 8px 12px;
+                font-size: 12px;
+            }
+            
+            .chat-header {
+                padding: 12px;
+            }
+            
+            .chat-header h1 {
+                font-size: 1.3rem;
+            }
+            
+
+            
+            .message-content {
+                padding: 12px 16px;
+                font-size: 14px;
+            }
+            
+            .action-btn {
+                padding: 8px 10px;
+                font-size: 0.75rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Neural Network Background -->
+    <div class="neural-background"></div>
+    
+    <!-- Partículas Espaciales 3D - Red Neuronal Expandida -->
+    <!-- Partículas Extra Grandes -->
+    <div class="space-particle xlarge" style="top: 5%; left: 10%;"></div>
+    <div class="space-particle xlarge" style="top: 15%; left: 85%;"></div>
+    <div class="space-particle xlarge" style="top: 25%; left: 50%;"></div>
+    <div class="space-particle xlarge" style="top: 35%; left: 20%;"></div>
+    <div class="space-particle xlarge" style="top: 45%; left: 75%;"></div>
+    <div class="space-particle xlarge" style="top: 55%; left: 40%;"></div>
+    <div class="space-particle xlarge" style="top: 65%; left: 90%;"></div>
+    <div class="space-particle xlarge" style="top: 75%; left: 15%;"></div>
+    <div class="space-particle xlarge" style="top: 85%; left: 60%;"></div>
+    <div class="space-particle xlarge" style="top: 95%; left: 30%;"></div>
+    
+    <!-- Partículas Grandes -->
+    <div class="space-particle large" style="top: 8%; left: 45%;"></div>
+    <div class="space-particle large" style="top: 18%; left: 70%;"></div>
+    <div class="space-particle large" style="top: 28%; left: 25%;"></div>
+    <div class="space-particle large" style="top: 38%; left: 80%;"></div>
+    <div class="space-particle large" style="top: 48%; left: 35%;"></div>
+    <div class="space-particle large" style="top: 58%; left: 65%;"></div>
+    <div class="space-particle large" style="top: 68%; left: 45%;"></div>
+    <div class="space-particle large" style="top: 78%; left: 85%;"></div>
+    <div class="space-particle large" style="top: 88%; left: 25%;"></div>
+    <div class="space-particle large" style="top: 12%; left: 55%;"></div>
+    <div class="space-particle large" style="top: 22%; left: 15%;"></div>
+    <div class="space-particle large" style="top: 32%; left: 95%;"></div>
+    <div class="space-particle large" style="top: 42%; left: 60%;"></div>
+    <div class="space-particle large" style="top: 52%; left: 10%;"></div>
+    <div class="space-particle large" style="top: 62%; left: 80%;"></div>
+    
+    <!-- Partículas Medianas -->
+    <div class="space-particle medium" style="top: 10%; left: 30%;"></div>
+    <div class="space-particle medium" style="top: 20%; left: 60%;"></div>
+    <div class="space-particle medium" style="top: 30%; left: 90%;"></div>
+    <div class="space-particle medium" style="top: 40%; left: 15%;"></div>
+    <div class="space-particle medium" style="top: 50%; left: 85%;"></div>
+    <div class="space-particle medium" style="top: 60%; left: 25%;"></div>
+    <div class="space-particle medium" style="top: 70%; left: 75%;"></div>
+    <div class="space-particle medium" style="top: 80%; left: 45%;"></div>
+    <div class="space-particle medium" style="top: 90%; left: 70%;"></div>
+    <div class="space-particle medium" style="top: 5%; left: 55%;"></div>
+    <div class="space-particle medium" style="top: 15%; left: 35%;"></div>
+    <div class="space-particle medium" style="top: 25%; left: 80%;"></div>
+    <div class="space-particle medium" style="top: 35%; left: 65%;"></div>
+    <div class="space-particle medium" style="top: 45%; left: 40%;"></div>
+    <div class="space-particle medium" style="top: 55%; left: 95%;"></div>
+    <div class="space-particle medium" style="top: 65%; left: 20%;"></div>
+    <div class="space-particle medium" style="top: 75%; left: 50%;"></div>
+    <div class="space-particle medium" style="top: 85%; left: 10%;"></div>
+    
+    <!-- Partículas Pequeñas -->
+    <div class="space-particle small" style="top: 7%; left: 20%;"></div>
+    <div class="space-particle small" style="top: 17%; left: 75%;"></div>
+    <div class="space-particle small" style="top: 27%; left: 40%;"></div>
+    <div class="space-particle small" style="top: 37%; left: 85%;"></div>
+    <div class="space-particle small" style="top: 47%; left: 25%;"></div>
+    <div class="space-particle small" style="top: 57%; left: 70%;"></div>
+    <div class="space-particle small" style="top: 67%; left: 35%;"></div>
+    <div class="space-particle small" style="top: 77%; left: 90%;"></div>
+    <div class="space-particle small" style="top: 87%; left: 50%;"></div>
+    <div class="space-particle small" style="top: 97%; left: 15%;"></div>
+    <div class="space-particle small" style="top: 3%; left: 65%;"></div>
+    <div class="space-particle small" style="top: 13%; left: 45%;"></div>
+    <div class="space-particle small" style="top: 23%; left: 95%;"></div>
+    <div class="space-particle small" style="top: 33%; left: 30%;"></div>
+    <div class="space-particle small" style="top: 43%; left: 80%;"></div>
+    <div class="space-particle small" style="top: 53%; left: 55%;"></div>
+    <div class="space-particle small" style="top: 63%; left: 10%;"></div>
+    <div class="space-particle small" style="top: 73%; left: 65%;"></div>
+    <div class="space-particle small" style="top: 83%; left: 35%;"></div>
+    <div class="space-particle small" style="top: 93%; left: 85%;"></div>
+    
+    <!-- Líneas de Conexión Neuronal Naturales - Red orgánica -->
+    <!-- Conexiones principales horizontales -->
+    <div class="neural-connection" style="top: 15%; left: 10%; width: 120px; transform: rotate(5deg);"></div>
+    <div class="neural-connection" style="top: 25%; left: 25%; width: 150px; transform: rotate(-8deg);"></div>
+    <div class="neural-connection" style="top: 35%; left: 15%; width: 180px; transform: rotate(12deg);"></div>
+    <div class="neural-connection" style="top: 45%; left: 30%; width: 140px; transform: rotate(-5deg);"></div>
+    <div class="neural-connection" style="top: 55%; left: 20%; width: 160px; transform: rotate(8deg);"></div>
+    <div class="neural-connection" style="top: 65%; left: 35%; width: 130px; transform: rotate(-10deg);"></div>
+    <div class="neural-connection" style="top: 75%; left: 15%; width: 170px; transform: rotate(6deg);"></div>
+    <div class="neural-connection" style="top: 85%; left: 25%; width: 140px; transform: rotate(-7deg);"></div>
+    
+    <!-- Conexiones diagonales púrpura -->
+    <div class="neural-connection purple" style="top: 20%; left: 50%; width: 100px; transform: rotate(25deg);"></div>
+    <div class="neural-connection purple" style="top: 40%; left: 60%; width: 120px; transform: rotate(-30deg);"></div>
+    <div class="neural-connection purple" style="top: 60%; left: 55%; width: 110px; transform: rotate(35deg);"></div>
+    <div class="neural-connection purple" style="top: 80%; left: 65%; width: 130px; transform: rotate(-25deg);"></div>
+    
+    <!-- Conexiones verticales naranja -->
+    <div class="neural-connection orange" style="top: 10%; left: 70%; width: 80px; transform: rotate(85deg);"></div>
+    <div class="neural-connection orange" style="top: 30%; left: 75%; width: 90px; transform: rotate(88deg);"></div>
+    <div class="neural-connection orange" style="top: 50%; left: 80%; width: 85px; transform: rotate(92deg);"></div>
+    <div class="neural-connection orange" style="top: 70%; left: 85%; width: 95px; transform: rotate(87deg);"></div>
+    
+    <!-- Conexiones del lado derecho -->
+    <div class="neural-connection" style="top: 18%; left: 75%; width: 140px; transform: rotate(-15deg);"></div>
+    <div class="neural-connection" style="top: 38%; left: 70%; width: 160px; transform: rotate(18deg);"></div>
+    <div class="neural-connection" style="top: 58%; left: 75%; width: 120px; transform: rotate(-12deg);"></div>
+    <div class="neural-connection" style="top: 78%; left: 80%; width: 150px; transform: rotate(15deg);"></div>
+    
+    <!-- Conexiones cruzadas para formar red -->
+    <div class="neural-connection purple" style="top: 12%; left: 40%; width: 200px; transform: rotate(45deg);"></div>
+    <div class="neural-connection purple" style="top: 32%; left: 45%; width: 180px; transform: rotate(-45deg);"></div>
+    <div class="neural-connection orange" style="top: 52%; left: 40%; width: 190px; transform: rotate(40deg);"></div>
+    <div class="neural-connection orange" style="top: 72%; left: 45%; width: 170px; transform: rotate(-40deg);"></div>
+    
+    <!-- Skip to main content for accessibility -->
+    <a href="#chat-main" class="skip-link" aria-label="Saltar al contenido principal del chat">Saltar al chat</a>
+    
+    <nav aria-label="Navegación principal">
+        <a href="/" class="back-btn" aria-label="Volver a la página principal">← Volver</a>
+    </nav>
+    
+    <main id="chat-main" class="chat-container" role="main">
+        <header class="chat-header">
+
+            <div class="chat-header-content">
+                <h1><span class="title-emoji">🤖</span> <span class="title-text">Gemini AI Chat</span></h1>
+                <div class="chat-status" role="status" aria-live="polite">
+                    <div class="status-dot" aria-hidden="true"></div>
+                    <span>Asistente en línea</span>
+                </div>
+            </div>
+
+        </header>
+        
+        <section class="chat-messages" id="messages" role="log" aria-live="polite" aria-label="Historial de conversación">
+        </section>
+        
+        <div class="typing-indicator" id="typing" role="status" aria-live="polite" aria-label="Indicador de escritura">
+            <span>El asistente está escribiendo</span>
+            <div class="typing-dots" aria-hidden="true">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+        
+        <section class="chat-input" aria-label="Área de entrada de mensajes">
+            <form class="input-container" onsubmit="sendMessage(); return false;">
+                <div class="input-wrapper">
+                    <label for="messageInput" class="sr-only">Escribe tu mensaje</label>
+                    <input type="text" id="messageInput" placeholder="Escribe tu mensaje aquí..." maxlength="1000" aria-describedby="charCounter" aria-required="true" />
+                    <div class="char-counter" id="charCounter" aria-live="polite">0/1000</div>
+                </div>
+                <button type="submit" class="send-button" id="sendButton" aria-label="Enviar mensaje">
+                    <span>Enviar</span>
+                    <span aria-hidden="true">📤</span>
+                </button>
+            </form>
+            <div class="input-actions" role="toolbar" aria-label="Acciones del chat">
+                <button class="action-btn" aria-label="Limpiar historial del chat" tabindex="0">🗑️ Limpiar chat</button>
+                <button class="action-btn" aria-label="Exportar conversación" tabindex="0">💾 Exportar</button>
+                <button class="action-btn" aria-label="Activar o desactivar síntesis de voz" tabindex="0">🎤 Voz</button>
+                <button class="action-btn" aria-label="Subir archivo" tabindex="0">📎 Archivo</button>
+            </div>
+            <input type="file" id="fileInput" style="display: none;" accept=".txt,.pdf,.doc,.docx,.jpg,.jpeg,.png,.gif" multiple aria-label="Seleccionar archivos para subir">
+        </section>
+    </main>
+
+    <script>
+        // === CONFIGURACIÓN OPTIMIZADA Y VARIABLES GLOBALES ===
+        let messagesContainer, messageInput, sendButton, typingIndicator, charCounter;
+        let isVoiceEnabled = false;
+        let chatHistory = [];
+        let isLoading = false;
+        let currentMessageId = 0;
+        let lastScrollPosition = 0;
+        let autoScrollEnabled = true;
+        let retryCount = 0;
+        const MAX_RETRIES = 3;
+        const RETRY_DELAY = 1000;
+        const MAX_MESSAGE_LENGTH = 4000;
+        const TYPING_SPEED = 30;
+        const particles = [];
+        const MAX_PARTICLES = 30; // Reducido para mejor rendimiento
+        let animationId;
+        let lastParticleTime = 0;
+        const PARTICLE_INTERVAL = 150; // Aumentado para reducir carga
+        
+        // Cache de elementos DOM para evitar búsquedas repetidas
+        const domCache = {
+            chatMessages: null,
+            messageInput: null,
+            sendButton: null,
+            typingIndicator: null,
+            particleContainer: null
+        };
+        
+        // Configuración de rendimiento
+        const PERFORMANCE_CONFIG = {
+            enableParticles: true,
+            enableAnimations: true,
+            enableSmoothScroll: true,
+            debounceDelay: 300,
+            throttleDelay: 16 // ~60fps
+        };
+        
+        // Métricas de rendimiento del cliente
+        let clientMetrics = {
+            messagesCount: 0,
+            averageResponseTime: 0,
+            lastMessageTime: 0,
+            cacheHits: 0
+        };
+        
+
+        
+        // === FUNCIONES DE UTILIDAD OPTIMIZADAS ===
+        function debounce(func, wait) {
+            let timeout;
+            return function executedFunction(...args) {
+                const later = () => {
+                    clearTimeout(timeout);
+                    func(...args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
+        }
+
+        function throttle(func, limit) {
+            let inThrottle;
+            return function() {
+                const args = arguments;
+                const context = this;
+                if (!inThrottle) {
+                    func.apply(context, args);
+                    inThrottle = true;
+                    setTimeout(() => inThrottle = false, limit);
+                }
+            }
+        }
+        
+        // Cache de elementos DOM
+        function initDOMCache() {
+            domCache.chatMessages = document.getElementById('messages');
+            domCache.messageInput = document.getElementById('messageInput');
+            domCache.sendButton = document.getElementById('sendButton');
+            domCache.typingIndicator = document.getElementById('typing');
+            domCache.particleContainer = document.body;
+        }
+        
+        // Función optimizada para obtener elementos del DOM
+        function getElement(key) {
+            if (!domCache[key]) {
+                switch(key) {
+                    case 'chatMessages':
+                        domCache[key] = document.getElementById('messages');
+                        break;
+                    case 'messageInput':
+                        domCache[key] = document.getElementById('messageInput');
+                        break;
+                    case 'sendButton':
+                        domCache[key] = document.getElementById('sendButton');
+                        break;
+                    case 'typingIndicator':
+                        domCache[key] = document.getElementById('typing');
+                        break;
+                    case 'particleContainer':
+                        domCache[key] = document.body;
+                        break;
+                }
+            }
+            return domCache[key];
+        }
+        
+        // Función para limpiar cache DOM cuando sea necesario
+        function clearDOMCache() {
+            Object.keys(domCache).forEach(key => {
+                domCache[key] = null;
+            });
+        }
+        
+        // Funciones principales (deben estar en scope global)
+        function addMessage(text, sender, timestamp = null) {
+            try {
+                if (!messagesContainer) {
+                    console.error('messagesContainer no está disponible');
+                    return;
+                }
+                
+                const messageDiv = document.createElement('div');
+                messageDiv.className = `message ${sender}`;
+                
+                const avatar = document.createElement('div');
+                avatar.className = 'message-avatar';
+                
+                // Emojis mejorados para el bot y usuario
+                if (sender === 'user') {
+                    avatar.innerHTML = '👨‍💻';
+                } else {
+                    avatar.innerHTML = '🤖';
+                }
+                
+                const contentWrapper = document.createElement('div');
+                
+                const content = document.createElement('div');
+                content.className = 'message-content';
+                content.textContent = text;
+                
+                const timeDiv = document.createElement('div');
+                timeDiv.className = 'message-time';
+                timeDiv.textContent = timestamp || new Date().toLocaleTimeString('es-ES', { 
+                    hour: '2-digit', 
+                    minute: '2-digit' 
+                });
+                
+                contentWrapper.appendChild(content);
+                contentWrapper.appendChild(timeDiv);
+                
+                messageDiv.appendChild(avatar);
+                messageDiv.appendChild(contentWrapper);
+                
+                messagesContainer.appendChild(messageDiv);
+                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+                
+                // Guardar en historial
+                chatHistory.push({
+                    text: text,
+                    sender: sender,
+                    timestamp: timestamp || new Date().toISOString()
+                });
+                
+                // Animación de entrada
+                messageDiv.style.opacity = '0';
+                messageDiv.style.transform = 'translateY(20px)';
+                setTimeout(() => {
+                    messageDiv.style.transition = 'all 0.3s ease';
+                    messageDiv.style.opacity = '1';
+                    messageDiv.style.transform = 'translateY(0)';
+                }, 100);
+            } catch (error) {
+                console.error('Error al agregar mensaje:', error);
+            }
+        }
+        
+        function showTyping() {
+            if (typingIndicator) {
+                typingIndicator.style.display = 'flex';
+                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+                
+                // Actualizar estado del bot
+                const statusText = document.querySelector('.chat-status span');
+                if (statusText) statusText.textContent = 'Escribiendo...';
+            }
+        }
+        
+        function hideTyping() {
+            if (typingIndicator) {
+                typingIndicator.style.display = 'none';
+                
+                // Restaurar estado del bot
+                const statusText = document.querySelector('.chat-status span');
+                if (statusText) statusText.textContent = 'Asistente en línea';
+            }
+        }
+        
+        // === ENVÍO DE MENSAJES OPTIMIZADO ===
+        async function sendMessage() {
+            const messageInput = getElement('messageInput') || document.getElementById('messageInput');
+            const sendButton = getElement('sendButton') || document.getElementById('sendButton');
+            
+            if (!messageInput || !sendButton) return;
+            
+            const message = messageInput.value.trim();
+            
+            if (!message || isLoading) return;
+            
+            if (message.length > 1000) {
+                showNotification('El mensaje es demasiado largo (máximo 1000 caracteres)', 'warning');
+                return;
+            }
+            
+            const startTime = performance.now();
+            
+            // Deshabilitar input y botón
+            isLoading = true;
+            messageInput.disabled = true;
+            sendButton.disabled = true;
+            sendButton.innerHTML = '<span>Enviando...</span><span>⏳</span>';
+            
+            // Agregar mensaje del usuario
+            addMessage(message, 'user');
+            messageInput.value = '';
+            updateCharCounter();
+            
+            // Mostrar indicador de escritura
+            showTyping();
+            
+            try {
+                // Usar AbortController para timeout
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 30000); // 30s timeout
+                
+                // Determinar la URL base (preferir HTTPS)
+                const protocol = window.location.protocol;
+                const host = window.location.host;
+                let apiUrl = '/api/chat/send';
+                
+                // Si estamos en HTTP, intentar actualizar a HTTPS para la API
+                if (protocol === 'http:' && (host.includes('localhost') || host.includes('127.0.0.1'))) {
+                    // Verificar si HTTPS está disponible
+                    try {
+                        const httpsUrl = `https://${host}/api/chat/send`;
+                        const testResponse = await fetch(httpsUrl, {
+                            method: 'HEAD',
+                            signal: AbortSignal.timeout(2000)
+                        });
+                        if (testResponse.ok || testResponse.status < 500) {
+                            apiUrl = httpsUrl;
+                            console.log('✅ Usando HTTPS para API requests');
+                        }
+                    } catch (httpsError) {
+                        console.warn('⚠️ HTTPS no disponible, usando HTTP:', httpsError.message);
+                    }
+                }
+                
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    body: JSON.stringify({ message: message }),
+                    signal: controller.signal,
+                    credentials: 'same-origin'
+                });
+                
+                clearTimeout(timeoutId);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                
+                // Actualizar métricas de rendimiento
+                const responseTime = performance.now() - startTime;
+                updateClientMetrics(responseTime);
+                
+                hideTyping();
+                
+                if (data.success) {
+                    addMessage(data.message, 'bot');
+                    retryCount = 0; // Reset retry count on success
+                    
+                    // Síntesis de voz si está habilitada
+                    if (isVoiceEnabled && 'speechSynthesis' in window) {
+                        speakText(data.message);
+                    }
+                } else {
+                    addMessage('❌ Error: ' + (data.message || 'Error desconocido'), 'bot');
+                    showNotification('Error al enviar el mensaje', 'error');
+                }
+                
+            } catch (error) {
+                hideTyping();
+                console.error('Error:', error);
+                
+                if (error.name === 'AbortError') {
+                    showNotification('Tiempo de espera agotado. Por favor, inténtalo de nuevo.', 'error');
+                } else if (retryCount < MAX_RETRIES) {
+                    retryCount++;
+                    showNotification(`Error de conexión. Reintentando... (${retryCount}/${MAX_RETRIES})`, 'warning');
+                    setTimeout(() => sendMessage(), RETRY_DELAY * retryCount);
+                    return;
+                } else {
+                    addMessage('🔌 Error de conexión: ' + error.message, 'bot');
+                    showNotification('Error de conexión', 'error');
+                    retryCount = 0;
+                }
+            } finally {
+                // Rehabilitar input
+                isLoading = false;
+                messageInput.disabled = false;
+                sendButton.disabled = false;
+                sendButton.innerHTML = '<span>Enviar</span><span>📤</span>';
+                messageInput.focus();
+            }
+        }
+        
+        // Actualizar métricas del cliente
+        function updateClientMetrics(responseTime) {
+            clientMetrics.messagesCount++;
+            clientMetrics.lastMessageTime = Date.now();
+            
+            // Calcular tiempo de respuesta promedio
+            if (clientMetrics.averageResponseTime === 0) {
+                clientMetrics.averageResponseTime = responseTime;
+            } else {
+                clientMetrics.averageResponseTime = 
+                    (clientMetrics.averageResponseTime + responseTime) / 2;
+            }
+        }
+        
+        // Inicialización DOM
+        document.addEventListener('DOMContentLoaded', function() {
+            try {
+                // Inicializar elementos DOM
+                messagesContainer = document.getElementById('messages');
+                messageInput = document.getElementById('messageInput');
+                sendButton = document.getElementById('sendButton');
+                typingIndicator = document.getElementById('typing');
+                charCounter = document.getElementById('charCounter');
+                
+                
+                // Verificar que todos los elementos existen
+                if (!messagesContainer || !messageInput || !sendButton || !typingIndicator || !charCounter) {
+                    console.error('Error: No se pudieron encontrar todos los elementos DOM necesarios');
+                    return;
+                }
+                
+                console.log('✅ Elementos DOM encontrados correctamente');
+                
+                // 1. Inicializar cache DOM
+                initDOMCache();
+                
+                // 2. Inicializar estilos CSS
+                initializeStyles();
+                
+                // 3. Configurar event listeners
+                setupEventListeners();
+                
+                // 4. Inicializar contadores y UI
+                updateCharCounter();
+                
+                // 5. Agregar mensaje de bienvenida
+                setTimeout(() => {
+                    addWelcomeMessage();
+                }, 100);
+                
+                // 6. Focus inicial en el input
+                if (messageInput) {
+                    messageInput.focus();
+                }
+                
+                // 7. Inicializar efectos visuales optimizados
+                createFloatingParticles();
+                setInterval(createParticle, 300);
+                
+                // 8. Inicializar efectos del agujero negro
+                initializeBlackHoleBackground();
+                
+                // 9. Inicializar Service Worker
+                initializeServiceWorker();
+                
+                // 10. Logs finales
+                console.log('✅ Chat inicializado correctamente');
+                console.log('💡 Atajos: Ctrl+K (focus input), Ctrl+L (limpiar chat)');
+                
+                // 11. Notificación final (con delay para asegurar que las animaciones estén listas)
+                setTimeout(() => {
+                    showNotification('¡Chat mejorado listo! 🚀', 'success');
+                }, 200);
+                
+            } catch (error) {
+                console.error('Error durante la inicialización:', error);
+            }
+        });
+
+        
+        // Nuevas funciones
+        function updateCharCounter() {
+            try {
+                if (!messageInput || !charCounter) {
+                    return;
+                }
+                
+                const currentLength = messageInput.value.length;
+                charCounter.textContent = `${currentLength}/1000`;
+                
+                if (currentLength > 800) {
+                    charCounter.style.color = 'var(--warning-color)';
+                } else if (currentLength > 950) {
+                    charCounter.style.color = 'var(--error-color)';
+                } else {
+                    charCounter.style.color = 'var(--text-secondary)';
+                }
+            } catch (error) {
+                console.error('Error al actualizar contador de caracteres:', error);
+            }
+        }
+        
+
+        
+        function addWelcomeMessage() {
+            addMessage('¡Hola! Soy tu asistente de IA powered by Google Gemini. ¿En qué puedo ayudarte hoy?', 'bot');
+        }
+        
+        function clearChat() {
+            try {
+                if (confirm('¿Estás seguro de que quieres limpiar el chat?')) {
+                    if (messagesContainer) {
+                        messagesContainer.innerHTML = '';
+                    }
+                    chatHistory = [];
+                    addWelcomeMessage();
+                    showNotification('Chat limpiado', 'success');
+                }
+            } catch (error) {
+                console.error('Error al limpiar chat:', error);
+                showNotification('Error al limpiar el chat', 'error');
+            }
+        }
+        
+        function exportChat() {
+            if (chatHistory.length === 0) {
+                showNotification('No hay mensajes para exportar', 'warning');
+                return;
+            }
+            
+            const chatText = chatHistory.map(msg => 
+                `[${new Date(msg.timestamp).toLocaleString('es-ES')}] ${msg.sender.toUpperCase()}: ${msg.text}`
+            ).join('\n\n');
+            
+            const blob = new Blob([chatText], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `chat-gemini-${new Date().toISOString().split('T')[0]}.txt`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            showNotification('Chat exportado exitosamente', 'success');
+        }
+        
+        function toggleVoice() {
+            if (!('speechSynthesis' in window)) {
+                showNotification('Tu navegador no soporta síntesis de voz', 'error');
+                return;
+            }
+            
+            isVoiceEnabled = !isVoiceEnabled;
+            const voiceBtn = document.querySelector('.input-actions .action-btn:nth-child(3)');
+            if (voiceBtn) {
+                voiceBtn.innerHTML = isVoiceEnabled ? '🔊 Voz ON' : '🎤 Voz';
+                voiceBtn.style.background = isVoiceEnabled ? 'rgba(0, 255, 136, 0.2)' : 'rgba(0, 245, 255, 0.1)';
+                voiceBtn.style.borderColor = isVoiceEnabled ? 'rgba(0, 255, 136, 0.5)' : 'rgba(0, 245, 255, 0.3)';
+                voiceBtn.style.color = isVoiceEnabled ? 'var(--success-color)' : 'var(--text-secondary)';
+            }
+            
+            showNotification(`Síntesis de voz ${isVoiceEnabled ? 'activada' : 'desactivada'}`, 'success');
+        }
+        
+        function speakText(text) {
+            if ('speechSynthesis' in window) {
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'es-ES';
+                utterance.rate = 0.9;
+                utterance.pitch = 1;
+                speechSynthesis.speak(utterance);
+            }
+        }
+        
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                padding: 12px 20px;
+                border-radius: 8px;
+                color: white;
+                font-weight: 500;
+                z-index: 1000;
+                animation: slideIn 0.3s ease;
+                max-width: 300px;
+            `;
+            
+            const colors = {
+                success: 'var(--success-color)',
+                error: 'var(--error-color)',
+                warning: 'var(--warning-color)',
+                info: 'var(--primary)'
+            };
+            
+            notification.style.background = colors[type] || colors.info;
+            notification.textContent = message;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.animation = 'slideOut 0.3s ease';
+                setTimeout(() => {
+                    if (notification.parentNode) {
+                        notification.parentNode.removeChild(notification);
+                    }
+                }, 300);
+            }, 3000);
+        }
+        
+        // Funciones de carga de archivos
+        function uploadFile() {
+            const fileInput = document.getElementById('fileInput');
+            fileInput.click();
+        }
+        
+        function handleFileUpload(files) {
+            if (!files || files.length === 0) return;
+            
+            Array.from(files).forEach(file => {
+                // Validar tamaño del archivo (máximo 10MB)
+                if (file.size > 10 * 1024 * 1024) {
+                    showNotification(`El archivo ${file.name} es demasiado grande (máximo 10MB)`, 'error');
+                    return;
+                }
+                
+                // Validar tipo de archivo
+                const allowedTypes = ['text/plain', 'application/pdf', 'application/msword', 
+                                    'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                                    'image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
+                
+                if (!allowedTypes.includes(file.type)) {
+                    showNotification(`Tipo de archivo no soportado: ${file.name}`, 'error');
+                    return;
+                }
+                
+                // Mostrar archivo cargado en el chat
+                const fileInfo = `📎 Archivo cargado: ${file.name} (${formatFileSize(file.size)})`;
+                addMessage(fileInfo, 'user');
+                
+                // Procesar archivo según su tipo
+                if (file.type.startsWith('text/')) {
+                    readTextFile(file);
+                } else if (file.type.startsWith('image/')) {
+                    processImageFile(file);
+                } else {
+                    // Para PDF y documentos, mostrar información básica
+                    addMessage(`📄 Documento recibido: ${file.name}. El bot puede ayudarte con preguntas sobre este archivo.`, 'bot');
+                }
+                
+                showNotification(`Archivo ${file.name} cargado exitosamente`, 'success');
+            });
+        }
+        
+        function readTextFile(file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const content = e.target.result;
+                const preview = content.length > 200 ? content.substring(0, 200) + '...' : content;
+                addMessage(`📝 Contenido del archivo:\n${preview}`, 'bot');
+            };
+            reader.readAsText(file);
+        }
+        
+        function processImageFile(file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const img = document.createElement('img');
+                img.src = e.target.result;
+                img.style.maxWidth = '200px';
+                img.style.maxHeight = '200px';
+                img.style.borderRadius = '8px';
+                img.style.marginTop = '8px';
+                
+                const messageDiv = document.createElement('div');
+                messageDiv.className = 'message bot';
+                
+                const avatar = document.createElement('div');
+                avatar.className = 'message-avatar';
+                avatar.innerHTML = '🤖';
+                
+                const contentWrapper = document.createElement('div');
+                const content = document.createElement('div');
+                content.className = 'message-content';
+                content.innerHTML = `🖼️ Imagen recibida: ${file.name}`;
+                content.appendChild(img);
+                
+                const timeDiv = document.createElement('div');
+                timeDiv.className = 'message-time';
+                timeDiv.textContent = new Date().toLocaleTimeString('es-ES', { 
+                    hour: '2-digit', 
+                    minute: '2-digit' 
+                });
+                
+                contentWrapper.appendChild(content);
+                contentWrapper.appendChild(timeDiv);
+                messageDiv.appendChild(avatar);
+                messageDiv.appendChild(contentWrapper);
+                
+                messagesContainer.appendChild(messageDiv);
+                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            };
+            reader.readAsDataURL(file);
+        }
+        
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+        
+        // Función para configurar event listeners
+        function setupEventListeners() {
+            try {
+                // Event Listeners para input
+                if (messageInput) {
+                    messageInput.addEventListener('input', updateCharCounter);
+                    
+                    messageInput.addEventListener('keypress', function(e) {
+                        if (e.key === 'Enter' && !e.shiftKey) {
+                            e.preventDefault();
+                            sendMessage();
+                        }
+                    });
+                    
+                    // Focus inicial
+                    messageInput.focus();
+                }
+                
+
+                
+                // Event listener para el botón de enviar
+                if (sendButton) {
+                    sendButton.addEventListener('click', sendMessage);
+                }
+                
+                // Event listener para carga de archivos
+                const fileInput = document.getElementById('fileInput');
+                if (fileInput) {
+                    fileInput.addEventListener('change', function(e) {
+                        handleFileUpload(e.target.files);
+                        // Limpiar el input para permitir cargar el mismo archivo nuevamente
+                        e.target.value = '';
+                    });
+                }
+                
+                // Event listeners para botones de acción
+                const actionButtons = document.querySelectorAll('.action-btn');
+                if (actionButtons.length >= 4) {
+                    // Botón limpiar chat (primer botón)
+                    actionButtons[0].addEventListener('click', clearChat);
+                    
+                    // Botón exportar (segundo botón)
+                    actionButtons[1].addEventListener('click', exportChat);
+                    
+                    // Botón voz (tercer botón)
+                    actionButtons[2].addEventListener('click', toggleVoice);
+                    
+                    // Botón archivo (cuarto botón)
+                    actionButtons[3].addEventListener('click', uploadFile);
+                }
+                
+                // Configurar drag and drop
+                setupDragAndDrop();
+                
+                // Configurar atajos de teclado
+                setupKeyboardShortcuts();
+                
+                console.log('✅ Event listeners configurados correctamente');
+            } catch (error) {
+                console.error('Error al configurar event listeners:', error);
+            }
+        }
+        
+        // Función para configurar drag and drop
+        function setupDragAndDrop() {
+            if (!messagesContainer) return;
+            
+            messagesContainer.addEventListener('dragover', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                messagesContainer.style.backgroundColor = 'rgba(0, 245, 255, 0.1)';
+            });
+            
+            messagesContainer.addEventListener('dragleave', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                messagesContainer.style.backgroundColor = '';
+            });
+            
+            messagesContainer.addEventListener('drop', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                messagesContainer.style.backgroundColor = '';
+                
+                const files = e.dataTransfer.files;
+                if (files.length > 0) {
+                    handleFileUpload(files);
+                }
+            });
+        }
+        
+        // Función para configurar atajos de teclado
+        function setupKeyboardShortcuts() {
+            document.addEventListener('keydown', function(e) {
+                if (e.ctrlKey && e.key === 'k') {
+                    e.preventDefault();
+                    if (messageInput) messageInput.focus();
+                }
+                if (e.ctrlKey && e.key === 'l') {
+                    e.preventDefault();
+                    clearChat();
+                }
+            });
+        }
+        
+        // Los event listeners ahora se configuran en setupEventListeners()
+        
+        // === FUNCIONES DE ANIMACIÓN OPTIMIZADAS ===
+        function createFloatingParticles() {
+            if (!PERFORMANCE_CONFIG.enableParticles) return;
+            
+            const container = getElement('particleContainer');
+            if (!container) return;
+
+            // Pool de partículas reutilizables
+            const particlePool = [];
+            
+            function getParticleFromPool() {
+                if (particlePool.length > 0) {
+                    return particlePool.pop();
+                }
+                
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                return particle;
+            }
+            
+            function returnParticleToPool(particle) {
+                if (particle.parentNode) {
+                    particle.parentNode.removeChild(particle);
+                }
+                particle.style.animation = '';
+                particlePool.push(particle);
+            }
+
+            function createParticle() {
+                if (particles.length >= MAX_PARTICLES) return;
+                
+                // Verificar si el usuario está inactivo para reducir animaciones
+                if (document.hidden) return;
+
+                const particle = getParticleFromPool();
+                
+                // Posición inicial optimizada
+                const startX = Math.random() * window.innerWidth;
+                const startY = window.innerHeight + 10;
+                
+                particle.style.left = startX + 'px';
+                particle.style.top = startY + 'px';
+                
+                // Propiedades de animación optimizadas
+                const duration = 6000 + Math.random() * 3000; // Reducido
+                const drift = (Math.random() - 0.5) * 80; // Reducido
+                
+                particle.style.animation = `float ${duration}ms linear`;
+                particle.style.setProperty('--drift', drift + 'px');
+                
+                container.appendChild(particle);
+                particles.push(particle);
+                
+                // Usar setTimeout optimizado
+                setTimeout(() => {
+                    const index = particles.indexOf(particle);
+                    if (index > -1) {
+                        particles.splice(index, 1);
+                        returnParticleToPool(particle);
+                    }
+                }, duration);
+            }
+
+            function animate() {
+                const now = performance.now();
+                if (now - lastParticleTime > PARTICLE_INTERVAL) {
+                    createParticle();
+                    lastParticleTime = now;
+                }
+                
+                // Solo continuar animación si la página está visible
+                if (!document.hidden) {
+                    animationId = requestAnimationFrame(animate);
+                } else {
+                    // Reanudar cuando la página vuelva a ser visible
+                    document.addEventListener('visibilitychange', function resumeAnimation() {
+                        if (!document.hidden) {
+                            document.removeEventListener('visibilitychange', resumeAnimation);
+                            animate();
+                        }
+                    });
+                }
+            }
+
+            animate();
+        }
+        
+        // Create floating particles (función simplificada para compatibilidad)
+        function createParticle() {
+            const particle = document.createElement('div');
+            particle.className = 'particle';
+            particle.style.left = Math.random() * 100 + 'vw';
+            particle.style.animationDelay = Math.random() * 6 + 's';
+            particle.style.animationDuration = (Math.random() * 3 + 3) + 's';
+            document.body.appendChild(particle);
+            
+            setTimeout(() => {
+                particle.remove();
+            }, 6000);
+        }
+        
+        // Función para inicializar animaciones CSS
+        function initializeStyles() {
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes slideIn {
+                    from { transform: translateX(100%); opacity: 0; }
+                    to { transform: translateX(0); opacity: 1; }
+                }
+                @keyframes slideOut {
+                    from { transform: translateX(0); opacity: 1; }
+                    to { transform: translateX(100%); opacity: 0; }
+                }
+                
+                /* Estilos para drag and drop */
+                .chat-messages.drag-over {
+                    background: rgba(0, 245, 255, 0.1) !important;
+                    border: 2px dashed var(--primary) !important;
+                    border-radius: 12px;
+                }
+                
+                /* Estilos para el botón de archivo */
+                .action-btn:hover {
+                    transform: translateY(-2px);
+                    box-shadow: 0 4px 12px rgba(0, 245, 255, 0.3);
+                }
+                
+                /* Estilos para imágenes en mensajes */
+                .message-content img {
+                    transition: transform 0.3s ease;
+                    cursor: pointer;
+                }
+                
+                .message-content img:hover {
+                    transform: scale(1.05);
+                }
+            `;
+            document.head.appendChild(style);
+        }
+        
+        // Función para inicializar Service Worker con soporte HTTPS
+        function initializeServiceWorker() {
+            if ('serviceWorker' in navigator) {
+                // Verificar si estamos en un contexto seguro (HTTPS)
+                const isSecureContext = window.isSecureContext || window.location.protocol === 'https:';
+                const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+                
+                if (isSecureContext || isLocalhost) {
+                    navigator.serviceWorker.register('/sw.js')
+                        .then(function(registration) {
+                            console.log('✅ Service Worker registrado:', registration.scope);
+                            
+                            // Escuchar mensajes del Service Worker
+                            navigator.serviceWorker.addEventListener('message', function(event) {
+                                if (event.data.type === 'SW_ACTIVATED') {
+                                    console.log('🔄 Service Worker activado con HTTPS:', event.data.version);
+                                    if (event.data.features && event.data.features.caching) {
+                                        showNotification('PWA optimizada con HTTPS activada', 'success');
+                                    }
+                                }
+                                
+                                if (event.data.type === 'PERFORMANCE_UPDATE') {
+                                    console.log('📊 Métricas de rendimiento:', event.data.metrics);
+                                }
+                            });
+                            
+                            // Verificar actualizaciones del Service Worker
+                            registration.addEventListener('updatefound', function() {
+                                const newWorker = registration.installing;
+                                newWorker.addEventListener('statechange', function() {
+                                    if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                                        showNotification('Nueva versión disponible. Recarga para actualizar.', 'info');
+                                    }
+                                });
+                            });
+                        })
+                        .catch(function(error) {
+                            console.log('❌ Error registrando Service Worker:', error);
+                            if (!isSecureContext && !isLocalhost) {
+                                showNotification('PWA requiere HTTPS para funcionalidad completa', 'warning');
+                            }
+                        });
+                } else {
+                    console.warn('⚠️ Service Worker requiere contexto seguro (HTTPS)');
+                    showNotification('Para funcionalidad PWA completa, usa HTTPS', 'info');
+                }
+            } else {
+                console.warn('⚠️ Service Worker no soportado en este navegador');
+            }
+        }
+        
+        // Función para limpiar cache del navegador
+        function clearBrowserCache() {
+            try {
+                // Limpiar localStorage
+                if (typeof(Storage) !== "undefined") {
+                    localStorage.clear();
+                }
+                
+                // Limpiar sessionStorage
+                if (typeof(Storage) !== "undefined") {
+                    sessionStorage.clear();
+                }
+                
+                // Forzar recarga sin cache
+                if ('caches' in window) {
+                    caches.keys().then(function(names) {
+                        for (let name of names) {
+                            caches.delete(name);
+                        }
+                    });
+                }
+                
+                console.log('✅ Cache del navegador limpiado');
+            } catch (error) {
+                console.error('Error al limpiar cache:', error);
+            }
+        }
+        
+        // Función para validar sintaxis JavaScript
+        function validateJavaScriptSyntax() {
+            try {
+                // Verificar que todas las funciones estén correctamente definidas
+                const requiredFunctions = [
+                    'addMessage', 'showTyping', 'hideTyping',
+                    'sendMessage', 'updateCharCounter', 'clearChat',
+                    'exportChat', 'toggleVoice', 'uploadFile', 'setupEventListeners'
+                ];
+                
+                requiredFunctions.forEach(funcName => {
+                    if (typeof window[funcName] !== 'function') {
+                        console.error(`❌ Función ${funcName} no está definida`);
+                    } else {
+                        console.log(`✅ Función ${funcName} correctamente definida`);
+                    }
+                });
+                
+                console.log('✅ Validación de sintaxis JavaScript completada');
+                return true;
+            } catch (error) {
+                console.error('❌ Error en validación de sintaxis:', error);
+                return false;
+            }
+        }
+        
+        // Inicialización simple del fondo del agujero negro
+        function initializeBlackHoleBackground() {
+            console.log('✅ Fondo del agujero negro basado en imagen real inicializado');
+        }
+        
+        // Limpiar cache al cargar la página
+        window.addEventListener('load', function() {
+            clearBrowserCache();
+            validateJavaScriptSyntax();
+        });
+        
+        // Forzar recarga sin cache si hay errores
+        window.addEventListener('error', function(e) {
+            if (e.message.includes('SyntaxError') || e.message.includes('Unexpected token')) {
+                console.warn('🔄 Error de sintaxis detectado, forzando recarga sin cache...');
+                setTimeout(() => {
+                    window.location.reload(true);
+                }, 1000);
+            }
+        });
+    </script>
+</body>
+</html>

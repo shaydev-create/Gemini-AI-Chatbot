@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>500 - Error del Servidor | Gemini AI Chatbot</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        .error-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            text-align: center;
+            padding: 2rem;
+        }
+        
+        .error-code {
+            font-size: 8rem;
+            font-weight: bold;
+            color: #ff4757;
+            margin: 0;
+            text-shadow: 0 0 20px rgba(255, 71, 87, 0.5);
+        }
+        
+        .error-message {
+            font-size: 1.5rem;
+            margin: 1rem 0;
+            color: var(--text-color);
+        }
+        
+        .error-description {
+            font-size: 1rem;
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+            max-width: 500px;
+        }
+        
+        .back-button {
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            margin: 0 10px;
+        }
+        
+        .back-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 255, 255, 0.3);
+        }
+        
+        .error-actions {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="error-container">
+        <h1 class="error-code">500</h1>
+        <h2 class="error-message">Error Interno del Servidor</h2>
+        <p class="error-description">
+            Algo salió mal en nuestros servidores. Nuestro equipo ha sido notificado
+            y está trabajando para resolver el problema. Por favor, inténtalo de nuevo más tarde.
+        </p>
+        <div class="error-actions">
+            <a href="{{ url_for('index') }}" class="back-button">
+                🏠 Volver al Inicio
+            </a>
+            <a href="javascript:history.back()" class="back-button">
+                ⬅️ Página Anterior
+            </a>
+        </div>
+    </div>
+</body>
+</html>

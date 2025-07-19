@@ -1,0 +1,103 @@
+{
+  "version": 2,
+  "name": "gemini-ai-chatbot",
+  "description": "🤖 Gemini AI Chatbot - Interfaz Futurista con Google Gemini AI",
+  "builds": [
+    {
+      "src": "wsgi.py",
+      "use": "@vercel/python",
+      "config": {
+        "maxLambdaSize": "50mb"
+      }
+    },
+    {
+      "src": "app/static/**",
+      "use": "@vercel/static"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/static/(.*)",
+      "dest": "/app/static/$1",
+      "headers": {
+        "Cache-Control": "public, max-age=31536000, immutable"
+      }
+    },
+    {
+      "src": "/favicon.ico",
+      "dest": "/app/static/favicon.ico"
+    },
+    {
+      "src": "/manifest.json",
+      "dest": "/app/static/manifest.json"
+    },
+    {
+      "src": "/sw.js",
+      "dest": "/app/static/sw.js"
+    },
+    {
+      "src": "/api/(.*)",
+      "dest": "/wsgi.py"
+    },
+    {
+      "src": "/auth/(.*)",
+      "dest": "/wsgi.py"
+    },
+    {
+      "src": "/chat",
+      "dest": "/wsgi.py"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/wsgi.py"
+    }
+  ],
+  "env": {
+    "FLASK_ENV": "production",
+    "FLASK_DEBUG": "False",
+    "PYTHONPATH": ".",
+    "PYTHONUNBUFFERED": "1"
+  },
+  "functions": {
+    "wsgi.py": {
+      "runtime": "python3.11",
+      "memory": 1024,
+      "maxDuration": 30
+    }
+  },
+  "regions": ["iad1"],
+  "github": {
+    "silent": false,
+    "autoAlias": true
+  },
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
+        {
+          "key": "X-Frame-Options",
+          "value": "DENY"
+        },
+        {
+          "key": "X-XSS-Protection",
+          "value": "1; mode=block"
+        },
+        {
+          "key": "Referrer-Policy",
+          "value": "strict-origin-when-cross-origin"
+        }
+      ]
+    }
+  ],
+  "redirects": [
+    {
+      "source": "/home",
+      "destination": "/",
+      "permanent": true
+    }
+  ]
+}

@@ -1,0 +1,118 @@
+<svg width="300" height="300" viewBox="0 0 300 300" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- Gradientes optimizados para Microsoft Store -->
+    <radialGradient id="bgGradient" cx="50%" cy="50%" r="70%">
+      <stop offset="0%" style="stop-color:#1e3a8a;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#1e40af;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#1e293b;stop-opacity:1" />
+    </radialGradient>
+    
+    <linearGradient id="neonGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#60a5fa;stop-opacity:1" />
+      <stop offset="25%" style="stop-color:#3b82f6;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#2563eb;stop-opacity:1" />
+      <stop offset="75%" style="stop-color:#1d4ed8;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#1e40af;stop-opacity:1" />
+    </linearGradient>
+    
+    <linearGradient id="accentGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#f59e0b;stop-opacity:0.8" />
+      <stop offset="50%" style="stop-color:#10b981;stop-opacity:0.8" />
+      <stop offset="100%" style="stop-color:#8b5cf6;stop-opacity:0.8" />
+    </linearGradient>
+    
+    <!-- Filtros para efectos Windows -->
+    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+      <feMerge> 
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    
+    <filter id="dropShadow" x="-50%" y="-50%" width="200%" height="200%">
+      <feDropShadow dx="0" dy="2" stdDeviation="4" flood-color="#000000" flood-opacity="0.3"/>
+    </filter>
+  </defs>
+  
+  <!-- Fondo principal con bordes redondeados para Windows -->
+  <rect width="300" height="300" rx="20" fill="url(#bgGradient)"/>
+  
+  <!-- Patrón de cuadrícula estilo Windows -->
+  <g opacity="0.1">
+    <!-- Líneas de cuadrícula -->
+    <defs>
+      <pattern id="grid" width="30" height="30" patternUnits="userSpaceOnUse">
+        <path d="M 30 0 L 0 0 0 30" fill="none" stroke="#60a5fa" stroke-width="1"/>
+      </pattern>
+    </defs>
+    <rect width="300" height="300" fill="url(#grid)"/>
+  </g>
+  
+  <!-- Logo principal - G estilizada para Gemini -->
+  <g filter="url(#dropShadow)">
+    <!-- Círculo exterior -->
+    <circle cx="150" cy="150" r="70" fill="none" stroke="url(#neonGradient)" stroke-width="6" opacity="0.9" filter="url(#glow)"/>
+    
+    <!-- Forma G principal -->
+    <g filter="url(#glow)">
+      <path d="M 105 150 
+               A 45 45 0 1 1 150 105
+               L 150 130
+               L 175 130
+               L 175 150
+               L 130 150
+               Z" 
+            fill="url(#neonGradient)" 
+            stroke="#60a5fa" 
+            stroke-width="3"/>
+      
+      <!-- Detalle interior de la G -->
+      <path d="M 130 150 L 165 150 L 165 165 L 130 165 Z" 
+            fill="url(#accentGradient)" 
+            opacity="0.9"/>
+    </g>
+  </g>
+  
+  <!-- Elementos decorativos estilo Windows -->
+  <g opacity="0.6">
+    <!-- Cuadrados flotantes estilo Windows -->
+    <rect x="50" y="50" width="12" height="12" fill="#60a5fa" opacity="0.7" filter="url(#glow)"/>
+    <rect x="238" y="50" width="12" height="12" fill="#10b981" opacity="0.7" filter="url(#glow)"/>
+    <rect x="50" y="238" width="12" height="12" fill="#f59e0b" opacity="0.7" filter="url(#glow)"/>
+    <rect x="238" y="238" width="12" height="12" fill="#8b5cf6" opacity="0.7" filter="url(#glow)"/>
+    
+    <!-- Líneas de conexión -->
+    <line x1="62" y1="56" x2="144" y2="144" stroke="#60a5fa" stroke-width="2" opacity="0.4"/>
+    <line x1="244" y1="56" x2="156" y2="144" stroke="#10b981" stroke-width="2" opacity="0.4"/>
+    <line x1="56" y1="244" x2="144" y2="156" stroke="#f59e0b" stroke-width="2" opacity="0.4"/>
+    <line x1="244" y1="244" x2="156" y2="156" stroke="#8b5cf6" stroke-width="2" opacity="0.4"/>
+  </g>
+  
+  <!-- Símbolo AI estilo Windows -->
+  <g transform="translate(230, 230)" filter="url(#glow)">
+    <rect x="-15" y="-15" width="30" height="30" rx="5" fill="none" stroke="url(#neonGradient)" stroke-width="2" opacity="0.8"/>
+    <circle cx="-5" cy="-3" r="2" fill="#60a5fa"/>
+    <circle cx="5" cy="-3" r="2" fill="#60a5fa"/>
+    <path d="M-8 3 Q0 6 8 3" stroke="#60a5fa" stroke-width="2" fill="none"/>
+    
+    <!-- Texto AI pequeño -->
+    <text x="0" y="35" text-anchor="middle" fill="#60a5fa" font-family="Segoe UI, Arial, sans-serif" font-size="10" font-weight="bold" opacity="0.8">AI</text>
+  </g>
+  
+  <!-- Efectos de esquina estilo Windows -->
+  <g opacity="0.4">
+    <path d="M25 25 L45 25 L45 45" stroke="url(#accentGradient)" stroke-width="3" fill="none"/>
+    <path d="M275 25 L255 25 L255 45" stroke="url(#accentGradient)" stroke-width="3" fill="none"/>
+    <path d="M25 275 L45 275 L45 255" stroke="url(#accentGradient)" stroke-width="3" fill="none"/>
+    <path d="M275 275 L255 275 L255 255" stroke="url(#accentGradient)" stroke-width="3" fill="none"/>
+  </g>
+  
+  <!-- Indicadores de estado estilo Windows -->
+  <g opacity="0.3">
+    <circle cx="75" cy="225" r="2" fill="#10b981"/>
+    <circle cx="225" cy="75" r="2" fill="#f59e0b"/>
+    <circle cx="75" cy="75" r="1" fill="#8b5cf6"/>
+    <circle cx="225" cy="225" r="1" fill="#ef4444"/>
+  </g>
+</svg>

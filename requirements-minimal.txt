@@ -1,0 +1,10 @@
+# Dependencias mínimas para ejecutar la aplicación
+Flask==3.0.3
+google-generativeai==0.8.3
+python-dotenv==1.0.1
+requests==2.32.3
+Flask-CORS==4.0.1
+PyJWT==2.9.0
+bcrypt==4.2.0
+Pillow==10.4.0
+psutil==5.9.6

@@ -1,0 +1,1220 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <meta name="cache-buster" content="v1.0.0-20250112">
+    <meta name="description" content="Gemini AI - La plataforma de inteligencia artificial más avanzada. Experimenta el futuro de la IA con tecnología de vanguardia y capacidades revolucionarias.">
+    <meta name="keywords" content="inteligencia artificial, AI, Gemini, chatbot, tecnología, futuro, machine learning">
+    <meta name="author" content="Gemini AI Team">
+    <meta name="robots" content="index, follow">
+    <meta name="language" content="Spanish">
+    <link rel="canonical" href="https://gemini-ai.com/">
+    
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:title" content="Gemini AI - Futuro de la Inteligencia Artificial">
+    <meta property="og:description" content="La plataforma de inteligencia artificial más avanzada. Experimenta el futuro de la IA con tecnología de vanguardia.">
+    <meta property="og:image" content="https://gemini-ai.com/static/images/og-image.jpg">
+    <meta property="og:url" content="https://gemini-ai.com/">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="Gemini AI">
+    <meta property="og:locale" content="es_ES">
+    
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Gemini AI - Futuro de la Inteligencia Artificial">
+    <meta name="twitter:description" content="La plataforma de inteligencia artificial más avanzada. Experimenta el futuro de la IA.">
+    <meta name="twitter:image" content="https://gemini-ai.com/static/images/twitter-card.jpg">
+    <meta name="twitter:site" content="@GeminiAI">
+    
+    <!-- PWA Meta Tags -->
+    <meta name="theme-color" content="#00f5ff">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Gemini AI">
+    <link rel="manifest" href="/static/manifest.json">
+    
+    <!-- Favicon and Icons -->
+    <link rel="icon" type="image/x-icon" href="/static/favicon.ico">
+    <link rel="apple-touch-icon" sizes="180x180" href="/static/icons/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/static/icons/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/static/icons/favicon-16x16.png">
+    
+    <title>Gemini AI - Futuro de la Inteligencia Artificial</title>
+    
+    <!-- Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "Gemini AI",
+      "description": "La plataforma de inteligencia artificial más avanzada del mundo",
+      "url": "https://gemini-ai.com",
+      "applicationCategory": "BusinessApplication",
+      "operatingSystem": "All",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      },
+      "author": {
+        "@type": "Organization",
+        "name": "Gemini AI Team"
+      }
+    }
+    </script>
+    <style>
+        :root {
+            --primary: #00f5ff;
+            --secondary: #1e3a8a;
+            --accent: #3b82f6;
+
+            --bg-card: rgba(255, 255, 255, 0.02);
+            --text-primary: #ffffff;
+            --text-secondary: #a0a0a0;
+            --glow: 0 0 20px var(--primary);
+            --neural-grid: linear-gradient(90deg, transparent 98%, rgba(0, 245, 255, 0.1) 100%);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1200px) {
+            .container {
+                gap: 0.5rem;
+                padding: 0.3rem;
+                max-width: 1200px;
+                margin: 0 auto;
+                min-height: 100vh;
+                justify-content: center;
+            }
+            
+            .main-title {
+                font-size: 2.8rem;
+            }
+            
+            .stars-container {
+                width: 180px;
+                height: 180px;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                gap: 1rem;
+                padding: 0.5rem;
+                min-height: 100vh;
+            }
+            
+            .ai-logo {
+                width: 40px;
+                height: 40px;
+                margin-bottom: 0.8rem;
+                margin-top: -1.5rem;
+            }
+            
+            .title-container {
+                margin-bottom: 0.8rem;
+                margin-top: -3rem;
+            }
+            
+            .main-title {
+                font-size: 2.2rem;
+                letter-spacing: 3px;
+            }
+            
+            .stars-container {
+                width: 150px;
+                height: 150px;
+            }
+            
+            .subtitle {
+                font-size: 0.9rem;
+                margin: 4rem 0 0.8rem 0;
+                letter-spacing: 1px;
+                max-width: 90%;
+            }
+            
+            .cta-button {
+                padding: 0.7rem 1.3rem;
+                font-size: 0.8rem;
+                margin: 0.8rem 0;
+            }
+            
+
+            
+            .scroll-indicator {
+                bottom: 1rem;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .container {
+                gap: 0.4rem;
+                padding: 0.2rem;
+            }
+            
+            .main-title {
+                font-size: 1.6rem;
+                letter-spacing: 1.5px;
+            }
+            
+            .stars-container {
+                width: 100px;
+                height: 100px;
+            }
+            
+            .subtitle {
+                font-size: 0.75rem;
+                margin: 3.5rem 0 0.4rem 0;
+                max-width: 95%;
+            }
+            
+
+            
+            .cta-button {
+                padding: 0.6rem 1rem;
+                font-size: 0.75rem;
+            }
+            
+            .ai-logo {
+                width: 30px;
+                height: 30px;
+                margin-top: -1rem;
+            }
+        }
+        
+        @media (max-height: 600px) {
+            .container {
+                gap: 0.3rem;
+                padding: 0.3rem;
+            }
+            
+            .ai-logo {
+                margin-bottom: 0.3rem;
+            }
+            
+            .title-container {
+                margin-bottom: 0.3rem;
+                margin-top: -2rem;
+            }
+            
+
+            
+            .cta-button {
+                margin: 0.5rem 0;
+            }
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        /* Accessibility Skip Link */
+        .skip-link {
+            position: absolute;
+            top: -40px;
+            left: 6px;
+            background: var(--primary);
+            color: #0a0a0f;
+            padding: 8px;
+            text-decoration: none;
+            border-radius: 4px;
+            z-index: 9999;
+            font-weight: bold;
+            transition: top 0.3s ease;
+        }
+        
+        .skip-link:focus {
+            top: 6px;
+        }
+        
+        /* Keyboard navigation improvements */
+        .cta-button:focus,
+        a:focus,
+        button:focus {
+            outline: 3px solid #00d4ff;
+            outline-offset: 2px;
+            box-shadow: 0 0 0 2px rgba(0, 212, 255, 0.3);
+        }
+        
+        .cta-button:focus {
+            transform: translateY(-2px) scale(1.02);
+        }
+        
+        /* Ensure all interactive elements are keyboard accessible */
+        .cta-button {
+            cursor: pointer;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: #0a0a0f;
+            color: var(--text-primary);
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Neural Network Background */
+        .neural-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                var(--neural-grid),
+                linear-gradient(0deg, transparent 98%, rgba(0, 245, 255, 0.05) 100%);
+            background-size: 50px 50px;
+            animation: neural-flow 20s linear infinite;
+            z-index: -2;
+        }
+
+        @keyframes neural-flow {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(50px, 50px); }
+        }
+
+        /* Floating Particles */
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+
+        .particle {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: var(--primary);
+            border-radius: 50%;
+            animation: float-particle 15s linear infinite;
+        }
+
+        @keyframes float-particle {
+            0% {
+                transform: translateY(100vh) scale(0);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-100vh) scale(1);
+                opacity: 0;
+            }
+        }
+
+        /* Main Container */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 1rem;
+            position: relative;
+            z-index: 10;
+            text-align: center;
+            gap: 1.5rem;
+        }
+
+        /* AI Logo */
+        .ai-logo {
+            width: 80px;
+            height: 80px;
+            margin-bottom: 1.2rem;
+            margin-top: -2rem;
+            position: relative;
+            animation: logo-pulse 3s ease-in-out infinite;
+        }
+
+        .ai-logo::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 100%;
+            height: 100%;
+            background: conic-gradient(from 0deg, var(--primary), var(--secondary), var(--accent), var(--primary));
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            animation: rotate-gradient 4s linear infinite;
+        }
+
+        .ai-logo::after {
+            content: '🤖';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 4rem;
+            z-index: 2;
+            background: #0a0a0f;
+            border-radius: 50%;
+            width: 90%;
+            height: 90%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        @keyframes logo-pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        @keyframes rotate-gradient {
+            0% { transform: translate(-50%, -50%) rotate(0deg); }
+            100% { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+
+        /* Main Title Container */
+        .title-container {
+            position: relative;
+            width: 100%;
+            height: auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1;
+            pointer-events: none;
+            margin-bottom: 1.5rem;
+            margin-top: -4.5rem;
+        }
+
+        /* Main Title */
+        .main-title {
+            font-size: clamp(2.5rem, 7vw, 5rem);
+            font-weight: 900;
+            text-align: center;
+            background: linear-gradient(135deg, var(--primary), var(--secondary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: title-glow 2s ease-in-out infinite alternate;
+            position: relative;
+            z-index: 15;
+            pointer-events: auto;
+            cursor: pointer;
+        }
+
+        @keyframes title-glow {
+            0% { filter: drop-shadow(0 0 10px var(--primary)); }
+            100% { filter: drop-shadow(0 0 30px var(--secondary)); }
+        }
+
+        /* Black Hole Stars Effect */
+        .stars-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            pointer-events: none;
+            overflow: hidden;
+            z-index: 0;
+        }
+        
+        /* Black Hole Center */
+        .stars-container::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 100px;
+            height: 100px;
+            background: radial-gradient(circle, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 0.9) 20%, rgba(0, 212, 255, 0.4) 50%, rgba(138, 43, 226, 0.3) 70%, transparent 100%);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            box-shadow: 0 0 50px rgba(0, 212, 255, 0.6), 0 0 100px rgba(0, 212, 255, 0.4), 0 0 150px rgba(138, 43, 226, 0.3), inset 0 0 30px rgba(0, 0, 0, 1);
+            animation: blackhole-pulse 3s ease-in-out infinite;
+        }
+        
+        /* Accretion Disk Effect */
+        .stars-container::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 200px;
+            height: 200px;
+            background: conic-gradient(from 0deg, transparent 0%, rgba(0, 212, 255, 0.1) 25%, rgba(138, 43, 226, 0.2) 50%, rgba(255, 20, 147, 0.1) 75%, transparent 100%);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            animation: accretion-disk 8s linear infinite;
+            opacity: 0.7;
+        }
+        
+        @keyframes blackhole-pulse {
+            0%, 100% {
+                transform: translate(-50%, -50%) scale(1);
+                box-shadow: 0 0 50px rgba(0, 212, 255, 0.6), 0 0 100px rgba(0, 212, 255, 0.4), 0 0 150px rgba(138, 43, 226, 0.3), inset 0 0 30px rgba(0, 0, 0, 1);
+            }
+            50% {
+                transform: translate(-50%, -50%) scale(1.15);
+                box-shadow: 0 0 80px rgba(0, 212, 255, 0.8), 0 0 160px rgba(0, 212, 255, 0.6), 0 0 240px rgba(138, 43, 226, 0.5), inset 0 0 50px rgba(0, 0, 0, 1);
+            }
+        }
+        
+        @keyframes accretion-disk {
+            0% { transform: translate(-50%, -50%) rotate(0deg); }
+            100% { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+
+        .star {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: var(--primary);
+            border-radius: 50%;
+            box-shadow: 0 0 8px var(--primary), 0 0 12px var(--primary);
+            animation: orbit-blackhole 15s linear infinite;
+            opacity: 0.9;
+            top: 50%;
+            left: 50%;
+            transform-origin: center;
+        }
+
+        /* Star variations for more diversity */
+        .star:nth-child(2n) {
+            background: var(--secondary);
+            box-shadow: 0 0 6px var(--secondary), 0 0 12px var(--secondary);
+            animation-duration: 8s;
+        }
+
+        .star:nth-child(3n) {
+            background: var(--accent);
+            box-shadow: 0 0 6px var(--accent), 0 0 12px var(--accent);
+            animation-duration: 12s;
+        }
+
+        .star:nth-child(4n) {
+            width: 3px;
+            height: 3px;
+            animation-duration: 18s;
+            background: #ff6b9d;
+            box-shadow: 0 0 10px #ff6b9d, 0 0 20px #ff6b9d;
+        }
+
+        .star:nth-child(5n) {
+            width: 4px;
+            height: 4px;
+            animation-duration: 6s;
+            background: #c471ed;
+            box-shadow: 0 0 12px #c471ed, 0 0 24px #c471ed;
+        }
+
+        .star:nth-child(6n) {
+            width: 1px;
+            height: 1px;
+            animation-duration: 25s;
+            background: #ffffff;
+            box-shadow: 0 0 4px #ffffff, 0 0 8px #ffffff;
+        }
+
+        .star:nth-child(7n) {
+            width: 5px;
+            height: 5px;
+            animation-duration: 4s;
+            background: #ffd700;
+            box-shadow: 0 0 15px #ffd700, 0 0 30px #ffd700;
+        }
+
+        /* Main orbital animation */
+        @keyframes orbit-blackhole {
+            0% {
+                transform: rotate(0deg) translateX(350px) rotate(0deg) scale(1);
+                opacity: 1;
+            }
+            60% {
+                transform: rotate(216deg) translateX(180px) rotate(-216deg) scale(0.8);
+                opacity: 0.9;
+            }
+            80% {
+                transform: rotate(288deg) translateX(90px) rotate(-288deg) scale(0.5);
+                opacity: 0.6;
+            }
+            95% {
+                transform: rotate(342deg) translateX(35px) rotate(-342deg) scale(0.2);
+                opacity: 0.3;
+            }
+            100% {
+                transform: rotate(360deg) translateX(15px) rotate(-360deg) scale(0.05);
+                opacity: 0;
+            }
+        }
+
+        /* Additional star orbits for more complexity */
+        .star.orbit-2 {
+            animation: orbit-blackhole-2 11s linear infinite;
+        }
+
+        .star.orbit-3 {
+            animation: orbit-blackhole-3 9s linear infinite;
+        }
+
+        .star.orbit-4 {
+            animation: orbit-blackhole-4 16s linear infinite;
+        }
+
+        .star.orbit-5 {
+            animation: orbit-blackhole-5 22s linear infinite;
+        }
+
+        .star.escape-velocity {
+            animation: escape-blackhole 30s linear infinite;
+        }
+
+        .star.slow-drift {
+            animation: slow-drift 45s linear infinite;
+        }
+
+        @keyframes orbit-blackhole-2 {
+            0% {
+                transform: rotate(90deg) translateX(320px) rotate(-90deg) scale(1);
+                opacity: 1;
+            }
+            65% {
+                transform: rotate(324deg) translateX(160px) rotate(-324deg) scale(0.7);
+                opacity: 0.8;
+            }
+            85% {
+                transform: rotate(396deg) translateX(80px) rotate(-396deg) scale(0.4);
+                opacity: 0.5;
+            }
+            100% {
+                transform: rotate(450deg) translateX(20px) rotate(-450deg) scale(0.1);
+                opacity: 0;
+            }
+        }
+
+        @keyframes orbit-blackhole-3 {
+            0% {
+                transform: rotate(180deg) translateX(280px) rotate(-180deg) scale(1);
+                opacity: 1;
+            }
+            70% {
+                transform: rotate(432deg) translateX(140px) rotate(-432deg) scale(0.6);
+                opacity: 0.7;
+            }
+            90% {
+                transform: rotate(504deg) translateX(70px) rotate(-504deg) scale(0.3);
+                opacity: 0.4;
+            }
+            100% {
+                transform: rotate(540deg) translateX(25px) rotate(-540deg) scale(0.08);
+                opacity: 0;
+            }
+        }
+
+        @keyframes orbit-blackhole-4 {
+            0% {
+                transform: rotate(270deg) translateX(400px) rotate(-270deg) scale(1);
+                opacity: 1;
+            }
+            50% {
+                transform: rotate(540deg) translateX(250px) rotate(-540deg) scale(0.9);
+                opacity: 0.9;
+            }
+            75% {
+                transform: rotate(675deg) translateX(120px) rotate(-675deg) scale(0.6);
+                opacity: 0.6;
+            }
+            90% {
+                transform: rotate(756deg) translateX(60px) rotate(-756deg) scale(0.3);
+                opacity: 0.3;
+            }
+            100% {
+                transform: rotate(810deg) translateX(18px) rotate(-810deg) scale(0.05);
+                opacity: 0;
+            }
+        }
+
+        @keyframes orbit-blackhole-5 {
+            0% {
+                transform: rotate(45deg) translateX(450px) rotate(-45deg) scale(1);
+                opacity: 1;
+            }
+            40% {
+                transform: rotate(360deg) translateX(300px) rotate(-360deg) scale(0.95);
+                opacity: 0.95;
+            }
+            70% {
+                transform: rotate(585deg) translateX(150px) rotate(-585deg) scale(0.7);
+                opacity: 0.7;
+            }
+            85% {
+                transform: rotate(675deg) translateX(75px) rotate(-675deg) scale(0.4);
+                opacity: 0.4;
+            }
+            100% {
+                transform: rotate(765deg) translateX(22px) rotate(-765deg) scale(0.1);
+                opacity: 0;
+            }
+        }
+
+        /* Stars escaping the black hole */
+        @keyframes escape-blackhole {
+            0% {
+                transform: rotate(0deg) translateX(500px) rotate(0deg) scale(0.8);
+                opacity: 0.8;
+            }
+            20% {
+                transform: rotate(72deg) translateX(600px) rotate(-72deg) scale(0.9);
+                opacity: 0.9;
+            }
+            40% {
+                transform: rotate(144deg) translateX(800px) rotate(-144deg) scale(1);
+                opacity: 1;
+            }
+            60% {
+                transform: rotate(216deg) translateX(1200px) rotate(-216deg) scale(1.1);
+                opacity: 0.8;
+            }
+            80% {
+                transform: rotate(288deg) translateX(1600px) rotate(-288deg) scale(1.2);
+                opacity: 0.5;
+            }
+            100% {
+                transform: rotate(360deg) translateX(2000px) rotate(-360deg) scale(1.3);
+                opacity: 0;
+            }
+        }
+
+        /* Slow drifting stars in the background */
+         @keyframes slow-drift {
+             0% {
+                 transform: rotate(0deg) translateX(800px) rotate(0deg) scale(0.6);
+                 opacity: 0.6;
+             }
+             25% {
+                 transform: rotate(90deg) translateX(900px) rotate(-90deg) scale(0.7);
+                 opacity: 0.7;
+             }
+             50% {
+                 transform: rotate(180deg) translateX(1000px) rotate(-180deg) scale(0.8);
+                 opacity: 0.8;
+             }
+             75% {
+                 transform: rotate(270deg) translateX(1100px) rotate(-270deg) scale(0.9);
+                 opacity: 0.7;
+             }
+             100% {
+                 transform: rotate(360deg) translateX(1200px) rotate(-360deg) scale(1);
+                 opacity: 0.5;
+             }
+         }
+
+         /* Special effects animations */
+         @keyframes twinkle {
+             0% { opacity: 0.3; transform: scale(0.8); }
+             100% { opacity: 1; transform: scale(1.2); }
+         }
+
+         @keyframes comet-trail {
+             0% {
+                 transform: rotate(0deg) translateX(600px) rotate(0deg) scale(1);
+                 opacity: 1;
+                 box-shadow: 0 0 20px #ffd700, 0 0 40px #ff6b9d, -20px 0 30px #ffd700, -40px 0 20px #ff6b9d;
+             }
+             50% {
+                 transform: rotate(180deg) translateX(300px) rotate(-180deg) scale(0.8);
+                 opacity: 0.8;
+                 box-shadow: 0 0 15px #ffd700, 0 0 30px #ff6b9d, -15px 0 25px #ffd700, -30px 0 15px #ff6b9d;
+             }
+             100% {
+                 transform: rotate(360deg) translateX(50px) rotate(-360deg) scale(0.3);
+                 opacity: 0.2;
+                 box-shadow: 0 0 10px #ffd700, 0 0 20px #ff6b9d, -10px 0 15px #ffd700, -20px 0 10px #ff6b9d;
+             }
+         }
+
+         @keyframes pulsar-pulse {
+             0%, 100% {
+                 transform: scale(1);
+                 box-shadow: 0 0 30px #c471ed, 0 0 60px #5f27cd;
+             }
+             50% {
+                 transform: scale(1.5);
+                 box-shadow: 0 0 50px #c471ed, 0 0 100px #5f27cd, 0 0 150px #c471ed;
+             }
+         }
+
+         /* Enhanced mobile responsiveness for new effects */
+         @media (max-width: 768px) {
+             .stars-container::before {
+                 width: 60px;
+                 height: 60px;
+             }
+             
+             .stars-container::after {
+                 width: 120px;
+                 height: 120px;
+             }
+             
+             @keyframes escape-blackhole {
+                 0% {
+                     transform: rotate(0deg) translateX(300px) rotate(0deg) scale(0.8);
+                     opacity: 0.8;
+                 }
+                 50% {
+                     transform: rotate(180deg) translateX(500px) rotate(-180deg) scale(1);
+                     opacity: 0.6;
+                 }
+                 100% {
+                     transform: rotate(360deg) translateX(800px) rotate(-360deg) scale(1.2);
+                     opacity: 0;
+                 }
+             }
+             
+             @keyframes slow-drift {
+                 0% {
+                     transform: rotate(0deg) translateX(400px) rotate(0deg) scale(0.6);
+                     opacity: 0.6;
+                 }
+                 50% {
+                     transform: rotate(180deg) translateX(500px) rotate(-180deg) scale(0.8);
+                     opacity: 0.8;
+                 }
+                 100% {
+                     transform: rotate(360deg) translateX(600px) rotate(-360deg) scale(1);
+                     opacity: 0.5;
+                 }
+             }
+         }
+
+        /* Subtitle */
+        .subtitle {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+            text-align: center;
+            margin: 6rem 0 1rem 0;
+            font-weight: 300;
+            letter-spacing: 1.5px;
+            max-width: 600px;
+            line-height: 1.4;
+        }
+
+        /* CTA Button */
+        .cta-button {
+            position: relative;
+            padding: 0.9rem 2rem;
+            font-size: 0.95rem;
+            font-weight: 600;
+            text-decoration: none;
+            color: var(--text-primary);
+            background: transparent;
+            border: 2px solid var(--primary);
+            border-radius: 50px;
+            transition: all 0.3s ease;
+            overflow: hidden;
+            margin: 1.5rem 0;
+            display: inline-block;
+            z-index: 10;
+        }
+
+        .cta-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, var(--primary), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .cta-button:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--glow);
+            border-color: var(--secondary);
+        }
+
+        .cta-button:hover::before {
+            left: 100%;
+        }
+
+        /* Stats Section */
+        .stats {
+            display: flex;
+            justify-content: center;
+            gap: 1.8rem;
+            margin: 1.2rem 0;
+            flex-wrap: wrap;
+        }
+
+        .stat {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            display: block;
+            margin-bottom: 0.2rem;
+        }
+
+        .stat-label {
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+                gap: 2rem;
+            }
+            
+            .stars-container {
+                width: 300px;
+                height: 300px;
+            }
+            
+            .main-title {
+                font-size: 2rem;
+            }
+            
+            .subtitle {
+                font-size: 1rem;
+                margin-bottom: 1.5rem;
+            }
+            
+            .cta-button {
+                padding: 0.8rem 1.5rem;
+                font-size: 0.9rem;
+            }
+            
+            .stats {
+                gap: 2rem;
+                margin: 2rem 0;
+            }
+            
+            .stat-number {
+                font-size: 2rem;
+            }
+            
+
+            
+            @keyframes orbit-blackhole {
+                0% {
+                    transform: rotate(0deg) translateX(300px) rotate(0deg) scale(1);
+                    opacity: 1;
+                }
+                60% {
+                    transform: rotate(216deg) translateX(150px) rotate(-216deg) scale(0.8);
+                    opacity: 0.9;
+                }
+                80% {
+                    transform: rotate(288deg) translateX(80px) rotate(-288deg) scale(0.5);
+                    opacity: 0.6;
+                }
+                95% {
+                    transform: rotate(342deg) translateX(30px) rotate(-342deg) scale(0.2);
+                    opacity: 0.3;
+                }
+                100% {
+                    transform: rotate(360deg) translateX(10px) rotate(-360deg) scale(0.05);
+                    opacity: 0;
+                }
+            }
+            
+            @keyframes orbit-blackhole-2 {
+                0% {
+                    transform: rotate(120deg) translateX(350px) rotate(-120deg) scale(1);
+                    opacity: 1;
+                }
+                60% {
+                    transform: rotate(336deg) translateX(180px) rotate(-336deg) scale(0.8);
+                    opacity: 0.9;
+                }
+                80% {
+                    transform: rotate(408deg) translateX(90px) rotate(-408deg) scale(0.5);
+                    opacity: 0.6;
+                }
+                95% {
+                    transform: rotate(462deg) translateX(35px) rotate(-462deg) scale(0.2);
+                    opacity: 0.3;
+                }
+                100% {
+                    transform: rotate(480deg) translateX(12px) rotate(-480deg) scale(0.05);
+                    opacity: 0;
+                }
+            }
+            
+            @keyframes orbit-blackhole-3 {
+                0% {
+                    transform: rotate(240deg) translateX(400px) rotate(-240deg) scale(1);
+                    opacity: 1;
+                }
+                60% {
+                    transform: rotate(456deg) translateX(200px) rotate(-456deg) scale(0.8);
+                    opacity: 0.9;
+                }
+                80% {
+                    transform: rotate(528deg) translateX(100px) rotate(-528deg) scale(0.5);
+                    opacity: 0.6;
+                }
+                95% {
+                    transform: rotate(582deg) translateX(40px) rotate(-582deg) scale(0.2);
+                    opacity: 0.3;
+                }
+                100% {
+                    transform: rotate(600deg) translateX(15px) rotate(-600deg) scale(0.05);
+                    opacity: 0;
+                }
+            }
+        }
+
+
+    </style>
+</head>
+<body>
+    <!-- Neural Network Background -->
+    <div class="neural-bg"></div>
+    
+    <!-- Floating Particles -->
+    <div class="particles" id="particles"></div>
+    
+    <!-- Skip to main content for accessibility -->
+    <a href="#main-content" class="skip-link" aria-label="Saltar al contenido principal">Saltar al contenido principal</a>
+    
+
+    
+    <!-- Main Container -->
+    <main id="main-content" class="container" role="main">
+        <!-- AI Logo -->
+        <div class="ai-logo" role="img" aria-label="Logo de Gemini AI con efecto de gradiente rotatorio">
+            <span class="sr-only">Icono del robot de Gemini AI</span>
+        </div>
+        
+        <!-- Main Title with Black Hole Effect -->
+        <header class="title-container">
+            <div class="stars-container" id="stars-container" role="img" aria-label="Efecto visual de agujero negro con estrellas orbitando"></div>
+            <h1 class="main-title">GEMINI AI</h1>
+        </header>
+        
+        <!-- Subtitle -->
+        <p class="subtitle" role="banner">EL FUTURO DE LA INTELIGENCIA ARTIFICIAL</p>
+        
+        <!-- CTA Button -->
+        <a href="/chat" class="cta-button" role="button" aria-label="Iniciar experiencia con Gemini AI" tabindex="0">INICIAR EXPERIENCIA</a>
+        
+    </main>
+    
+    <script>
+        // Create floating particles
+        function createParticles() {
+            const particlesContainer = document.getElementById('particles');
+            const particleCount = 30;
+            
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 15 + 's';
+                particle.style.animationDuration = (Math.random() * 10 + 10) + 's';
+                particlesContainer.appendChild(particle);
+            }
+        }
+        
+        // Create black hole stars effect
+        function createBlackHoleStars() {
+            const starsContainer = document.getElementById('stars-container');
+            const starCount = 600; // Increased star count significantly for more realistic effect
+            
+            for (let i = 0; i < starCount; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                
+                // Add different orbit classes for variety
+                const orbitType = Math.random();
+                if (orbitType < 0.15) {
+                    star.classList.add('orbit-2');
+                } else if (orbitType < 0.25) {
+                    star.classList.add('orbit-3');
+                } else if (orbitType < 0.35) {
+                    star.classList.add('orbit-4');
+                } else if (orbitType < 0.45) {
+                    star.classList.add('orbit-5');
+                } else if (orbitType < 0.55) {
+                    star.classList.add('escape-velocity');
+                } else if (orbitType < 0.65) {
+                    star.classList.add('slow-drift');
+                }
+                
+                // Random starting position around the circle with much larger radius for full screen effect
+                const angle = (i / starCount) * 360 + Math.random() * 90;
+                const radius = 100 + Math.random() * 600; // Increased radius range for better effect
+                star.style.transform = `rotate(${angle}deg) translateX(${radius}px)`;
+                
+                // Random animation delay for more natural effect
+                star.style.animationDelay = Math.random() * 30 + 's';
+                
+                // More size variation for depth effect
+                const sizeVariation = Math.random();
+                let size;
+                if (sizeVariation < 0.4) {
+                    size = 1 + Math.random() * 2; // Small stars
+                } else if (sizeVariation < 0.7) {
+                    size = 2 + Math.random() * 3; // Medium stars
+                } else if (sizeVariation < 0.9) {
+                    size = 3 + Math.random() * 4; // Large stars
+                } else {
+                    size = 5 + Math.random() * 3; // Giant stars
+                }
+                star.style.width = size + 'px';
+                star.style.height = size + 'px';
+                
+                // Enhanced color variation for cosmic effect
+                const colors = [
+                    '#00d4ff', '#0099cc', '#66e0ff', '#ffffff', '#ccf7ff', 
+                    '#4da6ff', '#80d4ff', '#ff6b9d', '#c471ed', '#ffd700',
+                    '#ff4757', '#5f27cd', '#00d2d3', '#ff9ff3', '#54a0ff',
+                    '#2ed573', '#ffa502', '#ff6348', '#70a1ff', '#5352ed'
+                ];
+                const color = colors[Math.floor(Math.random() * colors.length)];
+                star.style.background = `radial-gradient(circle, ${color} 0%, transparent 70%)`;
+                
+                // Enhanced glow effect based on star size
+                const glowIntensity = size * 2;
+                star.style.boxShadow = `0 0 ${glowIntensity}px ${color}, 0 0 ${glowIntensity * 1.5}px ${color}, 0 0 ${glowIntensity * 2}px ${color}`;
+                
+                // Add twinkle effect to some stars
+                if (Math.random() < 0.3) {
+                    star.style.animation += ', twinkle 2s ease-in-out infinite alternate';
+                }
+                
+                starsContainer.appendChild(star);
+            }
+            
+            // Add some special effect stars
+            createSpecialStars(starsContainer);
+        }
+        
+        // Create special effect stars (comets, pulsars, etc.)
+        function createSpecialStars(container) {
+            // Create comet-like stars
+            for (let i = 0; i < 10; i++) {
+                const comet = document.createElement('div');
+                comet.className = 'star comet';
+                comet.style.width = '6px';
+                comet.style.height = '2px';
+                comet.style.borderRadius = '50% 0 50% 0';
+                comet.style.background = 'linear-gradient(45deg, #ffd700, #ff6b9d, transparent)';
+                comet.style.boxShadow = '0 0 20px #ffd700, 0 0 40px #ff6b9d';
+                comet.style.animation = 'comet-trail 25s linear infinite';
+                comet.style.animationDelay = Math.random() * 25 + 's';
+                
+                const angle = Math.random() * 360;
+                const radius = 200 + Math.random() * 400;
+                comet.style.transform = `rotate(${angle}deg) translateX(${radius}px)`;
+                
+                container.appendChild(comet);
+            }
+            
+            // Create pulsar stars
+            for (let i = 0; i < 5; i++) {
+                const pulsar = document.createElement('div');
+                pulsar.className = 'star pulsar';
+                pulsar.style.width = '8px';
+                pulsar.style.height = '8px';
+                pulsar.style.background = 'radial-gradient(circle, #c471ed, #5f27cd)';
+                pulsar.style.boxShadow = '0 0 30px #c471ed, 0 0 60px #5f27cd';
+                pulsar.style.animation = 'pulsar-pulse 1.5s ease-in-out infinite, orbit-blackhole-3 20s linear infinite';
+                pulsar.style.animationDelay = Math.random() * 20 + 's';
+                
+                const angle = Math.random() * 360;
+                const radius = 150 + Math.random() * 300;
+                pulsar.style.transform = `rotate(${angle}deg) translateX(${radius}px)`;
+                
+                container.appendChild(pulsar);
+            }
+        }
+        
+
+        
+        // Stats animation removed - elements don't exist in DOM
+        
+        // Initialize on load
+        document.addEventListener('DOMContentLoaded', function() {
+            createParticles();
+            createBlackHoleStars();
+            
+            // Add entrance animations
+            const elements = document.querySelectorAll('.feature-card');
+            elements.forEach((el, index) => {
+                el.style.opacity = '0';
+                el.style.transform = 'translateY(50px)';
+                setTimeout(() => {
+                    el.style.transition = 'all 0.8s ease';
+                    el.style.opacity = '1';
+                    el.style.transform = 'translateY(0)';
+                }, 500 + index * 200);
+            });
+        });
+        
+        // Add mouse movement effect
+        document.addEventListener('mousemove', (e) => {
+            const cursor = { x: e.clientX, y: e.clientY };
+            const cards = document.querySelectorAll('.feature-card');
+            
+            cards.forEach(card => {
+                const rect = card.getBoundingClientRect();
+                const cardCenter = {
+                    x: rect.left + rect.width / 2,
+                    y: rect.top + rect.height / 2
+                };
+                
+                const distance = Math.sqrt(
+                    Math.pow(cursor.x - cardCenter.x, 2) + 
+                    Math.pow(cursor.y - cardCenter.y, 2)
+                );
+                
+                if (distance < 200) {
+                    const intensity = (200 - distance) / 200;
+                    card.style.transform = `translateY(-${intensity * 10}px) scale(${1 + intensity * 0.05})`;
+                } else {
+                    card.style.transform = 'translateY(0) scale(1)';
+                }
+            });
+        });
+        
+        console.log('🚀 Gemini AI - Futuro Cargado');
+        
+        // Registrar Service Worker para PWA
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function() {
+                navigator.serviceWorker.register('/sw.js')
+                    .then(function(registration) {
+                        console.log('✅ Service Worker registrado:', registration.scope);
+                    })
+                    .catch(function(error) {
+                        console.log('❌ Error registrando Service Worker:', error);
+                    });
+            });
+        }
+    </script>
+</body>
+</html>

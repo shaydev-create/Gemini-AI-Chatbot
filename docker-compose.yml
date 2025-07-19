@@ -1,0 +1,77 @@
+# 🐳 Docker Compose - Versión Limpia y Optimizada
+version: '3.8'
+
+services:
+  # 🚀 Aplicación principal
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: gemini-chatbot
+    ports:
+      - "5000:5000"
+    volumes:
+      - logs_data:/app/logs
+      - uploads_data:/app/uploads
+      - instance_data:/app/instance
+    environment:
+      - FLASK_ENV=production
+      - PYTHONPATH=/app
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+    env_file:
+      - .env
+    networks:
+      - gemini-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+          cpus: '0.5'
+        reservations:
+          memory: 256M
+          cpus: '0.25'
+
+  # 🔄 Nginx Reverse Proxy (Opcional)
+  nginx:
+    image: nginx:alpine
+    container_name: gemini-nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./deployment/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./ssl:/etc/nginx/ssl:ro
+      - ./app/static:/var/www/static:ro
+    depends_on:
+      - app
+    networks:
+      - gemini-network
+    restart: unless-stopped
+    profiles:
+      - nginx
+    deploy:
+      resources:
+        limits:
+          memory: 128M
+          cpus: '0.1'
+
+# 💾 Volúmenes persistentes
+volumes:
+  logs_data:
+    driver: local
+  uploads_data:
+    driver: local
+  instance_data:
+    driver: local
+
+# 🌐 Red personalizada
+networks:
+  gemini-network:
+    driver: bridge

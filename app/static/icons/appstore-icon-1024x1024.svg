@@ -1,0 +1,178 @@
+<svg width="1024" height="1024" viewBox="0 0 1024 1024" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- Gradientes optimizados para App Store -->
+    <radialGradient id="bgGradient" cx="50%" cy="50%" r="70%">
+      <stop offset="0%" style="stop-color:#0f1b2e;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#0a1428;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#000000;stop-opacity:1" />
+    </radialGradient>
+    
+    <linearGradient id="neonGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#00f5ff;stop-opacity:1" />
+      <stop offset="25%" style="stop-color:#0099ff;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#0066ff;stop-opacity:1" />
+      <stop offset="75%" style="stop-color:#0099ff;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#00f5ff;stop-opacity:1" />
+    </linearGradient>
+    
+    <linearGradient id="accentGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#ff6b6b;stop-opacity:0.9" />
+      <stop offset="33%" style="stop-color:#4ecdc4;stop-opacity:0.9" />
+      <stop offset="66%" style="stop-color:#45b7d1;stop-opacity:0.9" />
+      <stop offset="100%" style="stop-color:#96ceb4;stop-opacity:0.9" />
+    </linearGradient>
+    
+    <!-- Filtros para efectos premium -->
+    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="6" result="coloredBlur"/>
+      <feMerge> 
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    
+    <filter id="innerGlow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+      <feMerge> 
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    
+    <filter id="dropShadow" x="-50%" y="-50%" width="200%" height="200%">
+      <feDropShadow dx="0" dy="4" stdDeviation="8" flood-color="#000000" flood-opacity="0.3"/>
+    </filter>
+  </defs>
+  
+  <!-- Fondo principal -->
+  <rect width="1024" height="1024" fill="url(#bgGradient)"/>
+  
+  <!-- Patrón de red neuronal de fondo -->
+  <g opacity="0.12">
+    <!-- Grid de nodos -->
+    <g>
+      <!-- Nodos principales -->
+      <circle cx="256" cy="256" r="4" fill="#00f5ff"/>
+      <circle cx="768" cy="256" r="4" fill="#00f5ff"/>
+      <circle cx="512" cy="512" r="6" fill="#00f5ff"/>
+      <circle cx="256" cy="768" r="4" fill="#00f5ff"/>
+      <circle cx="768" cy="768" r="4" fill="#00f5ff"/>
+      
+      <!-- Nodos secundarios -->
+      <circle cx="384" cy="384" r="3" fill="#4ecdc4"/>
+      <circle cx="640" cy="384" r="3" fill="#4ecdc4"/>
+      <circle cx="384" cy="640" r="3" fill="#4ecdc4"/>
+      <circle cx="640" cy="640" r="3" fill="#4ecdc4"/>
+      
+      <!-- Nodos terciarios -->
+      <circle cx="192" cy="192" r="2" fill="#45b7d1"/>
+      <circle cx="832" cy="192" r="2" fill="#45b7d1"/>
+      <circle cx="192" cy="832" r="2" fill="#45b7d1"/>
+      <circle cx="832" cy="832" r="2" fill="#45b7d1"/>
+    </g>
+    
+    <!-- Conexiones principales -->
+    <g stroke-width="2" opacity="0.6">
+      <line x1="256" y1="256" x2="512" y2="512" stroke="#00f5ff"/>
+      <line x1="768" y1="256" x2="512" y2="512" stroke="#00f5ff"/>
+      <line x1="512" y1="512" x2="256" y2="768" stroke="#00f5ff"/>
+      <line x1="512" y1="512" x2="768" y2="768" stroke="#00f5ff"/>
+    </g>
+    
+    <!-- Conexiones secundarias -->
+    <g stroke-width="1.5" opacity="0.4">
+      <line x1="384" y1="384" x2="640" y2="384" stroke="#4ecdc4"/>
+      <line x1="384" y1="640" x2="640" y2="640" stroke="#4ecdc4"/>
+      <line x1="384" y1="384" x2="384" y2="640" stroke="#4ecdc4"/>
+      <line x1="640" y1="384" x2="640" y2="640" stroke="#4ecdc4"/>
+    </g>
+  </g>
+  
+  <!-- Logo principal - G estilizada para Gemini -->
+  <g filter="url(#dropShadow)">
+    <!-- Anillo exterior principal -->
+    <circle cx="512" cy="512" r="240" fill="none" stroke="url(#neonGradient)" stroke-width="12" opacity="0.9" filter="url(#glow)"/>
+    
+    <!-- Forma G principal -->
+    <g filter="url(#glow)">
+      <path d="M 360 512 
+               A 152 152 0 1 1 512 360
+               L 512 440
+               L 600 440
+               L 600 512
+               L 440 512
+               Z" 
+            fill="url(#neonGradient)" 
+            stroke="#00f5ff" 
+            stroke-width="6"
+            filter="url(#innerGlow)"/>
+      
+      <!-- Detalle interior de la G -->
+      <path d="M 440 512 L 560 512 L 560 560 L 440 560 Z" 
+            fill="url(#accentGradient)" 
+            opacity="0.95"/>
+      
+      <!-- Línea de conexión interna -->
+      <rect x="500" y="440" width="8" height="72" fill="#00f5ff" opacity="0.8"/>
+    </g>
+  </g>
+  
+  <!-- Elementos decorativos orbitales -->
+  <g opacity="0.6">
+    <!-- Anillos orbitales -->
+    <circle cx="512" cy="512" r="320" fill="none" stroke="#00f5ff" stroke-width="3" opacity="0.3" stroke-dasharray="20,10"/>
+    <circle cx="512" cy="512" r="380" fill="none" stroke="#4ecdc4" stroke-width="2" opacity="0.2" stroke-dasharray="30,15"/>
+    <circle cx="512" cy="512" r="440" fill="none" stroke="#45b7d1" stroke-width="1" opacity="0.15" stroke-dasharray="40,20"/>
+    
+    <!-- Puntos de energía orbitales -->
+    <circle cx="512" cy="192" r="6" fill="#00f5ff" filter="url(#glow)"/>
+    <circle cx="832" cy="512" r="6" fill="#4ecdc4" filter="url(#glow)"/>
+    <circle cx="512" cy="832" r="6" fill="#45b7d1" filter="url(#glow)"/>
+    <circle cx="192" cy="512" r="6" fill="#ff6b6b" filter="url(#glow)"/>
+    
+    <!-- Puntos secundarios -->
+    <circle cx="724" cy="300" r="4" fill="#96ceb4" filter="url(#glow)"/>
+    <circle cx="724" cy="724" r="4" fill="#feca57" filter="url(#glow)"/>
+    <circle cx="300" cy="724" r="4" fill="#ff9ff3" filter="url(#glow)"/>
+    <circle cx="300" cy="300" r="4" fill="#54a0ff" filter="url(#glow)"/>
+  </g>
+  
+  <!-- Símbolo AI premium -->
+  <g transform="translate(800, 800)" filter="url(#glow)">
+    <!-- Círculo principal -->
+    <circle cx="0" cy="0" r="48" fill="none" stroke="url(#neonGradient)" stroke-width="6" opacity="0.9"/>
+    
+    <!-- Ojos del AI -->
+    <circle cx="-16" cy="-12" r="6" fill="#00f5ff"/>
+    <circle cx="16" cy="-12" r="6" fill="#00f5ff"/>
+    
+    <!-- Sonrisa del AI -->
+    <path d="M-24 12 Q0 24 24 12" stroke="#00f5ff" stroke-width="6" fill="none"/>
+    
+    <!-- Texto AI -->
+    <text x="0" y="90" text-anchor="middle" fill="#00f5ff" font-family="Arial, sans-serif" font-size="28" font-weight="bold" opacity="0.9">AI</text>
+    
+    <!-- Partículas alrededor -->
+    <circle cx="-60" cy="-20" r="2" fill="#4ecdc4" opacity="0.7"/>
+    <circle cx="60" cy="-20" r="2" fill="#45b7d1" opacity="0.7"/>
+    <circle cx="0" cy="-70" r="2" fill="#ff6b6b" opacity="0.7"/>
+  </g>
+  
+  <!-- Efectos de esquina premium -->
+  <g opacity="0.5">
+    <path d="M80 80 L160 80 L160 160" stroke="url(#accentGradient)" stroke-width="6" fill="none" filter="url(#glow)"/>
+    <path d="M944 80 L864 80 L864 160" stroke="url(#accentGradient)" stroke-width="6" fill="none" filter="url(#glow)"/>
+    <path d="M80 944 L160 944 L160 864" stroke="url(#accentGradient)" stroke-width="6" fill="none" filter="url(#glow)"/>
+    <path d="M944 944 L864 944 L864 864" stroke="url(#accentGradient)" stroke-width="6" fill="none" filter="url(#glow)"/>
+  </g>
+  
+  <!-- Partículas flotantes para dinamismo -->
+  <g opacity="0.3">
+    <circle cx="150" cy="400" r="3" fill="#00f5ff"/>
+    <circle cx="874" cy="600" r="3" fill="#4ecdc4"/>
+    <circle cx="400" cy="150" r="2" fill="#45b7d1"/>
+    <circle cx="600" cy="874" r="2" fill="#ff6b6b"/>
+    <circle cx="200" cy="200" r="1" fill="#96ceb4"/>
+    <circle cx="824" cy="824" r="1" fill="#feca57"/>
+  </g>
+</svg>
