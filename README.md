@@ -1,4 +1,4 @@
-# 🚀 Gemini AI Chatbot
+# 🚀 Gemini AI Chatbot - Versión 2025
 
 Un chatbot inteligente potenciado por Google Gemini AI con interfaz web moderna y extensión de Chrome.
 
