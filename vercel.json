@@ -2,19 +2,6 @@
   "version": 2,
   "name": "gemini-ai-chatbot",
   "description": "🤖 Gemini AI Chatbot - Interfaz Futurista con Google Gemini AI",
-  "builds": [
-    {
-      "src": "wsgi.py",
-      "use": "@vercel/python",
-      "config": {
-        "maxLambdaSize": "50mb"
-      }
-    },
-    {
-      "src": "app/static/**",
-      "use": "@vercel/static"
-    }
-  ],
   "routes": [
     {
       "src": "/static/(.*)",
