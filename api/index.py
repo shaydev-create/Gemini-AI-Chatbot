@@ -12,9 +12,5 @@ if project_root not in sys.path:
 # Import the Flask app
 from app.main import app
 
-# This is the handler function that Vercel will call
-def handler(request):
-    return app(request.environ, lambda status, headers: None)
-
-# For compatibility with different Vercel Python runtimes
-application = app
+# Export the app for Vercel
+app = app
