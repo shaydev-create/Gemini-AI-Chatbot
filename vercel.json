@@ -1,6 +1,5 @@
 {
   "version": 2,
-  "name": "gemini_ai_chatbot",
   "routes": [
     {
       "src": "/static/(.*)",
