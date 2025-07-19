@@ -1,7 +1,6 @@
 {
   "version": 2,
   "name": "gemini-ai-chatbot",
-  "description": "🤖 Gemini AI Chatbot - Interfaz Futurista con Google Gemini AI",
   "routes": [
     {
       "src": "/static/(.*)",
