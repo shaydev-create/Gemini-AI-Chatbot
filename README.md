@@ -151,31 +151,6 @@ tail -f logs/app_errors.log
 
 ## 🚀 Despliegue
 
-### Vercel (Recomendado para Frontend)
-```bash
-# 1. Instalar Vercel CLI
-npm i -g vercel
-
-# 2. Login en Vercel
-vercel login
-
-# 3. Deployment automático
-python deploy_vercel.py
-
-# O manual:
-vercel --prod
-```
-
-#### Configuración de Variables de Entorno en Vercel:
-1. Ve a [Vercel Dashboard](https://vercel.com/dashboard)
-2. Selecciona tu proyecto `gemini-ai-chatbot`
-3. Ve a **Settings > Environment Variables**
-4. Agrega estas variables:
-   - `SECRET_KEY`: Tu clave secreta
-   - `GOOGLE_API_KEY`: Tu API key de Gemini
-   - `FLASK_ENV`: `production`
-   - `FLASK_DEBUG`: `False`
-
 ### Heroku
 ```bash
 # Instalar Heroku CLI
