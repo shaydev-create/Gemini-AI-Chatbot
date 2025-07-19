@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-📦 EMPAQUETADOR PARA CHROME WEB STORE
-Crea el package ZIP final listo para subir a Chrome Web Store
+🚀 Gemini AI Futuristic Chatbot - Chrome Store Package Creator
+Crea el paquete final para Chrome Web Store con todas las correcciones aplicadas.
 """
 
 import os
@@ -14,7 +14,7 @@ from datetime import datetime
 def create_chrome_package():
     """Crea el package completo para Chrome Web Store"""
     
-    print("📦 CREANDO PACKAGE PARA CHROME WEB STORE")
+    print("🚀 CREANDO PACKAGE PARA CHROME WEB STORE")
     print("=" * 50)
     
     # Directorio temporal para el package
@@ -23,7 +23,7 @@ def create_chrome_package():
         shutil.rmtree(package_dir)
     package_dir.mkdir()
     
-    # Archivos necesarios para Chrome Web Store
+    # Archivos necesarios para Chrome Web Store (solo los esenciales)
     files_to_include = [
         # Manifest
         ("chrome_extension_manifest.json", "manifest.json"),
@@ -35,18 +35,9 @@ def create_chrome_package():
         ("static/icons/chrome-webstore-icon-16x16.png", "icons/icon-16.png"),
         ("static/icons/chrome-webstore-icon-48x48.png", "icons/icon-48.png"),
         ("static/icons/chrome-webstore-icon-128x128.png", "icons/icon-128.png"),
-        ("static/icons/chrome-webstore-icon-512x512.png", "icons/icon-512.png"),
-        
-        # Service Worker
-        ("static/sw.js", "sw.js"),
-        
-        # CSS y JS esenciales
-        ("static/css/style.css", "css/style.css"),
-        ("static/js/app.js", "js/app.js"),
         
         # Documentos legales
         ("templates/privacy_policy.html", "privacy_policy.html"),
-        ("templates/terms_of_service.html", "terms_of_service.html"),
     ]
     
     print("📁 Copiando archivos...")

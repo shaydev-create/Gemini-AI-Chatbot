@@ -6,7 +6,7 @@ console.log('🚀 Gemini AI Chatbot - Background script iniciado');
 // Configuración del chatbot
 const CHATBOT_CONFIG = {
     name: '🚀 Gemini AI Futuristic Chatbot',
-    version: '1.0.0',
+    version: '1.0.1',
     serverUrl: 'https://127.0.0.1:5000'
 };
 
@@ -15,15 +15,7 @@ chrome.runtime.onInstalled.addListener((details) => {
     console.log('✅ Extensión instalada:', details.reason);
     
     if (details.reason === 'install') {
-        // Primera instalación
         console.log('🎉 Primera instalación del Gemini AI Chatbot');
-        
-        // Configurar datos iniciales
-        chrome.storage.local.set({
-            'chatbot_installed': true,
-            'install_date': new Date().toISOString(),
-            'version': CHATBOT_CONFIG.version
-        });
     }
 });
 
@@ -31,12 +23,10 @@ chrome.runtime.onInstalled.addListener((details) => {
 chrome.action.onClicked.addListener((tab) => {
     console.log('🖱️ Icono de extensión clickeado');
     
-    // Abrir popup (esto se maneja automáticamente por el manifest)
-    // Solo registramos el evento para analytics
-    chrome.storage.local.get(['usage_count'], (result) => {
-        const count = (result.usage_count || 0) + 1;
-        chrome.storage.local.set({ 'usage_count': count });
-        console.log(`📊 Uso #${count} del chatbot`);
+    // Abrir el chatbot en una nueva pestaña
+    chrome.tabs.create({
+        url: CHATBOT_CONFIG.serverUrl,
+        active: true
     });
 });
 
