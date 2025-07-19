@@ -33,8 +33,8 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 try:
-    # Importar la aplicación
-    from app import app
+    # Importar la aplicación desde app.main
+    from app.main import app
     
     # Configuración adicional para producción
     if not app.debug:

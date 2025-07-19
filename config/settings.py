@@ -60,7 +60,8 @@ class Config:
     COMPRESS_MIN_SIZE = 500
     
     # Configuración de API externa
-    GEMINI_API_KEY = os.getenv('GEMINI_API_KEY')
+    GOOGLE_API_KEY = os.getenv('GOOGLE_API_KEY')
+    GEMINI_API_KEY = os.getenv('GOOGLE_API_KEY')  # Alias para compatibilidad
     
     # Configuración de cache
     CACHE_EXPIRY = 3600  # 1 hora
