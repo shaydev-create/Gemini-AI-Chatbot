@@ -1,40 +1,37 @@
 {
   "version": 2,
-  "routes": [
+  "rewrites": [
     {
-      "src": "/static/(.*)",
-      "dest": "/app/static/$1",
-      "headers": {
-        "Cache-Control": "public, max-age=31536000, immutable"
-      }
+      "source": "/static/(.*)",
+      "destination": "/app/static/$1"
     },
     {
-      "src": "/favicon.ico",
-      "dest": "/app/static/favicon.ico"
+      "source": "/favicon.ico",
+      "destination": "/app/static/favicon.ico"
     },
     {
-      "src": "/manifest.json",
-      "dest": "/app/static/manifest.json"
+      "source": "/manifest.json",
+      "destination": "/app/static/manifest.json"
     },
     {
-      "src": "/sw.js",
-      "dest": "/app/static/sw.js"
+      "source": "/sw.js",
+      "destination": "/app/static/sw.js"
     },
     {
-      "src": "/api/(.*)",
-      "dest": "/wsgi.py"
+      "source": "/api/(.*)",
+      "destination": "/wsgi.py"
     },
     {
-      "src": "/auth/(.*)",
-      "dest": "/wsgi.py"
+      "source": "/auth/(.*)",
+      "destination": "/wsgi.py"
     },
     {
-      "src": "/chat",
-      "dest": "/wsgi.py"
+      "source": "/chat",
+      "destination": "/wsgi.py"
     },
     {
-      "src": "/(.*)",
-      "dest": "/wsgi.py"
+      "source": "/(.*)",
+      "destination": "/wsgi.py"
     }
   ],
   "env": {
@@ -56,6 +53,15 @@
     "autoAlias": true
   },
   "headers": [
+    {
+      "source": "/static/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        }
+      ]
+    },
     {
       "source": "/(.*)",
       "headers": [
