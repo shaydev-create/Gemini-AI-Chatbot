@@ -40,13 +40,6 @@
     "PYTHONPATH": ".",
     "PYTHONUNBUFFERED": "1"
   },
-  "functions": {
-    "wsgi.py": {
-      "runtime": "python3.9",
-      "memory": 1024,
-      "maxDuration": 30
-    }
-  },
   "regions": ["iad1"],
   "github": {
     "silent": false,
