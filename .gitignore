@@ -104,3 +104,6 @@ chrome_store_assets/
 # Documentación temporal
 PROJECT_CLEAN_STRUCTURE.md
 API_UPGRADE_GUIDE.md
+
+# Vercel (eliminado del proyecto)
+.vercel/
