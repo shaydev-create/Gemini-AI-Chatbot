@@ -19,8 +19,8 @@ class Config:
     TESTING = False
     
     # Configuración de servidor
-    HOST = os.getenv('HOST', '0.0.0.0')
-    PORT = int(os.getenv('PORT', 5000))
+    HOST = os.getenv('HOST', '127.0.0.1')
+    PORT = int(os.getenv('PORT', 8080))
     USE_HTTPS = os.getenv('USE_HTTPS', 'True').lower() == 'true'
     
     # Configuración JWT
