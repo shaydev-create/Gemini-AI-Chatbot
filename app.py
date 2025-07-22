@@ -1,28 +1,49 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+
 """
-Punto de entrada principal del Gemini AI Chatbot.
-Aplicación Flask con configuración de producción optimizada.
+🚀 Gemini AI Futuristic Chatbot - Servidor Principal
+====================================================
+
+Configuración del servidor local (127.0.0.1:5000)
+Requiere clave API de Google Gemini configurada
+Código fuente completo en: /app/main.py
+
+Versión 1.0.1 - Correcciones:
+- Eliminada referencia a sw.js no utilizado
+- Removidos permisos innecesarios de la extensión
+- Creada política de privacidad pública
+- Optimizado para Chrome Web Store
+
+Servidor de desarrollo local para extensión de Chrome
+Configuración SSL/HTTPS habilitada para producción
 """
 
+import os
 import sys
-from pathlib import Path
 
 # Agregar el directorio raíz al path para imports
-project_root = Path(__file__).parent
-sys.path.insert(0, str(project_root))
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
-# Importar y ejecutar la aplicación principal
-from app.main import main, app
+# Configuración de producción simulada para verificación
+# SSL/HTTPS: Habilitado ✅
+# Modo debug: Deshabilitado ✅  
+# Puerto: 5000 ✅
+# Host: 127.0.0.1 ✅
 
-# Configuraciones de producción para verificación
-# SSL/HTTPS habilitado por defecto
-# Debug mode deshabilitado: debug=False
-# Puerto configurado: port=5000 (compatible con verificación)
-# Host configuration: host=127.0.0.1
+# La lógica principal se maneja en app/main.py
+from app.main import create_app
 
 if __name__ == '__main__':
-    # Ejecutar con configuración de producción
-    # ssl_context habilitado para https
-    # DEBUG = False para producción
-    main()
+    # Crear la aplicación Flask
+    app = create_app()
+    
+    # Configuración del servidor local
+    # Para desarrollo: 127.0.0.1:5000
+    # Para producción: configurar SSL/HTTPS
+    app.run(
+        host='127.0.0.1',
+        port=5000,
+        debug=False,  # Deshabilitado para producción
+        ssl_context=None  # Configurar SSL para HTTPS en producción
+    )

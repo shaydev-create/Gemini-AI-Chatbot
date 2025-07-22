@@ -87,6 +87,7 @@ Si tienes preguntas sobre esta política de privacidad:
 - **📧 Email:** shayannelguapo10@gmail.com
 - **🐙 GitHub:** [github.com/shaydev-create/Gemini-AI-Chatbot](https://github.com/shaydev-create/Gemini-AI-Chatbot)
 - **🏪 Chrome Web Store:** Gemini AI Futuristic Chatbot
+- **🌐 URL Pública:** [https://shaydev-create.github.io/Gemini-AI-Chatbot/](https://shaydev-create.github.io/Gemini-AI-Chatbot/)
 
 ## 🛡️ Resumen de Seguridad
 
