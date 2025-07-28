@@ -1,123 +1,40 @@
 ---
 layout: default
-title: Privacy Policy - Gemini AI Futuristic Chatbot
-description: Privacy Policy for Gemini AI Futuristic Chatbot Chrome Extension
+title: Gemini AI Chatbot - Documentación
+description: Documentación oficial del proyecto Gemini AI Chatbot
 ---
 
-# 🔒 Privacy Policy
+# Gemini AI Chatbot
 
-**🚀 Gemini AI Futuristic Chatbot**  
-*Chrome Extension*
+## Descripción del Proyecto
 
-**Last Updated:** January 17, 2025  
-**Version:** 1.0.1  
-**Effective Date:** January 17, 2025
+Gemini AI Chatbot es una extensión de Chrome que integra el poder de Gemini AI para mejorar tu experiencia de navegación. Esta extensión te permite interactuar con la inteligencia artificial de Google Gemini directamente desde tu navegador, ofreciendo respuestas inteligentes y contextuales a tus consultas.
 
----
+## Características Principales
 
-## 🛡️ Privacy Commitment
+- 🚀 **Integración con Gemini AI**: Accede a las capacidades de la IA de Google directamente desde Chrome
+- 💬 **Interfaz de Chat**: Interactúa con la IA a través de una interfaz de chat intuitiva
+- 🔒 **Seguridad de Credenciales**: Sistema completo de protección de credenciales
+- 🌐 **Compatibilidad**: Funciona en todas las versiones recientes de Chrome
+- 📱 **Diseño Responsivo**: Experiencia de usuario optimizada para diferentes tamaños de pantalla
 
-This Chrome extension **completely respects your privacy**. We **DO NOT collect, store, or share any personal data**. The extension only facilitates access to your local Gemini AI server.
+## Documentación
 
-## 📋 Information We DO NOT Collect
+- [Guía de Usuario](USER_GUIDE.html)
+- [Documentación del Sistema](SYSTEM_DOCUMENTATION.html)
+- [Estructura del Proyecto](PROJECT_STRUCTURE.html)
+- [Guía de Instalación](INSTALLATION.html)
+- [Política de Privacidad](PRIVACY_POLICY.html)
+- [Seguridad de Credenciales](SEGURIDAD_CREDENCIALES.html)
 
-- ❌ **Personal Data:** No names, emails, or personal information
-- ❌ **Conversations:** We do not store or access your chats
-- ❌ **Files:** We do not process or save files you upload
-- ❌ **Browsing History:** We do not track your web activity
-- ❌ **Location:** We do not access your geographic location
-- ❌ **Cookies:** We do not use tracking cookies
-- ❌ **Analytics:** We do not collect usage data or statistics
+## Contribuir al Proyecto
 
-## 🎯 How the Extension Works
+¿Interesado en contribuir? Consulta nuestra [Guía de Contribución](CONTRIBUTING.html) para obtener información sobre cómo puedes ayudar a mejorar este proyecto.
 
-This Chrome extension functions as a simple **shortcut** that:
+## Licencia
 
-- ✅ **Opens your local server:** Connects directly to https://127.0.0.1:5000
-- ✅ **Local interface:** All processing occurs on your computer
-- ✅ **No external servers:** We do not send data to remote servers
-- ✅ **Complete control:** You have full control over your data
+Este proyecto está licenciado bajo los términos de la licencia MIT. Consulta el archivo [LICENSE](LICENSE) para más detalles.
 
-## 🔐 Extension Permissions
+## Contacto
 
-The extension only requests the minimum necessary permissions:
-
-- **activeTab:** To open your local application in a new tab
-- **host_permissions:** Only to access your local server (127.0.0.1:5000 and localhost:5000)
-
-### Why these permissions?
-
-- **activeTab:** Allows the extension to open a new tab with your local chatbot
-- **host_permissions:** Necessary to verify if your local server is running
-
-## 🤖 AI Processing
-
-When you use the chatbot:
-
-- 🏠 **Local server:** Your Flask application processes queries locally
-- 🔗 **Google API:** Your server connects directly to Google Gemini API
-- 🚫 **No intermediaries:** The extension does not intercept or modify data
-- 🔒 **Your API Key:** Only you have access to your API key
-
-## 🍪 Cookies and Storage
-
-- ❌ **No cookies:** The extension does not use cookies
-- ❌ **No local storage:** We do not save data in your browser
-- ❌ **No tracking:** We do not track your behavior
-- ❌ **No cache:** We do not store information temporarily
-
-## 🌐 Third-Party Data
-
-The extension does not share data with third parties because:
-
-- 🚫 **Does not collect data** to share
-- 🏠 **Works locally** on your computer
-- 🔒 **Direct connection** between your browser and your server
-
-## 👤 Your Rights
-
-Since we do not collect personal data:
-
-- ✅ **Complete control:** You have full control over your data
-- ✅ **No data to delete:** There is no personal information to erase
-- ✅ **Easy uninstallation:** You can remove the extension at any time
-- ✅ **Complete transparency:** Source code is available on GitHub
-
-## 🔄 Policy Updates
-
-If we make changes to this policy:
-
-- 📢 **Notification:** The modification date will be updated
-- 🔍 **Transparency:** Changes will be clearly indicated
-- 📝 **History:** We will maintain a change log on GitHub
-
-## 📞 Contact
-
-If you have questions about this privacy policy:
-
-- **📧 Email:** shayannelguapo10@gmail.com
-- **🐙 GitHub:** [github.com/shaydev-create/Gemini-AI-Chatbot](https://github.com/shaydev-create/Gemini-AI-Chatbot)
-- **🏪 Chrome Web Store:** Gemini AI Futuristic Chatbot
-
-## 🛡️ Security Summary
-
-This extension is completely safe and private. It functions as a simple shortcut to your local application, without collecting, storing, or transmitting any personal data. **Your privacy is 100% protected.**
-
-## 📋 Compliance
-
-This policy complies with:
-
-- ✅ **Chrome Web Store Developer Program Policies**
-- ✅ **Google Privacy Requirements**
-- ✅ **GDPR (General Data Protection Regulation)**
-- ✅ **CCPA (California Consumer Privacy Act)**
-
----
-
-**🚀 Gemini AI Futuristic Chatbot**  
-Chrome Extension for local access to your AI chatbot  
-*This policy complies with Chrome Web Store privacy regulations*
-
----
-
-**Public URL:** `https://shaydev-create.github.io/Gemini-AI-Chatbot/privacy-policy.html`
+Para preguntas, sugerencias o problemas relacionados con el proyecto, por favor [abre un issue](https://github.com/shaydev-crear/Gemini-AI-Chatbot/issues) en nuestro repositorio de GitHub.

@@ -34,3 +34,8 @@ coverage>=7.2.7
 # Debugging
 pdbpp>=0.10.3
 ipdb>=0.13.13
+
+# Herramientas para Chrome Web Store
+cairosvg>=2.7.0
+Pillow>=10.4.0
+wand>=0.6.11

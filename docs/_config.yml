@@ -1,4 +1,43 @@
----
-layout: default
-title: Privacy Policy
----
+# Configuración de Jekyll para GitHub Pages
+
+# Información del sitio
+title: Gemini AI Chatbot
+description: >-
+  Una extensión de Chrome que integra el poder de Gemini AI para mejorar tu experiencia de navegación
+baseurl: "/Gemini-AI-Chatbot" # el subpath de tu sitio, e.g. /blog
+url: "https://shaydev-crear.github.io" # la base hostname & protocol para tu sitio
+
+# Configuración de construcción
+markdown: kramdown
+theme: jekyll-theme-cayman
+plugins:
+  - jekyll-feed
+  - jekyll-seo-tag
+
+# Exclusiones de la construcción
+exclude:
+  - Gemfile
+  - Gemfile.lock
+  - node_modules
+  - vendor
+  - .travis.yml
+  - .gitignore
+  - README.md
+
+# Configuración de colecciones
+collections:
+  docs:
+    output: true
+    permalink: /:collection/:path/
+
+# Valores predeterminados para colecciones
+defaults:
+  - scope:
+      path: ""
+      type: "docs"
+    values:
+      layout: "page"
+  - scope:
+      path: ""
+    values:
+      layout: "default"
