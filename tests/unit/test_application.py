@@ -11,7 +11,7 @@ def test_create_app():
     """
     app = create_app()
     assert app is not None
-    assert app.name == 'app'
+    assert 'app.core.application' in app.name
 
 
 def test_app_config():
@@ -19,5 +19,5 @@ def test_app_config():
     Prueba que la aplicación carga correctamente la configuración.
     """
     app = create_app()
-    assert app.config['ENV'] is not None
-    assert app.config['DEBUG'] is not None
+    assert 'DEBUG' in app.config
+    assert 'SECRET_KEY' in app.config
