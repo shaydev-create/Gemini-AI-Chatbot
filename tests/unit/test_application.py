@@ -1,0 +1,23 @@
+"""Pruebas unitarias para la aplicación Flask."""
+
+import pytest
+from app.core.application import create_app
+from config.settings import Config
+
+
+def test_create_app():
+    """
+    Prueba que la función create_app crea correctamente una instancia de Flask.
+    """
+    app = create_app()
+    assert app is not None
+    assert app.name == 'app'
+
+
+def test_app_config():
+    """
+    Prueba que la aplicación carga correctamente la configuración.
+    """
+    app = create_app()
+    assert app.config['ENV'] is not None
+    assert app.config['DEBUG'] is not None
