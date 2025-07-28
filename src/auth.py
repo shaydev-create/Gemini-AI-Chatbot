@@ -139,3 +139,61 @@ class AuthManager:
 
 # Instancia global
 auth_manager = AuthManager()
+
+
+def get_current_user_with_verification(token=None):
+    """Obtiene el usuario actual con verificación de token.
+    
+    Args:
+        token: Token JWT opcional. Si no se proporciona, se obtiene del contexto.
+        
+    Returns:
+        Usuario autenticado o None si no hay autenticación válida.
+    """
+    try:
+        if token:
+            # Lógica para verificar token proporcionado manualmente
+            user_id = token.get('sub', {}).get('user_id')
+            if not user_id:
+                return None
+        else:
+            # Obtener identidad del token JWT en el contexto actual
+            user_id = get_jwt_identity().get('user_id')
+            if not user_id:
+                return None
+                
+        # En un entorno real, buscaríamos el usuario en la base de datos
+        # Aquí simulamos la búsqueda en el diccionario de usuarios
+        for user in auth_manager.users.values():
+            if user['id'] == user_id and user['is_active']:
+                return user
+        return None
+    except Exception:
+        return None
+
+
+def validate_password_strength(password):
+    """Valida la fortaleza de una contraseña.
+    
+    Args:
+        password: La contraseña a validar.
+        
+    Returns:
+        Tupla (bool, str) con el resultado de la validación y un mensaje.
+    """
+    if len(password) < 8:
+        return False, "La contraseña debe tener al menos 8 caracteres"
+        
+    if not any(c.isupper() for c in password):
+        return False, "La contraseña debe contener al menos una letra mayúscula"
+        
+    if not any(c.islower() for c in password):
+        return False, "La contraseña debe contener al menos una letra minúscula"
+        
+    if not any(c.isdigit() for c in password):
+        return False, "La contraseña debe contener al menos un número"
+        
+    if not any(c in "!@#$%^&*()_+-=[]{}|;:,.<>?/~`" for c in password):
+        return False, "La contraseña debe contener al menos un carácter especial"
+        
+    return True, "Contraseña válida"
