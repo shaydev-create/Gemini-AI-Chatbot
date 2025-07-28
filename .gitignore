@@ -28,13 +28,18 @@ ENV/
 env.bak/
 venv.bak/
 
-# Variables de entorno
+# Variables de entorno - PROTECCIÓN DE CREDENCIALES
 .env
+*.env
 .env.local
+.env.*.local
 .env.dev
 .env.prod
 .env.production
 .env.test
+.env.backup
+!.env.example
+!.env-sample
 
 # Logs
 logs/
@@ -96,6 +101,11 @@ yarn-error.log*
 # Archivos temporales de limpieza
 clean_project.py
 test_*.py
+
+# Archivos de seguridad y credenciales
+reports/credential_scan_*.txt
+.env.backup
+*.key.bak
 
 # Chrome extension builds
 *.zip

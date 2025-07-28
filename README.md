@@ -56,6 +56,20 @@ SECRET_KEY=tu_secret_key_seguro
 FLASK_ENV=production
 ```
 
+### 🔐 Protección de Credenciales
+
+Para proteger tus credenciales y evitar exposición accidental en GitHub:
+
+```bash
+# Limpiar credenciales antes de hacer commit
+python scripts/secure_env.py
+
+# Ver guía completa de seguridad
+cat docs/SEGURIDAD_CREDENCIALES.md
+```
+
+[📚 Ver guía completa de seguridad de credenciales](docs/SEGURIDAD_CREDENCIALES.md)
+
 ### 🎯 Obtener API Key de Gemini
 
 1. **Ve a [Google AI Studio](https://aistudio.google.com/)**
@@ -100,7 +114,8 @@ Gemini-AI-Chatbot/
 │   └── icons/                # Iconos de la extensión
 ├── 🐳 deployment/             # Docker y despliegue
 ├── 📚 docs/                   # Documentación
-│   └── PRIVACY_POLICY.md     # 🛡️ Política de privacidad
+│   ├── PRIVACY_POLICY.md     # 🛡️ Política de privacidad
+│   └── SEGURIDAD_CREDENCIALES.md # 🔐 Guía de seguridad
 ├── 🧪 tests/                  # Tests automatizados
 ├── .env                       # Variables de entorno
 ├── requirements.txt           # Dependencias Python
@@ -181,6 +196,7 @@ docker-compose logs -f app
 - ✅ **Rate limiting** para prevenir abuso
 - ✅ **Headers de seguridad** configurados
 - ✅ **Sanitización** de datos de usuario
+- ✅ **Protección de credenciales** con [guía de seguridad](docs/SEGURIDAD_CREDENCIALES.md)
 
 ### 🔐 Privacidad
 

@@ -1,0 +1,31 @@
+# Configuración de Git para proteger archivos sensibles
+
+# Marcar archivos .env como secretos
+.env filter=git-crypt diff=git-crypt
+.env.* filter=git-crypt diff=git-crypt
+!.env.example filter=git-crypt diff=git-crypt
+
+# Asegurar que los archivos de texto usen LF
+*.md text eol=lf
+*.py text eol=lf
+*.js text eol=lf
+*.html text eol=lf
+*.css text eol=lf
+*.json text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf
+
+# Archivos binarios
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.db binary
+*.sqlite binary
+*.sqlite3 binary
+
+# Ignorar en exportación
+.gitattributes export-ignore
+.gitignore export-ignore
+.github export-ignore
