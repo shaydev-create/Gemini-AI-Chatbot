@@ -11,7 +11,7 @@ on:
     types: [ published ]
 
 env:
-  PYTHON_VERSION: '3.11'
+  PYTHON_VERSION: '3.13.2'
   NODE_VERSION: '18'
 
 jobs:
@@ -22,19 +22,20 @@ jobs:
     
     strategy:
       matrix:
-        python-version: ['3.9', '3.10', '3.11']
+        python-version: ['3.10', '3.11', '3.13.2']
     
     steps:
     - name: 📥 Checkout code
       uses: actions/checkout@v4
       
     - name: 🐍 Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@v5
       with:
         python-version: ${{ matrix.python-version }}
+        cache: 'pip'
         
     - name: 📦 Cache dependencies
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: ~/.cache/pip
         key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
@@ -45,8 +46,9 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         sudo apt-get update && sudo apt-get install -y libmagic1 libmagic-dev
-        pip install -r requirements.txt
-        pip install -r requirements-dev.txt
+        pip install --use-pep517 -r requirements.txt
+        pip install --use-pep517 -r requirements-dev.txt
+        pip check
         
     - name: 🔍 Lint with flake8
       run: |
@@ -58,7 +60,7 @@ jobs:
         pytest tests/ --cov=src --cov-report=xml --cov-report=html
         
     - name: 📊 Upload coverage to Codecov
-      uses: codecov/codecov-action@v3
+      uses: codecov/codecov-action@v4
       with:
         file: ./coverage.xml
         flags: unittests
@@ -74,18 +76,19 @@ jobs:
       uses: actions/checkout@v4
       
     - name: 🐍 Set up Python
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@v5
       with:
         python-version: ${{ env.PYTHON_VERSION }}
+        cache: 'pip'
         
     - name: 🔍 Run Bandit security scan
       run: |
-        pip install bandit
+        pip install --use-pep517 bandit
         bandit -r src/ core/ app/ -f json -o bandit-report.json || true
         
     - name: 🔍 Run Safety check
       run: |
-        pip install safety
+        pip install --use-pep517 safety
         safety check --json --output safety-report.json || true
         
     - name: 📊 Upload security reports
@@ -150,13 +153,14 @@ jobs:
       uses: actions/checkout@v4
       
     - name: 🐍 Set up Python
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@v5
       with:
         python-version: ${{ env.PYTHON_VERSION }}
+        cache: 'pip'
         
     - name: 📦 Build Chrome Extension
       run: |
-        pip install cairosvg Pillow wand
+        pip install --use-pep517 cairosvg Pillow wand
         python scripts/prepare_chrome_store.py
         
     - name: 📊 Upload Chrome Extension
