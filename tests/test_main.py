@@ -17,8 +17,7 @@ from flask_testing import TestCase
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from app.core.application import create_app
-from config.database import db
-from src.models import User, ChatSession
+from src.models import db, User, ChatSession
 from src.auth import get_current_user_with_verification, validate_password_strength
 
 class BaseTestCase(TestCase):

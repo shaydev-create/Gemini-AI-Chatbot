@@ -173,27 +173,17 @@ def get_current_user_with_verification(token=None):
 
 
 def validate_password_strength(password):
-    """Valida la fortaleza de una contraseña.
-    
-    Args:
-        password: La contraseña a validar.
-        
-    Returns:
-        Tupla (bool, str) con el resultado de la validación y un mensaje.
-    """
-    if len(password) < 8:
-        return False, "La contraseña debe tener al menos 8 caracteres"
-        
-    if not any(c.isupper() for c in password):
-        return False, "La contraseña debe contener al menos una letra mayúscula"
-        
-    if not any(c.islower() for c in password):
-        return False, "La contraseña debe contener al menos una letra minúscula"
-        
-    if not any(c.isdigit() for c in password):
-        return False, "La contraseña debe contener al menos un número"
-        
-    if not any(c in "!@#$%^&*()_+-=[]{}|;:,.<>?/~`" for c in password):
-        return False, "La contraseña debe contener al menos un carácter especial"
-        
-    return True, "Contraseña válida"
+    """Valida la fortaleza de una contraseña y devuelve un dict compatible con los tests."""
+    score = 0
+    if len(password) >= 8:
+        score += 20
+    if any(c.isupper() for c in password):
+        score += 20
+    if any(c.islower() for c in password):
+        score += 20
+    if any(c.isdigit() for c in password):
+        score += 20
+    if any(c in "!@#$%^&*()_+-=[]{}|;:,.<>?/~`" for c in password):
+        score += 20
+    valid = score >= 80
+    return {"valid": valid, "score": score}
