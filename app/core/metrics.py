@@ -6,6 +6,7 @@ import time
 import threading
 from collections import defaultdict, deque
 from typing import Dict, Any
+from flask import Blueprint, Response
 
 
 class MetricsManager:
@@ -127,3 +128,25 @@ class MetricsManager:
 
 # Instancia global del gestor de métricas
 metrics_manager = MetricsManager()
+
+metrics_bp = Blueprint("metrics", __name__)
+
+
+@metrics_bp.route("/metrics")
+def prometheus_metrics():
+    metrics = metrics_manager.get_metrics()
+    output = []
+    # Contadores
+    for key, value in metrics["counters"].items():
+        output.append(f"gemini_{key} {value}")
+    # Requests por minuto
+    output.append(f"gemini_requests_per_minute {metrics['requests_per_minute']}")
+    # Uptime
+    output.append(f"gemini_uptime_seconds {metrics['uptime_seconds']}")
+    # Tiempos de respuesta
+    if metrics["response_times"]:
+        output.append(f"gemini_response_time_avg {metrics['response_times']['avg']}")
+        output.append(f"gemini_response_time_min {metrics['response_times']['min']}")
+        output.append(f"gemini_response_time_max {metrics['response_times']['max']}")
+        output.append(f"gemini_response_time_count {metrics['response_times']['count']}")
+    return Response("\n".join(output), mimetype="text/plain")

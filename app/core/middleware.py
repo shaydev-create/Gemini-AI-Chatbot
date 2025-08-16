@@ -2,7 +2,8 @@
 Middleware personalizado para el Gemini AI Chatbot.
 """
 
-from flask import request, g
+from flask import request, g, session
+from flask_wtf.csrf import CSRFProtect
 import time
 import logging
 
@@ -13,6 +14,9 @@ logger = logging.getLogger(__name__)
 
 def setup_middleware(app):
     """Configurar middleware personalizado."""
+    # Protección CSRF
+    csrf = CSRFProtect(app)
+    app.logger.info("CSRF protection enabled")
 
     @app.before_request
     def before_request():
@@ -46,6 +50,11 @@ def setup_middleware(app):
         response.headers["X-Request-ID"] = request.headers.get(
             "X-Request-ID", "unknown"
         )
+        # Cabeceras de seguridad para XSS
+        response.headers["X-Content-Type-Options"] = "nosniff"
+        response.headers["X-Frame-Options"] = "DENY"
+        response.headers["Content-Security-Policy"] = "default-src 'self'"
+        response.headers["X-XSS-Protection"] = "1; mode=block"
 
         return response
 

@@ -1,4 +1,4 @@
-                // requestAnimationFrame loop to guarantee input is always enabled
+// requestAnimationFrame loop to guarantee input is always enabled
                 function forceEnableInput() {
                     if (messageInput) {
                         if (messageInput.disabled) {
@@ -44,7 +44,7 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <link rel="manifest" href="/static/manifest.json">
     
-    <title>Chat - Gemini AI</title>
+    <title>{{ translate('title') }}</title>
     
     <!-- Structured Data -->
     <script type="application/ld+json">
@@ -910,167 +910,177 @@
     </style>
 </head>
 <body>
-    <!-- Neural Network Background -->
-    <div class="neural-background"></div>
+    <a href="#main-chat" class="skip-link">{{ translate('welcome') }}</a>
+    <div id="chat-container" role="main" aria-label="Chat principal">
+        <!-- Neural Network Background -->
+        <div class="neural-background"></div>
+        
+        <!-- Partículas Espaciales 3D - Red Neuronal Expandida -->
+        <!-- Partículas Extra Grandes -->
+        <div class="space-particle xlarge" style="top: 5%; left: 10%;"></div>
+        <div class="space-particle xlarge" style="top: 15%; left: 85%;"></div>
+        <div class="space-particle xlarge" style="top: 25%; left: 50%;"></div>
+        <div class="space-particle xlarge" style="top: 35%; left: 20%;"></div>
+        <div class="space-particle xlarge" style="top: 45%; left: 75%;"></div>
+        <div class="space-particle xlarge" style="top: 55%; left: 40%;"></div>
+        <div class="space-particle xlarge" style="top: 65%; left: 90%;"></div>
+        <div class="space-particle xlarge" style="top: 75%; left: 15%;"></div>
+        <div class="space-particle xlarge" style="top: 85%; left: 60%;"></div>
+        <div class="space-particle xlarge" style="top: 95%; left: 30%;"></div>
+        
+        <!-- Partículas Grandes -->
+        <div class="space-particle large" style="top: 8%; left: 45%;"></div>
+        <div class="space-particle large" style="top: 18%; left: 70%;"></div>
+        <div class="space-particle large" style="top: 28%; left: 25%;"></div>
+        <div class="space-particle large" style="top: 38%; left: 80%;"></div>
+        <div class="space-particle large" style="top: 48%; left: 35%;"></div>
+        <div class="space-particle large" style="top: 58%; left: 65%;"></div>
+        <div class="space-particle large" style="top: 68%; left: 45%;"></div>
+        <div class="space-particle large" style="top: 78%; left: 85%;"></div>
+        <div class="space-particle large" style="top: 88%; left: 25%;"></div>
+        <div class="space-particle large" style="top: 12%; left: 55%;"></div>
+        <div class="space-particle large" style="top: 22%; left: 15%;"></div>
+        <div class="space-particle large" style="top: 32%; left: 95%;"></div>
+        <div class="space-particle large" style="top: 42%; left: 60%;"></div>
+        <div class="space-particle large" style="top: 52%; left: 10%;"></div>
+        <div class="space-particle large" style="top: 62%; left: 80%;"></div>
+        
+        <!-- Partículas Medianas -->
+        <div class="space-particle medium" style="top: 10%; left: 30%;"></div>
+        <div class="space-particle medium" style="top: 20%; left: 60%;"></div>
+        <div class="space-particle medium" style="top: 30%; left: 90%;"></div>
+        <div class="space-particle medium" style="top: 40%; left: 15%;"></div>
+        <div class="space-particle medium" style="top: 50%; left: 85%;"></div>
+        <div class="space-particle medium" style="top: 60%; left: 25%;"></div>
+        <div class="space-particle medium" style="top: 70%; left: 75%;"></div>
+        <div class="space-particle medium" style="top: 80%; left: 45%;"></div>
+        <div class="space-particle medium" style="top: 90%; left: 70%;"></div>
+        <div class="space-particle medium" style="top: 5%; left: 55%;"></div>
+        <div class="space-particle medium" style="top: 15%; left: 35%;"></div>
+        <div class="space-particle medium" style="top: 25%; left: 80%;"></div>
+        <div class="space-particle medium" style="top: 35%; left: 65%;"></div>
+        <div class="space-particle medium" style="top: 45%; left: 40%;"></div>
+        <div class="space-particle medium" style="top: 55%; left: 95%;"></div>
+        <div class="space-particle medium" style="top: 65%; left: 20%;"></div>
+        <div class="space-particle medium" style="top: 75%; left: 50%;"></div>
+        <div class="space-particle medium" style="top: 85%; left: 10%;"></div>
     
-    <!-- Partículas Espaciales 3D - Red Neuronal Expandida -->
-    <!-- Partículas Extra Grandes -->
-    <div class="space-particle xlarge" style="top: 5%; left: 10%;"></div>
-    <div class="space-particle xlarge" style="top: 15%; left: 85%;"></div>
-    <div class="space-particle xlarge" style="top: 25%; left: 50%;"></div>
-    <div class="space-particle xlarge" style="top: 35%; left: 20%;"></div>
-    <div class="space-particle xlarge" style="top: 45%; left: 75%;"></div>
-    <div class="space-particle xlarge" style="top: 55%; left: 40%;"></div>
-    <div class="space-particle xlarge" style="top: 65%; left: 90%;"></div>
-    <div class="space-particle xlarge" style="top: 75%; left: 15%;"></div>
-    <div class="space-particle xlarge" style="top: 85%; left: 60%;"></div>
-    <div class="space-particle xlarge" style="top: 95%; left: 30%;"></div>
+        <!-- Partículas Pequeñas -->
+        <div class="space-particle small" style="top: 7%; left: 20%;"></div>
+        <div class="space-particle small" style="top: 17%; left: 75%;"></div>
+        <div class="space-particle small" style="top: 27%; left: 40%;"></div>
+        <div class="space-particle small" style="top: 37%; left: 85%;"></div>
+        <div class="space-particle small" style="top: 47%; left: 25%;"></div>
+        <div class="space-particle small" style="top: 57%; left: 70%;"></div>
+        <div class="space-particle small" style="top: 67%; left: 35%;"></div>
+        <div class="space-particle small" style="top: 77%; left: 90%;"></div>
+        <div class="space-particle small" style="top: 87%; left: 50%;"></div>
+        <div class="space-particle small" style="top: 97%; left: 15%;"></div>
+        <div class="space-particle small" style="top: 3%; left: 65%;"></div>
+        <div class="space-particle small" style="top: 13%; left: 45%;"></div>
+        <div class="space-particle small" style="top: 23%; left: 95%;"></div>
+        <div class="space-particle small" style="top: 33%; left: 30%;"></div>
+        <div class="space-particle small" style="top: 43%; left: 80%;"></div>
+        <div class="space-particle small" style="top: 53%; left: 55%;"></div>
+        <div class="space-particle small" style="top: 63%; left: 10%;"></div>
+        <div class="space-particle small" style="top: 73%; left: 65%;"></div>
+        <div class="space-particle small" style="top: 83%; left: 35%;"></div>
+        <div class="space-particle small" style="top: 93%; left: 85%;"></div>
+        
+        <!-- Líneas de Conexión Neuronal Naturales - Red orgánica -->
+        <!-- Conexiones principales horizontales -->
+        <div class="neural-connection" style="top: 15%; left: 10%; width: 120px; transform: rotate(5deg);"></div>
+        <div class="neural-connection" style="top: 25%; left: 25%; width: 150px; transform: rotate(-8deg);"></div>
+        <div class="neural-connection" style="top: 35%; left: 15%; width: 180px; transform: rotate(12deg);"></div>
+        <div class="neural-connection" style="top: 45%; left: 30%; width: 140px; transform: rotate(-5deg);"></div>
+        <div class="neural-connection" style="top: 55%; left: 20%; width: 160px; transform: rotate(8deg);"></div>
+        <div class="neural-connection" style="top: 65%; left: 35%; width: 130px; transform: rotate(-10deg);"></div>
+        <div class="neural-connection" style="top: 75%; left: 15%; width: 170px; transform: rotate(6deg);"></div>
+        <div class="neural-connection" style="top: 85%; left: 25%; width: 140px; transform: rotate(-7deg);"></div>
+        
+        <!-- Conexiones diagonales púrpura -->
+        <div class="neural-connection purple" style="top: 20%; left: 50%; width: 100px; transform: rotate(25deg);"></div>
+        <div class="neural-connection purple" style="top: 40%; left: 60%; width: 120px; transform: rotate(-30deg);"></div>
+        <div class="neural-connection purple" style="top: 60%; left: 55%; width: 110px; transform: rotate(35deg);"></div>
+        <div class="neural-connection purple" style="top: 80%; left: 65%; width: 130px; transform: rotate(-25deg);"></div>
+        
+        <!-- Conexiones verticales naranja -->
+        <div class="neural-connection orange" style="top: 10%; left: 70%; width: 80px; transform: rotate(85deg);"></div>
+        <div class="neural-connection orange" style="top: 30%; left: 75%; width: 90px; transform: rotate(88deg);"></div>
+        <div class="neural-connection orange" style="top: 50%; left: 80%; width: 85px; transform: rotate(92deg);"></div>
+        <div class="neural-connection orange" style="top: 70%; left: 85%; width: 95px; transform: rotate(87deg);"></div>
+        
+        <!-- Conexiones del lado derecho -->
+        <div class="neural-connection" style="top: 18%; left: 75%; width: 140px; transform: rotate(-15deg);"></div>
+        <div class="neural-connection" style="top: 38%; left: 70%; width: 160px; transform: rotate(18deg);"></div>
+        <div class="neural-connection" style="top: 58%; left: 75%; width: 120px; transform: rotate(-12deg);"></div>
+        <div class="neural-connection" style="top: 78%; left: 80%; width: 150px; transform: rotate(15deg);"></div>
+        
+        <!-- Conexiones cruzadas para formar red -->
+        <div class="neural-connection purple" style="top: 12%; left: 40%; width: 200px; transform: rotate(45deg);"></div>
+        <div class="neural-connection purple" style="top: 32%; left: 45%; width: 180px; transform: rotate(-45deg);"></div>
+        <div class="neural-connection orange" style="top: 52%; left: 40%; width: 190px; transform: rotate(40deg);"></div>
+        <div class="neural-connection orange" style="top: 72%; left: 45%; width: 170px; transform: rotate(-40deg);"></div>
     
-    <!-- Partículas Grandes -->
-    <div class="space-particle large" style="top: 8%; left: 45%;"></div>
-    <div class="space-particle large" style="top: 18%; left: 70%;"></div>
-    <div class="space-particle large" style="top: 28%; left: 25%;"></div>
-    <div class="space-particle large" style="top: 38%; left: 80%;"></div>
-    <div class="space-particle large" style="top: 48%; left: 35%;"></div>
-    <div class="space-particle large" style="top: 58%; left: 65%;"></div>
-    <div class="space-particle large" style="top: 68%; left: 45%;"></div>
-    <div class="space-particle large" style="top: 78%; left: 85%;"></div>
-    <div class="space-particle large" style="top: 88%; left: 25%;"></div>
-    <div class="space-particle large" style="top: 12%; left: 55%;"></div>
-    <div class="space-particle large" style="top: 22%; left: 15%;"></div>
-    <div class="space-particle large" style="top: 32%; left: 95%;"></div>
-    <div class="space-particle large" style="top: 42%; left: 60%;"></div>
-    <div class="space-particle large" style="top: 52%; left: 10%;"></div>
-    <div class="space-particle large" style="top: 62%; left: 80%;"></div>
-    
-    <!-- Partículas Medianas -->
-    <div class="space-particle medium" style="top: 10%; left: 30%;"></div>
-    <div class="space-particle medium" style="top: 20%; left: 60%;"></div>
-    <div class="space-particle medium" style="top: 30%; left: 90%;"></div>
-    <div class="space-particle medium" style="top: 40%; left: 15%;"></div>
-    <div class="space-particle medium" style="top: 50%; left: 85%;"></div>
-    <div class="space-particle medium" style="top: 60%; left: 25%;"></div>
-    <div class="space-particle medium" style="top: 70%; left: 75%;"></div>
-    <div class="space-particle medium" style="top: 80%; left: 45%;"></div>
-    <div class="space-particle medium" style="top: 90%; left: 70%;"></div>
-    <div class="space-particle medium" style="top: 5%; left: 55%;"></div>
-    <div class="space-particle medium" style="top: 15%; left: 35%;"></div>
-    <div class="space-particle medium" style="top: 25%; left: 80%;"></div>
-    <div class="space-particle medium" style="top: 35%; left: 65%;"></div>
-    <div class="space-particle medium" style="top: 45%; left: 40%;"></div>
-    <div class="space-particle medium" style="top: 55%; left: 95%;"></div>
-    <div class="space-particle medium" style="top: 65%; left: 20%;"></div>
-    <div class="space-particle medium" style="top: 75%; left: 50%;"></div>
-    <div class="space-particle medium" style="top: 85%; left: 10%;"></div>
-    
-    <!-- Partículas Pequeñas -->
-    <div class="space-particle small" style="top: 7%; left: 20%;"></div>
-    <div class="space-particle small" style="top: 17%; left: 75%;"></div>
-    <div class="space-particle small" style="top: 27%; left: 40%;"></div>
-    <div class="space-particle small" style="top: 37%; left: 85%;"></div>
-    <div class="space-particle small" style="top: 47%; left: 25%;"></div>
-    <div class="space-particle small" style="top: 57%; left: 70%;"></div>
-    <div class="space-particle small" style="top: 67%; left: 35%;"></div>
-    <div class="space-particle small" style="top: 77%; left: 90%;"></div>
-    <div class="space-particle small" style="top: 87%; left: 50%;"></div>
-    <div class="space-particle small" style="top: 97%; left: 15%;"></div>
-    <div class="space-particle small" style="top: 3%; left: 65%;"></div>
-    <div class="space-particle small" style="top: 13%; left: 45%;"></div>
-    <div class="space-particle small" style="top: 23%; left: 95%;"></div>
-    <div class="space-particle small" style="top: 33%; left: 30%;"></div>
-    <div class="space-particle small" style="top: 43%; left: 80%;"></div>
-    <div class="space-particle small" style="top: 53%; left: 55%;"></div>
-    <div class="space-particle small" style="top: 63%; left: 10%;"></div>
-    <div class="space-particle small" style="top: 73%; left: 65%;"></div>
-    <div class="space-particle small" style="top: 83%; left: 35%;"></div>
-    <div class="space-particle small" style="top: 93%; left: 85%;"></div>
-    
-    <!-- Líneas de Conexión Neuronal Naturales - Red orgánica -->
-    <!-- Conexiones principales horizontales -->
-    <div class="neural-connection" style="top: 15%; left: 10%; width: 120px; transform: rotate(5deg);"></div>
-    <div class="neural-connection" style="top: 25%; left: 25%; width: 150px; transform: rotate(-8deg);"></div>
-    <div class="neural-connection" style="top: 35%; left: 15%; width: 180px; transform: rotate(12deg);"></div>
-    <div class="neural-connection" style="top: 45%; left: 30%; width: 140px; transform: rotate(-5deg);"></div>
-    <div class="neural-connection" style="top: 55%; left: 20%; width: 160px; transform: rotate(8deg);"></div>
-    <div class="neural-connection" style="top: 65%; left: 35%; width: 130px; transform: rotate(-10deg);"></div>
-    <div class="neural-connection" style="top: 75%; left: 15%; width: 170px; transform: rotate(6deg);"></div>
-    <div class="neural-connection" style="top: 85%; left: 25%; width: 140px; transform: rotate(-7deg);"></div>
-    
-    <!-- Conexiones diagonales púrpura -->
-    <div class="neural-connection purple" style="top: 20%; left: 50%; width: 100px; transform: rotate(25deg);"></div>
-    <div class="neural-connection purple" style="top: 40%; left: 60%; width: 120px; transform: rotate(-30deg);"></div>
-    <div class="neural-connection purple" style="top: 60%; left: 55%; width: 110px; transform: rotate(35deg);"></div>
-    <div class="neural-connection purple" style="top: 80%; left: 65%; width: 130px; transform: rotate(-25deg);"></div>
-    
-    <!-- Conexiones verticales naranja -->
-    <div class="neural-connection orange" style="top: 10%; left: 70%; width: 80px; transform: rotate(85deg);"></div>
-    <div class="neural-connection orange" style="top: 30%; left: 75%; width: 90px; transform: rotate(88deg);"></div>
-    <div class="neural-connection orange" style="top: 50%; left: 80%; width: 85px; transform: rotate(92deg);"></div>
-    <div class="neural-connection orange" style="top: 70%; left: 85%; width: 95px; transform: rotate(87deg);"></div>
-    
-    <!-- Conexiones del lado derecho -->
-    <div class="neural-connection" style="top: 18%; left: 75%; width: 140px; transform: rotate(-15deg);"></div>
-    <div class="neural-connection" style="top: 38%; left: 70%; width: 160px; transform: rotate(18deg);"></div>
-    <div class="neural-connection" style="top: 58%; left: 75%; width: 120px; transform: rotate(-12deg);"></div>
-    <div class="neural-connection" style="top: 78%; left: 80%; width: 150px; transform: rotate(15deg);"></div>
-    
-    <!-- Conexiones cruzadas para formar red -->
-    <div class="neural-connection purple" style="top: 12%; left: 40%; width: 200px; transform: rotate(45deg);"></div>
-    <div class="neural-connection purple" style="top: 32%; left: 45%; width: 180px; transform: rotate(-45deg);"></div>
-    <div class="neural-connection orange" style="top: 52%; left: 40%; width: 190px; transform: rotate(40deg);"></div>
-    <div class="neural-connection orange" style="top: 72%; left: 45%; width: 170px; transform: rotate(-40deg);"></div>
-    
-    <!-- Skip to main content for accessibility -->
-    <a href="#chat-main" class="skip-link" aria-label="Saltar al contenido principal del chat">Saltar al chat</a>
-    
-    <nav aria-label="Navegación principal">
-        <a href="/" class="back-btn" aria-label="Volver a la página principal">← Volver</a>
-    </nav>
+        <!-- Skip to main content for accessibility -->
+        <a href="#chat-main" class="skip-link" aria-label="Saltar al contenido principal del chat">Saltar al chat</a>
+        
+        <nav aria-label="Navegación principal">
+            <a href="/" class="back-btn" aria-label="Volver a la página principal">← Volver</a>
+        </nav>
 
 
-    <!-- Único contenedor requerido por E2E Selenium y la app -->
-    <div id="chatContainer" class="chat-container" role="main" style="display: flex !important; flex-direction: column; position: relative; z-index: 1000; background: rgba(5,10,20,0.25); visibility: visible !important; opacity: 1 !important;">
-        <header class="chat-header">
-            <div class="chat-header-content">
-                <h1><span class="title-emoji">🤖</span> <span class="title-text">Gemini AI Chat</span></h1>
-                <div class="chat-status" role="status" aria-live="polite">
-                    <div class="status-dot" aria-hidden="true"></div>
-                    <span>Asistente en línea</span>
+        <!-- Único contenedor requerido por E2E Selenium y la app -->
+        <div id="chatContainer" class="chat-container" role="main" style="display: flex !important; flex-direction: column; position: relative; z-index: 1000; background: rgba(5,10,20,0.25); visibility: visible !important; opacity: 1 !important;">
+            <header class="chat-header">
+                <div class="chat-header-content">
+                    <h1><span class="title-emoji">🤖</span> <span class="title-text">Gemini AI Chat</span></h1>
+                    <div class="chat-status" role="status" aria-live="polite">
+                        <div class="status-dot" aria-hidden="true"></div>
+                        <span>Asistente en línea</span>
+                    </div>
+                </div>
+            </header>
+            <section class="chat-messages" id="messages" role="log" aria-live="polite" aria-label="Historial de conversación">
+            </section>
+            <div class="typing-indicator" id="typing" role="status" aria-live="polite" aria-label="Indicador de escritura">
+                <span>El asistente está escribiendo</span>
+                <div class="typing-dots" aria-hidden="true">
+                    <span></span>
+                    <span></span>
+                    <span></span>
                 </div>
             </div>
-        </header>
-        <section class="chat-messages" id="messages" role="log" aria-live="polite" aria-label="Historial de conversación">
-        </section>
-        <div class="typing-indicator" id="typing" role="status" aria-live="polite" aria-label="Indicador de escritura">
-            <span>El asistente está escribiendo</span>
-            <div class="typing-dots" aria-hidden="true">
-                <span></span>
-                <span></span>
-                <span></span>
-            </div>
+            <section class="chat-input" aria-label="Área de entrada de mensajes">
+                <form class="input-container" onsubmit="sendMessage(); return false;">
+                    <div class="input-wrapper">
+                        <label for="messageInput" class="sr-only">Escribe tu mensaje</label>
+                        <input type="text" id="messageInput" placeholder="Escribe tu mensaje aquí..." maxlength="1000" aria-describedby="charCounter" aria-required="true" autocomplete="off" style="background: rgba(5,10,20,0.2); color: #fff; position: relative; z-index: 2000; display: block !important; visibility: visible !important; opacity: 1 !important;" />
+                        <div class="char-counter" id="charCounter" aria-live="polite">0/1000</div>
+                    </div>
+                    <button type="submit" class="send-button" id="sendButton" aria-label="Enviar mensaje" style="z-index: 2000; display: block !important; visibility: visible !important; opacity: 1 !important;">
+                        <span>Enviar</span>
+                        <span aria-hidden="true">📤</span>
+                    </button>
+                </form>
+                <div class="input-actions" role="toolbar" aria-label="Acciones del chat">
+                    <button class="action-btn" aria-label="Limpiar historial del chat" tabindex="0">🗑️ Limpiar chat</button>
+                    <button class="action-btn" aria-label="Exportar conversación" tabindex="0">💾 Exportar</button>
+                    <button class="action-btn" aria-label="Activar o desactivar síntesis de voz" tabindex="0">🎤 Voz</button>
+                    <button class="action-btn" aria-label="Subir archivo" tabindex="0">📎 Archivo</button>
+                </div>
+                <input type="file" id="fileInput" style="display: none;" accept=".txt,.pdf,.doc,.docx,.jpg,.jpeg,.png,.gif" multiple aria-label="Seleccionar archivos para subir">
+            </section>
         </div>
-        <section class="chat-input" aria-label="Área de entrada de mensajes">
-            <form class="input-container" onsubmit="sendMessage(); return false;">
-                <div class="input-wrapper">
-                    <label for="messageInput" class="sr-only">Escribe tu mensaje</label>
-                    <input type="text" id="messageInput" placeholder="Escribe tu mensaje aquí..." maxlength="1000" aria-describedby="charCounter" aria-required="true" autocomplete="off" style="background: rgba(5,10,20,0.2); color: #fff; position: relative; z-index: 2000; display: block !important; visibility: visible !important; opacity: 1 !important;" />
-                    <div class="char-counter" id="charCounter" aria-live="polite">0/1000</div>
-                </div>
-                <button type="submit" class="send-button" id="sendButton" aria-label="Enviar mensaje" style="z-index: 2000; display: block !important; visibility: visible !important; opacity: 1 !important;">
-                    <span>Enviar</span>
-                    <span aria-hidden="true">📤</span>
-                </button>
-            </form>
-            <div class="input-actions" role="toolbar" aria-label="Acciones del chat">
-                <button class="action-btn" aria-label="Limpiar historial del chat" tabindex="0">🗑️ Limpiar chat</button>
-                <button class="action-btn" aria-label="Exportar conversación" tabindex="0">💾 Exportar</button>
-                <button class="action-btn" aria-label="Activar o desactivar síntesis de voz" tabindex="0">🎤 Voz</button>
-                <button class="action-btn" aria-label="Subir archivo" tabindex="0">📎 Archivo</button>
-            </div>
-            <input type="file" id="fileInput" style="display: none;" accept=".txt,.pdf,.doc,.docx,.jpg,.jpeg,.png,.gif" multiple aria-label="Seleccionar archivos para subir">
-        </section>
     </div>
-
+    <!-- Selector de idioma para internacionalización básica -->
+    <footer>
+        <label for="lang-select">Idioma:</label>
+        <select id="lang-select" aria-label="Seleccionar idioma">
+            <option value="es">Español</option>
+            <option value="en">English</option>
+        </select>
+    </footer>
     <script>
         // === CONFIGURACIÓN OPTIMIZADA Y VARIABLES GLOBALES ===
         let messagesContainer, messageInput, sendButton, typingIndicator, charCounter;
@@ -1628,6 +1638,7 @@
             }, 3000);
         }
         
+        
         // Funciones de carga de archivos
         function uploadFile() {
             const fileInput = document.getElementById('fileInput');
@@ -2102,6 +2113,11 @@
                     window.location.reload(true);
                 }, 1000);
             }
+        });
+
+        // Internacionalización básica
+        document.getElementById('lang-select').addEventListener('change', function(e) {
+            document.documentElement.lang = e.target.value;
         });
     </script>
 </body>

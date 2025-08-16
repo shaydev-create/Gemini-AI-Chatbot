@@ -31,9 +31,12 @@ class Config:
     JWT_BLACKLIST_TOKEN_CHECKS = ['access', 'refresh']
     
     # Configuración de base de datos
-    DATABASE_URL = os.getenv('DATABASE_URL', 'sqlite:///gemini_chatbot.db')
+    DATABASE_URL = os.getenv('DATABASE_URL', 'postgresql://usuario:password@localhost:5432/gemini_chatbot')
     SQLALCHEMY_DATABASE_URI = DATABASE_URL
     SQLALCHEMY_TRACK_MODIFICATIONS = False
+    # Para desarrollo local, puedes usar SQLite: 'sqlite:///gemini_chatbot.db'
+    # Para producción, usa PostgreSQL o MySQL
+    # Migraciones automáticas: Flask-Migrate
     
     # Configuración de archivos
     MAX_CONTENT_LENGTH = 16 * 1024 * 1024  # 16MB

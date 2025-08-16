@@ -1,6 +1,14 @@
 """
 Factory de aplicación Flask para el Gemini AI Chatbot.
 Configuración modular y escalable.
+
+Ejemplo de uso:
+    from app.core.application import create_app
+    app = create_app()
+    app.run()
+
+Documentación completa de la API y endpoints:
+    Ver README.md y docs/API_DOCUMENTATION.md
 """
 
 # import os  # Import no usado
@@ -9,15 +17,18 @@ from pathlib import Path
 from flask import Flask
 from flask_compress import Compress
 from flask_jwt_extended import JWTManager
+from flask_migrate import Migrate
 
 # Importaciones locales
 from config.settings import Config
 from config.database import init_db
 from app.api import register_api_routes
 from app.core.middleware import setup_middleware, setup_error_handlers
+from app.core.metrics import metrics_bp
 
 
 def create_app(config_class=Config):
+
     """
     Factory para crear la aplicación Flask.
 
@@ -38,6 +49,14 @@ def create_app(config_class=Config):
         static_folder=str(static_dir),
     )
 
+    # Hacer disponible la función translate en todos los templates
+    try:
+        from app.utils.i18n import translate
+        app.context_processor(lambda: dict(translate=translate))
+        app.logger.info("Función de traducción disponible en todos los templates")
+    except Exception as e:
+        app.logger.error(f"Error registrando translate en context_processor: {e}")
+
     # Configuración
     app.config.from_object(config_class)
 
@@ -49,6 +68,14 @@ def create_app(config_class=Config):
 
     # Registrar blueprints y rutas
     register_api_routes(app)
+    app.register_blueprint(metrics_bp)
+    # Registrar blueprint de administración
+    try:
+        from app.api.admin import admin_bp
+        app.register_blueprint(admin_bp)
+        app.logger.info("Blueprint de administración registrado")
+    except Exception as e:
+        app.logger.error(f"Error registrando admin_bp: {e}")
 
     # Configurar middleware
     setup_middleware(app)
@@ -95,11 +122,12 @@ def setup_extensions(app):
     """Inicializar extensiones de Flask."""
     # Compresión
     Compress(app)
-
     # JWT
     JWTManager(app)
-
-    app.logger.info("Extensiones inicializadas")
+    # Migraciones automáticas
+    from config.database import db
+    Migrate(app, db)
+    app.logger.info("Extensiones inicializadas y migraciones automáticas habilitadas")
 
 
 def setup_jwt(app):

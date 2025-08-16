@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ translate('admin_panel') }}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+    <header>
+        <h1>{{ translate('admin_panel') }}</h1>
+        <nav>
+            <a href="/">{{ translate('home') }}</a>
+            <a href="/logout">{{ translate('logout') }}</a>
+        </nav>
+    </header>
+    <main>
+        <section>
+            <h2>{{ translate('welcome') }}, {{ user.username }}</h2>
+            <p>{{ translate('access_restricted') }}</p>
+            <!-- Aquí se pueden agregar módulos de gestión de usuarios, logs, etc. -->
+        </section>
+    </main>
+</body>
+</html>

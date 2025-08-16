@@ -9,15 +9,42 @@ Un chatbot inteligente potenciado por Google Gemini AI con interfaz web moderna 
 
 ## ✨ Características
 
-- 🤖 **IA Avanzada**: Integración con Google Gemini AI
-- 🌐 **Interfaz Web**: Diseño moderno y responsivo
-- 🔌 **Extensión Chrome**: Acceso rápido desde el navegador
-- 🔒 **Seguro**: HTTPS, autenticación y validación
-- 📱 **PWA**: Funciona como aplicación móvil
-- 🐳 **Docker**: Despliegue fácil con contenedores
-- 🛡️ **Privacidad**: Sin recopilación de datos personales
+ - 🤖 **IA Avanzada**: Integración con Google Gemini AI
+ - 🌐 **Interfaz Web**: Diseño moderno, responsivo y accesible (ARIA, skip links, selector de idioma)
+ - 🔌 **Extensión Chrome**: Acceso rápido desde el navegador
+ - 🔒 **Seguro**: HTTPS, autenticación, validación y protección CSRF/XSS
+ - 📱 **PWA**: Funciona como aplicación móvil
+ - 🐳 **Docker**: Despliegue fácil con contenedores
+ - 📊 **Monitoreo**: Métricas Prometheus integradas
+
+ - 🌍 **Multiidioma avanzado**: Selección dinámica de idioma en toda la app
+
+ - 🛠️ **Panel de Administración**: Gestión y acceso restringido para administradores
+
+## 🛠️ Panel de Administración
+
+El sistema incluye un panel de administración básico accesible solo para usuarios autenticados con rol de administrador.
+
+- **Ruta:** `/admin`
+- **Protección:** Requiere JWT y rol de administrador
+- **Template:** `admin.html`
+
+Ejemplo de acceso:
+```bash
+curl -H "Authorization: Bearer <token_admin>" https://localhost:5000/admin
+# Respuesta: Renderiza el panel si el usuario es admin
+```
 
 ## 🚀 Inicio Rápido
+## 🌍 Multiidioma avanzado
+
+La aplicación soporta traducción dinámica de textos en español e inglés. Puedes agregar nuevos idiomas creando archivos JSON en `app/i18n/`.
+
+Ejemplo para agregar francés:
+1. Crea `app/i18n/fr.json` con las claves y traducciones.
+2. Accede con `?lang=fr` en la URL o selecciona desde el frontend.
+
+Todos los templates usan la función `translate` para mostrar textos según el idioma seleccionado.
 
 ### ⚡ Ejecución Inmediata
 
@@ -138,6 +165,26 @@ python app/main.py
 # 🌐 https://127.0.0.1:5000
 ```
 
+### 📚 Ejemplos de Uso de la API
+
+#### Autenticación
+```bash
+curl -X POST https://localhost:5000/api/auth/login -d '{"username": "user", "password": "pass"}' -H "Content-Type: application/json"
+# Respuesta: {"access_token": "..."}
+```
+
+#### Chat
+```bash
+curl -X POST https://localhost:5000/api/chat -d '{"message": "Hola Gemini!"}' -H "Authorization: Bearer <token>" -H "Content-Type: application/json"
+# Respuesta: {"reply": "¡Hola humano!"}
+```
+
+#### Subida de Archivos
+```bash
+curl -X POST https://localhost:5000/api/upload -F "file=@archivo.txt" -H "Authorization: Bearer <token>"
+# Respuesta: {"status": "success", "filename": "archivo.txt"}
+```
+
 ### 🐳 Método 2: Docker
 
 ```bash
@@ -163,6 +210,13 @@ pytest --cov=app tests/
 # Linting
 flake8 app/
 black app/
+ 
+# Limpieza automática de archivos temporales y credenciales
+python scripts/cleanup_temp_files.py
+python scripts/secure_env.py
+
+# Migraciones automáticas de base de datos
+scripts/migrate_db.ps1
 ```
 
 ## 📊 Monitoreo y Salud
@@ -175,6 +229,16 @@ curl https://localhost:5000/api/health
 
 # Respuesta esperada:
 # {"status": "healthy", "timestamp": "2025-01-17T..."}
+```
+
+### 📈 Métricas Prometheus
+
+```bash
+# Obtener métricas para monitoreo
+curl https://localhost:5000/metrics
+# Respuesta: formato Prometheus
+# flask_request_count_total{method="GET",endpoint="/api/chat"} 42
+# flask_request_latency_seconds_bucket{le="0.5",endpoint="/api/chat"} 40
 ```
 
 ### 📋 Logs
@@ -251,12 +315,15 @@ Este proyecto está bajo la **Licencia MIT**. Ver [LICENSE](LICENSE) para más d
 
 ## 🎯 Roadmap
 
-- [ ] 📱 Aplicación móvil nativa
-- [ ] 🌍 Soporte multiidioma
-- [ ] 🎨 Temas personalizables
-- [ ] 📊 Dashboard de analytics
-- [ ] 🔌 API pública
-- [ ] 🤖 Más modelos de IA
+ - [x] 📈 Métricas Prometheus para monitoreo
+ - [x] 🌍 Accesibilidad e internacionalización en frontend
+ - [x] 🔄 Scripts automáticos de migración y limpieza
+ - [ ] 📱 Aplicación móvil nativa
+ - [ ] 🌍 Soporte multiidioma avanzado
+ - [ ] 🎨 Temas personalizables
+ - [ ] 📊 Dashboard de analytics
+ - [ ] 🔌 API pública
+ - [ ] 🤖 Más modelos de IA
 
 ---
 
