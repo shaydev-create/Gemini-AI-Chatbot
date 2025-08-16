@@ -182,12 +182,27 @@ class TestPerformance:
         message_input = driver.find_element(By.ID, "messageInput")
         send_button = driver.find_element(By.ID, "sendButton")
         
+        from selenium.webdriver.support.ui import WebDriverWait
+        from selenium.webdriver.support import expected_conditions as EC
         for i in range(5):
-            message_input.clear()
+            # Use robust JS clear for input
+            driver.execute_script("document.dispatchEvent(new Event('selenium-clear-input'));")
+            WebDriverWait(driver, 2).until(lambda d: message_input.is_enabled() and message_input.is_displayed())
             message_input.send_keys(f"Mensaje {i}")
             send_button.click()
+            import time
             time.sleep(0.5)  # Pequeña pausa entre requests
         
         # La aplicación debe seguir funcionando
+        # Espera explícita para evitar condiciones de carrera
+        from selenium.webdriver.support.ui import WebDriverWait
+        WebDriverWait(driver, 3).until(lambda d: message_input.is_enabled() and message_input.is_displayed())
+
+        # Verificar estado real con JS
+        is_disabled = driver.execute_script("return arguments[0].disabled;", message_input)
+        if is_disabled:
+            driver.save_screenshot("input_failure.png")
+            print("[E2E] Screenshot guardada como input_failure.png")
+        assert not is_disabled, "El input sigue deshabilitado tras múltiples envíos. Ver screenshot input_failure.png."
         assert message_input.is_enabled()
         assert send_button.is_enabled()

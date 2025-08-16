@@ -7,6 +7,5 @@ Compatibilidad con estructura de archivos esperada.
 
 # Importaciones principales
 from app.core.application import create_app
-from app.main import app
 
-__all__ = ['create_app', 'app']
+__all__ = ['create_app']

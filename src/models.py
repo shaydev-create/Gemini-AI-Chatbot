@@ -8,11 +8,8 @@ Define las estructuras de datos principales de la aplicación.
 import datetime
 import secrets
 import bcrypt
-from flask_sqlalchemy import SQLAlchemy
+from config.database import db
 from datetime import datetime, timedelta
-
-# Instancia de SQLAlchemy
-db = SQLAlchemy()
 
 class User(db.Model):
     """Modelo de usuario para autenticación y gestión de perfiles."""

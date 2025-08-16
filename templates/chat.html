@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gemini AI Chatbot - Chat</title>
+</head>
+<body>
+</body>
+    <h1>Chat Gemini AI</h1>
+    <div id="chatContainer" style="min-height:200px; border:1px solid #ccc; margin-bottom:10px;"></div>
+    <input type="text" id="messageInput" placeholder="Escribe tu mensaje..." style="width:70%;" autocomplete="off" />
+    <button id="sendButton" style="width:20%;">Enviar</button>
+    <span id="spinner" style="display:none;">⏳</span>
+    <script>
+    const messageInput = document.getElementById('messageInput');
+    const sendButton = document.getElementById('sendButton');
+    const chatContainer = document.getElementById('chatContainer');
+    const spinner = document.getElementById('spinner');
+
+    function appendMessage(text, sender = 'user') {
+        const msgDiv = document.createElement('div');
+        msgDiv.textContent = text;
+        msgDiv.className = sender === 'user' ? 'user-message' : 'bot-message';
+        chatContainer.appendChild(msgDiv);
+        chatContainer.scrollTop = chatContainer.scrollHeight;
+    }
+
+    function setSendingState(isSending) {
+        sendButton.disabled = isSending;
+        spinner.style.display = isSending ? '' : 'none';
+        messageInput.focus();
+    }
+
+    sendButton.addEventListener('click', sendMessage);
+    messageInput.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') {
+            sendMessage();
+        }
+    });
+
+    function sendMessage() {
+        setSendingState(true);
+        const message = messageInput.value.trim();
+        if (!message) {
+            setSendingState(false);
+            return;
+        }
+        appendMessage(message, 'user');
+        // Simulate async bot response
+        setTimeout(() => {
+            appendMessage('Respuesta de Gemini AI', 'bot');
+            messageInput.value = '';
+            setSendingState(false);
+        }, 500);
+    }
+
+    // Expose for Selenium tests
+    window.safeClearInput = function() {
+        messageInput.value = '';
+        messageInput.focus();
+    };
+
+    // Initial state
+    setSendingState(false);
+    messageInput.focus();
+    </script>
+</body>
+</html>
