@@ -21,7 +21,7 @@ class GeminiService:
             raise ValueError("GEMINI_API_KEY no encontrada en las variables de entorno")
 
         genai.configure(api_key=self.api_key)
-        self.model = genai.GenerativeModel("gemini-1.5-flash")
+        self.model = genai.GenerativeModel("gemini-2.0-flash-001")
 
     def generate_response(self, message: str) -> Dict[str, Any]:
         """
@@ -53,7 +53,7 @@ class GeminiService:
                 "message": response_text,
                 "cached": False,
                 "response_time": response_time,
-                "model": "gemini-1.5-flash",
+                "model": "gemini-2.0-flash-001",
             }
 
         except Exception as e:

@@ -6,8 +6,8 @@ console.log('🚀 Gemini AI Chatbot - Background script iniciado');
 // Configuración del chatbot
 const CHATBOT_CONFIG = {
     name: '🚀 Gemini AI Futuristic Chatbot',
-    version: '1.0.1',
-    serverUrl: 'https://127.0.0.1:5000'
+    version: '1.0.3',
+    description: 'Asistente de IA independiente con Google Gemini'
 };
 
 // Evento de instalación
@@ -16,21 +16,19 @@ chrome.runtime.onInstalled.addListener((details) => {
     
     if (details.reason === 'install') {
         console.log('🎉 Primera instalación del Gemini AI Chatbot');
+        
+        // Mostrar página de bienvenida
+        chrome.tabs.create({
+            url: chrome.runtime.getURL('welcome.html')
+        });
+    }
+    
+    if (details.reason === 'update') {
+        console.log('🔄 Extensión actualizada');
     }
 });
 
-// Evento de activación de la extensión
-chrome.action.onClicked.addListener((tab) => {
-    console.log('🖱️ Icono de extensión clickeado');
-    
-    // Abrir el chatbot en una nueva pestaña
-    chrome.tabs.create({
-        url: CHATBOT_CONFIG.serverUrl,
-        active: true
-    });
-});
-
-// Manejar mensajes del popup
+// Manejar mensajes del popup y content scripts
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     console.log('📨 Mensaje recibido:', request);
     
@@ -42,12 +40,35 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
             });
             break;
             
-        case 'openChatbot':
-            // Abrir el chatbot en una nueva pestaña
-            chrome.tabs.create({
-                url: CHATBOT_CONFIG.serverUrl,
-                active: true
+        case 'getApiKey':
+            // Obtener API key del storage
+            chrome.storage.sync.get(['geminiApiKey'], (result) => {
+                sendResponse({
+                    success: true,
+                    apiKey: result.geminiApiKey || null
+                });
             });
+            return true; // Mantener el canal abierto para respuesta asíncrona
+            
+        case 'saveApiKey':
+            // Guardar API key en storage
+            chrome.storage.sync.set({ geminiApiKey: request.apiKey }, () => {
+                sendResponse({
+                    success: true,
+                    message: 'API Key guardada correctamente'
+                });
+            });
+            return true;
+            
+        case 'clearData':
+            // Limpiar todos los datos almacenados
+            chrome.storage.sync.clear(() => {
+                sendResponse({
+                    success: true,
+                    message: 'Datos limpiados correctamente'
+                });
+            });
+            return true;
             sendResponse({ success: true });
             break;
             

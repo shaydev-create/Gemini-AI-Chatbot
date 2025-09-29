@@ -1,0 +1,112 @@
+📸 INSTRUCCIONES PARA CAPTURAS DE PANTALLA - CHROME WEB STORE
+
+=== REQUISITOS DE CHROME WEB STORE ===
+
+📋 **Capturas Requeridas:**
+- Mínimo: 1 captura
+- Máximo: 5 capturas
+- Formato: PNG o JPEG
+- Tamaño: 1280x800 o 640x400 píxeles
+- Relación de aspecto: 16:10
+
+=== CAPTURAS SUGERIDAS ===
+
+🖼️ **Captura 1: Pantalla Principal del Chat**
+- Mostrar la interfaz de chat con algunos mensajes
+- Incluir tanto mensajes del usuario como respuestas de IA
+- Destacar el diseño futurista con gradientes
+- Tamaño: 1280x800px
+
+🖼️ **Captura 2: Configuración de API Key**
+- Mostrar la pantalla de configuración inicial
+- Incluir el campo de API Key (censurado)
+- Mostrar el botón "Guardar y Continuar"
+- Tamaño: 1280x800px
+
+🖼️ **Captura 3: Página de Bienvenida**
+- Mostrar welcome.html con las características
+- Incluir los iconos y descripciones de funcionalidades
+- Destacar el diseño moderno
+- Tamaño: 1280x800px
+
+🖼️ **Captura 4: Extensión en Acción**
+- Mostrar el popup abierto en el navegador
+- Incluir la barra de herramientas de Chrome
+- Mostrar una conversación activa
+- Tamaño: 1280x800px
+
+🖼️ **Captura 5: Características Destacadas**
+- Crear una imagen promocional con las características principales
+- Incluir iconos: 🤖 🔒 ⚡ 🎨
+- Texto: "Chat IA", "Privacidad Total", "Respuestas Rápidas", "Diseño Futurista"
+- Tamaño: 1280x800px
+
+=== CÓMO TOMAR LAS CAPTURAS ===
+
+🔧 **Preparación:**
+1. Instalar la extensión en modo desarrollador
+2. Configurar con una API Key válida
+3. Tener algunas conversaciones de ejemplo
+4. Usar un navegador limpio (sin otras extensiones visibles)
+
+📱 **Herramientas Recomendadas:**
+- Chrome DevTools (F12) para ajustar tamaño de ventana
+- Snipping Tool de Windows
+- OBS Studio para capturas de alta calidad
+- Canva o Figma para capturas promocionales
+
+🎨 **Consejos de Diseño:**
+- Usar fondos limpios y profesionales
+- Asegurar que el texto sea legible
+- Mostrar la funcionalidad real de la extensión
+- Evitar información personal o API Keys reales
+- Usar datos de ejemplo atractivos
+
+=== EJEMPLOS DE CONVERSACIONES PARA CAPTURAS ===
+
+💬 **Conversación Ejemplo 1:**
+Usuario: "¿Puedes ayudarme a escribir un email profesional?"
+IA: "¡Por supuesto! Te ayudo a redactar un email profesional. ¿Cuál es el propósito del email y a quién va dirigido?"
+
+💬 **Conversación Ejemplo 2:**
+Usuario: "Explícame qué es la inteligencia artificial"
+IA: "La inteligencia artificial (IA) es una rama de la informática que busca crear sistemas capaces de realizar tareas que normalmente requieren inteligencia humana..."
+
+💬 **Conversación Ejemplo 3:**
+Usuario: "¿Cómo puedo mejorar mi productividad?"
+IA: "Aquí tienes algunas estrategias efectivas para mejorar tu productividad: 1. Técnica Pomodoro..."
+
+=== CHECKLIST ANTES DE SUBIR ===
+
+✅ **Verificar:**
+- [ ] Todas las capturas son de 1280x800px
+- [ ] No hay información personal visible
+- [ ] La interfaz se ve moderna y profesional
+- [ ] Las capturas muestran funcionalidad real
+- [ ] Los colores y gradientes se ven correctos
+- [ ] El texto es legible en todas las capturas
+- [ ] No hay errores o bugs visibles
+
+=== NOMBRES DE ARCHIVOS SUGERIDOS ===
+
+- screenshot_1_chat_interface.png
+- screenshot_2_api_setup.png
+- screenshot_3_welcome_page.png
+- screenshot_4_browser_popup.png
+- screenshot_5_features_promo.png
+
+=== NOTAS ADICIONALES ===
+
+🎯 **Objetivo:** Las capturas deben mostrar claramente:
+- La funcionalidad principal (chat con IA)
+- La facilidad de uso
+- El diseño atractivo y moderno
+- La profesionalidad de la extensión
+
+🚫 **Evitar:**
+- Capturas borrosas o de baja calidad
+- Información personal o sensible
+- Errores o bugs en la interfaz
+- Diseños que no representen la versión final
+
+📈 **Impacto:** Buenas capturas pueden aumentar significativamente las descargas y la aprobación en Chrome Web Store.

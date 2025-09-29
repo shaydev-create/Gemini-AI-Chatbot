@@ -104,24 +104,25 @@
         @media (max-width: 768px) {
             .container {
                 gap: 1rem;
-                padding: 0.5rem;
-                min-height: 100vh;
+                padding: 0;
+                height: 100vh;
+                width: 100vw;
             }
             
             .ai-logo {
                 width: 40px;
                 height: 40px;
-                margin-bottom: 0.8rem;
-                margin-top: -1.5rem;
+                margin-bottom: 0.5rem;
+                margin-top: 0;
             }
             
             .title-container {
                 margin-bottom: 0.8rem;
-                margin-top: -3rem;
+                margin-top: 0;
             }
             
             .main-title {
-                font-size: 2.2rem;
+                font-size: 2.8rem;
                 letter-spacing: 3px;
             }
             
@@ -131,16 +132,18 @@
             }
             
             .subtitle {
-                font-size: 0.9rem;
-                margin: 4rem 0 0.8rem 0;
-                letter-spacing: 1px;
+                font-size: 1.1rem;
+                margin: 1rem 0 1rem 0;
+                letter-spacing: 1.5px;
                 max-width: 90%;
+                z-index: 20;
+                line-height: 1.5;
             }
             
             .cta-button {
-                padding: 0.7rem 1.3rem;
-                font-size: 0.8rem;
-                margin: 0.8rem 0;
+                padding: 0.8rem 1.8rem;
+                font-size: 1rem;
+                margin: 0.8rem 0 1.5rem 0;
             }
             
 
@@ -153,12 +156,14 @@
         @media (max-width: 480px) {
             .container {
                 gap: 0.4rem;
-                padding: 0.2rem;
+                padding: 0;
+                height: 100vh;
+                width: 100vw;
             }
             
             .main-title {
-                font-size: 1.6rem;
-                letter-spacing: 1.5px;
+                font-size: 2rem;
+                letter-spacing: 2px;
             }
             
             .stars-container {
@@ -167,29 +172,34 @@
             }
             
             .subtitle {
-                font-size: 0.75rem;
-                margin: 3.5rem 0 0.4rem 0;
+                font-size: 0.95rem;
+                margin: 1rem 0 0.8rem 0;
                 max-width: 95%;
+                z-index: 20;
+                line-height: 1.5;
             }
             
 
             
             .cta-button {
-                padding: 0.6rem 1rem;
-                font-size: 0.75rem;
+                padding: 0.7rem 1.4rem;
+                font-size: 0.9rem;
             }
             
             .ai-logo {
                 width: 30px;
                 height: 30px;
-                margin-top: -1rem;
+                margin-top: 0;
+                margin-bottom: 0.3rem;
             }
         }
         
         @media (max-height: 600px) {
             .container {
                 gap: 0.3rem;
-                padding: 0.3rem;
+                padding: 0;
+                height: 100vh;
+                width: 100vw;
             }
             
             .ai-logo {
@@ -198,7 +208,7 @@
             
             .title-container {
                 margin-bottom: 0.3rem;
-                margin-top: -2rem;
+                margin-top: 0;
             }
             
 
@@ -317,28 +327,30 @@
 
         /* Main Container */
         .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            min-height: 100vh;
+            width: 100vw;
+            height: 100vh;
+            margin: 0;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            padding: 1rem;
+            padding: 0;
             position: relative;
             z-index: 10;
             text-align: center;
-            gap: 1.5rem;
+            gap: 0.5rem;
+            transform: scale(1);
+            overflow: hidden;
         }
 
         /* AI Logo */
         .ai-logo {
-            width: 80px;
-            height: 80px;
-            margin-bottom: 1.2rem;
-            margin-top: -2rem;
+            width: 70px;
+            height: 70px;
+            margin: 0 0 0.5rem 0;
             position: relative;
             animation: logo-pulse 3s ease-in-out infinite;
+            z-index: 10;
         }
 
         .ai-logo::before {
@@ -354,8 +366,7 @@
             animation: rotate-gradient 4s linear infinite;
         }
 
-        .ai-logo::after {
-            content: '🤖';
+        .ai-logo span {
             position: absolute;
             top: 50%;
             left: 50%;
@@ -387,17 +398,18 @@
             width: 100%;
             height: auto;
             display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
             z-index: 1;
             pointer-events: none;
-            margin-bottom: 1.5rem;
-            margin-top: -4.5rem;
+            margin: 0;
+            padding: 0;
         }
 
         /* Main Title */
         .main-title {
-            font-size: clamp(2.5rem, 7vw, 5rem);
+            font-size: clamp(3rem, 8vw, 5.5rem);
             font-weight: 900;
             text-align: center;
             background: linear-gradient(135deg, var(--primary), var(--secondary), var(--accent));
@@ -409,6 +421,9 @@
             z-index: 15;
             pointer-events: auto;
             cursor: pointer;
+            letter-spacing: 4px;
+            text-shadow: 0 0 15px rgba(0, 245, 255, 0.5);
+            margin-top: 0;
         }
 
         @keyframes title-glow {
@@ -426,6 +441,10 @@
             pointer-events: none;
             overflow: hidden;
             z-index: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transform: translateZ(0);
         }
         
         /* Black Hole Center */
@@ -434,13 +453,14 @@
             position: absolute;
             top: 50%;
             left: 50%;
-            width: 100px;
-            height: 100px;
-            background: radial-gradient(circle, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 0.9) 20%, rgba(0, 212, 255, 0.4) 50%, rgba(138, 43, 226, 0.3) 70%, transparent 100%);
+            width: 150px;
+            height: 150px;
+            background: radial-gradient(circle, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 0.9) 20%, rgba(0, 212, 255, 0.5) 50%, rgba(138, 43, 226, 0.4) 70%, transparent 100%);
             border-radius: 50%;
             transform: translate(-50%, -50%);
-            box-shadow: 0 0 50px rgba(0, 212, 255, 0.6), 0 0 100px rgba(0, 212, 255, 0.4), 0 0 150px rgba(138, 43, 226, 0.3), inset 0 0 30px rgba(0, 0, 0, 1);
+            box-shadow: 0 0 60px rgba(0, 212, 255, 0.7), 0 0 120px rgba(0, 212, 255, 0.5), 0 0 180px rgba(138, 43, 226, 0.4), inset 0 0 40px rgba(0, 0, 0, 1);
             animation: blackhole-pulse 3s ease-in-out infinite;
+            z-index: 0;
         }
         
         /* Accretion Disk Effect */
@@ -449,13 +469,14 @@
             position: absolute;
             top: 50%;
             left: 50%;
-            width: 200px;
-            height: 200px;
-            background: conic-gradient(from 0deg, transparent 0%, rgba(0, 212, 255, 0.1) 25%, rgba(138, 43, 226, 0.2) 50%, rgba(255, 20, 147, 0.1) 75%, transparent 100%);
+            width: 300px;
+            height: 300px;
+            background: conic-gradient(from 0deg, transparent 0%, rgba(0, 212, 255, 0.2) 25%, rgba(138, 43, 226, 0.3) 50%, rgba(255, 20, 147, 0.2) 75%, transparent 100%);
             border-radius: 50%;
             transform: translate(-50%, -50%);
             animation: accretion-disk 8s linear infinite;
-            opacity: 0.7;
+            opacity: 0.8;
+            z-index: -1;
         }
         
         @keyframes blackhole-pulse {
@@ -798,32 +819,36 @@
 
         /* Subtitle */
         .subtitle {
-            font-size: 1.1rem;
+            font-size: 1.4rem;
             color: var(--text-secondary);
             text-align: center;
-            margin: 6rem 0 1rem 0;
-            font-weight: 300;
-            letter-spacing: 1.5px;
+            margin: 2rem 0 1.5rem 0;
+            font-weight: 400;
+            letter-spacing: 2px;
             max-width: 600px;
-            line-height: 1.4;
+            line-height: 1.5;
+            z-index: 20;
+            text-shadow: 0 0 10px rgba(160, 160, 160, 0.5);
         }
 
         /* CTA Button */
         .cta-button {
             position: relative;
-            padding: 0.9rem 2rem;
-            font-size: 0.95rem;
-            font-weight: 600;
+            padding: 1rem 2.5rem;
+            font-size: 1.2rem;
+            font-weight: 700;
             text-decoration: none;
             color: var(--text-primary);
-            background: transparent;
+            background: rgba(0, 245, 255, 0.1);
             border: 2px solid var(--primary);
             border-radius: 50px;
             transition: all 0.3s ease;
             overflow: hidden;
-            margin: 1.5rem 0;
+            margin: 1rem 0 1.5rem 0;
             display: inline-block;
-            z-index: 10;
+            z-index: 20;
+            letter-spacing: 1px;
+            box-shadow: 0 0 15px rgba(0, 245, 255, 0.3);
         }
 
         .cta-button::before {
@@ -897,13 +922,14 @@
             }
             
             .subtitle {
-                font-size: 1rem;
-                margin-bottom: 1.5rem;
+                font-size: 0.9rem;
+                margin: 5rem 0 1rem 0;
             }
             
             .cta-button {
-                padding: 0.8rem 1.5rem;
-                font-size: 0.9rem;
+                padding: 0.7rem 1.4rem;
+                font-size: 0.85rem;
+                margin: 0.5rem 0 1rem 0;
             }
             
             .stats {
@@ -1004,14 +1030,14 @@
     
     <!-- Main Container -->
     <main id="main-content" class="container" role="main">
-        <!-- AI Logo -->
-        <div class="ai-logo" role="img" aria-label="Logo de Gemini AI con efecto de gradiente rotatorio">
-            <span class="sr-only">Icono del robot de Gemini AI</span>
-        </div>
-        
         <!-- Main Title with Black Hole Effect -->
         <header class="title-container">
             <div class="stars-container" id="stars-container" role="img" aria-label="Efecto visual de agujero negro con estrellas orbitando"></div>
+            <!-- AI Logo -->
+            <div class="ai-logo" role="img" aria-label="Logo de Gemini AI con efecto de gradiente rotatorio">
+                <span aria-hidden="true">🤖</span>
+            </div>
+            
             <h1 class="main-title">GEMINI AI</h1>
         </header>
         
@@ -1019,8 +1045,18 @@
         <p class="subtitle" role="banner">EL FUTURO DE LA INTELIGENCIA ARTIFICIAL</p>
         
         <!-- CTA Button -->
-    <a href="/chat" class="cta-button" role="button" aria-label="Ir al chat de Gemini AI" tabindex="0">Chat</a>
+        <a href="/chat" class="cta-button" role="button" aria-label="Ir al chat de Gemini AI" tabindex="0">Chat</a>
         
+        <!-- Enlaces de Política de Privacidad y GitHub -->
+        <div class="footer-links" style="margin-top: 10px; display: flex; justify-content: center; gap: 30px; font-size: 1rem; background-color: rgba(0,0,0,0.2); padding: 12px; border-radius: 10px; box-shadow: 0 0 10px rgba(255,255,255,0.1); z-index: 10;">
+            <a href="/privacy_policy" style="color: #ffffff; text-decoration: none; transition: color 0.3s ease; font-weight: bold;" target="_blank">Política de Privacidad</a>
+            <a href="https://github.com/shaydev-create/Gemini-AI-Chatbot" style="color: #ffffff; text-decoration: none; transition: color 0.3s ease; display: flex; align-items: center; font-weight: bold;" target="_blank">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16" style="margin-right: 8px;">
+                    <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.012 8.012 0 0 0 16 8c0-4.42-3.58-8-8-8z"/>
+                </svg>
+                GitHub
+            </a>
+        </div>
     </main>
     
     <script>

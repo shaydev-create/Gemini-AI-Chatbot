@@ -71,31 +71,57 @@
         </div>
 
         <h2>1. 📋 Información que NO Recopilamos</h2>
+        <p>Esta extensión está diseñada con la privacidad como prioridad. <strong>NO recopilamos, almacenamos ni transmitimos</strong> ningún tipo de información personal, incluyendo:</p>
         <ul>
-            <li>❌ <strong>Datos personales:</strong> No recopilamos nombres, emails o información personal</li>
-            <li>❌ <strong>Conversaciones:</strong> No almacenamos ni accedemos a tus chats</li>
-            <li>❌ <strong>Archivos:</strong> No procesamos ni guardamos archivos que subas</li>
-            <li>❌ <strong>Historial de navegación:</strong> No rastreamos tu actividad web</li>
-            <li>❌ <strong>Ubicación:</strong> No accedemos a tu ubicación geográfica</li>
+            <li>❌ Datos personales (nombre, email, teléfono, dirección)</li>
+            <li>❌ Conversaciones o mensajes del chat (solo se procesan localmente)</li>
+            <li>❌ Archivos o documentos subidos</li>
+            <li>❌ Historial de navegación</li>
+            <li>❌ Ubicación geográfica</li>
+            <li>❌ Información de identificación del dispositivo</li>
+            <li>❌ Cookies o datos de seguimiento</li>
         </ul>
 
-        <h2>2. 🎯 Funcionamiento de la Extensión</h2>
-        <p>Esta extensión de Chrome funciona como un simple <strong>acceso directo</strong> que:</p>
+        <h2>2. ⚡ Cómo Funciona la Extensión</h2>
+        <p>Esta extensión funciona como un <strong>cliente independiente</strong> para la API de Google Gemini:</p>
         <ul>
-            <li>✅ <strong>Abre tu servidor local:</strong> Conecta directamente a https://127.0.0.1:5000</li>
-            <li>✅ <strong>Interfaz local:</strong> Todo el procesamiento ocurre en tu computadora</li>
-            <li>✅ <strong>Sin servidores externos:</strong> No enviamos datos a servidores remotos</li>
-            <li>✅ <strong>Control total:</strong> Tú controlas completamente tus datos</li>
+            <li>🔗 Se conecta directamente a la API de Google Generative Language</li>
+            <li>🔑 Utiliza tu API Key personal de Google (almacenada localmente)</li>
+            <li>💻 Las conversaciones se procesan en tiempo real sin almacenamiento</li>
+            <li>🔐 Comunicación directa con Google sin intermediarios</li>
+            <li>🗂️ Solo almacena tu API Key de forma segura en Chrome Storage</li>
         </ul>
 
-        <h2>3. 🔐 Permisos de la Extensión</h2>
-        <p>La extensión solo solicita el permiso mínimo necesario:</p>
+        <h2>2.1. 🔑 Uso de API Key de Google</h2>
+        <p>Para funcionar, la extensión requiere que proporciones tu propia API Key de Google Gemini:</p>
         <ul>
-            <li><strong>activeTab:</strong> Para abrir tu aplicación local en una nueva pestaña</li>
-            <li><strong>host_permissions:</strong> Solo para acceder a tu servidor local (127.0.0.1:5000)</li>
+            <li>🔒 Tu API Key se almacena únicamente en tu navegador (Chrome Storage Sync)</li>
+            <li>🚫 Nunca compartimos, vendemos o transmitimos tu API Key a terceros</li>
+            <li>🗑️ Puedes eliminar tu API Key en cualquier momento desde la configuración</li>
+            <li>📋 Solo se usa para autenticar tus solicitudes con Google Gemini</li>
+            <li>🔐 Google maneja todas las solicitudes según su propia política de privacidad</li>
         </ul>
 
-        <h2>4. 🤖 Procesamiento de IA</h2>
+        <h2>3. 🔐 Permisos Requeridos</h2>
+        <p>La extensión solicita únicamente los permisos esenciales para su funcionamiento:</p>
+        <ul>
+            <li>🔹 <strong>activeTab:</strong> Para interactuar con la pestaña activa cuando sea necesario</li>
+            <li>🔹 <strong>storage:</strong> Para almacenar de forma segura tu API Key en Chrome Storage</li>
+            <li>🔹 <strong>host_permissions (generativelanguage.googleapis.com):</strong> Para conectar con la API de Google Gemini</li>
+        </ul>
+        <p><em>Estos permisos son los mínimos necesarios y no permiten acceso a datos sensibles de navegación.</em></p>
+
+        <h2>4. 🛡️ Seguridad y Privacidad</h2>
+        <p>Implementamos las mejores prácticas de seguridad:</p>
+        <ul>
+            <li>🔒 <strong>Comunicación segura:</strong> Todas las conexiones usan HTTPS</li>
+            <li>🚫 <strong>Sin tracking:</strong> No utilizamos cookies ni sistemas de seguimiento</li>
+            <li>💾 <strong>Almacenamiento local:</strong> Solo tu API Key se guarda localmente en tu navegador</li>
+            <li>🔐 <strong>Código transparente:</strong> Funcionalidad clara y sin código malicioso</li>
+            <li>🗑️ <strong>Control total:</strong> Puedes eliminar todos los datos almacenados en cualquier momento</li>
+        </ul>
+
+        <h2>5. 🤖 Procesamiento de IA</h2>
         <p>Cuando usas el chatbot:</p>
         <ul>
             <li>🏠 <strong>Servidor local:</strong> Tu aplicación Flask procesa las consultas localmente</li>

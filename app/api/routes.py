@@ -8,6 +8,7 @@ from flask import (
     request,
     jsonify,
     send_from_directory,
+    Response,
 )
 from datetime import datetime
 import logging
@@ -44,6 +45,30 @@ def register_api_routes(app):
     # Registrar blueprint de autenticación
     from app.api.auth import auth_bp
     app.register_blueprint(auth_bp)
+    
+    # Registrar ruta para archivos de prueba e2e en modo desarrollo
+    @app.route('/tests/e2e/<path:filename>')
+    def serve_e2e_test_files(filename):
+        """Servir archivos de prueba e2e en modo desarrollo."""
+        import os
+        from flask import current_app, send_from_directory, Response
+        
+        # Obtener la ruta absoluta del directorio de pruebas e2e
+        project_root = os.path.abspath(os.path.dirname(os.path.dirname(current_app.root_path)))
+        tests_e2e_dir = os.path.join(project_root, 'tests', 'e2e')
+        current_app.logger.info(f"Directorio de pruebas e2e: {tests_e2e_dir}")
+        
+        try:
+            # Para archivos JavaScript, leer el contenido y devolverlo con el tipo MIME correcto
+            if filename.endswith('.js'):
+                with open(os.path.join(tests_e2e_dir, filename), 'r', encoding='utf-8') as f:
+                    content = f.read()
+                    return Response(content, mimetype='application/javascript')
+            # Para otros archivos, usar send_from_directory
+            return send_from_directory(tests_e2e_dir, filename)
+        except Exception as e:
+            current_app.logger.error(f"Error al servir archivo {filename}: {str(e)}")
+            return jsonify({"error": f"No se pudo cargar el archivo: {str(e)}"}), 500
 
 
 # Rutas principales
@@ -57,6 +82,12 @@ def index():
 def chat():
     """Página del chat."""
     return render_template("chat.html")
+
+
+@main_bp.route("/privacy_policy")
+def privacy_policy():
+    """Página de política de privacidad."""
+    return render_template("privacy_policy.html")
 
 
 # Rutas de utilidad
@@ -137,6 +168,12 @@ console.log('Service Worker básico cargado');
         f"        <priority>0.8</priority>\n"
         f"    </url>\n"
         f"    <url>\n"
+        f"        <loc>{base_url}/privacy_policy</loc>\n"
+        f"        <lastmod>{current_date}</lastmod>\n"
+        f"        <changefreq>monthly</changefreq>\n"
+        f"        <priority>0.7</priority>\n"
+        f"    </url>\n"
+        f"    <url>\n"
         f"        <loc>{base_url}/manifest.json</loc>\n"
         f"        <lastmod>{current_date}</lastmod>\n"
         f"        <changefreq>monthly</changefreq>\n"
@@ -194,6 +231,12 @@ def sitemap_xml():
             f'        <lastmod>{current_date}</lastmod>\n'
             f'        <changefreq>weekly</changefreq>\n'
             f'        <priority>0.8</priority>\n'
+            f'    </url>\n'
+            f'    <url>\n'
+            f'        <loc>{base_url}/privacy_policy</loc>\n'
+            f'        <lastmod>{current_date}</lastmod>\n'
+            f'        <changefreq>monthly</changefreq>\n'
+            f'        <priority>0.7</priority>\n'
             f'    </url>\n'
             f'    <url>\n'
             f'        <loc>{base_url}/manifest.json</loc>\n'
@@ -339,35 +382,3 @@ def create_basic_routes(app):
     @app.route("/chat")
     def chat():
         return render_template("chat.html")
-
-    @app.route("/api/chat/send", methods=["POST"])
-    @rate_limit_decorator
-    def send_message():
-        try:
-            data = request.get_json()
-            if not data or "message" not in data:
-                return (
-                    jsonify({
-                        "success": False,
-                        "message": "Mensaje requerido",
-                    }),
-                    400,
-                )
-
-            # Respuesta básica para desarrollo
-            return jsonify(
-                {
-                    "success": True,
-                    "message": f"Echo: {data['message']}",
-                    "cached": False,
-                }
-            )
-
-        except Exception:
-            return (
-                jsonify({
-                    "success": False,
-                    "message": "Error interno del servidor",
-                }),
-                500,
-            )

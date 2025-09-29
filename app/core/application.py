@@ -59,6 +59,9 @@ def create_app(config_class=Config):
 
     # Configuración
     app.config.from_object(config_class)
+    
+    # Deshabilitar protección CSRF para permitir solicitudes API sin token
+    app.config['WTF_CSRF_ENABLED'] = False
 
     # Configurar logging
     setup_logging(app)

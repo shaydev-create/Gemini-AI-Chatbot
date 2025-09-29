@@ -1,14 +1,3 @@
-// requestAnimationFrame loop to guarantee input is always enabled
-                function forceEnableInput() {
-                    if (messageInput) {
-                        if (messageInput.disabled) {
-                            console.warn('Input was disabled, forcibly enabling.');
-                            messageInput.disabled = false;
-                        }
-                        requestAnimationFrame(forceEnableInput);
-                    }
-                }
-                forceEnableInput();
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -43,6 +32,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <link rel="manifest" href="/static/manifest.json">
+    
     
     <title>{{ translate('title') }}</title>
     
@@ -82,15 +72,21 @@
             --text-primary: #ffffff;
             --text-secondary: #a0a0a0;
             --glass-bg: rgba(0, 245, 255, 0.008); /* ULTRA TRANSPARENTE */
-            --glass-border: rgba(0, 245, 255, 0.03); /* ULTRA TRANSPARENTE */
+            --glass-border: rgba(0, 245, 255, 0.03); /* ULTRA TRANSPARENTE */       
             --glow: 0 0 20px var(--primary);
             --neural-grid: linear-gradient(90deg, transparent 98%, rgba(0, 245, 255, 0.1) 100%);
         }
-        
+
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+        }
+
+        body, html {
+            width: 100%;
+            height: 100%;
+            overflow-x: hidden;
         }
         
         /* Accessibility Skip Link */
@@ -150,7 +146,7 @@
         
         body {
             font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-            background: #0a0a0f;
+            background: linear-gradient(135deg, #0c0c0c 0%, #1a1a2e 50%, #16213e 100%);
             height: 100vh;
             display: flex;
             justify-content: center;
@@ -161,291 +157,16 @@
             overflow: hidden;
         }
         
-        /* Fondo del Agujero Negro - RÉPLICA EXACTA DE LA IMAGEN REAL */
-        body::before {
-            content: '';
+        #neural-canvas {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: 
-                /* Campo de estrellas exacto como la imagen */
-                radial-gradient(0.5px 0.5px at 12px 18px, rgba(255, 255, 255, 0.9), transparent),
-                radial-gradient(1px 1px at 45px 32px, rgba(255, 255, 255, 0.7), transparent),
-                radial-gradient(0.5px 0.5px at 78px 65px, rgba(255, 255, 255, 0.8), transparent),
-                radial-gradient(1px 1px at 112px 23px, rgba(255, 255, 255, 0.6), transparent),
-                radial-gradient(0.5px 0.5px at 156px 89px, rgba(255, 255, 255, 0.9), transparent),
-                radial-gradient(1px 1px at 189px 45px, rgba(255, 255, 255, 0.5), transparent),
-                radial-gradient(0.5px 0.5px at 234px 78px, rgba(255, 255, 255, 0.8), transparent),
-                radial-gradient(1px 1px at 267px 12px, rgba(255, 255, 255, 0.7), transparent),
-                radial-gradient(0.5px 0.5px at 298px 56px, rgba(255, 255, 255, 0.6), transparent),
-                radial-gradient(1px 1px at 334px 91px, rgba(255, 255, 255, 0.9), transparent),
-                /* Estrellas distribuidas como en la imagen real */
-                radial-gradient(0.5px 0.5px at 15% 25%, rgba(255, 255, 255, 0.8), transparent),
-                radial-gradient(1px 1px at 85% 15%, rgba(255, 255, 255, 0.9), transparent),
-                radial-gradient(0.5px 0.5px at 25% 75%, rgba(255, 255, 255, 0.6), transparent),
-                radial-gradient(1px 1px at 75% 85%, rgba(255, 255, 255, 0.7), transparent),
-                radial-gradient(0.5px 0.5px at 95% 35%, rgba(255, 255, 255, 0.8), transparent),
-                radial-gradient(1px 1px at 5% 65%, rgba(255, 255, 255, 0.5), transparent),
-                radial-gradient(0.5px 0.5px at 45% 5%, rgba(255, 255, 255, 0.9), transparent),
-                radial-gradient(1px 1px at 65% 95%, rgba(255, 255, 255, 0.7), transparent),
-                /* Nebulosa de fondo sutil como en la imagen */
-                radial-gradient(ellipse 800px 400px at 30% 40%, rgba(70, 130, 180, 0.03), transparent),
-                radial-gradient(ellipse 600px 300px at 70% 60%, rgba(25, 25, 112, 0.02), transparent),
-                /* Fondo del espacio profundo exacto */
-                radial-gradient(ellipse at center, 
-                    #000000 0%, 
-                    #050510 20%, 
-                    #0a0a1a 40%, 
-                    #0f0f25 60%, 
-                    #0a0a1a 80%, 
-                    #000000 100%
-                );
-            background-size: 
-                200px 200px, 200px 200px, 200px 200px, 200px 200px, 200px 200px,
-                200px 200px, 200px 200px, 200px 200px, 200px 200px, 200px 200px,
-                400px 400px, 400px 400px, 400px 400px, 400px 400px, 400px 400px,
-                400px 400px, 400px 400px, 400px 400px,
-                1200px 600px, 1000px 500px,
-                100% 100%;
-            z-index: -10;
+            z-index: -1;
         }
         
-        /* FONDO ESTRELLADO CON PARTÍCULAS 3D */
-        
-        /* Fondo base del espacio profundo */
-        body::before {
-            content: '';
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: 
-                /* Gradiente de espacio profundo */
-                radial-gradient(ellipse at top, rgba(15, 25, 45, 0.9) 0%, rgba(5, 10, 25, 0.95) 50%, rgba(0, 0, 10, 1) 100%),
-                /* Nebulosas distantes */
-                radial-gradient(circle at 20% 30%, rgba(75, 0, 130, 0.1) 0%, transparent 50%),
-                radial-gradient(circle at 80% 70%, rgba(25, 25, 112, 0.08) 0%, transparent 40%),
-                radial-gradient(circle at 60% 20%, rgba(72, 61, 139, 0.06) 0%, transparent 35%),
-                /* Base negra del espacio */
-                linear-gradient(180deg, rgba(0, 0, 5, 1) 0%, rgba(0, 0, 0, 1) 100%);
-            z-index: -10;
-        }
-        
-        /* Campo de estrellas estático */
-        body::after {
-            content: '';
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-image: 
-                /* Estrellas grandes brillantes */
-                radial-gradient(2px 2px at 20px 30px, rgba(255, 255, 255, 0.9), transparent),
-                radial-gradient(2px 2px at 40px 70px, rgba(255, 255, 255, 0.8), transparent),
-                radial-gradient(1px 1px at 90px 40px, rgba(255, 255, 255, 0.7), transparent),
-                radial-gradient(1px 1px at 130px 80px, rgba(255, 255, 255, 0.6), transparent),
-                radial-gradient(2px 2px at 160px 30px, rgba(255, 255, 255, 0.9), transparent),
-                radial-gradient(1px 1px at 200px 60px, rgba(255, 255, 255, 0.7), transparent),
-                radial-gradient(1px 1px at 240px 90px, rgba(255, 255, 255, 0.5), transparent),
-                radial-gradient(2px 2px at 280px 20px, rgba(255, 255, 255, 0.8), transparent),
-                radial-gradient(1px 1px at 320px 70px, rgba(255, 255, 255, 0.6), transparent),
-                radial-gradient(1px 1px at 360px 40px, rgba(255, 255, 255, 0.7), transparent),
-                /* Estrellas medianas */
-                radial-gradient(1px 1px at 15px 60px, rgba(200, 220, 255, 0.6), transparent),
-                radial-gradient(1px 1px at 55px 20px, rgba(255, 220, 200, 0.5), transparent),
-                radial-gradient(1px 1px at 85px 80px, rgba(220, 255, 220, 0.4), transparent),
-                radial-gradient(1px 1px at 115px 50px, rgba(255, 255, 200, 0.6), transparent),
-                radial-gradient(1px 1px at 145px 90px, rgba(200, 200, 255, 0.5), transparent),
-                radial-gradient(1px 1px at 175px 10px, rgba(255, 200, 255, 0.4), transparent),
-                radial-gradient(1px 1px at 205px 40px, rgba(220, 255, 255, 0.5), transparent),
-                radial-gradient(1px 1px at 235px 70px, rgba(255, 255, 220, 0.4), transparent),
-                radial-gradient(1px 1px at 265px 100px, rgba(200, 255, 200, 0.6), transparent),
-                radial-gradient(1px 1px at 295px 30px, rgba(255, 220, 220, 0.5), transparent),
-                /* Estrellas pequeñas */
-                radial-gradient(0.5px 0.5px at 25px 45px, rgba(255, 255, 255, 0.4), transparent),
-                radial-gradient(0.5px 0.5px at 65px 85px, rgba(255, 255, 255, 0.3), transparent),
-                radial-gradient(0.5px 0.5px at 95px 15px, rgba(255, 255, 255, 0.4), transparent),
-                radial-gradient(0.5px 0.5px at 125px 65px, rgba(255, 255, 255, 0.3), transparent),
-                radial-gradient(0.5px 0.5px at 155px 35px, rgba(255, 255, 255, 0.4), transparent),
-                radial-gradient(0.5px 0.5px at 185px 75px, rgba(255, 255, 255, 0.3), transparent),
-                radial-gradient(0.5px 0.5px at 215px 25px, rgba(255, 255, 255, 0.4), transparent),
-                radial-gradient(0.5px 0.5px at 245px 55px, rgba(255, 255, 255, 0.3), transparent),
-                radial-gradient(0.5px 0.5px at 275px 85px, rgba(255, 255, 255, 0.4), transparent),
-                radial-gradient(0.5px 0.5px at 305px 15px, rgba(255, 255, 255, 0.3), transparent);
-            background-repeat: repeat;
-            background-size: 400px 400px, 350px 350px, 300px 300px;
-            z-index: -9;
-        }
-        
-        /* Partículas flotantes 3D - Red Neuronal Mejorada */
-        .space-particle {
-            position: fixed;
-            border-radius: 50%;
-            pointer-events: none;
-            z-index: -5;
-            animation: float3D 8s infinite ease-in-out;
-        }
-        
-        /* Diferentes tamaños de partículas - MÁS GRANDES Y NOTORIAS */
-        .space-particle.small {
-            width: 6px;
-            height: 6px;
-            background: radial-gradient(circle, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.4) 70%, transparent 100%);
-            box-shadow: 0 0 12px rgba(255, 255, 255, 0.8), 0 0 24px rgba(100, 150, 255, 0.5);
-        }
-        
-        .space-particle.medium {
-            width: 10px;
-            height: 10px;
-            background: radial-gradient(circle, rgba(100, 200, 255, 0.9) 0%, rgba(100, 200, 255, 0.5) 70%, transparent 100%);
-            box-shadow: 0 0 16px rgba(100, 200, 255, 0.9), 0 0 32px rgba(100, 200, 255, 0.6);
-        }
-        
-        .space-particle.large {
-            width: 14px;
-            height: 14px;
-            background: radial-gradient(circle, rgba(255, 180, 100, 0.9) 0%, rgba(255, 180, 100, 0.5) 70%, transparent 100%);
-            box-shadow: 0 0 20px rgba(255, 180, 100, 0.9), 0 0 40px rgba(255, 180, 100, 0.7);
-        }
-        
-        /* Nueva clase para partículas extra grandes */
-        .space-particle.xlarge {
-            width: 18px;
-            height: 18px;
-            background: radial-gradient(circle, rgba(255, 100, 255, 0.9) 0%, rgba(255, 100, 255, 0.5) 70%, transparent 100%);
-            box-shadow: 0 0 25px rgba(255, 100, 255, 0.9), 0 0 50px rgba(255, 100, 255, 0.8);
-        }
-        
-        /* Líneas de conexión neuronal corregidas - Más naturales */
-        .neural-connection {
-            position: fixed;
-            height: 1px; /* Más delgadas para parecer más naturales */
-            background: linear-gradient(90deg, 
-                transparent 0%, 
-                rgba(100, 200, 255, 0.6) 10%, 
-                rgba(100, 200, 255, 0.9) 50%, 
-                rgba(100, 200, 255, 0.6) 90%, 
-                transparent 100%);
-            transform-origin: left center;
-            pointer-events: none;
-            z-index: -4;
-            animation: pulse-connection 4s infinite ease-in-out;
-            border-radius: 1px;
-            box-shadow: 0 0 3px rgba(100, 200, 255, 0.4);
-        }
-        
-        /* Líneas púrpura más sutiles */
-        .neural-connection.purple {
-            background: linear-gradient(90deg, 
-                transparent 0%, 
-                rgba(255, 100, 255, 0.5) 10%, 
-                rgba(255, 100, 255, 0.8) 50%, 
-                rgba(255, 100, 255, 0.5) 90%, 
-                transparent 100%);
-            box-shadow: 0 0 3px rgba(255, 100, 255, 0.3);
-        }
-        
-        /* Líneas naranjas más sutiles */
-        .neural-connection.orange {
-            background: linear-gradient(90deg, 
-                transparent 0%, 
-                rgba(255, 180, 100, 0.5) 10%, 
-                rgba(255, 180, 100, 0.8) 50%, 
-                rgba(255, 180, 100, 0.5) 90%, 
-                transparent 100%);
-            box-shadow: 0 0 3px rgba(255, 180, 100, 0.3);
-        }
-        
-        @keyframes pulse-connection {
-            0%, 100% { 
-                opacity: 0.3; 
-                transform: scaleX(1) scaleY(1); 
-            }
-            50% { 
-                opacity: 0.8; 
-                transform: scaleX(1.02) scaleY(1.5); 
-            }
-        }
-        
-        /* Animación 3D de las partículas */
-        @keyframes float3D {
-            0% {
-                transform: translateZ(0px) translateY(0px) translateX(0px);
-                opacity: 0;
-            }
-            10% {
-                opacity: 1;
-            }
-            50% {
-                transform: translateZ(100px) translateY(-20px) translateX(10px);
-                opacity: 1;
-            }
-            90% {
-                opacity: 1;
-            }
-            100% {
-                transform: translateZ(200px) translateY(-40px) translateX(20px);
-                opacity: 0;
-            }
-        }
-        
-        /* Partículas con diferentes velocidades */
-        .space-particle:nth-child(odd) {
-            animation-duration: 6s;
-            animation-delay: -2s;
-        }
-        
-        .space-particle:nth-child(even) {
-            animation-duration: 10s;
-            animation-delay: -4s;
-        }
-        
-        .space-particle:nth-child(3n) {
-            animation-duration: 12s;
-            animation-delay: -1s;
-        }
-        
-        .space-particle:nth-child(4n) {
-            animation-duration: 8s;
-            animation-delay: -3s;
-        }
-        
-        .space-particle:nth-child(5n) {
-            animation-duration: 14s;
-            animation-delay: -5s;
-        }
-        
-        /* Neural Network Background */
-        .neural-background {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: 
-                var(--neural-grid),
-                linear-gradient(0deg, transparent 98%, rgba(0, 245, 255, 0.05) 100%);
-            background-size: 50px 50px;
-            /* SIN ANIMACIÓN - FONDO ESTÁTICO */
-            z-index: -3;
-        }
-        
-        /* Floating Particles - DESHABILITADAS */
-        .particle {
-            position: fixed;
-            width: 4px;
-            height: 4px;
-            background: var(--accent);
-            border-radius: 50%;
-            pointer-events: none;
-            z-index: 1;
-            /* SIN ANIMACIÓN */
-            opacity: 0; /* Ocultas para no interferir */
-        }
+
         
 
         
@@ -476,6 +197,12 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
+        }
+        
+        .chat-header-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
         
         .chat-header-content {
@@ -731,6 +458,23 @@
             box-shadow: 0 4px 12px rgba(0, 245, 255, 0.3);
         }
         
+        /* Estilos para los botones de idioma */
+        .lang-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            min-width: 90px;
+        }
+        
+        .lang-btn[data-lang="es"] {
+            order: 4; /* Ordenar después de los otros botones */
+        }
+        
+        .lang-btn[data-lang="en"] {
+            order: 5; /* Ordenar después del botón español */
+        }
+        
         .typing-indicator {
             display: none;
             align-items: center;
@@ -864,12 +608,19 @@
             .input-actions {
                 flex-wrap: wrap;
                 justify-content: center;
+                gap: 6px;
             }
             
             .action-btn {
                 flex: 1;
                 min-width: 80px;
                 text-align: center;
+                font-size: 0.75rem;
+                padding: 6px 8px;
+            }
+            
+            .lang-btn {
+                min-width: 70px;
             }
         }
         
@@ -910,118 +661,10 @@
     </style>
 </head>
 <body>
+    
+    <canvas id="neural-canvas"></canvas>
     <a href="#main-chat" class="skip-link">{{ translate('welcome') }}</a>
     <div id="chat-container" role="main" aria-label="Chat principal">
-        <!-- Neural Network Background -->
-        <div class="neural-background"></div>
-        
-        <!-- Partículas Espaciales 3D - Red Neuronal Expandida -->
-        <!-- Partículas Extra Grandes -->
-        <div class="space-particle xlarge" style="top: 5%; left: 10%;"></div>
-        <div class="space-particle xlarge" style="top: 15%; left: 85%;"></div>
-        <div class="space-particle xlarge" style="top: 25%; left: 50%;"></div>
-        <div class="space-particle xlarge" style="top: 35%; left: 20%;"></div>
-        <div class="space-particle xlarge" style="top: 45%; left: 75%;"></div>
-        <div class="space-particle xlarge" style="top: 55%; left: 40%;"></div>
-        <div class="space-particle xlarge" style="top: 65%; left: 90%;"></div>
-        <div class="space-particle xlarge" style="top: 75%; left: 15%;"></div>
-        <div class="space-particle xlarge" style="top: 85%; left: 60%;"></div>
-        <div class="space-particle xlarge" style="top: 95%; left: 30%;"></div>
-        
-        <!-- Partículas Grandes -->
-        <div class="space-particle large" style="top: 8%; left: 45%;"></div>
-        <div class="space-particle large" style="top: 18%; left: 70%;"></div>
-        <div class="space-particle large" style="top: 28%; left: 25%;"></div>
-        <div class="space-particle large" style="top: 38%; left: 80%;"></div>
-        <div class="space-particle large" style="top: 48%; left: 35%;"></div>
-        <div class="space-particle large" style="top: 58%; left: 65%;"></div>
-        <div class="space-particle large" style="top: 68%; left: 45%;"></div>
-        <div class="space-particle large" style="top: 78%; left: 85%;"></div>
-        <div class="space-particle large" style="top: 88%; left: 25%;"></div>
-        <div class="space-particle large" style="top: 12%; left: 55%;"></div>
-        <div class="space-particle large" style="top: 22%; left: 15%;"></div>
-        <div class="space-particle large" style="top: 32%; left: 95%;"></div>
-        <div class="space-particle large" style="top: 42%; left: 60%;"></div>
-        <div class="space-particle large" style="top: 52%; left: 10%;"></div>
-        <div class="space-particle large" style="top: 62%; left: 80%;"></div>
-        
-        <!-- Partículas Medianas -->
-        <div class="space-particle medium" style="top: 10%; left: 30%;"></div>
-        <div class="space-particle medium" style="top: 20%; left: 60%;"></div>
-        <div class="space-particle medium" style="top: 30%; left: 90%;"></div>
-        <div class="space-particle medium" style="top: 40%; left: 15%;"></div>
-        <div class="space-particle medium" style="top: 50%; left: 85%;"></div>
-        <div class="space-particle medium" style="top: 60%; left: 25%;"></div>
-        <div class="space-particle medium" style="top: 70%; left: 75%;"></div>
-        <div class="space-particle medium" style="top: 80%; left: 45%;"></div>
-        <div class="space-particle medium" style="top: 90%; left: 70%;"></div>
-        <div class="space-particle medium" style="top: 5%; left: 55%;"></div>
-        <div class="space-particle medium" style="top: 15%; left: 35%;"></div>
-        <div class="space-particle medium" style="top: 25%; left: 80%;"></div>
-        <div class="space-particle medium" style="top: 35%; left: 65%;"></div>
-        <div class="space-particle medium" style="top: 45%; left: 40%;"></div>
-        <div class="space-particle medium" style="top: 55%; left: 95%;"></div>
-        <div class="space-particle medium" style="top: 65%; left: 20%;"></div>
-        <div class="space-particle medium" style="top: 75%; left: 50%;"></div>
-        <div class="space-particle medium" style="top: 85%; left: 10%;"></div>
-    
-        <!-- Partículas Pequeñas -->
-        <div class="space-particle small" style="top: 7%; left: 20%;"></div>
-        <div class="space-particle small" style="top: 17%; left: 75%;"></div>
-        <div class="space-particle small" style="top: 27%; left: 40%;"></div>
-        <div class="space-particle small" style="top: 37%; left: 85%;"></div>
-        <div class="space-particle small" style="top: 47%; left: 25%;"></div>
-        <div class="space-particle small" style="top: 57%; left: 70%;"></div>
-        <div class="space-particle small" style="top: 67%; left: 35%;"></div>
-        <div class="space-particle small" style="top: 77%; left: 90%;"></div>
-        <div class="space-particle small" style="top: 87%; left: 50%;"></div>
-        <div class="space-particle small" style="top: 97%; left: 15%;"></div>
-        <div class="space-particle small" style="top: 3%; left: 65%;"></div>
-        <div class="space-particle small" style="top: 13%; left: 45%;"></div>
-        <div class="space-particle small" style="top: 23%; left: 95%;"></div>
-        <div class="space-particle small" style="top: 33%; left: 30%;"></div>
-        <div class="space-particle small" style="top: 43%; left: 80%;"></div>
-        <div class="space-particle small" style="top: 53%; left: 55%;"></div>
-        <div class="space-particle small" style="top: 63%; left: 10%;"></div>
-        <div class="space-particle small" style="top: 73%; left: 65%;"></div>
-        <div class="space-particle small" style="top: 83%; left: 35%;"></div>
-        <div class="space-particle small" style="top: 93%; left: 85%;"></div>
-        
-        <!-- Líneas de Conexión Neuronal Naturales - Red orgánica -->
-        <!-- Conexiones principales horizontales -->
-        <div class="neural-connection" style="top: 15%; left: 10%; width: 120px; transform: rotate(5deg);"></div>
-        <div class="neural-connection" style="top: 25%; left: 25%; width: 150px; transform: rotate(-8deg);"></div>
-        <div class="neural-connection" style="top: 35%; left: 15%; width: 180px; transform: rotate(12deg);"></div>
-        <div class="neural-connection" style="top: 45%; left: 30%; width: 140px; transform: rotate(-5deg);"></div>
-        <div class="neural-connection" style="top: 55%; left: 20%; width: 160px; transform: rotate(8deg);"></div>
-        <div class="neural-connection" style="top: 65%; left: 35%; width: 130px; transform: rotate(-10deg);"></div>
-        <div class="neural-connection" style="top: 75%; left: 15%; width: 170px; transform: rotate(6deg);"></div>
-        <div class="neural-connection" style="top: 85%; left: 25%; width: 140px; transform: rotate(-7deg);"></div>
-        
-        <!-- Conexiones diagonales púrpura -->
-        <div class="neural-connection purple" style="top: 20%; left: 50%; width: 100px; transform: rotate(25deg);"></div>
-        <div class="neural-connection purple" style="top: 40%; left: 60%; width: 120px; transform: rotate(-30deg);"></div>
-        <div class="neural-connection purple" style="top: 60%; left: 55%; width: 110px; transform: rotate(35deg);"></div>
-        <div class="neural-connection purple" style="top: 80%; left: 65%; width: 130px; transform: rotate(-25deg);"></div>
-        
-        <!-- Conexiones verticales naranja -->
-        <div class="neural-connection orange" style="top: 10%; left: 70%; width: 80px; transform: rotate(85deg);"></div>
-        <div class="neural-connection orange" style="top: 30%; left: 75%; width: 90px; transform: rotate(88deg);"></div>
-        <div class="neural-connection orange" style="top: 50%; left: 80%; width: 85px; transform: rotate(92deg);"></div>
-        <div class="neural-connection orange" style="top: 70%; left: 85%; width: 95px; transform: rotate(87deg);"></div>
-        
-        <!-- Conexiones del lado derecho -->
-        <div class="neural-connection" style="top: 18%; left: 75%; width: 140px; transform: rotate(-15deg);"></div>
-        <div class="neural-connection" style="top: 38%; left: 70%; width: 160px; transform: rotate(18deg);"></div>
-        <div class="neural-connection" style="top: 58%; left: 75%; width: 120px; transform: rotate(-12deg);"></div>
-        <div class="neural-connection" style="top: 78%; left: 80%; width: 150px; transform: rotate(15deg);"></div>
-        
-        <!-- Conexiones cruzadas para formar red -->
-        <div class="neural-connection purple" style="top: 12%; left: 40%; width: 200px; transform: rotate(45deg);"></div>
-        <div class="neural-connection purple" style="top: 32%; left: 45%; width: 180px; transform: rotate(-45deg);"></div>
-        <div class="neural-connection orange" style="top: 52%; left: 40%; width: 190px; transform: rotate(40deg);"></div>
-        <div class="neural-connection orange" style="top: 72%; left: 45%; width: 170px; transform: rotate(-40deg);"></div>
-    
         <!-- Skip to main content for accessibility -->
         <a href="#chat-main" class="skip-link" aria-label="Saltar al contenido principal del chat">Saltar al chat</a>
         
@@ -1031,7 +674,7 @@
 
 
         <!-- Único contenedor requerido por E2E Selenium y la app -->
-        <div id="chatContainer" class="chat-container" role="main" style="display: flex !important; flex-direction: column; position: relative; z-index: 1000; background: rgba(5,10,20,0.25); visibility: visible !important; opacity: 1 !important;">
+        <div id="chatContainer" class="chat-container" role="main">
             <header class="chat-header">
                 <div class="chat-header-content">
                     <h1><span class="title-emoji">🤖</span> <span class="title-text">Gemini AI Chat</span></h1>
@@ -1055,10 +698,10 @@
                 <form class="input-container" onsubmit="sendMessage(); return false;">
                     <div class="input-wrapper">
                         <label for="messageInput" class="sr-only">Escribe tu mensaje</label>
-                        <input type="text" id="messageInput" placeholder="Escribe tu mensaje aquí..." maxlength="1000" aria-describedby="charCounter" aria-required="true" autocomplete="off" style="background: rgba(5,10,20,0.2); color: #fff; position: relative; z-index: 2000; display: block !important; visibility: visible !important; opacity: 1 !important;" />
+                        <input type="text" id="messageInput" placeholder="Escribe tu mensaje aquí..." maxlength="1000" aria-describedby="charCounter" aria-required="true" autocomplete="off" />
                         <div class="char-counter" id="charCounter" aria-live="polite">0/1000</div>
                     </div>
-                    <button type="submit" class="send-button" id="sendButton" aria-label="Enviar mensaje" style="z-index: 2000; display: block !important; visibility: visible !important; opacity: 1 !important;">
+                    <button type="submit" class="send-button" id="sendButton" aria-label="Enviar mensaje">
                         <span>Enviar</span>
                         <span aria-hidden="true">📤</span>
                     </button>
@@ -1068,19 +711,14 @@
                     <button class="action-btn" aria-label="Exportar conversación" tabindex="0">💾 Exportar</button>
                     <button class="action-btn" aria-label="Activar o desactivar síntesis de voz" tabindex="0">🎤 Voz</button>
                     <button class="action-btn" aria-label="Subir archivo" tabindex="0">📎 Archivo</button>
+                    <button class="action-btn lang-btn" data-lang="es" aria-label="Cambiar a español" tabindex="0">🇪🇸 Español</button>
+                    <button class="action-btn lang-btn" data-lang="en" aria-label="Cambiar a inglés" tabindex="0">🇬🇧 English</button>
                 </div>
                 <input type="file" id="fileInput" style="display: none;" accept=".txt,.pdf,.doc,.docx,.jpg,.jpeg,.png,.gif" multiple aria-label="Seleccionar archivos para subir">
             </section>
         </div>
     </div>
-    <!-- Selector de idioma para internacionalización básica -->
-    <footer>
-        <label for="lang-select">Idioma:</label>
-        <select id="lang-select" aria-label="Seleccionar idioma">
-            <option value="es">Español</option>
-            <option value="en">English</option>
-        </select>
-    </footer>
+    <!-- El selector de idioma se ha movido a los botones de acción del chat -->
     <script>
         // === CONFIGURACIÓN OPTIMIZADA Y VARIABLES GLOBALES ===
         let messagesContainer, messageInput, sendButton, typingIndicator, charCounter;
@@ -1091,6 +729,7 @@
         let lastScrollPosition = 0;
         let autoScrollEnabled = true;
         let retryCount = 0;
+        let conversationId = 'session_' + Date.now(); // ID único para la conversación actual
         const MAX_RETRIES = 3;
         const RETRY_DELAY = 1000;
         const MAX_MESSAGE_LENGTH = 4000;
@@ -1100,6 +739,17 @@
         let animationId;
         let lastParticleTime = 0;
         const PARTICLE_INTERVAL = 150; // Aumentado para reducir carga
+        
+        // requestAnimationFrame loop to guarantee input is always enabled
+        function forceEnableInput() {
+            if (messageInput) {
+                if (messageInput.disabled) {
+                    console.warn('Input was disabled, forcibly enabling.');
+                    messageInput.disabled = false;
+                }
+                requestAnimationFrame(forceEnableInput);
+            }
+        }
         
         // Cache de elementos DOM para evitar búsquedas repetidas
         const domCache = {
@@ -1322,7 +972,9 @@
                 const host = window.location.host;
                 let apiUrl = '/api/chat/send';
                 
-                // Si estamos en HTTP, intentar actualizar a HTTPS para la API
+                // Usar siempre el mismo protocolo que la página
+                // Comentado el intento de actualizar a HTTPS ya que causa problemas
+                /*
                 if (protocol === 'http:' && (host.includes('localhost') || host.includes('127.0.0.1'))) {
                     // Verificar si HTTPS está disponible
                     try {
@@ -1339,6 +991,7 @@
                         console.warn('⚠️ HTTPS no disponible, usando HTTP:', httpsError.message);
                     }
                 }
+                */
                 
                 const response = await fetch(apiUrl, {
                     method: 'POST',
@@ -1346,7 +999,12 @@
                         'Content-Type': 'application/json',
                         'X-Requested-With': 'XMLHttpRequest'
                     },
-                    body: JSON.stringify({ message: message }),
+                    body: JSON.stringify({ 
+                        message: message,
+                        conversation_id: conversationId || 'default',
+                        model: 'gemini-pro',
+                        stream: false
+                    }),
                     signal: controller.signal,
                     credentials: 'same-origin'
                 });
@@ -1434,6 +1092,9 @@
                     });
                     observer.observe(messageInput, { attributes: true, attributeFilter: ['disabled'] });
                 }
+                
+                // El script del modo SOLO se carga al final del documento
+                // No es necesario cargarlo dinámicamente aquí
             try {
                 // Inicializar elementos DOM
                 messagesContainer = document.getElementById('messages');
@@ -1473,6 +1134,9 @@
                     messageInput.disabled = false;
                     messageInput.focus();
                 }
+                
+                // Iniciar el loop de forceEnableInput
+                forceEnableInput();
 
                 // 12. Periodic check to keep input enabled
                 setInterval(() => {
@@ -1485,8 +1149,8 @@
                 createFloatingParticles();
                 setInterval(createParticle, 300);
                 
-                // 8. Inicializar efectos del agujero negro
-                initializeBlackHoleBackground();
+                // 8. Inicializar efectos del fondo de partículas
+                initializeParticlesBackground();
                 
                 // 9. Inicializar Service Worker
                 initializeServiceWorker();
@@ -1531,7 +1195,7 @@
 
         
         function addWelcomeMessage() {
-            addMessage('¡Hola! Soy tu asistente de IA powered by Google Gemini. ¿En qué puedo ayudarte hoy?', 'bot');
+            addMessage('¡Hola! Soy tu asistente de IA. ¿En qué puedo ayudarte hoy?', 'bot');
         }
         
         function clearChat() {
@@ -1798,6 +1462,9 @@
                 
                 // Configurar atajos de teclado
                 setupKeyboardShortcuts();
+                
+                // Configurar botones de idioma
+                setupLanguageButtons();
                 
                 console.log('✅ Event listeners configurados correctamente');
             } catch (error) {
@@ -2094,15 +1761,151 @@
             }
         }
         
-        // Inicialización simple del fondo del agujero negro
-        function initializeBlackHoleBackground() {
-            console.log('✅ Fondo del agujero negro basado en imagen real inicializado');
+        // Inicializar fondo de partículas
+        function initializeParticlesBackground() {
+            // Variables para el canvas de red neuronal
+            const canvas = document.getElementById('neural-canvas');
+            const ctx = canvas.getContext('2d');
+            let neuralParticles = [];
+            let neuralAnimationId;
+
+            // Configuración de partículas
+            const config = {
+                particleCount: 100,
+                maxDistance: 120,
+                particleSpeed: 0.5,
+                nodeRadius: 2,
+                connectionOpacity: 0.3,
+                particleOpacity: 0.7
+            };
+
+            // Clase Particle
+            class Particle {
+                constructor() {
+                    this.x = Math.random() * canvas.width;
+                    this.y = Math.random() * canvas.height;
+                    this.vx = (Math.random() - 0.5) * config.particleSpeed;
+                    this.vy = (Math.random() - 0.5) * config.particleSpeed;
+                    this.radius = config.nodeRadius + Math.random() * 2;
+                }
+
+                update() {
+                    this.x += this.vx;
+                    this.y += this.vy;
+
+                    // Rebote en los bordes
+                    if (this.x < 0 || this.x > canvas.width) this.vx *= -1;
+                    if (this.y < 0 || this.y > canvas.height) this.vy *= -1;
+
+                    // Mantener dentro de los límites
+                    this.x = Math.max(0, Math.min(canvas.width, this.x));
+                    this.y = Math.max(0, Math.min(canvas.height, this.y));
+                }
+
+                draw() {
+                    ctx.beginPath();
+                    ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                    ctx.fillStyle = `rgba(0, 212, 255, ${config.particleOpacity})`;
+                    ctx.fill();
+
+                    // Efecto de brillo
+                    ctx.beginPath();
+                    ctx.arc(this.x, this.y, this.radius * 0.5, 0, Math.PI * 2);
+                    ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+                    ctx.fill();
+                }
+            }
+
+            // Inicializar canvas
+            function initCanvas() {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+            }
+
+            // Crear partículas
+            function createParticles() {
+                neuralParticles = [];
+                for (let i = 0; i < config.particleCount; i++) {
+                    neuralParticles.push(new Particle());
+                }
+            }
+
+            // Dibujar conexiones entre partículas
+            function drawConnections() {
+                for (let i = 0; i < neuralParticles.length; i++) {
+                    for (let j = i + 1; j < neuralParticles.length; j++) {
+                        const dx = neuralParticles[i].x - neuralParticles[j].x;
+                        const dy = neuralParticles[i].y - neuralParticles[j].y;
+                        const distance = Math.sqrt(dx * dx + dy * dy);
+
+                        if (distance < config.maxDistance) {
+                            const opacity = (1 - distance / config.maxDistance) * config.connectionOpacity;
+                            ctx.beginPath();
+                            ctx.moveTo(neuralParticles[i].x, neuralParticles[i].y);
+                            ctx.lineTo(neuralParticles[j].x, neuralParticles[j].y);
+                            ctx.strokeStyle = `rgba(0, 212, 255, ${opacity})`;
+                            ctx.lineWidth = 1;
+                            ctx.stroke();
+                        }
+                    }
+                }
+            }
+
+            // Loop de animación
+            function animate() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                // Actualizar y dibujar partículas
+                neuralParticles.forEach(particle => {
+                    particle.update();
+                    particle.draw();
+                });
+
+                // Dibujar conexiones
+                drawConnections();
+
+                neuralAnimationId = requestAnimationFrame(animate);
+            }
+
+            // Redimensionar canvas
+            function resizeCanvas() {
+                initCanvas();
+                createParticles();
+            }
+
+            // Event listeners para el canvas
+            window.addEventListener('resize', resizeCanvas);
+
+            // Inicializar red neuronal
+            initCanvas();
+            createParticles();
+            animate();
+
+            // Efecto de interacción con el mouse en las partículas
+            canvas.addEventListener('mousemove', (e) => {
+                const rect = canvas.getBoundingClientRect();
+                const mouseX = e.clientX - rect.left;
+                const mouseY = e.clientY - rect.top;
+
+                neuralParticles.forEach(particle => {
+                    const dx = mouseX - particle.x;
+                    const dy = mouseY - particle.y;
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+
+                    if (distance < 100) {
+                        const force = (100 - distance) / 100;
+                        particle.vx += dx * force * 0.001;
+                        particle.vy += dy * force * 0.001;
+                    }
+                });
+            });
         }
         
         // Limpiar cache al cargar la página
         window.addEventListener('load', function() {
             clearBrowserCache();
             validateJavaScriptSyntax();
+            initializeParticlesBackground();
         });
         
         // Forzar recarga sin cache si hay errores
@@ -2115,10 +1918,74 @@
             }
         });
 
-        // Internacionalización básica
-        document.getElementById('lang-select').addEventListener('change', function(e) {
-            document.documentElement.lang = e.target.value;
-        });
+        // Internacionalización básica con botones
+        function setupLanguageButtons() {
+            const langButtons = document.querySelectorAll('.lang-btn');
+            
+            langButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const lang = this.getAttribute('data-lang');
+                    document.documentElement.lang = lang;
+                    
+                    // Resaltar el botón del idioma seleccionado
+                    langButtons.forEach(btn => {
+                        btn.style.background = 'rgba(0, 245, 255, 0.1)';
+                        btn.style.borderColor = 'rgba(0, 245, 255, 0.3)';
+                        btn.style.color = 'var(--text-secondary)';
+                    });
+                    
+                    this.style.background = 'rgba(0, 255, 136, 0.2)';
+                    this.style.borderColor = 'rgba(0, 255, 136, 0.5)';
+                    this.style.color = 'var(--success-color)';
+                    
+                    showNotification(`Idioma cambiado a ${lang === 'es' ? 'Español' : 'English'}`, 'success');
+                });
+            });
+            
+            // Resaltar el botón del idioma actual al cargar
+            const currentLang = document.documentElement.lang || 'es';
+            const currentLangButton = document.querySelector(`.lang-btn[data-lang="${currentLang}"]`);
+            if (currentLangButton) {
+                currentLangButton.style.background = 'rgba(0, 255, 136, 0.2)';
+                currentLangButton.style.borderColor = 'rgba(0, 255, 136, 0.5)';
+                currentLangButton.style.color = 'var(--success-color)';
+            }
+        }
+        
+        // Script de pruebas desactivado
+        // El bucle automático de pruebas ha sido eliminado para evitar ejecuciones no deseadas
+        console.log('ℹ️ Modo de pruebas automáticas desactivado');
+        // Para ejecutar pruebas, usar los comandos específicos desde la terminal
+    </script>
+    
+    <!-- Scripts de desarrollo (solo se cargan en entorno local) -->
+    <script>
+        // Verificar si estamos en entorno de desarrollo
+        if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+            // Función para habilitar las herramientas de desarrollo
+            function enableDevTools() {
+                console.log('🛠️ Herramientas de desarrollo habilitadas');
+                
+                // Exponer funciones útiles para depuración
+                window.debugChat = {
+                    clearMessages: function() {
+                        document.querySelector('.chat-messages').innerHTML = '';
+                        console.log('Mensajes borrados');
+                    },
+                    simulateError: function() {
+                        console.error('Error simulado para pruebas');
+                        throw new Error('Error simulado para pruebas');
+                    },
+                    toggleTestMode: function() {
+                        document.body.classList.toggle('test-mode');
+                        console.log('Modo de prueba: ' + (document.body.classList.contains('test-mode') ? 'activado' : 'desactivado'));
+                    }
+                };
+            }
+            
+            // Habilitar herramientas de desarrollo
+            enableDevTools();
+        }
     </script>
 </body>
 </html>

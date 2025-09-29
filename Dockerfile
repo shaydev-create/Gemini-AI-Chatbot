@@ -1,70 +1,36 @@
-# 🚀 Dockerfile para Gemini AI Chatbot - Versión Optimizada
-FROM python:3.11-slim
-
-# Metadatos
-LABEL maintainer="Gemini AI Chatbot Team"
-LABEL version="2.0.0"
-LABEL description="Chatbot AI con Google Gemini - Versión Limpia"
+﻿# Dockerfile para Gemini AI Chatbot
+FROM python:3.9-slim
 
 # Establecer directorio de trabajo
 WORKDIR /app
 
-# Variables de entorno optimizadas
-ENV PYTHONDONTWRITEBYTECODE=1 \
-    PYTHONUNBUFFERED=1 \
-    FLASK_APP=app.main:app \
-    FLASK_ENV=production \
-    PYTHONPATH=/app
-
-# Instalar dependencias del sistema (mínimas)
+# Instalar dependencias del sistema
 RUN apt-get update && apt-get install -y \
     gcc \
-    curl \
-    libmagic1 \
-    libmagic-dev \
-    && rm -rf /var/lib/apt/lists/* \
-    && apt-get clean
+    && rm -rf /var/lib/apt/lists/*
 
-# Copiar solo requirements primero (para cache de Docker)
+# Copiar archivos de requisitos
 COPY requirements.txt .
 
-# Instalar dependencias Python
-RUN pip install --no-cache-dir --upgrade pip && \
-    pip install --no-cache-dir -r requirements.txt
+# Instalar dependencias de Python
+RUN pip install --no-cache-dir -r requirements.txt
 
-# Crear usuario no-root para seguridad
-RUN useradd --create-home --shell /bin/bash --uid 1000 app
-
-# Copiar código de la aplicación (estructura limpia)
+# Copiar código de la aplicación
 COPY app/ ./app/
 COPY config/ ./config/
-COPY .env .
-COPY wsgi.py .
+COPY scripts/ ./scripts/
+COPY .env.example .env
 
-# Crear directorios necesarios con permisos correctos
-RUN mkdir -p logs uploads instance && \
-    chown -R app:app /app && \
-    chmod -R 755 /app
-
-# Cambiar a usuario no-root
-USER app
+# Crear directorio para logs
+RUN mkdir -p logs
 
 # Exponer puerto
 EXPOSE 5000
 
-# Health check mejorado
-HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
-    CMD curl -f http://localhost:5000/api/health || exit 1
+# Variables de entorno
+ENV FLASK_APP=app.py
+ENV FLASK_ENV=production
+ENV PYTHONPATH=/app
 
-# Comando optimizado para producción
-CMD ["gunicorn", \
-     "--bind", "0.0.0.0:5000", \
-     "--workers", "4", \
-     "--worker-class", "sync", \
-     "--timeout", "120", \
-     "--keep-alive", "2", \
-     "--max-requests", "1000", \
-     "--max-requests-jitter", "100", \
-     "--access-logfile", "-", \
-     "--error-logfile", "-", \
-     "wsgi:app"]
+# Comando para ejecutar la aplicación
+CMD ["python", "app/app.py"]

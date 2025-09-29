@@ -17,6 +17,17 @@ def setup_middleware(app):
     # Protección CSRF
     csrf = CSRFProtect(app)
     app.logger.info("CSRF protection enabled")
+    
+    # Eximir rutas API específicas de la protección CSRF
+    @csrf.exempt
+    def csrf_exempt_api_routes():
+        pass
+        
+    # Eximir la ruta /api/chat/send de la protección CSRF
+    @app.before_request
+    def exempt_api_routes():
+        if request.path == '/api/chat/send' and request.method == 'POST':
+            csrf.protect_csrf = False
 
     @app.before_request
     def before_request():
@@ -53,7 +64,7 @@ def setup_middleware(app):
         # Cabeceras de seguridad para XSS
         response.headers["X-Content-Type-Options"] = "nosniff"
         response.headers["X-Frame-Options"] = "DENY"
-        response.headers["Content-Security-Policy"] = "default-src 'self'"
+        response.headers["Content-Security-Policy"] = "default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; img-src 'self' data:;"
         response.headers["X-XSS-Protection"] = "1; mode=block"
 
         return response

@@ -2,8 +2,8 @@
   "manifest_version": 3,
   "name": "🚀 Gemini AI Futuristic Chatbot",
   "short_name": "GeminiFuture",
-  "version": "1.0.2",
-  "description": "🤖 Asistente de IA futurista con Google Gemini. Interfaz neural, análisis de documentos y chat inteligente.",
+  "version": "1.0.3",
+  "description": "🤖 Asistente de IA futurista con Google Gemini. Interfaz neural, análisis de documentos y chat inteligente con funcionalidad completa.",
   "homepage_url": "https://github.com/shaydev-create/Gemini-AI-Chatbot",
   "privacy_policy": "https://shaydev-create.github.io/Gemini-AI-Chatbot/docs/privacy-policy.html",
   "icons": {
@@ -12,7 +12,7 @@
     "128": "icons/icon_128.png"
   },
   "action": {
-    "default_popup": "index.html",
+    "default_popup": "popup.html",
     "default_title": "🚀 Gemini AI Futuristic Chatbot",
     "default_icon": {
       "16": "icons/icon_16.png",
@@ -24,11 +24,11 @@
     "service_worker": "background.js"
   },
   "permissions": [
-    "activeTab"
+    "activeTab",
+    "storage"
   ],
   "host_permissions": [
-    "https://127.0.0.1:5000/*",
-    "https://localhost:5000/*"
+    "https://generativelanguage.googleapis.com/*"
   ],
   "content_security_policy": {
     "extension_pages": "script-src 'self'; object-src 'self'; style-src 'self' 'unsafe-inline'"

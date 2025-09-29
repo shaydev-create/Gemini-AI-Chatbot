@@ -1,0 +1,101 @@
+🚀 GEMINI AI FUTURISTIC CHATBOT - DESCRIPCIÓN PARA CHROME WEB STORE
+
+=== DESCRIPCIÓN CORTA (132 caracteres máximo) ===
+🤖 Asistente de IA futurista con Google Gemini. Chat inteligente, interfaz moderna y privacidad total. ¡Pruébalo gratis!
+
+=== DESCRIPCIÓN DETALLADA ===
+
+🚀 **Gemini AI Futuristic Chatbot** - Tu Asistente de IA Personal
+
+Experimenta el futuro de la inteligencia artificial con nuestra extensión de Chrome que te conecta directamente con Google Gemini AI. Diseñada con una interfaz futurista y moderna, esta extensión te ofrece conversaciones inteligentes sin comprometer tu privacidad.
+
+✨ **CARACTERÍSTICAS PRINCIPALES:**
+
+🤖 **Chat Inteligente con IA**
+• Conversaciones naturales y fluidas con Google Gemini
+• Respuestas rápidas y precisas
+• Soporte para múltiples idiomas
+• Interfaz de chat intuitiva y moderna
+
+🔒 **Privacidad y Seguridad Total**
+• NO recopilamos datos personales
+• NO almacenamos conversaciones
+• Tu API Key se guarda solo en tu navegador
+• Comunicación directa con Google (sin intermediarios)
+• Cumple con Manifest V3 de Chrome
+
+⚡ **Rendimiento Optimizado**
+• Conexión directa con la API de Google Gemini
+• Respuestas en tiempo real
+• Interfaz responsive y rápida
+• Diseño optimizado para popup de extensión
+
+🎨 **Diseño Futurista**
+• Gradientes modernos y animaciones suaves
+• Interfaz neural inspirada en ciencia ficción
+• Experiencia visual inmersiva
+• Diseño responsive para todos los tamaños
+
+🔧 **Fácil Configuración**
+• Solo necesitas una API Key gratuita de Google
+• Configuración en menos de 2 minutos
+• Página de bienvenida con instrucciones claras
+• Soporte técnico disponible
+
+🛡️ **Seguridad Garantizada**
+• Manifest V3 (última versión de seguridad de Chrome)
+• Permisos mínimos necesarios
+• Sin código malicioso o tracking
+• Código transparente y auditado
+
+📱 **Cómo Usar:**
+1. Instala la extensión
+2. Obtén tu API Key gratuita en Google AI Studio
+3. Configura la extensión con tu API Key
+4. ¡Comienza a chatear con Gemini AI!
+
+🎯 **Perfecto Para:**
+• Estudiantes que necesitan ayuda con tareas
+• Profesionales buscando asistencia rápida
+• Desarrolladores que quieren integrar IA
+• Cualquiera curioso sobre inteligencia artificial
+• Usuarios que valoran la privacidad
+
+🔗 **Requisitos:**
+• Chrome 88 o superior
+• API Key gratuita de Google Gemini (incluye instrucciones)
+• Conexión a internet
+
+💡 **¿Por qué elegir nuestra extensión?**
+• Interfaz más moderna del mercado
+• Privacidad garantizada al 100%
+• Configuración súper simple
+• Actualizaciones regulares
+• Soporte técnico responsive
+
+🌟 **Testimonios de Usuarios:**
+"La interfaz es increíblemente futurista y la privacidad está garantizada" - Usuario verificado
+"Configuración súper fácil, funciona perfectamente" - Usuario verificado
+"El diseño es espectacular, parece del futuro" - Usuario verificado
+
+📞 **Soporte:**
+¿Tienes preguntas? Nuestro equipo está aquí para ayudarte. Contacta a través de nuestro sitio web o GitHub.
+
+🔄 **Actualizaciones Regulares:**
+Mejoramos constantemente la extensión con nuevas características y optimizaciones de seguridad.
+
+---
+
+**Etiquetas/Keywords:** gemini, ai, chatbot, artificial intelligence, google, chat, assistant, futuristic, modern, privacy, secure, manifest v3
+
+**Categoría:** Productividad
+
+**Idiomas Soportados:** Español, Inglés (interfaz), Múltiples idiomas (chat con IA)
+
+**Versión:** 1.0.3
+
+**Desarrollador:** ShayDev Create
+
+**Sitio Web:** https://github.com/shaydev-create/Gemini-AI-Chatbot
+
+**Política de Privacidad:** https://shaydev-create.github.io/Gemini-AI-Chatbot/docs/privacy-policy.html
