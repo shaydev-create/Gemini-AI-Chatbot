@@ -118,3 +118,7 @@ API_UPGRADE_GUIDE.md
 
 # Vercel (eliminado del proyecto)
 .vercel/
+# Google Cloud Credentials
+credentials/
+*.json
+vertex-ai-key.json
