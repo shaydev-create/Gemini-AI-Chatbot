@@ -147,7 +147,7 @@ MAX_CONTENT_LENGTH=50
 ```
 
 ### Obtener API Key de Gemini
-1. Visita: https://makersuite.google.com/app/apikey
+1. Visita: https://aistudio.google.com/
 2. Inicia sesión con tu cuenta de Google
 3. Crea una nueva API key
 4. Copia la key al archivo `.env`

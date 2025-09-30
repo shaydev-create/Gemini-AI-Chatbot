@@ -199,7 +199,7 @@ def setup_api_keys():
     
     # Solicitar nueva API key
     print("🔑 CONFIGURACIÓN DE NUEVA API KEY")
-    print("Obtén tu API key en: https://makersuite.google.com/app/apikey")
+    print("Obtén tu API key en: https://aistudio.google.com/")
     print()
     
     new_key = input("Ingresa tu API key de Gemini: ").strip()

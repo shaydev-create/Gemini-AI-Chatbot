@@ -23,7 +23,7 @@ Extensión de Chrome que proporciona acceso directo a Google Gemini AI con una i
 ## 🔑 Configuración
 
 1. **Obtener API Key**:
-   - Visita [Google AI Studio](https://makersuite.google.com/app/apikey)
+   - Visita [Google AI Studio](https://aistudio.google.com/)
    - Crea una nueva API Key gratuita
    - Copia la API Key
 

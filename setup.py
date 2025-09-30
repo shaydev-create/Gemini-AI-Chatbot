@@ -201,7 +201,7 @@ def print_next_steps():
     📋 SIGUIENTES PASOS:
     
     1. 🔑 Configurar API Key de Gemini:
-       - Obtén tu API key en: https://makersuite.google.com/app/apikey
+       - Obtén tu API key en: https://aistudio.google.com/
        - Edita el archivo .env y reemplaza: GEMINI_API_KEY=your_gemini_api_key_here
     
     2. 🚀 Ejecutar la aplicación:
