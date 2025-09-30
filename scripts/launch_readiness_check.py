@@ -57,9 +57,9 @@ class LaunchReadinessChecker:
             'app.py',
             'requirements.txt',
             'README.md',
-            'static/css/style.css',
-            'static/js/main.js',
-            'templates/index.html',
+            'app/static/css/style.css',
+            'app/static/js/main.js',
+            'app/templates/index.html',
             'src/__init__.py',
             'core/__init__.py'
         ]
@@ -247,7 +247,7 @@ class LaunchReadinessChecker:
         """Verificar assets estáticos"""
         print("\n🔍 Verificando assets estáticos...")
         
-        static_dir = self.project_root / 'static'
+        static_dir = self.project_root / 'app' / 'static'
         
         if not static_dir.exists():
             self.log_result(

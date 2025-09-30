@@ -340,3 +340,39 @@ Este proyecto est√° bajo la **Licencia MIT**. Ver [LICENSE](LICENSE) para m√°s d
 ---
 
 ‚≠ê **¬°Dale una estrella si te gusta el proyecto!** ‚≠ê
+##  ConfiguraciÛn de Vertex AI
+
+Este proyecto est· configurado para usar Google Cloud Vertex AI como alternativa a la API directa de Gemini. Vertex AI ofrece mejor escalabilidad y control de costos.
+
+### ConfiguraciÛn del Proyecto
+- **Proyecto ID**: gen-lang-client-0952676857
+- **RegiÛn**: us-central1
+- **Modelo**: gemini-1.5-flash
+
+### Pasos para configurar Vertex AI:
+
+1. **Accede a tu proyecto de Google Cloud**:
+   `
+   https://console.cloud.google.com/welcome?cloudshell=true&project=gen-lang-client-0952676857
+   `
+
+2. **Sigue las instrucciones detalladas**:
+   - Ve al archivo credentials/SETUP_INSTRUCTIONS.md
+   - Ejecuta los comandos en Google Cloud Shell
+   - Descarga el archivo de credenciales
+
+3. **Verifica la configuraciÛn**:
+   `ash
+   python test_vertex_ai.py
+   `
+
+### Variables de entorno configuradas:
+`env
+GOOGLE_CLOUD_PROJECT_ID=gen-lang-client-0952676857
+GOOGLE_CLOUD_LOCATION=us-central1
+GOOGLE_APPLICATION_CREDENTIALS=./credentials/vertex-ai-key.json
+VERTEX_AI_ENABLED=True
+VERTEX_AI_MODEL=gemini-1.5-flash
+VERTEX_AI_MAX_DAILY_COST=50.0
+`
+
