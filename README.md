@@ -1,32 +1,30 @@
-# 🚀 Gemini AI Futuristic Chatbot - Versión 2025
+# Gemini AI Futuristic Chatbot - Version 2025
 
-Un chatbot inteligente potenciado por Google Gemini AI con interfaz web moderna y extensión de Chrome.
+Un chatbot inteligente potenciado por Google Gemini AI con interfaz web moderna y extension de Chrome.
 
 [![Chrome Web Store](https://img.shields.io/badge/Chrome%20Web%20Store-Available-brightgreen)](https://chrome.google.com/webstore)
 [![GitHub](https://img.shields.io/badge/GitHub-Repository-blue)](https://github.com/shaydev-create/Gemini-AI-Chatbot)
 [![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Privacy Policy](https://img.shields.io/badge/Privacy-Policy-green)](docs/PRIVACY_POLICY.md)
 
-## ✨ Características
+## Caracteristicas
 
- - 🤖 **IA Avanzada**: Integración con Google Gemini AI
- - 🌐 **Interfaz Web**: Diseño moderno, responsivo y accesible (ARIA, skip links, selector de idioma)
- - 🔌 **Extensión Chrome**: Acceso rápido desde el navegador
- - 🔒 **Seguro**: HTTPS, autenticación, validación y protección CSRF/XSS
- - 📱 **PWA**: Funciona como aplicación móvil
- - 🐳 **Docker**: Despliegue fácil con contenedores
- - 📊 **Monitoreo**: Métricas Prometheus integradas
+- **IA Avanzada**: Integracion con Google Gemini AI
+- **Interfaz Web**: Diseno moderno, responsivo y accesible (ARIA, skip links, selector de idioma)
+- **Extension Chrome**: Acceso rapido desde el navegador
+- **Seguro**: HTTPS, autenticacion, validacion y proteccion CSRF/XSS
+- **PWA**: Funciona como aplicacion movil
+- **Docker**: Despliegue facil con contenedores
+- **Monitoreo**: Metricas Prometheus integradas
+- **Multiidioma avanzado**: Seleccion dinamica de idioma en toda la app
+- **Panel de Administracion**: Gestion y acceso restringido para administradores
 
- - 🌍 **Multiidioma avanzado**: Selección dinámica de idioma en toda la app
+## Panel de Administracion
 
- - 🛠️ **Panel de Administración**: Gestión y acceso restringido para administradores
-
-## 🛠️ Panel de Administración
-
-El sistema incluye un panel de administración básico accesible solo para usuarios autenticados con rol de administrador.
+El sistema incluye un panel de administracion basico accesible solo para usuarios autenticados con rol de administrador.
 
 - **Ruta:** `/admin`
-- **Protección:** Requiere JWT y rol de administrador
+- **Proteccion:** Requiere JWT y rol de administrador
 - **Template:** `admin.html`
 
 Ejemplo de acceso:
@@ -35,344 +33,277 @@ curl -H "Authorization: Bearer <token_admin>" https://localhost:5000/admin
 # Respuesta: Renderiza el panel si el usuario es admin
 ```
 
-## 🚀 Inicio Rápido
-## 🌍 Multiidioma avanzado
+## Multiidioma avanzado
 
-La aplicación soporta traducción dinámica de textos en español e inglés. Puedes agregar nuevos idiomas creando archivos JSON en `app/i18n/`.
+La aplicacion soporta traduccion dinamica de textos en espanol e ingles. Puedes agregar nuevos idiomas creando archivos JSON en `app/i18n/`.
 
-Ejemplo para agregar francés:
+Ejemplo para agregar frances:
+
 1. Crea `app/i18n/fr.json` con las claves y traducciones.
 2. Accede con `?lang=fr` en la URL o selecciona desde el frontend.
 
-Todos los templates usan la función `translate` para mostrar textos según el idioma seleccionado.
+Todos los templates usan la funcion `translate` para mostrar textos segun el idioma seleccionado.
 
-### ⚡ Ejecución Inmediata
+## Inicio Rapido
+
+### Ejecucion Inmediata
 
 ```bash
-# 1. Clonar repositorio
+# Clona el repositorio
 git clone https://github.com/shaydev-create/Gemini-AI-Chatbot.git
 cd Gemini-AI-Chatbot
 
-# 2. Configurar API Key
-cp .env.example .env
-# Editar .env y agregar tu GEMINI_API_KEY
+# Configura tu API key de Gemini
+echo "GEMINI_API_KEY=tu_api_key_aqui" > .env
 
-# 3. Ejecutar aplicación
-python app/main.py
-
-# 4. Abrir navegador en: https://localhost:5000
-```
-
-### 🐳 Con Docker (Recomendado para Producción)
-
-```bash
-# Ejecutar con Docker
+# Ejecuta con Docker (recomendado)
 docker-compose up -d
 
-# Acceder a https://localhost:5000
+# O ejecuta localmente
+pip install -r requirements.txt
+python app.py
 ```
 
-## 🔧 Configuración
+Listo! Abre http://localhost:5000 en tu navegador.
 
-### 🔑 Variables de Entorno Requeridas
+### Requisitos del Sistema
 
-```env
+- **Python**: 3.8+ (recomendado 3.11+)
+- **Docker**: Opcional pero recomendado
+- **Navegador**: Chrome, Firefox, Safari, Edge (ultimas versiones)
+- **API Key**: Google Gemini AI (gratuita)
+
+## Configuracion de API Key
+
+### Obtener API Key de Gemini
+
+1. Ve a [Google AI Studio](https://aistudio.google.com/)
+2. Crea una cuenta o inicia sesion
+3. Genera una nueva API key
+4. Copia la key a tu archivo `.env`
+
+```bash
 # Archivo .env
 GEMINI_API_KEY=tu_api_key_aqui
-SECRET_KEY=tu_secret_key_seguro
-FLASK_ENV=production
 ```
 
-### 🔐 Protección de Credenciales
+### Seguridad de Credenciales
 
-Para proteger tus credenciales y evitar exposición accidental en GitHub:
+**IMPORTANTE**: Nunca subas tu API key al repositorio publico.
 
 ```bash
-# Limpiar credenciales antes de hacer commit
+# Limpia credenciales antes de commit
 python scripts/secure_env.py
 
-# Ver guía completa de seguridad
-cat docs/SEGURIDAD_CREDENCIALES.md
+# Verifica que .env no tenga credenciales reales
+cat .env
 ```
 
-[📚 Ver guía completa de seguridad de credenciales](docs/SEGURIDAD_CREDENCIALES.md)
+Ver [guia completa de seguridad](docs/SEGURIDAD_CREDENCIALES.md).
 
-### 🎯 Obtener API Key de Gemini
+## Extension de Chrome
 
-1. **Ve a [Google AI Studio](https://aistudio.google.com/)**
-2. **Crea una cuenta** o inicia sesión
-3. **Genera una nueva API key**
-4. **Copia la key** a tu archivo `.env`
+### Instalacion
 
-## 🌐 Extensión de Chrome
+1. Descarga o clona este repositorio
+2. Abre Chrome y ve a `chrome://extensions/`
+3. Activa "Modo de desarrollador"
+4. Haz clic en "Cargar extension sin empaquetar"
+5. Selecciona la carpeta `chrome_extension/`
 
-### 📥 Instalación
+### Uso
 
-1. **Descarga** o clona este repositorio
-2. **Abre Chrome** y ve a `chrome://extensions/`
-3. **Activa** "Modo de desarrollador" (esquina superior derecha)
-4. **Clic** en "Cargar extensión sin empaquetar"
-5. **Selecciona** la carpeta `chrome_extension/`
-6. **¡Listo!** El icono 🚀 aparecerá en la barra de herramientas
+1. Haz clic en el icono de Gemini AI en la barra de herramientas
+2. Configura tu API key en la ventana emergente
+3. Comienza a chatear!
 
-### 🎯 Uso de la Extensión
+## Docker
 
-- **Clic en el icono** 🚀 para abrir el popup
-- **"Abrir Aplicación"** para acceder al chatbot completo
-- **Funciona solo** cuando tu servidor local está ejecutándose
-
-## 📁 Estructura del Proyecto
-
-```
-Gemini-AI-Chatbot/
-├── 📱 app/                    # Aplicación principal Flask
-│   ├── api/                   # Rutas API REST
-│   ├── core/                  # Funcionalidades core
-│   ├── services/              # Servicios (Gemini AI)
-│   ├── static/                # CSS, JS, imágenes
-│   ├── templates/             # Templates HTML
-│   ├── utils/                 # Utilidades y helpers
-│   └── main.py               # 🎯 PUNTO DE ENTRADA
-├── 🔧 config/                 # Configuraciones
-├── 🌐 chrome_extension/       # Extensión de Chrome
-│   ├── manifest.json          # Configuración extensión
-│   ├── background.js          # Service worker
-│   ├── index.html            # Popup principal
-│   └── icons/                # Iconos de la extensión
-├── 🐳 deployment/             # Docker y despliegue
-├── 📚 docs/                   # Documentación
-│   ├── PRIVACY_POLICY.md     # 🛡️ Política de privacidad
-│   └── SEGURIDAD_CREDENCIALES.md # 🔐 Guía de seguridad
-├── 🧪 tests/                  # Tests automatizados
-├── .env                       # Variables de entorno
-├── requirements.txt           # Dependencias Python
-└── README.md                 # Este archivo
-```
-
-## 🚀 Cómo Ejecutar
-
-### 🖥️ Método 1: Ejecución Local (Más Rápido)
-
-```bash
-# Navegar al directorio
-cd "C:\Users\shaya\OneDrive\Documents\Python+Visual Studio Code\Google Gemini"
-
-# Ejecutar directamente
-python app/main.py
-
-# La aplicación estará disponible en:
-# 🌐 https://localhost:5000
-# 🌐 https://127.0.0.1:5000
-```
-
-### 📚 Ejemplos de Uso de la API
-
-#### Autenticación
-```bash
-curl -X POST https://localhost:5000/api/auth/login -d '{"username": "user", "password": "pass"}' -H "Content-Type: application/json"
-# Respuesta: {"access_token": "..."}
-```
-
-#### Chat
-```bash
-curl -X POST https://localhost:5000/api/chat -d '{"message": "Hola Gemini!"}' -H "Authorization: Bearer <token>" -H "Content-Type: application/json"
-# Respuesta: {"reply": "¡Hola humano!"}
-```
-
-#### Subida de Archivos
-```bash
-curl -X POST https://localhost:5000/api/upload -F "file=@archivo.txt" -H "Authorization: Bearer <token>"
-# Respuesta: {"status": "success", "filename": "archivo.txt"}
-```
-
-### 🐳 Método 2: Docker
+### Ejecucion con Docker Compose (Recomendado)
 
 ```bash
 # Desarrollo
-docker-compose -f docker-compose.dev.yml up -d
-
-# Producción
 docker-compose up -d
 
-# Ver logs
-docker-compose logs -f app
+# Produccion
+docker-compose -f docker-compose.prod.yml up -d
 ```
 
-## 🧪 Testing y Calidad
+### Ejecucion con Docker
 
 ```bash
-# Ejecutar todos los tests
-pytest tests/ -v
+# Construir imagen
+docker build -t gemini-chatbot .
 
-# Tests con cobertura
-pytest --cov=app tests/
-
-# Linting
-flake8 app/
-black app/
- 
-# Limpieza automática de archivos temporales y credenciales
-python scripts/cleanup_temp_files.py
-python scripts/secure_env.py
-
-# Migraciones automáticas de base de datos
-scripts/migrate_db.ps1
+# Ejecutar contenedor
+docker run -d -p 5000:5000 --env-file .env gemini-chatbot
 ```
 
-## 📊 Monitoreo y Salud
+## PWA (Progressive Web App)
 
-### 🔍 Health Check
+La aplicacion funciona como PWA:
 
-```bash
-# Verificar estado de la aplicación
-curl https://localhost:5000/api/health
+- **Instalable**: Agrega a pantalla de inicio
+- **Offline**: Funciona sin conexion (limitado)
+- **Responsive**: Optimizada para moviles
+- **Fast**: Carga rapida con Service Worker
 
-# Respuesta esperada:
-# {"status": "healthy", "timestamp": "2025-01-17T..."}
-```
+## Desarrollo
 
-### 📈 Métricas Prometheus
-
-```bash
-# Obtener métricas para monitoreo
-curl https://localhost:5000/metrics
-# Respuesta: formato Prometheus
-# flask_request_count_total{method="GET",endpoint="/api/chat"} 42
-# flask_request_latency_seconds_bucket{le="0.5",endpoint="/api/chat"} 40
-```
-
-### 📋 Logs
+### Instalacion Local
 
 ```bash
-# Ver logs en tiempo real
-tail -f logs/app.log
-
-# Con Docker
-docker-compose logs -f app
-```
-
-## 🔒 Seguridad y Privacidad
-
-### 🛡️ Características de Seguridad
-
-- ✅ **HTTPS** habilitado por defecto
-- ✅ **Validación** de entrada estricta
-- ✅ **Rate limiting** para prevenir abuso
-- ✅ **Headers de seguridad** configurados
-- ✅ **Sanitización** de datos de usuario
-- ✅ **Protección de credenciales** con [guía de seguridad](docs/SEGURIDAD_CREDENCIALES.md)
-
-### 🔐 Privacidad
-
-- ❌ **NO recopilamos** datos personales
-- ❌ **NO almacenamos** conversaciones
-- ❌ **NO utilizamos** cookies de seguimiento
-- ✅ **Procesamiento local** únicamente
-- ✅ **Política de privacidad** completa: [docs/PRIVACY_POLICY.md](docs/PRIVACY_POLICY.md)
-
-## 🌍 Despliegue en Producción
-
-### 🚀 Heroku
-
-```bash
-# Configurar variables de entorno
-heroku config:set GEMINI_API_KEY=tu_api_key
-heroku config:set SECRET_KEY=tu_secret_key
-
-# Desplegar
-git push heroku main
-```
-
-### 🖥️ VPS/Servidor
-
-```bash
-# En tu servidor
+# Clona el repositorio
 git clone https://github.com/shaydev-create/Gemini-AI-Chatbot.git
 cd Gemini-AI-Chatbot
 
-# Con Docker + Nginx
-docker-compose --profile nginx up -d
+# Crea entorno virtual
+python -m venv venv
+source venv/bin/activate  # Linux/Mac
+venv\Scripts\activate     # Windows
+
+# Instala dependencias
+pip install -r requirements.txt
+
+# Configura variables de entorno
+cp .env.example .env
+# Edita .env con tus credenciales
+
+# Ejecuta la aplicacion
+python app.py
 ```
 
-## 🤝 Contribuir
+### Estructura del Proyecto
 
-1. **Fork** el proyecto
-2. **Crea** una rama (`git checkout -b feature/AmazingFeature`)
-3. **Commit** tus cambios (`git commit -m 'Add AmazingFeature'`)
-4. **Push** a la rama (`git push origin feature/AmazingFeature`)
-5. **Abre** un Pull Request
+```
+Gemini-AI-Chatbot/
+|-- app/                    # Aplicacion principal
+|   |-- static/            # Archivos estaticos (CSS, JS, imagenes)
+|   |-- templates/         # Templates HTML
+|   |-- services/          # Servicios (Gemini, Auth, etc.)
+|   +-- utils/             # Utilidades
+|-- chrome_extension/       # Extension de Chrome
+|-- docs/                  # Documentacion
+|-- scripts/               # Scripts de utilidad
+|-- tests/                 # Pruebas
+|-- docker-compose.yml     # Docker Compose
+|-- Dockerfile            # Imagen Docker
+|-- requirements.txt      # Dependencias Python
++-- app.py               # Punto de entrada
+```
 
-## 📞 Soporte y Contacto
+### Scripts Utiles
 
-- 📧 **Email:** shayannelguapo10@gmail.com
-- 🐛 **Issues:** [GitHub Issues](https://github.com/shaydev-create/Gemini-AI-Chatbot/issues)
-- 🐙 **GitHub:** [shaydev-create](https://github.com/shaydev-create)
-- 🏪 **Chrome Web Store:** Gemini AI Futuristic Chatbot
+```bash
+# Verificar dependencias
+python scripts/check_dependencies.py
 
-## 📄 Licencia
+# Limpiar credenciales
+python scripts/secure_env.py
 
-Este proyecto está bajo la **Licencia MIT**. Ver [LICENSE](LICENSE) para más detalles.
+# Configurar API keys
+python scripts/setup_api_keys.py
 
-## 🎯 Roadmap
+# Verificar preparacion para lanzamiento
+python scripts/launch_readiness_check.py
+```
 
- - [x] 📈 Métricas Prometheus para monitoreo
- - [x] 🌍 Accesibilidad e internacionalización en frontend
- - [x] 🔄 Scripts automáticos de migración y limpieza
- - [ ] 📱 Aplicación móvil nativa
- - [ ] 🌍 Soporte multiidioma avanzado
- - [ ] 🎨 Temas personalizables
- - [ ] 📊 Dashboard de analytics
- - [ ] 🔌 API pública
- - [ ] 🤖 Más modelos de IA
+## Pruebas
+
+```bash
+# Ejecutar todas las pruebas
+python -m pytest tests/
+
+# Pruebas con cobertura
+python -m pytest tests/ --cov=app
+
+# Pruebas especificas
+python -m pytest tests/test_gemini_service.py
+```
+
+## Monitoreo
+
+La aplicacion incluye metricas de Prometheus:
+
+- **Endpoint**: `/metrics`
+- **Metricas**: Requests, latencia, errores
+- **Dashboard**: Compatible con Grafana
+
+## Seguridad
+
+- **HTTPS**: Forzado en produccion
+- **CSRF**: Proteccion contra ataques CSRF
+- **XSS**: Sanitizacion de entrada
+- **Rate Limiting**: Limites de velocidad
+- **JWT**: Autenticacion segura
+- **Validacion**: Entrada validada
+
+Ver [documentacion de seguridad](docs/SECURITY.md).
+
+## Internacionalizacion
+
+Idiomas soportados:
+- **Espanol** (es)
+- **Ingles** (en)
+
+Para agregar un nuevo idioma:
+1. Crea `app/i18n/{codigo_idioma}.json`
+2. Traduce todas las claves
+3. Agrega el idioma al selector
+
+## Documentacion
+
+- [Guia de Usuario](docs/USER_GUIDE.md)
+- [Documentacion de API](docs/API_DOCUMENTATION.md)
+- [Guia de Contribucion](docs/CONTRIBUTING.md)
+- [Estructura del Proyecto](docs/PROJECT_STRUCTURE.md)
+- [Seguridad de Credenciales](docs/SEGURIDAD_CREDENCIALES.md)
+
+## Contribuir
+
+Las contribuciones son bienvenidas!
+
+1. Fork el proyecto
+2. Crea una rama para tu feature (`git checkout -b feature/AmazingFeature`)
+3. Commit tus cambios (`git commit -m 'Add some AmazingFeature'`)
+4. Push a la rama (`git push origin feature/AmazingFeature`)
+5. Abre un Pull Request
+
+Ver [guia de contribucion](docs/CONTRIBUTING.md).
+
+## Licencia
+
+Este proyecto esta bajo la Licencia MIT. Ver [LICENSE](LICENSE) para mas detalles.
+
+## Agradecimientos
+
+- [Google Gemini AI](https://ai.google.dev/) por la API de IA
+- [Flask](https://flask.palletsprojects.com/) por el framework web
+- [Bootstrap](https://getbootstrap.com/) por los componentes UI
+- Comunidad open source por las librerias utilizadas
+
+## Soporte
+
+- **Issues**: [GitHub Issues](https://github.com/shaydev-create/Gemini-AI-Chatbot/issues)
+- **Discusiones**: [GitHub Discussions](https://github.com/shaydev-create/Gemini-AI-Chatbot/discussions)
+- **Email**: [Contacto](mailto:support@example.com)
+
+## Changelog
+
+### v2.0.0 (2025-01-XX)
+- Nueva interfaz futuristica
+- Soporte multiidioma
+- Panel de administracion
+- Seguridad mejorada
+- PWA completa
+
+### v1.0.0 (2024-XX-XX)
+- Lanzamiento inicial
+- Integracion Gemini AI
+- Extension Chrome
+- Soporte Docker
 
 ---
 
-**🚀 Gemini AI Futuristic Chatbot** - Desarrollado con ❤️ por [shaydev-create](https://github.com/shaydev-create)
-
-## 🎯 Roadmap
-
-- [ ] Migración a Vertex AI
-- [ ] Soporte multiidioma
-- [ ] Integración con bases de datos
-- [ ] API REST completa
-- [ ] Aplicación móvil nativa
-
----
-
-⭐ **¡Dale una estrella si te gusta el proyecto!** ⭐
-##  Configuraci�n de Vertex AI
-
-Este proyecto est� configurado para usar Google Cloud Vertex AI como alternativa a la API directa de Gemini. Vertex AI ofrece mejor escalabilidad y control de costos.
-
-### Configuraci�n del Proyecto
-- **Proyecto ID**: gen-lang-client-0952676857
-- **Regi�n**: us-central1
-- **Modelo**: gemini-1.5-flash
-
-### Pasos para configurar Vertex AI:
-
-1. **Accede a tu proyecto de Google Cloud**:
-   `
-   https://console.cloud.google.com/welcome?cloudshell=true&project=gen-lang-client-0952676857
-   `
-
-2. **Sigue las instrucciones detalladas**:
-   - Ve al archivo credentials/SETUP_INSTRUCTIONS.md
-   - Ejecuta los comandos en Google Cloud Shell
-   - Descarga el archivo de credenciales
-
-3. **Verifica la configuraci�n**:
-   `ash
-   python test_vertex_ai.py
-   `
-
-### Variables de entorno configuradas:
-`env
-GOOGLE_CLOUD_PROJECT_ID=gen-lang-client-0952676857
-GOOGLE_CLOUD_LOCATION=us-central1
-GOOGLE_APPLICATION_CREDENTIALS=./credentials/vertex-ai-key.json
-VERTEX_AI_ENABLED=True
-VERTEX_AI_MODEL=gemini-1.5-flash
-VERTEX_AI_MAX_DAILY_COST=50.0
-`
+Si te gusta este proyecto, dale una estrella en GitHub!
 
