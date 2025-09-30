@@ -28,6 +28,7 @@ El sistema incluye un panel de administracion basico accesible solo para usuario
 - **Template:** `admin.html`
 
 Ejemplo de acceso:
+
 ```bash
 curl -H "Authorization: Bearer <token_admin>" https://localhost:5000/admin
 # Respuesta: Renderiza el panel si el usuario es admin
@@ -64,7 +65,8 @@ pip install -r requirements.txt
 python app.py
 ```
 
-Listo! Abre http://localhost:5000 en tu navegador.
+Listo! Abre http:
+//localhost:5000 en tu navegador.
 
 ### Requisitos del Sistema
 
@@ -175,7 +177,6 @@ python app.py
 
 ### Estructura del Proyecto
 
-```
 Gemini-AI-Chatbot/
 |-- app/                    # Aplicacion principal
 |   |-- static/            # Archivos estaticos (CSS, JS, imagenes)
@@ -190,7 +191,6 @@ Gemini-AI-Chatbot/
 |-- Dockerfile            # Imagen Docker
 |-- requirements.txt      # Dependencias Python
 +-- app.py               # Punto de entrada
-```
 
 ### Scripts Utiles
 
@@ -243,10 +243,12 @@ Ver [documentacion de seguridad](docs/SECURITY.md).
 ## Internacionalizacion
 
 Idiomas soportados:
+
 - **Espanol** (es)
 - **Ingles** (en)
 
 Para agregar un nuevo idioma:
+
 1. Crea `app/i18n/{codigo_idioma}.json`
 2. Traduce todas las claves
 3. Agrega el idioma al selector
@@ -291,6 +293,7 @@ Este proyecto esta bajo la Licencia MIT. Ver [LICENSE](LICENSE) para mas detalle
 ## Changelog
 
 ### v2.0.0 (2025-01-XX)
+
 - Nueva interfaz futuristica
 - Soporte multiidioma
 - Panel de administracion
@@ -298,6 +301,7 @@ Este proyecto esta bajo la Licencia MIT. Ver [LICENSE](LICENSE) para mas detalle
 - PWA completa
 
 ### v1.0.0 (2024-XX-XX)
+
 - Lanzamiento inicial
 - Integracion Gemini AI
 - Extension Chrome
@@ -306,4 +310,3 @@ Este proyecto esta bajo la Licencia MIT. Ver [LICENSE](LICENSE) para mas detalle
 ---
 
 Si te gusta este proyecto, dale una estrella en GitHub!
-
