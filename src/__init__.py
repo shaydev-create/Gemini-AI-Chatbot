@@ -8,4 +8,4 @@ Compatibilidad con estructura de archivos esperada.
 # Importaciones principales
 from app.core.application import create_app
 
-__all__ = ['create_app']
+__all__ = ["create_app"]

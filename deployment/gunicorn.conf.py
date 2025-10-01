@@ -56,41 +56,52 @@ keepalive = 5
 
 # ===== HOOKS DE GUNICORN =====
 
+
 def when_ready(server):
     """Hook ejecutado cuando el servidor está listo."""
     server.log.info("🚀 Gemini AI Chatbot - Servidor Gunicorn iniciado")
     server.log.info(f"📊 Workers: {workers}")
-    server.log.info(f"🔒 SSL: {'Habilitado' if keyfile and certfile else 'Deshabilitado'}")
+    server.log.info(
+        f"🔒 SSL: {
+            'Habilitado' if keyfile and certfile else 'Deshabilitado'}")
+
 
 def worker_int(worker):
     """Hook ejecutado cuando un worker recibe SIGINT."""
     worker.log.info(f"⚠️ Worker {worker.pid} recibió SIGINT")
 
+
 def pre_fork(server, worker):
     """Hook ejecutado antes de hacer fork de un worker."""
     server.log.info(f"🔄 Iniciando worker {worker.age}")
+
 
 def post_fork(server, worker):
     """Hook ejecutado después de hacer fork de un worker."""
     server.log.info(f"✅ Worker {worker.pid} iniciado correctamente")
 
+
 def worker_abort(worker):
     """Hook ejecutado cuando un worker es abortado."""
     worker.log.error(f"❌ Worker {worker.pid} abortado")
+
 
 def pre_exec(server):
     """Hook ejecutado antes de exec."""
     server.log.info("🔄 Reiniciando servidor Gunicorn")
 
+
 def on_exit(server):
     """Hook ejecutado al salir del servidor."""
     server.log.info("🛑 Gemini AI Chatbot - Servidor Gunicorn detenido")
+
 
 def on_reload(server):
     """Hook ejecutado al recargar configuración."""
     server.log.info("🔄 Recargando configuración de Gunicorn")
 
 # ===== CONFIGURACIÓN ESPECÍFICA POR ENTORNO =====
+
 
 # Desarrollo
 if os.getenv('FLASK_ENV') == 'development':
@@ -105,7 +116,7 @@ elif os.getenv('FLASK_ENV') == 'production':
     preload_app = True
     max_requests = 1000
     max_requests_jitter = 50
-    
+
     # Configuración de seguridad adicional para producción
     forwarded_allow_ips = '*'
     secure_scheme_headers = {

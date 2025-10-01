@@ -1,4 +1,4 @@
-﻿#!/usr/bin/env python3
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 """
@@ -22,6 +22,7 @@ Configuración SSL/HTTPS habilitada para producción
 Soporte completo para Docker y contenedores
 """
 
+from app.main import create_app
 import os
 import sys
 
@@ -29,26 +30,25 @@ import sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 # Configuración de producción verificada
-# SSL/HTTPS: Habilitado 
-# Modo debug: Deshabilitado   
-# Puerto: 5000 
-# Host: 127.0.0.1 
-# Docker: Configurado 
-# Chrome Store: Listo 
+# SSL/HTTPS: Habilitado
+# Modo debug: Deshabilitado
+# Puerto: 5000
+# Host: 127.0.0.1
+# Docker: Configurado
+# Chrome Store: Listo
 
 # La lógica principal se maneja en app/main.py
-from app.main import create_app
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     # Crear la aplicación Flask
     app = create_app()
-    
+
     # Configuración del servidor local
     # Para desarrollo: 127.0.0.1:5000
     # Para producción: configurar SSL/HTTPS
     app.run(
-        host='127.0.0.1',
+        host="127.0.0.1",
         port=5000,
         debug=False,  # Deshabilitado para producción
-        ssl_context=None  # Configurar SSL para HTTPS en producción
+        ssl_context=None,  # Configurar SSL para HTTPS en producción
     )

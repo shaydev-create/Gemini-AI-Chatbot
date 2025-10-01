@@ -5,6 +5,7 @@ from config.database import db
 # Blueprint para autenticación
 auth_bp = Blueprint("auth", __name__, url_prefix="/auth")
 
+
 @auth_bp.route("/login", methods=["POST"])
 def login():
     data = request.get_json()
@@ -14,8 +15,18 @@ def login():
     if user and user.check_password(data.get("password")):
         # Mock access_token
         access_token = user.api_key or "mocktoken123"
-        return jsonify({"success": True, "message": "Login exitoso", "access_token": access_token}), 200
+        return (
+            jsonify(
+                {
+                    "success": True,
+                    "message": "Login exitoso",
+                    "access_token": access_token,
+                }
+            ),
+            200,
+        )
     return jsonify({"success": False, "message": "Credenciales inválidas"}), 401
+
 
 @auth_bp.route("/register", methods=["POST"])
 def register():
@@ -30,7 +41,7 @@ def register():
         first_name=data.get("first_name"),
         last_name=data.get("last_name"),
         status="active",
-        email_verified=True
+        email_verified=True,
     )
     user.set_password(data.get("password"))
     db.session.add(user)

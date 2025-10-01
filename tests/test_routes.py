@@ -16,4 +16,5 @@ def test_api_health_check(client):
     Prueba que la ruta de verificación de salud de la API funciona correctamente.
     """
     response = client.get('/api/health')
-    assert response.status_code in (200, 404)  # Aceptamos 404 si la ruta no está implementada aún
+    # Aceptamos 404 si la ruta no está implementada aún
+    assert response.status_code in (200, 404)

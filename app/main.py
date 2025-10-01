@@ -5,6 +5,8 @@ Punto de entrada principal del Gemini AI Chatbot.
 Aplicación Flask con arquitectura modular y optimizada.
 """
 
+from config.settings import Config
+from app.core.application import create_app
 import os
 import sys
 from pathlib import Path
@@ -13,8 +15,6 @@ from pathlib import Path
 project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root))
 
-from app.core.application import create_app
-from config.settings import Config
 
 # Crear la aplicación Flask (disponible para importación)
 app = create_app()
@@ -49,9 +49,17 @@ def main():
             if cert_info and "error" not in cert_info:
                 print("🔒 SSL/HTTPS configurado correctamente")
                 print(
-                    f"📋 Certificado válido hasta: {cert_info.get('not_valid_after', 'N/A')}"
+                    f"📋 Certificado válido hasta: {
+                        cert_info.get(
+                            'not_valid_after',
+                            'N/A')}"
                 )
-                print(f"🔑 Algoritmo: {cert_info.get('signature_algorithm', 'N/A')}")
+                print(
+                    f"🔑 Algoritmo: {
+                        cert_info.get(
+                            'signature_algorithm',
+                            'N/A')}"
+                )
             else:
                 print("🔒 SSL/HTTPS configurado con certificados básicos")
 

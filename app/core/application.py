@@ -28,7 +28,6 @@ from app.core.metrics import metrics_bp
 
 
 def create_app(config_class=Config):
-
     """
     Factory para crear la aplicación Flask.
 
@@ -52,6 +51,7 @@ def create_app(config_class=Config):
     # Hacer disponible la función translate en todos los templates
     try:
         from app.utils.i18n import translate
+
         app.context_processor(lambda: dict(translate=translate))
         app.logger.info("Función de traducción disponible en todos los templates")
     except Exception as e:
@@ -59,9 +59,9 @@ def create_app(config_class=Config):
 
     # Configuración
     app.config.from_object(config_class)
-    
+
     # Deshabilitar protección CSRF para permitir solicitudes API sin token
-    app.config['WTF_CSRF_ENABLED'] = False
+    app.config["WTF_CSRF_ENABLED"] = False
 
     # Configurar logging
     setup_logging(app)
@@ -75,6 +75,7 @@ def create_app(config_class=Config):
     # Registrar blueprint de administración
     try:
         from app.api.admin import admin_bp
+
         app.register_blueprint(admin_bp)
         app.logger.info("Blueprint de administración registrado")
     except Exception as e:
@@ -115,10 +116,7 @@ def setup_logging(app):
             app.logger.addHandler(file_handler)
 
         app.logger.setLevel(logging.INFO)
-        app.logger.info(
-            "Gemini AI Chatbot "
-            "startup"
-        )
+        app.logger.info("Gemini AI Chatbot " "startup")
 
 
 def setup_extensions(app):
@@ -129,6 +127,7 @@ def setup_extensions(app):
     JWTManager(app)
     # Migraciones automáticas
     from config.database import db
+
     Migrate(app, db)
     app.logger.info("Extensiones inicializadas y migraciones automáticas habilitadas")
 

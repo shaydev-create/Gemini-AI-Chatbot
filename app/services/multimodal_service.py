@@ -23,9 +23,13 @@ class MultimodalService:
             raise ValueError("GEMINI_API_KEY no encontrada en las variables de entorno")
 
         genai.configure(api_key=self.api_key)
-        self.model = genai.GenerativeModel(Config.GEMINI_VISION_MODEL or "gemini-1.5-flash")
+        self.model = genai.GenerativeModel(
+            Config.GEMINI_VISION_MODEL or "gemini-1.5-flash"
+        )
 
-    def generate_response(self, message: str, images: List[str] = None) -> Dict[str, Any]:
+    def generate_response(
+        self, message: str, images: List[str] = None
+    ) -> Dict[str, Any]:
         """Generar respuesta multimodal usando Gemini AI.
 
         Args:
@@ -40,10 +44,10 @@ class MultimodalService:
         try:
             # Preparar contenido multimodal
             content_parts = []
-            
+
             # Añadir texto
             content_parts.append({"text": message})
-            
+
             # Añadir imágenes si existen
             if images and len(images) > 0:
                 for img in images:
@@ -51,10 +55,14 @@ class MultimodalService:
                         # Es una imagen en base64
                         img_data = img.split(",")[1]
                         img_bytes = base64.b64decode(img_data)
-                        content_parts.append({"inline_data": {
-                            "mime_type": "image/jpeg",
-                            "data": base64.b64encode(img_bytes).decode("utf-8")
-                        }})
+                        content_parts.append(
+                            {
+                                "inline_data": {
+                                    "mime_type": "image/jpeg",
+                                    "data": base64.b64encode(img_bytes).decode("utf-8"),
+                                }
+                            }
+                        )
                     elif os.path.exists(img):
                         # Es una ruta de archivo
                         mime_type = "image/jpeg"  # Por defecto
@@ -62,13 +70,19 @@ class MultimodalService:
                             mime_type = "image/png"
                         elif img.lower().endswith(".gif"):
                             mime_type = "image/gif"
-                            
+
                         with open(img, "rb") as f:
                             image_data = f.read()
-                            content_parts.append({"inline_data": {
-                                "mime_type": mime_type,
-                                "data": base64.b64encode(image_data).decode("utf-8")
-                            }})
+                            content_parts.append(
+                                {
+                                    "inline_data": {
+                                        "mime_type": mime_type,
+                                        "data": base64.b64encode(image_data).decode(
+                                            "utf-8"
+                                        ),
+                                    }
+                                }
+                            )
                     else:
                         logger.warning(f"Imagen no encontrada: {img}")
 
@@ -79,14 +93,17 @@ class MultimodalService:
                     temperature=0.4,  # Menor temperatura para respuestas más precisas
                     max_output_tokens=2048,
                     top_p=0.8,
-                    top_k=40
+                    top_k=40,
                 ),
             )
 
             response_text = response.text
             response_time = time.time() - start_time
 
-            logger.info(f"Respuesta multimodal generada en {response_time:.2f}s")
+            logger.info(
+                f"Respuesta multimodal generada en {
+                    response_time:.2f}s"
+            )
 
             return {
                 "success": True,
@@ -133,7 +150,7 @@ _multimodal_service_instance = None
 
 def get_multimodal_service() -> MultimodalService:
     """Obtener una instancia singleton del servicio multimodal.
-    
+
     Returns:
         MultimodalService: Instancia del servicio multimodal
     """

@@ -1,6 +1,7 @@
 """
 Utilidad para cargar traducciones y seleccionar idioma en Gemini AI Chatbot.
 """
+
 import json
 from pathlib import Path
 from flask import session, request
@@ -10,12 +11,14 @@ DEFAULT_LANG = "es"
 
 _cache = {}
 
+
 def get_locale():
     lang = request.args.get("lang") or session.get("lang") or DEFAULT_LANG
     if lang not in ("es", "en"):
         lang = DEFAULT_LANG
     session["lang"] = lang
     return lang
+
 
 def translate(key):
     lang = get_locale()

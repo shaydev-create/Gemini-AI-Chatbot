@@ -15,7 +15,7 @@ def app():
         'TESTING': True,
         'DEBUG': True,
     })
-    
+
     # Configurar la aplicación para pruebas
     with app.app_context():
         yield app

@@ -17,16 +17,16 @@ def setup_middleware(app):
     # Protección CSRF
     csrf = CSRFProtect(app)
     app.logger.info("CSRF protection enabled")
-    
+
     # Eximir rutas API específicas de la protección CSRF
     @csrf.exempt
     def csrf_exempt_api_routes():
         pass
-        
+
     # Eximir la ruta /api/chat/send de la protección CSRF
     @app.before_request
     def exempt_api_routes():
-        if request.path == '/api/chat/send' and request.method == 'POST':
+        if request.path == "/api/chat/send" and request.method == "POST":
             csrf.protect_csrf = False
 
     @app.before_request
@@ -36,7 +36,10 @@ def setup_middleware(app):
 
         # Log del request
         logger.info(
-            f"Request: {request.method} {request.path} from {request.remote_addr}"
+            f"Request: {
+                request.method} {
+                request.path} from {
+                request.remote_addr}"
         )
 
         # Incrementar contador de requests
@@ -55,7 +58,11 @@ def setup_middleware(app):
             metrics_manager.record_response_time(response_time)
 
             # Log del response
-            logger.info(f"Response: {response.status_code} in {response_time:.3f}s")
+            logger.info(
+                f"Response: {
+                    response.status_code} in {
+                    response_time:.3f}s"
+            )
 
         # Headers de seguridad adicionales
         response.headers["X-Request-ID"] = request.headers.get(
@@ -64,7 +71,9 @@ def setup_middleware(app):
         # Cabeceras de seguridad para XSS
         response.headers["X-Content-Type-Options"] = "nosniff"
         response.headers["X-Frame-Options"] = "DENY"
-        response.headers["Content-Security-Policy"] = "default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; img-src 'self' data:;"
+        response.headers["Content-Security-Policy"] = (
+            "default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; img-src 'self' data:;"
+        )
         response.headers["X-XSS-Protection"] = "1; mode=block"
 
         return response

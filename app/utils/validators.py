@@ -121,7 +121,8 @@ def validate_file_upload(
     if extension not in [ext.lower() for ext in allowed_extensions]:
         return (
             False,
-            f"Extensión no permitida. Permitidas: {', '.join(allowed_extensions)}",
+            f"Extensión no permitida. Permitidas: {
+                ', '.join(allowed_extensions)}",
         )
 
     # Verificar caracteres peligrosos en el nombre
