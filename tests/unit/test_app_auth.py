@@ -92,7 +92,7 @@ class TestAuthManager(unittest.TestCase):
         with self.app.app_context():
             user = User.query.filter_by(username="testuser").first()
             # Lock the account by failing login max_attempts times
-            for i in range(self.auth_manager.max_attempts):
+            for _ in range(self.auth_manager.max_attempts):
                 self.auth_manager.authenticate_user("testuser", "wrong_password")
             user = User.query.filter_by(username="testuser").first()
             # Ensure both datetimes are timezone-aware
