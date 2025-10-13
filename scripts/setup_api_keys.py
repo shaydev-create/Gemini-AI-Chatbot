@@ -1,3 +1,15 @@
+ENV_FILE = ".env"
+ENV_SAMPLE_FILE = ".env-sample"
+ENV_EXAMPLE_FILE = ".env.example"
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+import os
+import re
+import sys
+from pathlib import Path
+import requests
+from dotenv import load_dotenv
+
 def show_api_key_status(gemini_key, google_key):
     print("📋 ESTADO ACTUAL DE LAS CLAVES API:")
     if gemini_key:
@@ -37,27 +49,6 @@ def prompt_for_new_api_key():
             print("❌ Configuración cancelada")
             return None
     return new_key
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-"""
-🔑 CONFIGURADOR DE API KEYS - GEMINI AI CHATBOT
-
-Este script ayuda a configurar las claves API de forma segura.
-Permite configurar y probar las claves API de Gemini sin exponerlas.
-"""
-
-import os
-import re
-import sys
-from pathlib import Path
-
-import requests
-from dotenv import load_dotenv
-
-# Constantes
-ENV_FILE = ".env"
-ENV_SAMPLE_FILE = ".env-sample"
-ENV_EXAMPLE_FILE = ".env.example"
 
 
 def print_banner():
