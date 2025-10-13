@@ -51,6 +51,40 @@
             <div id="aiStatus" class="ai-status">
                 <span id="aiStatusText">Checking Chrome AI availability...</span>
             </div>
+
+            <!-- Instant Translator Section -->
+            <div class="translator-section" style="margin-top: 18px;">
+                <h4>🌐 Instant Translator</h4>
+                <textarea id="translatorInput" class="input-field" rows="2" placeholder="Enter text to translate..."></textarea>
+                <div style="display: flex; gap: 8px; margin: 8px 0;">
+                    <select id="sourceLang" class="input-field" style="width: 45%;">
+                        <option value="auto">Detect language</option>
+                        <option value="en">English</option>
+                        <option value="es">Spanish</option>
+                        <option value="fr">French</option>
+                        <option value="de">German</option>
+                        <option value="it">Italian</option>
+                        <option value="pt">Portuguese</option>
+                        <option value="ja">Japanese</option>
+                        <option value="ko">Korean</option>
+                        <option value="zh">Chinese</option>
+                    </select>
+                    <span style="align-self: center;">→</span>
+                    <select id="targetLang" class="input-field" style="width: 45%;">
+                        <option value="en">English</option>
+                        <option value="es">Spanish</option>
+                        <option value="fr">French</option>
+                        <option value="de">German</option>
+                        <option value="it">Italian</option>
+                        <option value="pt">Portuguese</option>
+                        <option value="ja">Japanese</option>
+                        <option value="ko">Korean</option>
+                        <option value="zh">Chinese</option>
+                    </select>
+                </div>
+                <button id="instantTranslateBtn" class="button" style="width: 100%;">🌐 Translate Instantly</button>
+                <div id="translatorResult" class="ai-result" style="display:none; margin-top:8px;"></div>
+            </div>
         </div>
         
         <div class="chat-messages" id="chatMessages">

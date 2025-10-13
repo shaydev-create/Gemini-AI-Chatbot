@@ -14,10 +14,14 @@ const dom = {
         saveApiKey: document.getElementById('saveApiKey'),
         backToChat: document.getElementById('backToChat'),
         send: document.getElementById('sendButton'),
+        instantTranslate: document.getElementById('instantTranslateBtn'),
     },
     inputs: {
         apiKey: document.getElementById('apiKeyInput'),
         message: document.getElementById('messageInput'),
+        translatorInput: document.getElementById('translatorInput'),
+        sourceLang: document.getElementById('sourceLang'),
+        targetLang: document.getElementById('targetLang'),
     },
     containers: {
         messages: document.getElementById('chatMessages'),
@@ -32,7 +36,42 @@ const dom = {
             text: document.getElementById('connectionText'),
         },
     },
+    translatorResult: document.getElementById('translatorResult'),
 };
+// --- Instant Translator Handler ---
+async function handleInstantTranslate() {
+    const text = dom.inputs.translatorInput.value.trim();
+    const sourceLang = dom.inputs.sourceLang.value;
+    const targetLang = dom.inputs.targetLang.value;
+    const resultDiv = dom.translatorResult;
+
+    resultDiv.style.display = 'block';
+    resultDiv.textContent = 'Translating...';
+
+    if (!text) {
+        resultDiv.textContent = '❓ Please enter text to translate.';
+        return;
+    }
+    if (sourceLang === targetLang && sourceLang !== 'auto') {
+        resultDiv.textContent = '❓ Please select different source and target languages.';
+        return;
+    }
+
+    try {
+        const result = await sendToActiveTab('translateContent', {
+            text,
+            sourceLanguage: sourceLang,
+            targetLanguage: targetLang
+        });
+        if (result.success) {
+            resultDiv.textContent = result.data;
+        } else {
+            throw new Error(result.error);
+        }
+    } catch (error) {
+        resultDiv.textContent = `❌ Translation Error: ${error.message}`;
+    }
+}
 
 // --- Estado de la Aplicación ---
 const state = {
@@ -342,6 +381,10 @@ function setupEventListeners() {
     
     // Chrome AI buttons
     setupChromeAIEventListeners();
+    // Instant Translator button
+    if (dom.buttons.instantTranslate) {
+        dom.buttons.instantTranslate.addEventListener('click', handleInstantTranslate);
+    }
 }
 
 function setupChromeAIEventListeners() {

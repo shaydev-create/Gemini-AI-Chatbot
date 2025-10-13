@@ -1,3 +1,6 @@
+[tool.ruff.lint]
+ignore = ["E203", "E501"]
+select = ["E", "F", "W", "C", "B", "I"]
 [tool.poetry]
 name = "gemini-ai-chatbot"
 version = "2.0.0"

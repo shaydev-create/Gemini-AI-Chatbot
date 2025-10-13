@@ -10,6 +10,7 @@ import sys
 import zipfile
 from datetime import datetime
 
+
 def check_required_files(extension_dir, required_files):
     missing_files = [f for f in required_files if not os.path.exists(os.path.join(extension_dir, f))]
     if missing_files:

@@ -168,13 +168,18 @@ const messageHandlers = {
             throw new Error('Chrome AI not available');
         }
 
-        const { text, targetLanguage = 'English' } = data;
+        const { text, sourceLanguage = 'auto', targetLanguage = 'English' } = data;
         const content = text || messageHandlers.extractPageContent().substring(0, 1500);
-        const prompt = `Translate the following text to ${targetLanguage}:\n\n${content}`;
-        
+        let prompt = '';
+        if (sourceLanguage === 'auto') {
+            prompt = `Translate the following text to ${targetLanguage}:\n\n${content}`;
+        } else {
+            prompt = `Translate the following text from ${sourceLanguage} to ${targetLanguage}:\n\n${content}`;
+        }
+
         try {
             const translation = await chromeAI.prompt(prompt);
-            log('info', `Content translated to ${targetLanguage} using Chrome AI`);
+            log('info', `Content translated from ${sourceLanguage} to ${targetLanguage} using Chrome AI`);
             return translation;
         } catch (error) {
             log('error', 'Chrome AI translation failed:', error);

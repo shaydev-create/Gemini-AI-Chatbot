@@ -9,7 +9,6 @@ import pytest
 from app.core.application import get_flask_app
 
 
-
 @pytest.fixture
 def app():
     """Crear aplicación Flask para tests."""

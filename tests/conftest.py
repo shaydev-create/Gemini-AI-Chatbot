@@ -2,7 +2,6 @@ import pytest
 from app.core.application import get_flask_app
 
 
-
 @pytest.fixture(scope="module")
 def app():
     """Crea y configura una nueva instancia de la aplicacion Flask para cada modulo de prueba."""

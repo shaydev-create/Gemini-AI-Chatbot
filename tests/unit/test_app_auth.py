@@ -5,14 +5,13 @@ Comprehensive unit tests for the app.auth module.
 """
 
 import unittest
-from flask import Flask
 from datetime import datetime, timedelta, timezone
 from unittest.mock import patch
-
 
 from app.auth import AuthManager
 from app.config.extensions import db
 from app.models import User
+from flask import Flask
 
 
 class TestAuthManager(unittest.TestCase):
