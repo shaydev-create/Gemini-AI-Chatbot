@@ -63,7 +63,7 @@ def check_db_connection(db_url: str) -> tuple[bool, str]:
     """
     engine = create_engine(db_url)
     try:
-        with engine.connect() as connection:
+        with engine.connect() as _:
             logger.info(f"✅ Conexión exitosa a la base de datos: {db_url}")
             return True, "Conexión exitosa"
     except OperationalError as e:

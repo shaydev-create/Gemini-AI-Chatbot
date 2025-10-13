@@ -39,7 +39,7 @@ def send_message():
     try:
         current_user = get_current_user_from_jwt()
         user_id = current_user.id if current_user else None
-    except Exception:
+    except Exception as e:
         user_id = None  # Usuario anónimo
 
     gemini_service = current_app.gemini_service

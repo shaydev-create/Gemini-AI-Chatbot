@@ -8,7 +8,6 @@ from typing import Any, Dict, Optional, Tuple
 
 try:
     __import__("google.cloud.aiplatform")
-    import vertexai
     from vertexai.generative_models import GenerationConfig, GenerativeModel
 
     VERTEX_AI_AVAILABLE = True
@@ -410,7 +409,7 @@ class VertexAIClient:
                     prompt, max_tokens, temperature, **kwargs
                 )
             else:
-                raise Exception(f"Solicitud rechazada: {reason}")
+                raise ValueError(f"Solicitud rechazada: {reason}")
 
         # Intentar con Vertex AI primero
         if self.initialized and not self.fallback_active:
@@ -450,7 +449,7 @@ class VertexAIClient:
             except Exception as e:
                 logger.error(f"❌ Error en Gemini API: {e}")
                 self._update_metrics(0, 0, 0, 0, False)
-                raise Exception(f"Todos los clientes fallaron. Último error: {e}")
+                raise RuntimeError(f"Todos los clientes fallaron. Último error: {e}") from e
 
         raise Exception("No hay clientes disponibles")
 

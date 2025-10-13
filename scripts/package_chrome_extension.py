@@ -96,7 +96,7 @@ def create_chrome_extension_package():
         # Crear archivo ZIP
         with zipfile.ZipFile(zip_path, "w", zipfile.ZIP_DEFLATED) as zipf:
             # Agregar todos los archivos de la extensión
-            for root, dirs, files in os.walk(chrome_extension_dir):
+            for root, _dirs, files in os.walk(chrome_extension_dir):
                 for file in files:
                     file_path = os.path.join(root, file)
                     # Calcular ruta relativa desde chrome_extension_dir

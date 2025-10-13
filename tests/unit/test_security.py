@@ -252,7 +252,7 @@ def test_security_manager_failed_authentication(security_manager):
     # Configurar el mock para que la verificación de credenciales falle
     security_manager._verify_user_credentials.return_value = False
 
-    with pytest.raises(Exception, match="Invalid credentials"):
+    with pytest.raises(AuthenticationError, match="Invalid credentials"):
         security_manager.authenticate_user("testuser", "wrong_password")
 
 

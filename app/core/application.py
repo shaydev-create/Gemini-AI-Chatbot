@@ -41,7 +41,7 @@ def create_app(config_class=DevelopmentConfig):
         # o una cabecera HTTP. Por ahora, se fija a 'es'.
         return "es"
 
-    babel = Babel(app, locale_selector=get_locale)
+    _ = Babel(app, locale_selector=get_locale)
 
     # Registrar blueprints
     app.register_blueprint(main_blueprint)

@@ -62,7 +62,7 @@ class ScreenshotGenerator:
         """Wait for the Flask server to be ready."""
         print(f"⏳ Waiting for server at {url}...")
 
-        for i in range(timeout):
+        for _ in range(timeout):
             try:
                 response = requests.get(url, timeout=2)
                 if response.status_code == 200:

@@ -128,7 +128,7 @@ def get_postgresql_connection(
         conn.autocommit = False
         return conn
     except psycopg2.Error as e:
-        raise Exception(f"Error conectando a PostgreSQL: {e}")
+        raise Exception(f"Error conectando a PostgreSQL: {e}") from e
 
 
 def get_sqlite_tables(conn: sqlite3.Connection) -> List[str]:

@@ -346,7 +346,7 @@ class DataEncryption:
             decrypted_data = self.cipher.decrypt(decoded_data)
             return decrypted_data.decode()
         except Exception as e:
-            raise ValueError(f"Failed to decrypt data: {e}")
+            raise ValueError(f"Failed to decrypt data: {e}") from e
 
 
 class SecurityAuditor:

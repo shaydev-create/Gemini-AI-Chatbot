@@ -273,7 +273,7 @@ class TestVertexAIClient:
         self.client.fallback_active = True
         self.mock_vertex_config.limits["max_tokens_per_request"] = 50
 
-        with pytest.raises(Exception, match="Solicitud rechazada:"):
+        with pytest.raises(ValueError, match="Solicitud rechazada:"):
             await self.client.generate_response(
                 "test a long prompt that exceeds the token limit"
             )
@@ -333,7 +333,7 @@ class TestVertexAIClient:
             "Gemini Error"
         )
 
-        with pytest.raises(Exception, match="Todos los clientes fallaron"):
+        with pytest.raises(RuntimeError, match="Todos los clientes fallaron"):
             await self.client.generate_response("test")
 
         assert self.client.error_count == 1
