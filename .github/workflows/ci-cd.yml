@@ -54,13 +54,13 @@ jobs:
         run: |
           poetry install --with dev
 
-      - name: 🔧 Auto-fix with ruff
+      - name: 🔧 Auto-fix con Ruff
         run: |
-          poetry run lint --fix || true
-          poetry run format
-      - name: 🔍 Lint with ruff (check)
+          poetry run ruff check . --fix || true
+          poetry run ruff format .
+      - name: 🔍 Lint con Ruff (check)
         run: |
-          poetry run lint
+          poetry run ruff check .
 
       - name: 🔍 Type check with mypy
         run: |
