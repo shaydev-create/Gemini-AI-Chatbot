@@ -47,7 +47,9 @@ def hash_string(text: str, algorithm: str = "sha256") -> str:
         hash_obj.update(text.encode("utf-8"))
         return hash_obj.hexdigest()
     except ValueError:
-        logger.exception("Algoritmo de hash no válido: %s. Usando sha256 como fallback.", algorithm)
+        logger.exception(
+            "Algoritmo de hash no válido: %s. Usando sha256 como fallback.", algorithm
+        )
         hash_obj = hashlib.sha256()
         hash_obj.update(text.encode("utf-8"))
         return hash_obj.hexdigest()
@@ -80,7 +82,10 @@ def get_file_size(file_path: Union[str, Path]) -> Optional[int]:
     try:
         return Path(file_path).stat().st_size
     except (OSError, FileNotFoundError):
-        logger.debug("No se pudo obtener el tamaño del archivo (puede que no exista): %s", file_path)
+        logger.debug(
+            "No se pudo obtener el tamaño del archivo (puede que no exista): %s",
+            file_path,
+        )
         return None
 
 
@@ -101,7 +106,7 @@ def sanitize_filename(filename: str) -> str:
     # Limitar la longitud total del nombre del archivo
     if len(sanitized) > 255:
         name, ext = os.path.splitext(sanitized)
-        sanitized = name[:255 - len(ext)] + ext
+        sanitized = name[: 255 - len(ext)] + ext
 
     return sanitized
 
@@ -121,9 +126,9 @@ def format_bytes(size_in_bytes: int) -> str:
 
     power = 1024
     n = 0
-    power_labels = {0: 'B', 1: 'KB', 2: 'MB', 3: 'GB', 4: 'TB'}
+    power_labels = {0: "B", 1: "KB", 2: "MB", 3: "GB", 4: "TB"}
 
-    while size_in_bytes >= power and n < len(power_labels) -1 :
+    while size_in_bytes >= power and n < len(power_labels) - 1:
         size_in_bytes /= power
         n += 1
 
@@ -146,5 +151,5 @@ def truncate_text(text: str, max_length: int, suffix: str = "...") -> str:
         return text
 
     # Truncar y eliminar espacios en blanco al final antes de añadir el sufijo
-    truncated = text[:max_length - len(suffix)].rstrip()
+    truncated = text[: max_length - len(suffix)].rstrip()
     return truncated + suffix

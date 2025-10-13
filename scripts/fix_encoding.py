@@ -4,18 +4,19 @@
 Script para verificar y corregir la codificación de archivos de documentación
 """
 
-import os
-import chardet
 import glob
+import os
+
+import chardet
 
 
 def detect_encoding(file_path):
     """Detecta la codificación de un archivo"""
     try:
-        with open(file_path, 'rb') as f:
+        with open(file_path, "rb") as f:
             raw_data = f.read()
             result = chardet.detect(raw_data)
-            return result['encoding'], result['confidence']
+            return result["encoding"], result["confidence"]
     except Exception as e:
         print(f"Error detectando codificación de {file_path}: {e}")
         return None, 0
@@ -25,11 +26,11 @@ def convert_to_utf8(file_path, original_encoding):
     """Convierte un archivo a UTF-8"""
     try:
         # Leer con la codificación original
-        with open(file_path, 'r', encoding=original_encoding) as f:
+        with open(file_path, "r", encoding=original_encoding) as f:
             content = f.read()
 
         # Escribir en UTF-8
-        with open(file_path, 'w', encoding='utf-8') as f:
+        with open(file_path, "w", encoding="utf-8") as f:
             f.write(content)
 
         print(f"✅ Convertido {file_path} de {original_encoding} a UTF-8")
@@ -44,12 +45,7 @@ def main():
     print("🔍 Verificando codificación de archivos de documentación...")
 
     # Patrones de archivos a verificar
-    patterns = [
-        "docs/*.md",
-        "*.md",
-        "chrome_extension/*.html",
-        "chrome_extension/*.md"
-    ]
+    patterns = ["docs/*.md", "*.md", "chrome_extension/*.html", "chrome_extension/*.md"]
 
     files_to_check = []
     for pattern in patterns:
@@ -67,11 +63,11 @@ def main():
             if encoding:
                 print(
                     f"📄 {file_path}: {encoding} (confianza: {
-                        confidence:.2f})")
+                        confidence:.2f})"
+                )
 
                 # Si no es UTF-8 y tiene alta confianza, convertir
-                if encoding.lower() not in [
-                        'utf-8', 'ascii'] and confidence > 0.7:
+                if encoding.lower() not in ["utf-8", "ascii"] and confidence > 0.7:
                     print(f"⚠️  Archivo {file_path} no está en UTF-8")
                     issues_found += 1
 
@@ -80,14 +76,15 @@ def main():
 
                 # Verificar si hay caracteres problemáticos
                 try:
-                    with open(file_path, 'r', encoding='utf-8') as f:
+                    with open(file_path, "r", encoding="utf-8") as f:
                         content = f.read()
                         # Buscar caracteres problemáticos comunes
-                        problematic_chars = ['�', '\ufffd', '\x00']
+                        problematic_chars = ["�", "\ufffd", "\x00"]
                         for char in problematic_chars:
                             if char in content:
                                 print(
-                                    f"⚠️  Encontrados caracteres problemáticos en {file_path}")
+                                    f"⚠️  Encontrados caracteres problemáticos en {file_path}"
+                                )
                                 issues_found += 1
                                 break
                 except UnicodeDecodeError:

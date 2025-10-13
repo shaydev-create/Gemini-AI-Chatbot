@@ -12,7 +12,15 @@ from google.auth.exceptions import DefaultCredentialsError
 class TestVertexAIConfig:
     """Tests para la configuración de Vertex AI."""
 
-    @patch.dict(os.environ, {'GOOGLE_CLOUD_PROJECT_ID': 'test-project', 'GOOGLE_CLOUD_LOCATION': 'us-central1', 'VERTEX_AI_ENABLED': 'true', 'VERTEX_AI_MAX_DAILY_COST': '10.0'})
+    @patch.dict(
+        os.environ,
+        {
+            "GOOGLE_CLOUD_PROJECT_ID": "test-project",
+            "GOOGLE_CLOUD_LOCATION": "us-central1",
+            "VERTEX_AI_ENABLED": "true",
+            "VERTEX_AI_MAX_DAILY_COST": "10.0",
+        },
+    )
     def test_init_with_valid_config(self):
         """Test inicialización con configuración válida."""
         config = VertexAIConfig()
@@ -22,7 +30,7 @@ class TestVertexAIConfig:
         assert config.max_daily_cost == 10.0
         assert config.enabled is True
 
-    @patch.dict(os.environ, {'VERTEX_AI_ENABLED': 'true'}, clear=True)
+    @patch.dict(os.environ, {"VERTEX_AI_ENABLED": "true"}, clear=True)
     def test_init_with_missing_project_id(self):
         """Test inicialización sin project_id."""
         config = VertexAIConfig()
@@ -31,7 +39,10 @@ class TestVertexAIConfig:
         assert not is_valid
         assert "GOOGLE_CLOUD_PROJECT_ID no está configurado" in error_msg
 
-    @patch.dict(os.environ, {'GOOGLE_CLOUD_PROJECT_ID': 'test-project', 'VERTEX_AI_ENABLED': 'false'})
+    @patch.dict(
+        os.environ,
+        {"GOOGLE_CLOUD_PROJECT_ID": "test-project", "VERTEX_AI_ENABLED": "false"},
+    )
     def test_init_with_disabled_vertex_ai(self):
         """Test inicialización con Vertex AI deshabilitado."""
         config = VertexAIConfig()
@@ -67,13 +78,16 @@ class TestVertexAIConfig:
         assert cost > 0
         assert isinstance(cost, float)
 
-    @patch.dict(os.environ, {'GOOGLE_CLOUD_PROJECT_ID': 'test-project-id', 'VERTEX_AI_ENABLED': 'true'})
+    @patch.dict(
+        os.environ,
+        {"GOOGLE_CLOUD_PROJECT_ID": "test-project-id", "VERTEX_AI_ENABLED": "true"},
+    )
     def test_get_model_endpoint(self):
         """Test obtener endpoint del modelo."""
         config = VertexAIConfig()
 
         # Asegurarnos de que el project_id se cargó desde el entorno mockeado
-        assert config.project_id == 'test-project-id'
+        assert config.project_id == "test-project-id"
 
         endpoint = config.get_model_endpoint("fast")
 
@@ -82,11 +96,14 @@ class TestVertexAIConfig:
         assert config.project_id in endpoint
         assert "us-central1" in endpoint
 
-    @patch.dict(os.environ, {
-        'GOOGLE_CLOUD_PROJECT_ID': 'test-project',
-        'VERTEX_AI_ENABLED': 'true',
-        'GOOGLE_APPLICATION_CREDENTIALS': 'non_existent_file.json'
-    })
+    @patch.dict(
+        os.environ,
+        {
+            "GOOGLE_CLOUD_PROJECT_ID": "test-project",
+            "VERTEX_AI_ENABLED": "true",
+            "GOOGLE_APPLICATION_CREDENTIALS": "non_existent_file.json",
+        },
+    )
     def test_validate_config_invalid_credentials_path(self):
         """Test validation fails with a non-existent credentials file."""
         config = VertexAIConfig()
@@ -94,35 +111,39 @@ class TestVertexAIConfig:
         assert not is_valid
         assert "Archivo de credenciales no encontrado" in error_msg
 
-    @patch.dict(os.environ, {
-        'GOOGLE_CLOUD_PROJECT_ID': 'test-project',
-        'VERTEX_AI_ENABLED': 'true'
-    })
-    @patch('app.config.vertex_ai.aiplatform.init')
+    @patch.dict(
+        os.environ,
+        {"GOOGLE_CLOUD_PROJECT_ID": "test-project", "VERTEX_AI_ENABLED": "true"},
+    )
+    @patch("app.config.vertex_ai.aiplatform.init")
     def test_initialize_success(self, mock_init):
         """Test inicialización exitosa de Vertex AI."""
         config = VertexAIConfig()
         config.initialize()
         mock_init.assert_called_once_with(
-            project=config.project_id,
-            location=config.location
+            project=config.project_id, location=config.location
         )
 
-    @patch.dict(os.environ, {
-        'GOOGLE_CLOUD_PROJECT_ID': 'test-project',
-        'VERTEX_AI_ENABLED': 'true'
-    })
-    @patch('app.config.vertex_ai.aiplatform.init', side_effect=DefaultCredentialsError("Credenciales no encontradas"))
+    @patch.dict(
+        os.environ,
+        {"GOOGLE_CLOUD_PROJECT_ID": "test-project", "VERTEX_AI_ENABLED": "true"},
+    )
+    @patch(
+        "app.config.vertex_ai.aiplatform.init",
+        side_effect=DefaultCredentialsError("Credenciales no encontradas"),
+    )
     def test_initialize_credentials_error(self, mock_init):
         """Test error de credenciales en inicialización."""
         config = VertexAIConfig()
         assert not config.initialize()
 
-    @patch.dict(os.environ, {
-        'GOOGLE_CLOUD_PROJECT_ID': 'test-project',
-        'VERTEX_AI_ENABLED': 'true'
-    })
-    @patch('app.config.vertex_ai.aiplatform.init', side_effect=Exception("Error genérico"))
+    @patch.dict(
+        os.environ,
+        {"GOOGLE_CLOUD_PROJECT_ID": "test-project", "VERTEX_AI_ENABLED": "true"},
+    )
+    @patch(
+        "app.config.vertex_ai.aiplatform.init", side_effect=Exception("Error genérico")
+    )
     def test_initialize_generic_error(self, mock_init):
         """Test error genérico en inicialización."""
         config = VertexAIConfig()
@@ -133,7 +154,7 @@ class TestVertexAIConfig:
         """Test that get_model_endpoint falls back to the 'fast' model."""
         config = VertexAIConfig()
         endpoint = config.get_model_endpoint("non_existent_model")
-        fast_model_name = config.models['fast']['name']
+        fast_model_name = config.models["fast"]["name"]
         assert fast_model_name in endpoint
 
     def test_estimate_cost_invalid_model(self):
@@ -157,10 +178,10 @@ class TestVertexAIClient:
         client = VertexAIClient()
 
         assert client.config is not None
-        assert hasattr(client, 'initialized')
-        assert hasattr(client, 'fallback_active')
-        assert hasattr(client, 'daily_cost')
-        assert hasattr(client, 'request_count')
+        assert hasattr(client, "initialized")
+        assert hasattr(client, "fallback_active")
+        assert hasattr(client, "daily_cost")
+        assert hasattr(client, "request_count")
 
     def test_estimate_tokens(self, mock_client):
         """Test estimación de tokens."""
@@ -210,12 +231,12 @@ class TestVertexAIClient:
 
         stats = mock_client.get_usage_stats()
 
-        assert 'daily_stats' in stats
-        assert stats['daily_stats']['requests'] == 50
-        assert stats['daily_stats']['cost'] == 5.0
-        assert stats['daily_stats']['errors'] == 2
-        assert 'limits' in stats
-        assert 'status' in stats
+        assert "daily_stats" in stats
+        assert stats["daily_stats"]["requests"] == 50
+        assert stats["daily_stats"]["cost"] == 5.0
+        assert stats["daily_stats"]["errors"] == 2
+        assert "limits" in stats
+        assert "status" in stats
 
 
 @pytest.mark.integration
@@ -223,8 +244,8 @@ class TestVertexAIIntegration:
     """Tests de integración para Vertex AI."""
 
     @pytest.mark.skipif(
-        not os.getenv('GOOGLE_CLOUD_PROJECT_ID'),
-        reason="Variables de entorno de Vertex AI no configuradas"
+        not os.getenv("GOOGLE_CLOUD_PROJECT_ID"),
+        reason="Variables de entorno de Vertex AI no configuradas",
     )
     @pytest.mark.asyncio
     async def test_real_vertex_ai_connection(self):
@@ -238,15 +259,16 @@ class TestVertexAIIntegration:
             # Test simple
             result = await client.generate_response("Hola, ¿cómo estás?")
 
-            assert result['success'] is True
-            assert len(result['response']) > 0
-            assert result['source'] in ['vertex_ai', 'gemini_api']
+            assert result["success"] is True
+            assert len(result["response"]) > 0
+            assert result["source"] in ["vertex_ai", "gemini_api"]
         else:
             pytest.skip("No se pudo inicializar el cliente")
 
     @pytest.mark.skipif(
-        not os.getenv('GOOGLE_API_KEY') or os.getenv('GOOGLE_API_KEY') == 'test-api-key',
-        reason="Google API Key no configurada o es de prueba"
+        not os.getenv("GOOGLE_API_KEY")
+        or os.getenv("GOOGLE_API_KEY") == "test-api-key",
+        reason="Google API Key no configurada o es de prueba",
     )
     @pytest.mark.asyncio
     async def test_gemini_fallback_connection(self):
@@ -259,8 +281,7 @@ class TestVertexAIIntegration:
         if success:
             result = await client.generate_response("Test de fallback")
 
-            assert result['success'] is True
-            assert len(result['response']) > 0
+            assert result["success"] is True
+            assert len(result["response"]) > 0
         else:
             pytest.skip("No se pudo inicializar el cliente")
-

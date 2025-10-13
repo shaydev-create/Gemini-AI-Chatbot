@@ -8,8 +8,7 @@ from pathlib import Path
 
 # Configurar logging
 logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(levelname)s - %(message)s'
+    level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
 )
 logger = logging.getLogger(__name__)
 
@@ -21,17 +20,17 @@ def check_requirements() -> bool:
         bool: True si todas las dependencias están disponibles
     """
     required_packages = [
-        'google-cloud-aiplatform',
-        'google-auth',
-        'google-auth-oauthlib',
-        'vertexai'
+        "google-cloud-aiplatform",
+        "google-auth",
+        "google-auth-oauthlib",
+        "vertexai",
     ]
 
     missing_packages = []
 
     for package in required_packages:
         try:
-            __import__(package.replace('-', '_'))
+            __import__(package.replace("-", "_"))
             logger.info(f"✅ {package} está instalado")
         except ImportError:
             missing_packages.append(package)
@@ -55,9 +54,9 @@ def get_project_root() -> Path:
 
     # Buscar hacia arriba hasta encontrar requirements.txt o .git
     while current_path.parent != current_path:
-        if (current_path /
-            'requirements.txt').exists() or (current_path /
-                                             '.git').exists():
+        if (current_path / "requirements.txt").exists() or (
+            current_path / ".git"
+        ).exists():
             return current_path
         current_path = current_path.parent
 
@@ -123,15 +122,15 @@ def setup_credentials_directory() -> Path:
         Path: Ruta al directorio de credenciales
     """
     project_root = get_project_root()
-    credentials_dir = project_root / 'credentials'
+    credentials_dir = project_root / "credentials"
 
     # Crear directorio si no existe
     credentials_dir.mkdir(exist_ok=True)
 
     # Crear .gitignore para proteger credenciales
-    gitignore_path = credentials_dir / '.gitignore'
+    gitignore_path = credentials_dir / ".gitignore"
     if not gitignore_path.exists():
-        with open(gitignore_path, 'w') as f:
+        with open(gitignore_path, "w") as f:
             f.write("# Ignorar todos los archivos de credenciales\n")
             f.write("*.json\n")
             f.write("*.key\n")
@@ -145,7 +144,7 @@ def setup_credentials_directory() -> Path:
 def create_env_template() -> None:
     """Crear template de variables de entorno."""
     project_root = get_project_root()
-    env_template_path = project_root / '.env.vertex_ai.template'
+    env_template_path = project_root / ".env.vertex_ai.template"
 
     template_content = """
 # Configuración de Google Cloud y Vertex AI
@@ -187,7 +186,7 @@ VERTEX_AI_DEBUG=false
 VERTEX_AI_HEALTH_CHECK_INTERVAL=300
 """
 
-    with open(env_template_path, 'w', encoding='utf-8') as f:
+    with open(env_template_path, "w", encoding="utf-8") as f:
         f.write(template_content)
 
     logger.info(f"📝 Template creado: {env_template_path}")
@@ -202,22 +201,23 @@ def verify_authentication() -> bool:
     """
     try:
         from google.auth import default
-        __import__('google.cloud.aiplatform')
+
+        __import__("google.cloud.aiplatform")
         import vertexai
+
         logger.info("🔍 Verificando autenticación...")
 
         # Verificar credenciales por defecto
         try:
             credentials, project_id = default()
-            logger.info(
-                f"✅ Credenciales encontradas para proyecto: {project_id}")
+            logger.info(f"✅ Credenciales encontradas para proyecto: {project_id}")
         except Exception as e:
             logger.error(f"❌ Error obteniendo credenciales por defecto: {e}")
             return False
 
         # Verificar variables de entorno
-        vertex_project = os.getenv('VERTEX_AI_PROJECT_ID')
-        vertex_location = os.getenv('VERTEX_AI_LOCATION', 'us-central1')
+        vertex_project = os.getenv("VERTEX_AI_PROJECT_ID")
+        vertex_location = os.getenv("VERTEX_AI_LOCATION", "us-central1")
 
         if not vertex_project:
             logger.error("❌ VERTEX_AI_PROJECT_ID no está configurado")
@@ -237,7 +237,8 @@ def verify_authentication() -> bool:
         # Verificar acceso a modelos
         try:
             from vertexai.generative_models import GenerativeModel
-            GenerativeModel('gemini-1.5-flash')
+
+            GenerativeModel("gemini-1.5-flash")
             logger.info("✅ Modelo Gemini accesible")
         except Exception as e:
             logger.warning(f"⚠️ Advertencia con modelo: {e}")
@@ -259,22 +260,23 @@ def show_current_config() -> None:
 
     # Variables de entorno relevantes
     env_vars = [
-        'GOOGLE_APPLICATION_CREDENTIALS',
-        'VERTEX_AI_PROJECT_ID',
-        'VERTEX_AI_LOCATION',
-        'VERTEX_AI_ENABLED',
-        'VERTEX_AI_DEFAULT_MODEL',
-        'GOOGLE_API_KEY',
-        'GEMINI_API_KEY'
+        "GOOGLE_APPLICATION_CREDENTIALS",
+        "VERTEX_AI_PROJECT_ID",
+        "VERTEX_AI_LOCATION",
+        "VERTEX_AI_ENABLED",
+        "VERTEX_AI_DEFAULT_MODEL",
+        "GOOGLE_API_KEY",
+        "GEMINI_API_KEY",
     ]
 
     for var in env_vars:
         value = os.getenv(var)
         if value:
             # Ocultar claves sensibles
-            if 'key' in var.lower() or 'credentials' in var.lower():
-                display_value = f"{value[:10]}...{value[-4:]}" if len(
-                    value) > 14 else "***"
+            if "key" in var.lower() or "credentials" in var.lower():
+                display_value = (
+                    f"{value[:10]}...{value[-4:]}" if len(value) > 14 else "***"
+                )
             else:
                 display_value = value
             logger.info(f"  {var}: {display_value}")
@@ -287,27 +289,19 @@ def main():
     import argparse
 
     parser = argparse.ArgumentParser(
-        description='Configurar autenticación de Google Cloud y Vertex AI'
+        description="Configurar autenticación de Google Cloud y Vertex AI"
     )
     parser.add_argument(
-        '--verify',
-        action='store_true',
-        help='Verificar configuración actual'
+        "--verify", action="store_true", help="Verificar configuración actual"
     )
     parser.add_argument(
-        '--setup',
-        action='store_true',
-        help='Configurar directorios y templates'
+        "--setup", action="store_true", help="Configurar directorios y templates"
     )
     parser.add_argument(
-        '--guide',
-        action='store_true',
-        help='Mostrar guía de configuración'
+        "--guide", action="store_true", help="Mostrar guía de configuración"
     )
     parser.add_argument(
-        '--config',
-        action='store_true',
-        help='Mostrar configuración actual'
+        "--config", action="store_true", help="Mostrar configuración actual"
     )
 
     args = parser.parse_args()
@@ -343,10 +337,9 @@ def main():
             logger.info("\n🎉 ¡Configuración verificada exitosamente!")
         else:
             logger.error("\n❌ Configuración incompleta o incorrecta")
-            logger.info(
-                "\n💡 Ejecuta con --guide para ver la guía de configuración")
+            logger.info("\n💡 Ejecuta con --guide para ver la guía de configuración")
             sys.exit(1)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

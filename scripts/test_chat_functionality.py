@@ -24,15 +24,15 @@ API_URL = f"{BASE_URL}/api/chat/send"
 
 
 class Colors:
-    GREEN = '\033[92m'
-    RED = '\033[91m'
-    YELLOW = '\033[93m'
-    BLUE = '\033[94m'
-    PURPLE = '\033[95m'
-    CYAN = '\033[96m'
-    WHITE = '\033[97m'
-    BOLD = '\033[1m'
-    END = '\033[0m'
+    GREEN = "\033[92m"
+    RED = "\033[91m"
+    YELLOW = "\033[93m"
+    BLUE = "\033[94m"
+    PURPLE = "\033[95m"
+    CYAN = "\033[96m"
+    WHITE = "\033[97m"
+    BOLD = "\033[1m"
+    END = "\033[0m"
 
 
 def print_header(text):
@@ -69,6 +69,7 @@ def test_server_connection():
     try:
         # Deshabilitar verificación SSL para desarrollo
         import urllib3
+
         urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
         response = requests.get(BASE_URL, verify=False, timeout=10)
@@ -97,7 +98,7 @@ def test_chat_api():
         "¿Cuál es tu nombre?",
         "Explícame qué es la inteligencia artificial",
         "¿Puedes ayudarme con matemáticas?",
-        "Cuéntame un chiste"
+        "Cuéntame un chiste",
     ]
 
     success_count = 0
@@ -110,43 +111,43 @@ def test_chat_api():
         try:
             # Deshabilitar verificación SSL para desarrollo
             import urllib3
+
             urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
             payload = {"message": message}
             headers = {
                 "Content-Type": "application/json",
-                "X-Requested-With": "XMLHttpRequest"
+                "X-Requested-With": "XMLHttpRequest",
             }
 
             start_time = time.time()
             response = requests.post(
-                API_URL,
-                json=payload,
-                headers=headers,
-                verify=False,
-                timeout=30
+                API_URL, json=payload, headers=headers, verify=False, timeout=30
             )
             response_time = time.time() - start_time
 
             if response.status_code == 200:
                 data = response.json()
-                if data.get('success'):
+                if data.get("success"):
                     print_success(
                         f"Respuesta recibida en {
-                            response_time:.2f}s")
+                            response_time:.2f}s"
+                    )
                     print(
                         f"   🤖 Respuesta: '{
                             data.get(
                                 'message',
                                 'Sin mensaje')[
-                                :100]}...'")
+                                :100]}...'"
+                    )
                     success_count += 1
                 else:
                     print_error(
                         f"API respondió con error: {
                             data.get(
                                 'message',
-                                'Error desconocido')}")
+                                'Error desconocido')}"
+                    )
             else:
                 print_error(f"Error HTTP: {response.status_code}")
 
@@ -177,6 +178,7 @@ def test_chat_page():
     try:
         # Deshabilitar verificación SSL para desarrollo
         import urllib3
+
         urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
         chat_url = f"{BASE_URL}/chat"
@@ -192,10 +194,10 @@ def test_chat_page():
                 'id="sendButton"',
                 'id="typing"',
                 'class="action-btn"',
-                'sendMessage()',
-                'addMessage',
-                'showTyping',
-                'hideTyping'
+                "sendMessage()",
+                "addMessage",
+                "showTyping",
+                "hideTyping",
             ]
 
             missing_elements = []
@@ -209,14 +211,18 @@ def test_chat_page():
 
                 # Verificar funcionalidades específicas
                 functionalities = [
-                    ('Función sendMessage', 'function sendMessage' in content or 'async function sendMessage' in content),
-                    ('Botones de acción', 'action-btn' in content),
-                    ('Indicador de escritura', 'typing-indicator' in content),
-                    ('Contador de caracteres', 'char-counter' in content),
-                    ('Carga de archivos', 'fileInput' in content),
-                    ('Síntesis de voz', 'speechSynthesis' in content),
-                    ('Drag and drop', 'dragover' in content),
-                    ('Atajos de teclado', 'keydown' in content)
+                    (
+                        "Función sendMessage",
+                        "function sendMessage" in content
+                        or "async function sendMessage" in content,
+                    ),
+                    ("Botones de acción", "action-btn" in content),
+                    ("Indicador de escritura", "typing-indicator" in content),
+                    ("Contador de caracteres", "char-counter" in content),
+                    ("Carga de archivos", "fileInput" in content),
+                    ("Síntesis de voz", "speechSynthesis" in content),
+                    ("Drag and drop", "dragover" in content),
+                    ("Atajos de teclado", "keydown" in content),
                 ]
 
                 for func_name, is_present in functionalities:
@@ -260,7 +266,7 @@ def test_file_structure():
         "docs/terms_of_service.html",
         "docs/EXECUTIVE_SUMMARY.md",
         "docs/VERTEX_AI_MIGRATION_STEPS.md",
-        "docs/LAUNCH_STEP_BY_STEP.md"
+        "docs/LAUNCH_STEP_BY_STEP.md",
     ]
 
     missing_files = []
@@ -297,25 +303,26 @@ def test_chrome_extension_package():
 
         base_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
         zip_path = os.path.join(
-            base_path, "gemini-ai-chatbot-chrome-20250715_145314.zip")
+            base_path, "gemini-ai-chatbot-chrome-20250715_145314.zip"
+        )
 
         if not os.path.exists(zip_path):
             print_error("Archivo ZIP de la extensión no encontrado")
             return False
 
-        with zipfile.ZipFile(zip_path, 'r') as zip_file:
+        with zipfile.ZipFile(zip_path, "r") as zip_file:
             files_in_zip = zip_file.namelist()
 
             required_extension_files = [
-                'manifest.json',
-                'index.html',
-                'background.js',
-                'content.js',
-                'popup.html',
-                'popup.js',
-                'icons/icon_16.png',
-                'icons/icon_48.png',
-                'icons/icon_128.png'
+                "manifest.json",
+                "index.html",
+                "background.js",
+                "content.js",
+                "popup.html",
+                "popup.js",
+                "icons/icon_16.png",
+                "icons/icon_48.png",
+                "icons/icon_128.png",
             ]
 
             missing_in_zip = []
@@ -335,13 +342,18 @@ def test_chrome_extension_package():
 
                 # Verificar manifest.json
                 try:
-                    manifest_content = zip_file.read(
-                        'manifest.json').decode('utf-8')
+                    manifest_content = zip_file.read("manifest.json").decode("utf-8")
                     manifest_data = json.loads(manifest_content)
 
-                    print_info(f"Nombre: {manifest_data.get('name', 'No especificado')}")
-                    print_info(f"Versión: {manifest_data.get('version', 'No especificada')}")
-                    print_info(f"Descripción: {manifest_data.get('description', 'No especificada')[:50]}...")
+                    print_info(
+                        f"Nombre: {manifest_data.get('name', 'No especificado')}"
+                    )
+                    print_info(
+                        f"Versión: {manifest_data.get('version', 'No especificada')}"
+                    )
+                    print_info(
+                        f"Descripción: {manifest_data.get('description', 'No especificada')[:50]}..."
+                    )
 
                 except Exception as e:
                     print_warning(f"No se pudo leer manifest.json: {str(e)}")
@@ -364,8 +376,7 @@ def generate_test_report(results):
     print(f"   📊 Total de pruebas: {total_tests}")
     print(f"   ✅ Pruebas exitosas: {passed_tests}")
     print(f"   ❌ Pruebas fallidas: {total_tests - passed_tests}")
-    print(
-        f"   📈 Porcentaje de éxito: {(passed_tests / total_tests) * 100:.1f}%")
+    print(f"   📈 Porcentaje de éxito: {(passed_tests / total_tests) * 100:.1f}%")
 
     print(f"\n{Colors.BOLD}Detalle por prueba:{Colors.END}")
     for test_name, result in results.items():
@@ -378,18 +389,19 @@ def generate_test_report(results):
 
     if passed_tests == total_tests:
         print_success(
-            "🎉 ¡Todas las pruebas pasaron! El sistema está listo para el lanzamiento.")
+            "🎉 ¡Todas las pruebas pasaron! El sistema está listo para el lanzamiento."
+        )
         print_info("✅ Puedes proceder con la publicación en Chrome Web Store")
         print_info("✅ Todas las funcionalidades están operativas")
         print_info("✅ La estructura de archivos es correcta")
     elif passed_tests >= total_tests * 0.8:
         print_warning(
-            "⚠️ La mayoría de pruebas pasaron, pero hay algunos problemas menores")
+            "⚠️ La mayoría de pruebas pasaron, pero hay algunos problemas menores"
+        )
         print_info("🔧 Revisa los errores reportados antes del lanzamiento")
         print_info("📋 Considera hacer pruebas manuales adicionales")
     else:
-        print_error(
-            "❌ Múltiples pruebas fallaron - NO recomendado para lanzamiento")
+        print_error("❌ Múltiples pruebas fallaron - NO recomendado para lanzamiento")
         print_warning("🛠️ Corrige los errores críticos antes de proceder")
         print_warning("🔍 Realiza una revisión completa del sistema")
 
@@ -398,7 +410,7 @@ def generate_test_report(results):
     report_file = f"test_report_{timestamp}.txt"
 
     try:
-        with open(report_file, 'w', encoding='utf-8') as f:
+        with open(report_file, "w", encoding="utf-8") as f:
             f.write("REPORTE DE PRUEBAS - GEMINI AI CHATBOT\n")
             f.write(f"Fecha: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n")
             f.write(f"{'=' * 50}\n\n")
@@ -406,7 +418,8 @@ def generate_test_report(results):
             f.write(f"Pruebas exitosas: {passed_tests}\n")
             f.write(f"Pruebas fallidas: {total_tests - passed_tests}\n")
             f.write(
-                f"Porcentaje de éxito: {(passed_tests / total_tests) * 100:.1f}%\n\n")
+                f"Porcentaje de éxito: {(passed_tests / total_tests) * 100:.1f}%\n\n"
+            )
 
             f.write("DETALLE POR PRUEBA:\n")
             for test_name, result in results.items():
@@ -424,7 +437,8 @@ def main():
     print_header("🤖 GEMINI AI CHATBOT - PRUEBAS PRE-LANZAMIENTO")
     print_info(
         f"Iniciando pruebas en: {
-            datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+            datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"
+    )
 
     # Ejecutar todas las pruebas
     results = {}

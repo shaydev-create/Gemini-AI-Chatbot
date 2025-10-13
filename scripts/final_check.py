@@ -29,7 +29,7 @@ def check_zip_contents(zip_path):
         return False
 
     try:
-        with zipfile.ZipFile(zip_path, 'r') as zip_file:
+        with zipfile.ZipFile(zip_path, "r") as zip_file:
             files = zip_file.namelist()
             print(f"📁 Archivos en el ZIP ({len(files)}):")
             for file in files:
@@ -37,10 +37,10 @@ def check_zip_contents(zip_path):
 
             # Verificar archivos críticos
             critical_files = [
-                'manifest.json',
-                'index.html',
-                'background.js',
-                'content.js'
+                "manifest.json",
+                "index.html",
+                "background.js",
+                "content.js",
             ]
 
             missing = []
@@ -85,12 +85,16 @@ def main():
     # 2. Verificar screenshots
     print("\n📸 2. SCREENSHOTS")
     screenshots = [
-        ("chrome_store_assets/screenshots/screenshot_1_main.png",
-         "Screenshot Principal"),
-        ("chrome_store_assets/screenshots/screenshot_2_features.png",
-         "Screenshot Características"),
-        ("chrome_store_assets/screenshots/promo_tile.png",
-         "Tile Promocional")]
+        (
+            "chrome_store_assets/screenshots/screenshot_1_main.png",
+            "Screenshot Principal",
+        ),
+        (
+            "chrome_store_assets/screenshots/screenshot_2_features.png",
+            "Screenshot Características",
+        ),
+        ("chrome_store_assets/screenshots/promo_tile.png", "Tile Promocional"),
+    ]
 
     for path, desc in screenshots:
         if not check_file_exists(path, desc):
@@ -102,7 +106,7 @@ def main():
         ("static/icons/chrome-webstore-icon-16x16.png", "Icono 16x16"),
         ("static/icons/chrome-webstore-icon-48x48.png", "Icono 48x48"),
         ("static/icons/chrome-webstore-icon-128x128.png", "Icono 128x128"),
-        ("static/icons/chrome-webstore-icon-512x512.png", "Icono 512x512")
+        ("static/icons/chrome-webstore-icon-512x512.png", "Icono 512x512"),
     ]
 
     for path, desc in icons:
@@ -113,7 +117,7 @@ def main():
     print("\n📄 4. DOCUMENTOS LEGALES")
     legal_docs = [
         ("templates/privacy_policy.html", "Privacy Policy"),
-        ("templates/terms_of_service.html", "Terms of Service")
+        ("templates/terms_of_service.html", "Terms of Service"),
     ]
 
     for path, desc in legal_docs:
@@ -125,7 +129,7 @@ def main():
     api_files = [
         ("src/config/vertex_ai.py", "Configuración Vertex AI"),
         ("src/config/vertex_client.py", "Cliente Vertex AI"),
-        (".env.vertex", "Variables de entorno Vertex AI")
+        (".env.vertex", "Variables de entorno Vertex AI"),
     ]
 
     for path, desc in api_files:
@@ -137,7 +141,7 @@ def main():
     docs = [
         ("docs/LAUNCH_STEP_BY_STEP.md", "Guía paso a paso"),
         ("docs/EXECUTIVE_SUMMARY.md", "Resumen ejecutivo"),
-        ("docs/VERTEX_AI_MIGRATION_STEPS.md", "Migración Vertex AI")
+        ("docs/VERTEX_AI_MIGRATION_STEPS.md", "Migración Vertex AI"),
     ]
 
     for path, desc in docs:

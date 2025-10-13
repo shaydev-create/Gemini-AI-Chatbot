@@ -28,7 +28,9 @@ class MultimodalService:
             client: Una instancia del VertexAIClient ya inicializado.
         """
         if not client or not client.initialized:
-            raise ValueError("El VertexAIClient debe ser proporcionado y estar inicializado.")
+            raise ValueError(
+                "El VertexAIClient debe ser proporcionado y estar inicializado."
+            )
         self.client = client
         logger.info("✅ Servicio Multimodal inicializado.")
 
@@ -36,7 +38,9 @@ class MultimodalService:
         """
         Crea un objeto `Part` de imagen a partir de una ruta de archivo o datos en base64.
         """
-        if isinstance(image_data, Path) or (isinstance(image_data, str) and Path(image_data).exists()):
+        if isinstance(image_data, Path) or (
+            isinstance(image_data, str) and Path(image_data).exists()
+        ):
             path = Path(image_data)
             mime_type = f"image/{path.suffix.lower().strip('.')}"
             with open(path, "rb") as f:
@@ -48,13 +52,12 @@ class MultimodalService:
             data = base64.b64decode(encoded)
             return Part.from_data(data, mime_type=mime_type)
 
-        raise ValueError(f"Formato de imagen no válido o ruta no encontrada: {image_data}")
+        raise ValueError(
+            f"Formato de imagen no válido o ruta no encontrada: {image_data}"
+        )
 
     def generate_response(
-        self,
-        prompt: str,
-        images: List[Union[str, Path]],
-        model_type: str = "pro"
+        self, prompt: str, images: List[Union[str, Path]], model_type: str = "pro"
     ) -> str:
         """
         Genera una respuesta a partir de un prompt de texto y una lista de imágenes.
@@ -77,7 +80,9 @@ class MultimodalService:
                     image_part = self._create_image_part(image_source)
                     content_parts.append(image_part)
                 except (ValueError, FileNotFoundError) as e:
-                    logger.warning("⚠️ No se pudo procesar una imagen y será omitida: %s", e)
+                    logger.warning(
+                        "⚠️ No se pudo procesar una imagen y será omitida: %s", e
+                    )
                     continue
 
             if len(content_parts) <= 1:
@@ -86,9 +91,7 @@ class MultimodalService:
 
             # Usar el cliente centralizado para generar contenido
             response: GenerationResponse = self.client.generate_content(
-                prompt=content_parts,
-                model_type=model_type,
-                stream=False
+                prompt=content_parts, model_type=model_type, stream=False
             )
 
             response_text = response.text
@@ -97,7 +100,10 @@ class MultimodalService:
 
         except Exception:
             logger.exception("❌ Error al generar la respuesta multimodal.")
-            return "Lo siento, ha ocurrido un error al procesar tu solicitud de imágenes."
+            return (
+                "Lo siento, ha ocurrido un error al procesar tu solicitud de imágenes."
+            )
+
 
 # La instanciación de este servicio, al igual que GeminiService,
 # se realizará durante la creación de la aplicación Flask.

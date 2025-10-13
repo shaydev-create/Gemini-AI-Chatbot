@@ -1,4 +1,4 @@
-﻿"""
+"""
 Middleware personalizado para el Gemini AI Chatbot.
 """
 
@@ -38,9 +38,6 @@ def setup_middleware(app):
         # Log del request
         logger.info(
             f"Request: {request.method} {request.path} from {request.remote_addr}"
-
-
-
         )
 
         # Incrementar contador de requests
@@ -59,11 +56,7 @@ def setup_middleware(app):
             metrics_manager.record_response_time(response_time)
 
             # Log del response
-            logger.info(
-                f"Response: {response.status_code} in {response_time:.3f}s"
-
-
-            )
+            logger.info(f"Response: {response.status_code} in {response_time:.3f}s")
 
         # Headers de seguridad adicionales
         response.headers["X-Request-ID"] = request.headers.get(

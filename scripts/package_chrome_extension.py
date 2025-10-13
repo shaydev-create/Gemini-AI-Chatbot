@@ -18,7 +18,7 @@ def create_chrome_extension_package():
     project_root = os.path.dirname(os.path.abspath(__file__))
     # Subir un nivel desde scripts/
     project_root = os.path.dirname(project_root)
-    chrome_extension_dir = os.path.join(project_root, 'chrome_extension')
+    chrome_extension_dir = os.path.join(project_root, "chrome_extension")
 
     print(f"📁 Directorio del proyecto: {project_root}")
     print(f"📁 Directorio de extensión: {chrome_extension_dir}")
@@ -30,12 +30,12 @@ def create_chrome_extension_package():
 
     # Archivos requeridos para la extensión
     required_files = [
-        'manifest.json',
-        'popup.html',
-        'popup.js',
-        'background.js',
-        'content.js',
-        'index.html'
+        "manifest.json",
+        "popup.html",
+        "popup.js",
+        "background.js",
+        "content.js",
+        "index.html",
     ]
 
     # Verificar archivos requeridos
@@ -48,16 +48,17 @@ def create_chrome_extension_package():
     if missing_files:
         print(
             f"❌ Error: Faltan archivos requeridos: {
-                ', '.join(missing_files)}")
+                ', '.join(missing_files)}"
+        )
         return False
 
     # Verificar directorio de iconos
-    icons_dir = os.path.join(chrome_extension_dir, 'icons')
+    icons_dir = os.path.join(chrome_extension_dir, "icons")
     if not os.path.exists(icons_dir):
         print("❌ Error: No se encontró el directorio icons")
         return False
 
-    required_icons = ['icon_16.png', 'icon_48.png', 'icon_128.png']
+    required_icons = ["icon_16.png", "icon_48.png", "icon_128.png"]
     missing_icons = []
     for icon in required_icons:
         icon_path = os.path.join(icons_dir, icon)
@@ -69,9 +70,9 @@ def create_chrome_extension_package():
         return False
 
     # Leer y validar manifest.json
-    manifest_path = os.path.join(chrome_extension_dir, 'manifest.json')
+    manifest_path = os.path.join(chrome_extension_dir, "manifest.json")
     try:
-        with open(manifest_path, 'r', encoding='utf-8') as f:
+        with open(manifest_path, "r", encoding="utf-8") as f:
             manifest = json.load(f)
 
         print(f"✅ Manifest válido - Nombre: {manifest.get('name', 'N/A')}")
@@ -93,7 +94,7 @@ def create_chrome_extension_package():
 
     try:
         # Crear archivo ZIP
-        with zipfile.ZipFile(zip_path, 'w', zipfile.ZIP_DEFLATED) as zipf:
+        with zipfile.ZipFile(zip_path, "w", zipfile.ZIP_DEFLATED) as zipf:
             # Agregar todos los archivos de la extensión
             for root, dirs, files in os.walk(chrome_extension_dir):
                 for file in files:
@@ -111,7 +112,7 @@ def create_chrome_extension_package():
 
             # Listar contenido del ZIP para verificación
             print("\n📋 Contenido del paquete:")
-            with zipfile.ZipFile(zip_path, 'r') as zipf:
+            with zipfile.ZipFile(zip_path, "r") as zipf:
                 for info in zipf.infolist():
                     print(f"  📄 {info.filename} ({info.file_size} bytes)")
 
@@ -129,21 +130,21 @@ def validate_extension_structure():
     """Validar la estructura de la extensión"""
 
     project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    chrome_extension_dir = os.path.join(project_root, 'chrome_extension')
+    chrome_extension_dir = os.path.join(project_root, "chrome_extension")
 
     print("🔍 Validando estructura de la extensión...")
 
     # Estructura esperada
     expected_structure = {
-        'manifest.json': 'Archivo de configuración principal',
-        'popup.html': 'Interfaz del popup',
-        'popup.js': 'Lógica del popup',
-        'background.js': 'Script de fondo',
-        'content.js': 'Script de contenido',
-        'index.html': 'Página principal de la aplicación',
-        'icons/icon_16.png': 'Icono 16x16',
-        'icons/icon_48.png': 'Icono 48x48',
-        'icons/icon_128.png': 'Icono 128x128'
+        "manifest.json": "Archivo de configuración principal",
+        "popup.html": "Interfaz del popup",
+        "popup.js": "Lógica del popup",
+        "background.js": "Script de fondo",
+        "content.js": "Script de contenido",
+        "index.html": "Página principal de la aplicación",
+        "icons/icon_16.png": "Icono 16x16",
+        "icons/icon_48.png": "Icono 48x48",
+        "icons/icon_128.png": "Icono 128x128",
     }
 
     validation_results = []
@@ -167,8 +168,7 @@ def validate_extension_structure():
 
     print("\n📊 Resumen de validación:")
     print(f"  ✅ Archivos válidos: {valid_files}/{total_files}")
-    print(
-        f"  📈 Porcentaje de completitud: {(valid_files / total_files) * 100:.1f}%")
+    print(f"  📈 Porcentaje de completitud: {(valid_files / total_files) * 100:.1f}%")
 
     return valid_files == total_files
 
@@ -181,7 +181,8 @@ def main():
     # Validar estructura
     if not validate_extension_structure():
         print(
-            "\n❌ La validación de estructura falló. Corrige los errores antes de continuar.")
+            "\n❌ La validación de estructura falló. Corrige los errores antes de continuar."
+        )
         return False
 
     print("\n" + "=" * 60)

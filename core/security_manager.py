@@ -60,7 +60,8 @@ class SecurityManagerCore:
         if request.remote_addr in self.security.blocked_ips:
             self.logger.warning(
                 f"Blocked IP attempted access: {
-                    request.remote_addr}")
+                    request.remote_addr}"
+            )
             return "Access denied", 403
 
         # Log de request
@@ -68,7 +69,8 @@ class SecurityManagerCore:
             f"Request: {
                 request.method} {
                 request.path} from {
-                request.remote_addr}")
+                request.remote_addr}"
+        )
 
         # Verificar autenticación para rutas protegidas
         if self._requires_auth(request.path):
@@ -86,17 +88,14 @@ class SecurityManagerCore:
         self.logger.info(
             f"Response: {
                 response.status_code} for {
-                request.path}")
+                request.path}"
+        )
 
         return response
 
     def _requires_auth(self, path: str) -> bool:
         """Verificar si la ruta requiere autenticación."""
-        protected_paths = [
-            "/api/chat",
-            "/api/history",
-            "/api/settings",
-            "/api/user"]
+        protected_paths = ["/api/chat", "/api/history", "/api/settings", "/api/user"]
 
         return any(path.startswith(protected) for protected in protected_paths)
 
@@ -107,11 +106,7 @@ class SecurityManagerCore:
         if auth_header and auth_header.startswith("Bearer "):
             # Aquí iría la validación JWT
             # Por simplicidad, retornamos éxito
-            return {
-                "success": True,
-                "user": {
-                    "id": "demo_user",
-                    "username": "demo"}}
+            return {"success": True, "user": {"id": "demo_user", "username": "demo"}}
 
         # Verificar API key
         api_key = request.headers.get("X-API-Key")
@@ -126,9 +121,9 @@ class SecurityManagerCore:
         """Manejar error 401."""
         self.logger.warning(
             f"Unauthorized access attempt: {
-                request.remote_addr}")
-        return {"error": "Unauthorized",
-                "message": "Acceso no autorizado"}, 401
+                request.remote_addr}"
+        )
+        return {"error": "Unauthorized", "message": "Acceso no autorizado"}, 401
 
     def _handle_forbidden(self, error):
         """Manejar error 403."""
@@ -168,12 +163,7 @@ class SecurityManagerCore:
         audit_entry = {
             "timestamp": datetime.now(timezone.utc).isoformat(),
             "event": event,
-            "user": getattr(
-                g,
-                "current_user",
-                {}).get(
-                "username",
-                "anonymous"),
+            "user": getattr(g, "current_user", {}).get("username", "anonymous"),
             "ip": request.remote_addr if request else "system",
             "details": details,
         }

@@ -21,7 +21,7 @@ def print_banner():
 
 def run_script(script_name, description):
     """Ejecutar un script Python y mostrar resultado"""
-    script_path = Path('scripts') / script_name
+    script_path = Path("scripts") / script_name
 
     if not script_path.exists():
         print(f"❌ Script no encontrado: {script_path}")
@@ -31,10 +31,7 @@ def run_script(script_name, description):
     print("-" * 60)
 
     try:
-        result = subprocess.run(
-            [sys.executable, str(script_path)],
-            check=False
-        )
+        result = subprocess.run([sys.executable, str(script_path)], check=False)
         success = result.returncode == 0
 
         if success:
@@ -53,21 +50,21 @@ def run_script(script_name, description):
 
 def check_gitignore():
     """Verificar que .gitignore contiene entradas para archivos sensibles"""
-    gitignore_path = Path('.gitignore')
+    gitignore_path = Path(".gitignore")
 
     if not gitignore_path.exists():
         print("❌ Archivo .gitignore no encontrado")
         return False
 
-    with open(gitignore_path, 'r', encoding='utf-8') as f:
+    with open(gitignore_path, "r", encoding="utf-8") as f:
         content = f.read()
 
     required_entries = [
-        '.env',
-        '*.env',
-        '.env.*',
-        '!.env.example',
-        '!.env-sample',
+        ".env",
+        "*.env",
+        ".env.*",
+        "!.env.example",
+        "!.env-sample",
     ]
 
     missing_entries = []
@@ -89,9 +86,9 @@ def check_gitignore():
 
 def check_env_files():
     """Verificar archivos de entorno"""
-    env_path = Path('.env')
-    env_example_path = Path('.env.example')
-    env_sample_path = Path('.env-sample')
+    env_path = Path(".env")
+    env_example_path = Path(".env.example")
+    env_sample_path = Path(".env-sample")
 
     if not env_path.exists():
         print("⚠️ Archivo .env no encontrado")
@@ -110,16 +107,16 @@ def check_env_files():
 
 def check_gitattributes():
     """Verificar archivo .gitattributes"""
-    gitattributes_path = Path('.gitattributes')
+    gitattributes_path = Path(".gitattributes")
 
     if not gitattributes_path.exists():
         print("⚠️ Archivo .gitattributes no encontrado")
         return False
 
-    with open(gitattributes_path, 'r', encoding='utf-8') as f:
+    with open(gitattributes_path, "r", encoding="utf-8") as f:
         content = f.read()
 
-    if '.env filter=git-crypt' not in content:
+    if ".env filter=git-crypt" not in content:
         print("⚠️ Configuración de git-crypt no encontrada en .gitattributes")
         return False
     else:
@@ -152,10 +149,8 @@ def main():
     check_gitattributes()
 
     # Ejecutar scripts de seguridad
-    run_script(
-        'check_exposed_credentials.py',
-        'Verificando credenciales expuestas')
-    run_script('secure_env.py', 'Limpiando archivo .env')
+    run_script("check_exposed_credentials.py", "Verificando credenciales expuestas")
+    run_script("secure_env.py", "Limpiando archivo .env")
 
     # Mostrar recomendaciones
     show_recommendations()

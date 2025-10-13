@@ -55,8 +55,12 @@ def _load_translations(lang: str) -> Dict[str, str]:
                 _translations_cache[lang] = json.load(f)
                 logger.info("Traducciones para '%s' cargadas en caché.", lang)
         except (FileNotFoundError, json.JSONDecodeError):
-            logger.exception("No se pudo cargar o parsear el archivo de traducción para '%s'.", lang)
-            _translations_cache[lang] = {}  # Guardar un diccionario vacío para evitar reintentos
+            logger.exception(
+                "No se pudo cargar o parsear el archivo de traducción para '%s'.", lang
+            )
+            _translations_cache[
+                lang
+            ] = {}  # Guardar un diccionario vacío para evitar reintentos
 
     return _translations_cache[lang]
 
@@ -78,7 +82,9 @@ def translate(key: str, **kwargs) -> str:
         except (KeyError, IndexError):
             logger.warning(
                 "Error al formatear la clave de traducción '%s' para el idioma '%s'. "
-                "Asegúrese de que los placeholders coincidan.", key, lang
+                "Asegúrese de que los placeholders coincidan.",
+                key,
+                lang,
             )
             return key  # Devolver la clave original si el formato falla
 

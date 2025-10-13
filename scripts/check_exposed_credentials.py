@@ -16,21 +16,17 @@ from pathlib import Path
 
 # Patrones de credenciales a buscar
 PATTERNS = {
-    'API Key de Google/Gemini': [
+    "API Key de Google/Gemini": [
         r'GOOGLE_API_KEY\s*=\s*["\']([^"\'\s]{35,})["\']',
         r'GEMINI_API_KEY\s*=\s*["\']([^"\'\s]{35,})["\']',
-        r'AIza[0-9A-Za-z\-_]{35,}'
+        r"AIza[0-9A-Za-z\-_]{35,}",
     ],
-    'Claves secretas': [
+    "Claves secretas": [
         r'SECRET_KEY\s*=\s*["\']([^"\'\s]{16,})["\']',
-        r'JWT_SECRET_KEY\s*=\s*["\']([^"\'\s]{16,})["\']'
+        r'JWT_SECRET_KEY\s*=\s*["\']([^"\'\s]{16,})["\']',
     ],
-    'Credenciales de email': [
-        r'MAIL_PASSWORD\s*=\s*["\']([^"\'\s]{8,})["\']'
-    ],
-    'Claves PWA': [
-        r'VAPID_PRIVATE_KEY\s*=\s*["\']([^"\'\s]{20,})["\']'
-    ]
+    "Credenciales de email": [r'MAIL_PASSWORD\s*=\s*["\']([^"\'\s]{8,})["\']'],
+    "Claves PWA": [r'VAPID_PRIVATE_KEY\s*=\s*["\']([^"\'\s]{20,})["\']'],
 }
 
 
@@ -49,7 +45,7 @@ def run_command(command):
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
             text=True,
-            shell=True
+            shell=True,
         )
         return result.stdout
     except Exception as e:
@@ -63,13 +59,13 @@ def check_git_history():
     print()
 
     # Verificar si estamos en un repositorio Git
-    if not os.path.exists('.git'):
+    if not os.path.exists(".git"):
         print("❌ No se encontró un repositorio Git en este directorio")
         return False
 
     # Obtener lista de commits
-    commits = run_command("git log --format=%H").strip().split('\n')
-    if not commits or commits[0] == '':
+    commits = run_command("git log --format=%H").strip().split("\n")
+    if not commits or commits[0] == "":
         print("❌ No se encontraron commits en el repositorio")
         return False
 
@@ -83,17 +79,18 @@ def check_git_history():
 
         # Obtener información del commit
         commit_info = run_command(
-            f"git show --name-only --format='%h|%an|%ad|%s' {commit} --date=short")
+            f"git show --name-only --format='%h|%an|%ad|%s' {commit} --date=short"
+        )
         if not commit_info:
             continue
 
-        lines = commit_info.split('\n')
+        lines = commit_info.split("\n")
         if not lines:
             continue
 
         # Extraer metadatos del commit
         try:
-            commit_meta = lines[0].split('|')
+            commit_meta = lines[0].split("|")
             short_hash = commit_meta[0]
             author = commit_meta[1]
             date = commit_meta[2]
@@ -115,20 +112,21 @@ def check_git_history():
                     safe_matches = []
                     for match in matches:
                         if len(match) > 8:
-                            safe_match = match[:4] + '*' * \
-                                (len(match) - 8) + match[-4:]
+                            safe_match = match[:4] + "*" * (len(match) - 8) + match[-4:]
                         else:
-                            safe_match = '*' * len(match)
+                            safe_match = "*" * len(match)
                         safe_matches.append(safe_match)
 
                     # Añadir al reporte
                     report_lines.append(
-                        f"⚠️  {cred_type} encontrada en commit {short_hash}")
+                        f"⚠️  {cred_type} encontrada en commit {short_hash}"
+                    )
                     report_lines.append(f"   Fecha: {date}, Autor: {author}")
                     report_lines.append(f"   Asunto: {subject}")
                     report_lines.append(
                         f"   Credencial parcial: {
-                            ', '.join(safe_matches)}")
+                            ', '.join(safe_matches)}"
+                    )
                     report_lines.append("")
 
     # Mostrar resultados
@@ -139,7 +137,8 @@ def check_git_history():
         print("")
         print("🛡️  RECOMENDACIONES:")
         print(
-            "1. Ejecuta 'python scripts/secure_env.py' para limpiar credenciales actuales")
+            "1. Ejecuta 'python scripts/secure_env.py' para limpiar credenciales actuales"
+        )
         print("2. Lee la guía de seguridad en 'docs/SEGURIDAD_CREDENCIALES.md'")
         print("3. Considera usar BFG Repo-Cleaner para limpiar el historial de Git")
         print("   https://rtyley.github.io/bfg-repo-cleaner/")
@@ -152,33 +151,37 @@ def check_git_history():
 
 def generate_report(found_credentials):
     """Generar reporte de análisis"""
-    report_dir = Path('reports')
+    report_dir = Path("reports")
     report_dir.mkdir(exist_ok=True)
 
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     report_file = report_dir / f"credential_scan_{timestamp}.txt"
 
-    with open(report_file, 'w', encoding='utf-8') as f:
+    with open(report_file, "w", encoding="utf-8") as f:
         f.write("🔍 REPORTE DE ANÁLISIS DE CREDENCIALES - GEMINI AI CHATBOT\n")
         f.write("=" * 70 + "\n\n")
         f.write(
             f"Fecha de análisis: {
-                datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n\n")
+                datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n\n"
+        )
 
         if found_credentials:
             f.write(
-                "⚠️  SE ENCONTRARON CREDENCIALES EXPUESTAS EN EL HISTORIAL DE GIT\n\n")
+                "⚠️  SE ENCONTRARON CREDENCIALES EXPUESTAS EN EL HISTORIAL DE GIT\n\n"
+            )
             f.write("🛡️  RECOMENDACIONES:\n")
             f.write(
-                "1. Ejecuta 'python scripts/secure_env.py' para limpiar credenciales actuales\n")
+                "1. Ejecuta 'python scripts/secure_env.py' para limpiar credenciales actuales\n"
+            )
+            f.write("2. Lee la guía de seguridad en 'docs/SEGURIDAD_CREDENCIALES.md'\n")
             f.write(
-                "2. Lee la guía de seguridad en 'docs/SEGURIDAD_CREDENCIALES.md'\n")
-            f.write(
-                "3. Considera usar BFG Repo-Cleaner para limpiar el historial de Git\n")
+                "3. Considera usar BFG Repo-Cleaner para limpiar el historial de Git\n"
+            )
             f.write("   https://rtyley.github.io/bfg-repo-cleaner/\n\n")
         else:
             f.write(
-                "✅ No se encontraron credenciales expuestas en el historial de Git\n\n")
+                "✅ No se encontraron credenciales expuestas en el historial de Git\n\n"
+            )
 
     print(f"\n📋 Reporte guardado en: {report_file}")
 

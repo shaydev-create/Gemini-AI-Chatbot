@@ -16,9 +16,9 @@ import requests
 from dotenv import load_dotenv
 
 # Constantes
-ENV_FILE = '.env'
-ENV_SAMPLE_FILE = '.env-sample'
-ENV_EXAMPLE_FILE = '.env.example'
+ENV_FILE = ".env"
+ENV_SAMPLE_FILE = ".env-sample"
+ENV_EXAMPLE_FILE = ".env.example"
 
 
 def print_banner():
@@ -48,15 +48,16 @@ def setup_env_file():
     if not sample_path:
         print(
             f"❌ No se encontró ningún archivo de ejemplo ({
-                ', '.join(sample_files)})")
+                ', '.join(sample_files)})"
+        )
         print(f"❌ Crea un archivo {ENV_FILE} manualmente")
         return False
 
     # Copiar archivo de ejemplo
-    with open(sample_path, 'r', encoding='utf-8') as f:
+    with open(sample_path, "r", encoding="utf-8") as f:
         sample_content = f.read()
 
-    with open(env_path, 'w', encoding='utf-8') as f:
+    with open(env_path, "w", encoding="utf-8") as f:
         f.write(sample_content)
 
     print(f"✅ Archivo {ENV_FILE} creado a partir de {sample_path}")
@@ -68,17 +69,17 @@ def load_current_keys():
     load_dotenv(ENV_FILE)
 
     keys = {
-        'GEMINI_API_KEY': os.getenv('GEMINI_API_KEY', ''),
-        'GOOGLE_API_KEY': os.getenv('GOOGLE_API_KEY', '')
+        "GEMINI_API_KEY": os.getenv("GEMINI_API_KEY", ""),
+        "GOOGLE_API_KEY": os.getenv("GOOGLE_API_KEY", ""),
     }
 
     # Si GOOGLE_API_KEY está vacío pero GEMINI_API_KEY no, copiar valor
-    if not keys['GOOGLE_API_KEY'] and keys['GEMINI_API_KEY']:
-        keys['GOOGLE_API_KEY'] = keys['GEMINI_API_KEY']
+    if not keys["GOOGLE_API_KEY"] and keys["GEMINI_API_KEY"]:
+        keys["GOOGLE_API_KEY"] = keys["GEMINI_API_KEY"]
 
     # Si GEMINI_API_KEY está vacío pero GOOGLE_API_KEY no, copiar valor
-    if not keys['GEMINI_API_KEY'] and keys['GOOGLE_API_KEY']:
-        keys['GEMINI_API_KEY'] = keys['GOOGLE_API_KEY']
+    if not keys["GEMINI_API_KEY"] and keys["GOOGLE_API_KEY"]:
+        keys["GEMINI_API_KEY"] = keys["GOOGLE_API_KEY"]
 
     return keys
 
@@ -89,7 +90,7 @@ def is_valid_api_key(api_key):
         return False
 
     # Patrón típico de API key de Google
-    pattern = r'^AIza[0-9A-Za-z\-_]{35,}$'
+    pattern = r"^AIza[0-9A-Za-z\-_]{35,}$"
     return bool(re.match(pattern, api_key))
 
 
@@ -103,20 +104,21 @@ def test_gemini_api(api_key):
     params = {"key": api_key}
 
     data = {
-        "contents": [{
-            "parts": [{
-                "text": "Hola, ¿puedes responder con una frase corta para verificar que la API funciona?"
-            }]
-        }]
+        "contents": [
+            {
+                "parts": [
+                    {
+                        "text": "Hola, ¿puedes responder con una frase corta para verificar que la API funciona?"
+                    }
+                ]
+            }
+        ]
     }
 
     try:
         response = requests.post(
-            url,
-            headers=headers,
-            params=params,
-            json=data,
-            timeout=10)
+            url, headers=headers, params=params, json=data, timeout=10
+        )
 
         if response.status_code == 200:
             return True, "API key válida"
@@ -145,7 +147,7 @@ def update_env_file(key_name, key_value):
 
     try:
         # Leer contenido actual
-        with open(env_path, 'r', encoding='utf-8') as f:
+        with open(env_path, "r", encoding="utf-8") as f:
             content = f.read()
 
         # Buscar la clave en el archivo
@@ -154,17 +156,13 @@ def update_env_file(key_name, key_value):
 
         if re.search(pattern, content, re.MULTILINE):
             # Reemplazar valor existente
-            new_content = re.sub(
-                pattern,
-                replacement,
-                content,
-                flags=re.MULTILINE)
+            new_content = re.sub(pattern, replacement, content, flags=re.MULTILINE)
         else:
             # Añadir nueva clave al final
             new_content = content.rstrip() + f"\n{replacement}\n"
 
         # Guardar cambios
-        with open(env_path, 'w', encoding='utf-8') as f:
+        with open(env_path, "w", encoding="utf-8") as f:
             f.write(new_content)
 
         return True
@@ -178,22 +176,20 @@ def setup_api_keys():
     """Configurar claves API interactivamente"""
     # Cargar claves actuales
     current_keys = load_current_keys()
-    gemini_key = current_keys['GEMINI_API_KEY']
-    google_key = current_keys['GOOGLE_API_KEY']
+    gemini_key = current_keys["GEMINI_API_KEY"]
+    google_key = current_keys["GOOGLE_API_KEY"]
 
     # Mostrar estado actual
     print("📋 ESTADO ACTUAL DE LAS CLAVES API:")
 
     if gemini_key:
-        masked_key = gemini_key[:4] + '*' * \
-            (len(gemini_key) - 8) + gemini_key[-4:]
+        masked_key = gemini_key[:4] + "*" * (len(gemini_key) - 8) + gemini_key[-4:]
         print(f"✅ GEMINI_API_KEY: {masked_key}")
     else:
         print("❌ GEMINI_API_KEY: No configurada")
 
     if google_key:
-        masked_key = google_key[:4] + '*' * \
-            (len(google_key) - 8) + google_key[-4:]
+        masked_key = google_key[:4] + "*" * (len(google_key) - 8) + google_key[-4:]
         print(f"✅ GOOGLE_API_KEY: {masked_key}")
     else:
         print("❌ GOOGLE_API_KEY: No configurada")
@@ -209,9 +205,8 @@ def setup_api_keys():
             print(f"✅ API key actual válida: {message}")
             print()
 
-            response = input(
-                "¿Deseas configurar una nueva API key? (s/n): ").lower()
-            if response != 's':
+            response = input("¿Deseas configurar una nueva API key? (s/n): ").lower()
+            if response != "s":
                 print("✅ Configuración actual mantenida")
                 return True
         else:
@@ -232,7 +227,7 @@ def setup_api_keys():
     if not is_valid_api_key(new_key):
         print("⚠️ El formato de la API key no parece correcto")
         response = input("¿Deseas continuar de todos modos? (s/n): ").lower()
-        if response != 's':
+        if response != "s":
             print("❌ Configuración cancelada")
             return False
 
@@ -244,20 +239,17 @@ def setup_api_keys():
         print(f"✅ API key válida: {message}")
     else:
         print(f"❌ API key inválida: {message}")
-        response = input(
-            "¿Deseas guardar esta API key de todos modos? (s/n): ").lower()
-        if response != 's':
+        response = input("¿Deseas guardar esta API key de todos modos? (s/n): ").lower()
+        if response != "s":
             print("❌ Configuración cancelada")
             return False
 
     # Actualizar archivo .env
     print("💾 Guardando API key en archivo .env...")
 
-    if update_env_file(
-        'GEMINI_API_KEY',
-        new_key) and update_env_file(
-        'GOOGLE_API_KEY',
-            new_key):
+    if update_env_file("GEMINI_API_KEY", new_key) and update_env_file(
+        "GOOGLE_API_KEY", new_key
+    ):
         print("✅ API key guardada correctamente")
         return True
     else:

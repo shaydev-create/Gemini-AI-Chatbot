@@ -6,14 +6,13 @@ from flask import Flask
 
 
 class TestAdminRoutes(unittest.TestCase):
-
     def setUp(self):
         self.app = Flask(__name__)
-        self.app.config['TESTING'] = True
-        self.app.register_blueprint(admin_bp, url_prefix='/api/admin')
+        self.app.config["TESTING"] = True
+        self.app.register_blueprint(admin_bp, url_prefix="/api/admin")
         self.client = self.app.test_client()
 
-    @patch('app.api.admin.get_security_summary')
+    @patch("app.api.admin.get_security_summary")
     def test_get_security_summary_route(self, mock_get_security_summary):
         """
         Prueba que la ruta /api/admin/security-summary funciona correctamente.
@@ -21,7 +20,7 @@ class TestAdminRoutes(unittest.TestCase):
         expected_summary = {"status": "secure"}
         mock_get_security_summary.return_value = expected_summary
 
-        response = self.client.get('/api/admin/security-summary')
+        response = self.client.get("/api/admin/security-summary")
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.get_json(), expected_summary)
@@ -40,7 +39,7 @@ class TestAdminRoutes(unittest.TestCase):
             self.app.metrics = mock_metrics_manager
 
             # Realizar la solicitud dentro del contexto de la aplicación
-            response = self.client.get('/api/admin/metrics')
+            response = self.client.get("/api/admin/metrics")
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.get_json(), expected_metrics)
@@ -50,11 +49,12 @@ class TestAdminRoutes(unittest.TestCase):
         """
         Prueba que la ruta /api/admin/system-status funciona correctamente.
         """
-        response = self.client.get('/api/admin/system-status')
+        response = self.client.get("/api/admin/system-status")
 
         self.assertEqual(response.status_code, 200)
-        self.assertIn('db', response.get_json())
-        self.assertIn('cache', response.get_json())
+        self.assertIn("db", response.get_json())
+        self.assertIn("cache", response.get_json())
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     unittest.main()

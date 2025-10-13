@@ -19,14 +19,18 @@ def send_message():
         return jsonify({"message": "El campo 'message' es requerido."}), 400
 
     user_message = data["message"].strip()
-    session_id = data.get("session_id", "anonymous")  # Usar sesión anónima si no se proporciona
+    session_id = data.get(
+        "session_id", "anonymous"
+    )  # Usar sesión anónima si no se proporciona
     image_context = data.get("image_context", None)  # Nuevo: contexto de imagen
     language = data.get("language", "es")  # Obtener idioma, por defecto español
 
     if not user_message:
         return jsonify({"message": "El mensaje no puede estar vacío."}), 400
     if len(user_message) > 4000:
-        return jsonify({"message": "El mensaje excede el límite de 4000 caracteres."}), 400
+        return jsonify(
+            {"message": "El mensaje excede el límite de 4000 caracteres."}
+        ), 400
 
     # Intentar obtener usuario autenticado, pero no requerirlo
     try:
@@ -37,16 +41,18 @@ def send_message():
 
     gemini_service = current_app.gemini_service
     if not gemini_service:
-        return jsonify({"message": "El servicio de IA no está disponible en este momento."}), 503
+        return jsonify(
+            {"message": "El servicio de IA no está disponible en este momento."}
+        ), 503
 
     try:
         # Prepare the prompt with image context if available
         final_prompt = user_message
-        
+
         if image_context and image_context.get("has_image"):
             image_name = image_context.get("image_name", "imagen")
             context_message = image_context.get("context_message", "")
-            
+
             if language == "en":
                 final_prompt = f"""
 {context_message}
@@ -67,14 +73,16 @@ Contexto de imagen:
 
 Por favor, analiza la imagen proporcionada y responde a la pregunta del usuario de manera detallada y útil.
 """
-            current_app.logger.info(f"Processing message with image context: {image_name}")
-        
+            current_app.logger.info(
+                f"Processing message with image context: {image_name}"
+            )
+
         response_text = gemini_service.generate_response(
             session_id=session_id,
             user_id=user_id,
             prompt=final_prompt,
             image_data=image_context.get("image_data") if image_context else None,
-            language=language
+            language=language,
         )
         return jsonify({"response": response_text, "session_id": session_id}), 200
     except Exception as e:
@@ -92,21 +100,20 @@ def stream_message():
     return jsonify({"message": "Endpoint de streaming no implementado aún."}), 501
 
 
-
 @api_bp.route("/health", methods=["GET"])
 def health_check():
     """
     Endpoint de health check para verificar que la API está activa.
     """
     import time
+
     metrics = {}
-    uptime_seconds = int(time.time() - getattr(current_app, 'start_time', time.time()))
-    metrics['uptime_seconds'] = uptime_seconds
-    return jsonify({
-        "status": "healthy",
-        "timestamp": int(time.time()),
-        "metrics": metrics
-    }), 200
+    uptime_seconds = int(time.time() - getattr(current_app, "start_time", time.time()))
+    metrics["uptime_seconds"] = uptime_seconds
+    return jsonify(
+        {"status": "healthy", "timestamp": int(time.time()), "metrics": metrics}
+    ), 200
+
 
 # Export Blueprint for import in app and tests
 __all__ = ["api_bp"]

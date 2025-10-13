@@ -29,18 +29,26 @@ class ConversationMemory:
 
     def _load_or_create_session(self, session_id: str, user_id: int) -> ChatSession:
         """Carga una sesión existente o crea una nueva si no se encuentra."""
-        session = ChatSession.query.filter_by(session_id=session_id, user_id=user_id).first()
+        session = ChatSession.query.filter_by(
+            session_id=session_id, user_id=user_id
+        ).first()
         if session:
-            logger.debug("Sesión de chat cargada desde la base de datos: %s", session_id)
+            logger.debug(
+                "Sesión de chat cargada desde la base de datos: %s", session_id
+            )
             return session
         else:
-            logger.info("Creando nueva sesión de chat en la base de datos: %s", session_id)
+            logger.info(
+                "Creando nueva sesión de chat en la base de datos: %s", session_id
+            )
             new_session = ChatSession(session_id=session_id, user_id=user_id)
             db.session.add(new_session)
             db.session.commit()
             return new_session
 
-    def add_message(self, role: str, content: str, tokens: Optional[int] = None) -> None:
+    def add_message(
+        self, role: str, content: str, tokens: Optional[int] = None
+    ) -> None:
         """
         Añade un mensaje a la sesión de chat actual y lo guarda en la base de datos.
 
@@ -53,14 +61,13 @@ class ConversationMemory:
             raise ValueError("El rol debe ser 'user' o 'model'")
 
         message = ChatMessage(
-            session_id=self.session.id,
-            role=role,
-            content=content,
-            tokens=tokens
+            session_id=self.session.id, role=role, content=content, tokens=tokens
         )
         db.session.add(message)
         db.session.commit()
-        logger.debug("Mensaje de '%s' añadido a la sesión %s", role, self.session.session_id)
+        logger.debug(
+            "Mensaje de '%s' añadido a la sesión %s", role, self.session.session_id
+        )
 
     def get_history(self) -> List[ChatMessage]:
         """
@@ -69,22 +76,32 @@ class ConversationMemory:
         Returns:
             Una lista de objetos ChatMessage, ordenados del más antiguo al más reciente.
         """
-        return ChatMessage.query.filter_by(session_id=self.session.id)\
-                                .order_by(ChatMessage.created_at.asc())\
-                                .limit(self.max_history)\
-                                .all()
+        return (
+            ChatMessage.query.filter_by(session_id=self.session.id)
+            .order_by(ChatMessage.created_at.asc())
+            .limit(self.max_history)
+            .all()
+        )
 
     def clear(self) -> None:
         """
         Elimina todos los mensajes asociados a la sesión de chat actual.
         """
         try:
-            num_deleted = ChatMessage.query.filter_by(session_id=self.session.id).delete()
+            num_deleted = ChatMessage.query.filter_by(
+                session_id=self.session.id
+            ).delete()
             db.session.commit()
-            logger.info("Historial de la sesión %s limpiado (%d mensajes eliminados).", self.session.session_id, num_deleted)
+            logger.info(
+                "Historial de la sesión %s limpiado (%d mensajes eliminados).",
+                self.session.session_id,
+                num_deleted,
+            )
         except Exception:
             db.session.rollback()
-            logger.exception("Error al limpiar el historial de la sesión %s", self.session.session_id)
+            logger.exception(
+                "Error al limpiar el historial de la sesión %s", self.session.session_id
+            )
 
     @property
     def session_id(self) -> str:
@@ -101,8 +118,10 @@ class ConversationMemory:
         history = self.get_history()
         formatted_history = []
         for msg in history:
-            formatted_history.append({
-                "role": msg.role,
-                "parts": [{"text": msg.content}],
-            })
+            formatted_history.append(
+                {
+                    "role": msg.role,
+                    "parts": [{"text": msg.content}],
+                }
+            )
         return formatted_history

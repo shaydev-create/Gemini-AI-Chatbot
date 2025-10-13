@@ -4,8 +4,7 @@ from unittest.mock import MagicMock, patch
 
 
 class TestAppMain(unittest.TestCase):
-
-    @patch('app.core.application.create_app')
+    @patch("app.core.application.create_app")
     def test_main_script_execution(self, mock_create_app):
         """
         Prueba que el script principal `app/main.py` se ejecuta correctamente
@@ -18,7 +17,7 @@ class TestAppMain(unittest.TestCase):
 
         # Ejecutar el script app/main.py simulando `python app/main.py`.
         # run_name='__main__' asegura que el bloque if __name__ == '__main__' se ejecute.
-        runpy.run_module('app.main', run_name='__main__')
+        runpy.run_module("app.main", run_name="__main__")
 
         # Verificar que create_app fue llamado para instanciar la app.
         mock_create_app.assert_called_once()
@@ -27,5 +26,6 @@ class TestAppMain(unittest.TestCase):
         # El objeto app creado dentro de app/main.py es en realidad nuestro mock_app.
         mock_app.run.assert_called_once_with(host="0.0.0.0", port=5000)
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     unittest.main()

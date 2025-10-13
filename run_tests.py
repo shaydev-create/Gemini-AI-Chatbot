@@ -18,14 +18,17 @@ def main():
         result = subprocess.run(
             ["pytest"],
             capture_output=False,  # Permitir que pytest muestre su salida directamente
-            text=True
+            text=True,
         )
-        
+
         # Salir con el código de retorno de pytest
         return result.returncode
-        
+
     except FileNotFoundError:
-        print("Error: No se pudo encontrar pytest. Asegúrate de que esté instalado.", file=sys.stderr)
+        print(
+            "Error: No se pudo encontrar pytest. Asegúrate de que esté instalado.",
+            file=sys.stderr,
+        )
         return 1
     except Exception as e:
         print(f"Error inesperado: {e}", file=sys.stderr)

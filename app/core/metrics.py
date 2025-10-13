@@ -1,4 +1,4 @@
-﻿"""
+"""
 Sistema de métricas para monitoreo de rendimiento.
 """
 
@@ -33,7 +33,10 @@ class MetricsManager:
         self.request_history: Deque[Dict[str, Any]] = deque(maxlen=max_history)
         self.start_time: float = time.time()
 
-        logger.info("📈 MetricsManager inicializado con un historial máximo de %d entradas.", max_history)
+        logger.info(
+            "📈 MetricsManager inicializado con un historial máximo de %d entradas.",
+            max_history,
+        )
 
     def increment_counter(self, name: str, value: int = 1):
         """Incrementa un contador específico."""
@@ -51,12 +54,14 @@ class MetricsManager:
         """
         with self._lock:
             timestamp = time.time()
-            self.request_history.append({
-                "timestamp": timestamp,
-                "endpoint": endpoint,
-                "method": method,
-                "status_code": status_code,
-            })
+            self.request_history.append(
+                {
+                    "timestamp": timestamp,
+                    "endpoint": endpoint,
+                    "method": method,
+                    "status_code": status_code,
+                }
+            )
             self.increment_counter("total_requests")
             self.increment_counter(f"requests_method_{method.lower()}")
             self.increment_counter(f"requests_status_{status_code}")
@@ -80,7 +85,11 @@ class MetricsManager:
                     "count": len(times),
                 }
 
-            recent_requests = [req for req in self.request_history if current_time - req["timestamp"] <= 60]
+            recent_requests = [
+                req
+                for req in self.request_history
+                if current_time - req["timestamp"] <= 60
+            ]
 
             return {
                 "uptime_seconds": uptime,
@@ -108,7 +117,13 @@ metrics_manager = MetricsManager()
 metrics_bp = Blueprint("metrics", __name__)
 
 
-def _format_prometheus_metric(name: str, value: Any, metric_type: str, help_text: str, labels: Dict[str, str] = None) -> str:
+def _format_prometheus_metric(
+    name: str,
+    value: Any,
+    metric_type: str,
+    help_text: str,
+    labels: Dict[str, str] = None,
+) -> str:
     """Formatea una métrica individual para la salida de Prometheus."""
     label_str = ""
     if labels:
@@ -124,50 +139,59 @@ def prometheus_metrics():
     """
     if current_app.config.get("TESTING", False):
         # Deshabilitar en modo de prueba para no interferir con los tests
-        return Response("Métricas deshabilitadas en modo de prueba.", mimetype="text/plain")
+        return Response(
+            "Métricas deshabilitadas en modo de prueba.", mimetype="text/plain"
+        )
 
     metrics = metrics_manager.get_metrics()
     output: List[str] = []
 
     # Uptime
-    output.append(_format_prometheus_metric(
-        "gemini_uptime_seconds",
-        metrics["uptime_seconds"],
-        "gauge",
-        "Tiempo de actividad de la aplicación en segundos."
-    ))
+    output.append(
+        _format_prometheus_metric(
+            "gemini_uptime_seconds",
+            metrics["uptime_seconds"],
+            "gauge",
+            "Tiempo de actividad de la aplicación en segundos.",
+        )
+    )
 
     # Contadores generales
     for key, value in metrics["counters"].items():
-        output.append(_format_prometheus_metric(
-            f"gemini_{key}",
-            value,
-            "counter",
-            f"Contador para {key}."
-        ))
+        output.append(
+            _format_prometheus_metric(
+                f"gemini_{key}", value, "counter", f"Contador para {key}."
+            )
+        )
 
     # Estadísticas de tiempo de respuesta
     if "response_time_stats" in metrics and metrics["response_time_stats"]:
         stats = metrics["response_time_stats"]
-        output.append(_format_prometheus_metric(
-            "gemini_response_time_avg_seconds",
-            stats["avg_seconds"],
-            "gauge",
-            "Tiempo de respuesta promedio."
-        ))
-        output.append(_format_prometheus_metric(
-            "gemini_response_time_max_seconds",
-            stats["max_seconds"],
-            "gauge",
-            "Tiempo de respuesta máximo."
-        ))
+        output.append(
+            _format_prometheus_metric(
+                "gemini_response_time_avg_seconds",
+                stats["avg_seconds"],
+                "gauge",
+                "Tiempo de respuesta promedio.",
+            )
+        )
+        output.append(
+            _format_prometheus_metric(
+                "gemini_response_time_max_seconds",
+                stats["max_seconds"],
+                "gauge",
+                "Tiempo de respuesta máximo.",
+            )
+        )
 
     # Solicitudes por minuto
-    output.append(_format_prometheus_metric(
-        "gemini_requests_per_minute",
-        metrics["requests_per_minute"],
-        "gauge",
-        "Número de solicitudes en los últimos 60 segundos."
-    ))
+    output.append(
+        _format_prometheus_metric(
+            "gemini_requests_per_minute",
+            metrics["requests_per_minute"],
+            "gauge",
+            "Número de solicitudes en los últimos 60 segundos.",
+        )
+    )
 
     return Response("\n".join(output), mimetype="text/plain; version=0.0.4")

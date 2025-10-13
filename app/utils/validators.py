@@ -50,14 +50,22 @@ def validate_message_content(message: str) -> Tuple[bool, Optional[str]]:
         return False, "El mensaje no puede estar vacío."
 
     if len(message) > 4096:
-        return False, "El mensaje excede la longitud máxima permitida (4096 caracteres)."
+        return (
+            False,
+            "El mensaje excede la longitud máxima permitida (4096 caracteres).",
+        )
 
     if len(message.strip()) < 2:
         return False, "El mensaje es demasiado corto (mínimo 2 caracteres)."
 
     if DANGEROUS_SCRIPT_PATTERNS.search(message):
-        logger.warning(f"Detectado contenido potencialmente peligroso en el mensaje: '{message[:100]}...'")
-        return False, "El mensaje contiene contenido no permitido que podría ser inseguro."
+        logger.warning(
+            f"Detectado contenido potencialmente peligroso en el mensaje: '{message[:100]}...'"
+        )
+        return (
+            False,
+            "El mensaje contiene contenido no permitido que podría ser inseguro.",
+        )
 
     return True, None
 
@@ -134,7 +142,9 @@ def validate_file_upload(
         )
 
     if DANGEROUS_FILENAME_CHARS.search(filename):
-        logger.warning(f"Nombre de archivo '{filename}' contiene caracteres no permitidos.")
+        logger.warning(
+            f"Nombre de archivo '{filename}' contiene caracteres no permitidos."
+        )
         return False, "El nombre del archivo contiene caracteres no válidos."
 
     return True, None

@@ -4,7 +4,6 @@ from app.services.conversation_memory import ConversationMemory
 
 
 class TestConversationMemory(unittest.TestCase):
-
     def setUp(self):
         """
         Configura una nueva instancia de ConversationMemory antes de cada prueba.
@@ -28,10 +27,10 @@ class TestConversationMemory(unittest.TestCase):
         history = self.memory.get_history()
 
         self.assertEqual(len(history), 2)
-        self.assertEqual(history[0]['role'], 'user')
-        self.assertEqual(history[0]['content'], 'Hola')
-        self.assertEqual(history[1]['role'], 'model')
-        self.assertEqual(history[1]['content'], 'Hola, ¿cómo estás?')
+        self.assertEqual(history[0]["role"], "user")
+        self.assertEqual(history[0]["content"], "Hola")
+        self.assertEqual(history[1]["role"], "model")
+        self.assertEqual(history[1]["content"], "Hola, ¿cómo estás?")
 
     def test_get_history(self):
         """
@@ -66,8 +65,8 @@ class TestConversationMemory(unittest.TestCase):
 
         history = self.memory.get_history()
         self.assertEqual(len(history), 5)
-        self.assertEqual(history[0]['content'], "Mensaje 5")
-        self.assertEqual(history[4]['content'], "Mensaje 9")
+        self.assertEqual(history[0]["content"], "Mensaje 5")
+        self.assertEqual(history[4]["content"], "Mensaje 9")
 
     def test_add_message_with_invalid_role(self):
         """
@@ -76,5 +75,6 @@ class TestConversationMemory(unittest.TestCase):
         with self.assertRaises(ValueError):
             self.memory.add_message("invalid_role", "Este mensaje fallará")
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     unittest.main()

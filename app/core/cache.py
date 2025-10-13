@@ -26,7 +26,10 @@ class CacheManager:
         self._cache: Dict[str, tuple[Any, float]] = {}
         self.default_ttl = default_ttl
         self._lock = threading.Lock()
-        logger.info("CacheManager inicializado con un TTL por defecto de %d segundos.", default_ttl)
+        logger.info(
+            "CacheManager inicializado con un TTL por defecto de %d segundos.",
+            default_ttl,
+        )
 
     def get(self, key: str) -> Optional[Any]:
         """
@@ -55,7 +58,9 @@ class CacheManager:
 
         with self._lock:
             self._cache[key] = (value, expiry)
-        logger.debug("Cache SET para la clave: %s con un TTL de %d segundos.", key, ttl_to_use)
+        logger.debug(
+            "Cache SET para la clave: %s con un TTL de %d segundos.", key, ttl_to_use
+        )
 
     def delete(self, key: str) -> bool:
         """
@@ -82,13 +87,20 @@ class CacheManager:
         """
         with self._lock:
             current_time = time.time()
-            expired_keys = [key for key, (_, expiry) in self._cache.items() if current_time >= expiry]
+            expired_keys = [
+                key
+                for key, (_, expiry) in self._cache.items()
+                if current_time >= expiry
+            ]
 
             for key in expired_keys:
                 del self._cache[key]
 
         if expired_keys:
-            logger.info("Limpieza de caché: %d entradas expiradas eliminadas.", len(expired_keys))
+            logger.info(
+                "Limpieza de caché: %d entradas expiradas eliminadas.",
+                len(expired_keys),
+            )
         return len(expired_keys)
 
     def get_stats(self) -> Dict[str, int]:

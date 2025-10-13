@@ -27,19 +27,15 @@ def create_chrome_icons():
 
     for size in sizes:
         # Crear imagen
-        img = Image.new('RGBA', (size, size), bg_color)
+        img = Image.new("RGBA", (size, size), bg_color)
         draw = ImageDraw.Draw(img)
 
         # Dibujar círculo de fondo
         margin = size // 8
         circle_bbox = [margin, margin, size - margin, size - margin]
         draw.ellipse(
-            circle_bbox,
-            fill=accent_color,
-            outline=text_color,
-            width=max(
-                1,
-                size // 64))
+            circle_bbox, fill=accent_color, outline=text_color, width=max(1, size // 64)
+        )
 
         # Dibujar letra "G" en el centro
         try:
@@ -82,57 +78,45 @@ def create_chrome_manifest():
         "short_name": "GeminiChat",
         "version": "1.0.0",
         "description": "Asistente de IA avanzado con Google Gemini. Chat inteligente, análisis de documentos y más.",
-
         "icons": {
             "16": "static/icons/chrome-webstore-icon-16x16.png",
             "48": "static/icons/chrome-webstore-icon-48x48.png",
             "128": "static/icons/chrome-webstore-icon-128x128.png",
-            "512": "static/icons/chrome-webstore-icon-512x512.png"
+            "512": "static/icons/chrome-webstore-icon-512x512.png",
         },
-
         "action": {
             "default_popup": "index.html",
             "default_title": "Gemini AI Chatbot",
             "default_icon": {
                 "16": "static/icons/chrome-webstore-icon-16x16.png",
                 "48": "static/icons/chrome-webstore-icon-48x48.png",
-                "128": "static/icons/chrome-webstore-icon-128x128.png"
-            }
+                "128": "static/icons/chrome-webstore-icon-128x128.png",
+            },
         },
-
-        "background": {
-            "service_worker": "static/sw.js"
-        },
-
-        "permissions": [
-            "storage",
-            "activeTab",
-            "scripting"
-        ],
-
+        "background": {"service_worker": "static/sw.js"},
+        "permissions": ["storage", "activeTab", "scripting"],
         "host_permissions": [
             "https://127.0.0.1:5000/*",
             "https://localhost:5000/*",
-            "https://*.gemini-ai.com/*"
+            "https://*.gemini-ai.com/*",
         ],
-
         "content_security_policy": {
             "extension_pages": "script-src 'self'; object-src 'self'; style-src 'self' 'unsafe-inline'"
         },
-
         "web_accessible_resources": [
             {
                 "resources": ["static/*", "templates/*", "*.html", "*.css", "*.js"],
-                "matches": ["<all_urls>"]
+                "matches": ["<all_urls>"],
             }
-        ]
+        ],
     }
 
     # Guardar manifest para Chrome Web Store
     chrome_manifest_path = Path("chrome_extension_manifest.json")
 
     import json
-    with open(chrome_manifest_path, 'w', encoding='utf-8') as f:
+
+    with open(chrome_manifest_path, "w", encoding="utf-8") as f:
         json.dump(manifest, f, indent=2, ensure_ascii=False)
 
     print(f"✅ Manifest para Chrome creado: {chrome_manifest_path}")
@@ -274,7 +258,7 @@ def create_popup_html():
 </body>
 </html>"""
 
-    with open("index.html", 'w', encoding='utf-8') as f:
+    with open("index.html", "w", encoding="utf-8") as f:
         f.write(popup_html)
 
     print("✅ Archivo popup HTML creado: index.html")

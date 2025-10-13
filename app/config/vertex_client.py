@@ -7,7 +7,7 @@ from datetime import datetime
 from typing import Any, Dict, Optional, Tuple
 
 try:
-    __import__('google.cloud.aiplatform')
+    __import__("google.cloud.aiplatform")
     import vertexai
     from vertexai.generative_models import GenerationConfig, GenerativeModel
 
@@ -89,16 +89,23 @@ class VertexAIClient:
         #         return True
 
         # 2. Si Vertex AI falla o está deshabilitado, intentar inicializar Gemini API como fallback
-        if self.config.fallback_config.get("use_gemini_api", True) and GEMINI_API_AVAILABLE:
+        if (
+            self.config.fallback_config.get("use_gemini_api", True)
+            and GEMINI_API_AVAILABLE
+        ):
             if self._initialize_gemini_api():
                 self.initialized = True
                 self.is_healthy = True
                 self.fallback_active = True
-                logger.info("🔄 Cliente de IA inicializado en modo Fallback (Gemini API).")
+                logger.info(
+                    "🔄 Cliente de IA inicializado en modo Fallback (Gemini API)."
+                )
                 return True
 
         self.is_healthy = False
-        logger.error("❌ No se pudo inicializar ningún cliente de IA. Todas las funciones estarán desactivadas.")
+        logger.error(
+            "❌ No se pudo inicializar ningún cliente de IA. Todas las funciones estarán desactivadas."
+        )
         return False
 
     def _initialize_vertex_ai(self) -> bool:
@@ -111,12 +118,20 @@ class VertexAIClient:
             for model_type, model_info in self.config.models.items():
                 try:
                     self.models[model_type] = GenerativeModel(model_info["name"])
-                    logger.debug("✅ Modelo Vertex AI '%s' (%s) cargado.", model_type, model_info["name"])
+                    logger.debug(
+                        "✅ Modelo Vertex AI '%s' (%s) cargado.",
+                        model_type,
+                        model_info["name"],
+                    )
                 except Exception:
-                    logger.exception("⚠️ No se pudo cargar el modelo de Vertex AI: %s", model_type)
+                    logger.exception(
+                        "⚠️ No se pudo cargar el modelo de Vertex AI: %s", model_type
+                    )
 
             if not self.models:
-                logger.error("❌ No se pudo cargar ningún modelo de Vertex AI, la inicialización falló.")
+                logger.error(
+                    "❌ No se pudo cargar ningún modelo de Vertex AI, la inicialización falló."
+                )
                 return False
 
             return True
@@ -129,7 +144,9 @@ class VertexAIClient:
         try:
             api_key = os.getenv("GOOGLE_API_KEY") or os.getenv("GEMINI_API_KEY")
             if not api_key:
-                logger.warning("⚠️ No se encontró la API key para Gemini (GEMINI_API_KEY o GOOGLE_API_KEY).")
+                logger.warning(
+                    "⚠️ No se encontró la API key para Gemini (GEMINI_API_KEY o GOOGLE_API_KEY)."
+                )
                 return False
 
             genai.configure(api_key=api_key)
@@ -448,21 +465,22 @@ class VertexAIClient:
         """Versión síncrona de generate_response para compatibilidad."""
         import asyncio
         import concurrent.futures
-        import threading
-        
+
         def run_async():
             # Crear un nuevo loop de eventos en un hilo separado
             new_loop = asyncio.new_event_loop()
             asyncio.set_event_loop(new_loop)
             try:
                 return new_loop.run_until_complete(
-                    self.generate_response(prompt, model_type, max_tokens, temperature, **kwargs)
+                    self.generate_response(
+                        prompt, model_type, max_tokens, temperature, **kwargs
+                    )
                 )
             except Exception as e:
                 raise e
             finally:
                 new_loop.close()
-        
+
         # Ejecutar siempre en un hilo separado para evitar conflictos
         with concurrent.futures.ThreadPoolExecutor() as executor:
             future = executor.submit(run_async)
@@ -536,9 +554,7 @@ class VertexAIClient:
         if self.initialized:
             try:
                 # Test simple con el modelo más básico
-                await self._generate_with_vertex_ai(
-                    "Test", "basic", 10, 0.1
-                )
+                await self._generate_with_vertex_ai("Test", "basic", 10, 0.1)
                 health_status["vertex_ai"]["available"] = True
             except Exception as e:
                 health_status["vertex_ai"]["error"] = str(e)

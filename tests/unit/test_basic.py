@@ -1,5 +1,6 @@
 # Test básico para verificar que pytest funciona correctamente
 
+
 def test_basic():
     """Test básico que siempre pasa para verificar que pytest funciona."""
     assert True

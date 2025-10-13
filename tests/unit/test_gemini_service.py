@@ -16,8 +16,8 @@ class TestGeminiService:
         # Reiniciar el servicio antes de cada test
         GeminiService().model = None
 
-    @patch('app.services.GeminiService().Config')
-    @patch('app.services.GeminiService().genai')
+    @patch("app.services.GeminiService().Config")
+    @patch("app.services.GeminiService().genai")
     def test_init_app_with_valid_api_key(self, mock_genai, mock_config):
         """Test inicialización con API key válida."""
         # Configuramos el mock para que devuelva la API key
@@ -25,7 +25,7 @@ class TestGeminiService:
         mock_config.SAFETY_SETTINGS = {}
         mock_config.GENERATION_CONFIG = {}
 
-        mock_app = Mock() # El mock de la app ya no necesita el diccionario de config
+        mock_app = Mock()  # El mock de la app ya no necesita el diccionario de config
 
         # Usamos el objeto singleton importado
         GeminiService().init_app(mock_app)
@@ -34,8 +34,8 @@ class TestGeminiService:
         mock_genai.GenerativeModel.assert_called_once()
         assert GeminiService().model is not None
 
-    @patch('app.services.GeminiService().Config')
-    @patch('app.services.GeminiService().genai')
+    @patch("app.services.GeminiService().Config")
+    @patch("app.services.GeminiService().genai")
     def test_init_app_without_api_key(self, mock_genai, mock_config):
         """Test inicialización sin API key."""
         # Configuramos el mock para que no devuelva API key

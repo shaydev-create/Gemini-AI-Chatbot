@@ -40,7 +40,9 @@ class Config:
     GEMINI_VISION_MODEL: str = os.environ.get("GEMINI_VISION_MODEL")
 
     # Límites de tasa de solicitudes por defecto.
-    RATE_LIMIT_DEFAULT: str = os.environ.get("RATE_LIMIT_DEFAULT", "200 per day;50 per hour")
+    RATE_LIMIT_DEFAULT: str = os.environ.get(
+        "RATE_LIMIT_DEFAULT", "200 per day;50 per hour"
+    )
 
     # Configuración de cookies de sesión para mayor seguridad.
     SESSION_COOKIE_HTTPONLY: bool = True
@@ -65,12 +67,13 @@ class Config:
 
 class DevelopmentConfig(Config):
     """Configuración para el entorno de desarrollo."""
+
     import secrets
 
     DEBUG: bool = True
-    SQLALCHEMY_DATABASE_URI: str = os.environ.get("DEV_DATABASE_URL") or "sqlite:///" + str(
-        BASE_DIR / "gemini_chatbot_dev.db"
-    )
+    SQLALCHEMY_DATABASE_URI: str = os.environ.get(
+        "DEV_DATABASE_URL"
+    ) or "sqlite:///" + str(BASE_DIR / "gemini_chatbot_dev.db")
 
     # En desarrollo, si no se define una SECRET_KEY, se genera una temporal.
     # Esto es conveniente para desarrollo local pero invalida las sesiones al reiniciar.
@@ -86,7 +89,9 @@ class TestingConfig(Config):
     """Configuración para el entorno de pruebas."""
 
     TESTING: bool = True
-    SECRET_KEY: str = os.environ.get("TEST_SECRET_KEY", "test-secret-key-change-in-production")
+    SECRET_KEY: str = os.environ.get(
+        "TEST_SECRET_KEY", "test-secret-key-change-in-production"
+    )
     SQLALCHEMY_DATABASE_URI: str = "sqlite:///:memory:"
     WTF_CSRF_ENABLED: bool = False
     # ID de proyecto de Vertex AI para los tests.
@@ -109,9 +114,13 @@ class ProductionConfig(Config):
         """Asegura que las variables críticas de entorno estén definidas en producción."""
         super().__init__()
         if not self.SECRET_KEY:
-            raise ValueError("❌ No se ha configurado la SECRET_KEY en el entorno de producción.")
+            raise ValueError(
+                "❌ No se ha configurado la SECRET_KEY en el entorno de producción."
+            )
         if not self.SQLALCHEMY_DATABASE_URI:
-            raise ValueError("❌ No se ha configurado la DATABASE_URL en el entorno de producción.")
+            raise ValueError(
+                "❌ No se ha configurado la DATABASE_URL en el entorno de producción."
+            )
 
 
 # Diccionario para acceder a las configuraciones por nombre.
@@ -119,5 +128,5 @@ config: dict[str, type[Config]] = {
     "development": DevelopmentConfig,
     "testing": TestingConfig,
     "production": ProductionConfig,
-    "default": DevelopmentConfig
+    "default": DevelopmentConfig,
 }

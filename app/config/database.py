@@ -42,7 +42,9 @@ def reset_db(app):
             db.create_all()
             logger.info("✅ Base de datos reseteada (tablas eliminadas y creadas).")
         except SQLAlchemyError as e:
-            logger.exception(f"❌ Error de SQLAlchemy al resetear la base de datos: {e}")
+            logger.exception(
+                f"❌ Error de SQLAlchemy al resetear la base de datos: {e}"
+            )
             raise
         except Exception as e:
             logger.exception(f"❌ Error inesperado al resetear la base de datos: {e}")

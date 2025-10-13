@@ -26,7 +26,9 @@ class TestAuthManager(unittest.TestCase):
         hashed_password = self.auth_manager.hash_password(password)
         self.assertNotEqual(password, hashed_password)
         self.assertTrue(self.auth_manager.verify_password(password, hashed_password))
-        self.assertFalse(self.auth_manager.verify_password("wrong_password", hashed_password))
+        self.assertFalse(
+            self.auth_manager.verify_password("wrong_password", hashed_password)
+        )
 
     def test_create_user_success(self):
         """Test successful user creation."""
@@ -34,14 +36,18 @@ class TestAuthManager(unittest.TestCase):
         self.assertIn("newuser", self.auth_manager.users)
         self.assertEqual(user["username"], "newuser")
         self.assertEqual(user["email"], "new@example.com")
-        self.assertTrue(self.auth_manager.verify_password("newpass", user["password_hash"]))
+        self.assertTrue(
+            self.auth_manager.verify_password("newpass", user["password_hash"])
+        )
         self.assertIn("api_key", user)
         self.assertIsInstance(user["created_at"], datetime)
 
     def test_create_user_already_exists(self):
         """Test that creating a user that already exists raises a ValueError."""
         with self.assertRaises(ValueError) as context:
-            self.auth_manager.create_user("testuser", "another_password", "another@example.com")
+            self.auth_manager.create_user(
+                "testuser", "another_password", "another@example.com"
+            )
         self.assertEqual(str(context.exception), "Usuario ya existe")
 
     def test_authenticate_user_success(self):
@@ -74,14 +80,20 @@ class TestAuthManager(unittest.TestCase):
         # Lock the account
         for i in range(self.auth_manager.max_attempts):
             self.auth_manager.authenticate_user("testuser", "wrong_password")
-            self.assertEqual(self.auth_manager.failed_attempts["testuser"]["count"], i + 1)
+            self.assertEqual(
+                self.auth_manager.failed_attempts["testuser"]["count"], i + 1
+            )
 
         with self.assertRaises(ValueError) as context:
             self.auth_manager.authenticate_user("testuser", "wrong_password")
-        self.assertEqual(str(context.exception), "Cuenta bloqueada por múltiples intentos fallidos")
+        self.assertEqual(
+            str(context.exception), "Cuenta bloqueada por múltiples intentos fallidos"
+        )
 
         # Simulate time passing to unlock the account
-        self.auth_manager.failed_attempts["testuser"]["last_attempt"] -= timedelta(seconds=self.auth_manager.lockout_duration + 1)
+        self.auth_manager.failed_attempts["testuser"]["last_attempt"] -= timedelta(
+            seconds=self.auth_manager.lockout_duration + 1
+        )
 
         # Should be able to attempt login again (will fail, but not be locked)
         user = self.auth_manager.authenticate_user("testuser", "wrong_password")
@@ -116,8 +128,8 @@ class TestAuthManager(unittest.TestCase):
         user = self.auth_manager.authenticate_api_key(api_key)
         self.assertIsNone(user)
 
-    @patch('app.auth.create_access_token')
-    @patch('app.auth.create_refresh_token')
+    @patch("app.auth.create_access_token")
+    @patch("app.auth.create_refresh_token")
     def test_create_tokens(self, mock_create_refresh, mock_create_access):
         """Test JWT token creation."""
         mock_create_access.return_value = "fake_access_token"
@@ -134,22 +146,29 @@ class TestAuthManager(unittest.TestCase):
             "username": user_data["username"],
             "role": user_data["role"],
         }
-        mock_create_access.assert_called_once_with(identity=expected_identity, expires_delta=timedelta(hours=1))
-        mock_create_refresh.assert_called_once_with(identity=expected_identity, expires_delta=timedelta(days=30))
+        mock_create_access.assert_called_once_with(
+            identity=expected_identity, expires_delta=timedelta(hours=1)
+        )
+        mock_create_refresh.assert_called_once_with(
+            identity=expected_identity, expires_delta=timedelta(days=30)
+        )
+
 
 class TestGetCurrentUser(unittest.TestCase):
     """Test suite for the get_current_user_with_verification function."""
 
     def setUp(self):
         """Set up a shared AuthManager instance."""
-        self.patcher = patch('app.auth.auth_manager', AuthManager())
+        self.patcher = patch("app.auth.auth_manager", AuthManager())
         self.auth_manager = self.patcher.start()
-        self.user = self.auth_manager.create_user("testuser", "password123", "test@example.com")
+        self.user = self.auth_manager.create_user(
+            "testuser", "password123", "test@example.com"
+        )
 
     def tearDown(self):
         self.patcher.stop()
 
-    @patch('app.auth.get_jwt_identity')
+    @patch("app.auth.get_jwt_identity")
     def test_get_current_user_from_context_success(self, mock_get_identity):
         """Test getting the current user from the JWT context successfully."""
         mock_get_identity.return_value = {"user_id": self.user["id"]}
@@ -158,7 +177,7 @@ class TestGetCurrentUser(unittest.TestCase):
         self.assertIsNotNone(found_user)
         self.assertEqual(found_user["id"], self.user["id"])
 
-    @patch('app.auth.get_jwt_identity')
+    @patch("app.auth.get_jwt_identity")
     def test_get_current_user_from_context_not_found(self, mock_get_identity):
         """Test getting a user that does not exist from context."""
         mock_get_identity.return_value = {"user_id": "nonexistent_id"}
@@ -178,11 +197,12 @@ class TestGetCurrentUser(unittest.TestCase):
         self.assertIsNone(AuthManager().get_current_user(token={}))
         self.assertIsNone(AuthManager().get_current_user(token=None))
 
-    @patch('app.auth.get_jwt_identity', side_effect=Exception("JWT error"))
+    @patch("app.auth.get_jwt_identity", side_effect=Exception("JWT error"))
     def test_get_current_user_exception_safety(self, mock_get_identity):
         """Test that the function is safe against exceptions from get_jwt_identity."""
         found_user = AuthManager().get_current_user()
         self.assertIsNone(found_user)
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     unittest.main()

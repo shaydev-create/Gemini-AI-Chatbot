@@ -17,7 +17,7 @@ from sqlalchemy.exc import OperationalError, SQLAlchemyError
 class TestDatabaseConnection:
     """Tests para conexión de base de datos."""
 
-    @patch('app.config.database.create_engine')
+    @patch("app.config.database.create_engine")
     def test_check_db_connection_success(self, mock_create_engine):
         """Test conexión exitosa a la base de datos."""
         # Mock engine y context manager
@@ -29,20 +29,21 @@ class TestDatabaseConnection:
         mock_engine.connect.return_value = mock_connect_cm
         mock_create_engine.return_value = mock_engine
 
-        with patch.dict(os.environ, {'DATABASE_URL': 'sqlite:///:memory:'}, clear=True):
+        with patch.dict(os.environ, {"DATABASE_URL": "sqlite:///:memory:"}, clear=True):
             result, msg, db_type = check_db_connection()
 
-    @patch('app.config.database.create_engine')
+    @patch("app.config.database.create_engine")
     def test_check_db_connection_failure(self, mock_create_engine):
         """Test fallo de conexión a la base de datos."""
         mock_create_engine.side_effect = OperationalError(
-            "Connection failed", None, None)
+            "Connection failed", None, None
+        )
 
         result, msg, db_type = check_db_connection()
 
         assert result is False
 
-    @patch('app.config.database.create_engine')
+    @patch("app.config.database.create_engine")
     def test_check_db_connection_sqlalchemy_error(self, mock_create_engine):
         """Test error de SQLAlchemy en conexión."""
         mock_create_engine.side_effect = SQLAlchemyError("SQLAlchemy error")
@@ -58,22 +59,24 @@ class TestDatabaseInitialization:
     def test_init_db_raises_error_if_uri_not_set(self):
         """Test que init_db lanza RuntimeError si no se ha configurado la URI."""
         from flask import Flask
+
         app = Flask(__name__)
         # Asegurarse de que la configuración no está presente
-        if 'SQLALCHEMY_DATABASE_URI' in app.config:
-            del app.config['SQLALCHEMY_DATABASE_URI']
+        if "SQLALCHEMY_DATABASE_URI" in app.config:
+            del app.config["SQLALCHEMY_DATABASE_URI"]
 
         with pytest.raises(RuntimeError) as excinfo:
             init_db(app)
         assert "SQLALCHEMY_DATABASE_URI no está configurada" in str(excinfo.value)
 
-    @patch('app.config.database.db.create_all')
-    @patch('app.config.database.db.drop_all')
+    @patch("app.config.database.db.create_all")
+    @patch("app.config.database.db.drop_all")
     def test_reset_db_success(self, mock_drop_all, mock_create_all):
         """Test reset exitoso de la base de datos."""
         from flask import Flask
+
         app = Flask(__name__)
-        app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///test.db'
+        app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///test.db"
         # No debe lanzar excepción
         try:
             reset_db(app)
@@ -86,11 +89,11 @@ class TestDatabaseInitialization:
 class TestPostgreSQLMigration:
     """Tests para migración a PostgreSQL."""
 
-    @patch('app.config.database.create_engine')
+    @patch("app.config.database.create_engine")
     def test_migrate_to_postgresql_connection_failure(self, mock_create_engine):
         """Test fallo de conexión en migración a PostgreSQL."""
         # Simular entorno habilitado pero error de conexión
-        with patch.dict(os.environ, {'POSTGRES_ENABLED': 'true'}):
+        with patch.dict(os.environ, {"POSTGRES_ENABLED": "true"}):
             # Simular error al conectar a PostgreSQL
             mock_create_engine.side_effect = Exception("No se puede conectar")
             result = migrate_to_postgresql()
@@ -104,17 +107,17 @@ class TestPostgreSQLIntegration:
     @pytest.fixture
     def postgresql_url(self):
         """Fixture para URL de PostgreSQL de prueba."""
-        host = os.getenv('POSTGRES_TEST_HOST', 'localhost')
-        port = os.getenv('POSTGRES_TEST_PORT', '5432')
-        db = os.getenv('POSTGRES_TEST_DB', 'test_gemini_chatbot')
-        user = os.getenv('POSTGRES_TEST_USER', 'test_user')
-        password = os.getenv('POSTGRES_TEST_PASSWORD', 'test_password')
+        host = os.getenv("POSTGRES_TEST_HOST", "localhost")
+        port = os.getenv("POSTGRES_TEST_PORT", "5432")
+        db = os.getenv("POSTGRES_TEST_DB", "test_gemini_chatbot")
+        user = os.getenv("POSTGRES_TEST_USER", "test_user")
+        password = os.getenv("POSTGRES_TEST_PASSWORD", "test_password")
 
         return f"postgresql://{user}:{password}@{host}:{port}/{db}"
 
     @pytest.mark.skipif(
-        not os.getenv('POSTGRES_TEST_HOST'),
-        reason="PostgreSQL de prueba no configurado"
+        not os.getenv("POSTGRES_TEST_HOST"),
+        reason="PostgreSQL de prueba no configurado",
     )
     def test_real_postgresql_connection(self, postgresql_url):
         """Test conexión real a PostgreSQL (requiere configuración)."""
@@ -122,8 +125,8 @@ class TestPostgreSQLIntegration:
         assert result is True
 
     @pytest.mark.skipif(
-        not os.getenv('POSTGRES_TEST_HOST'),
-        reason="PostgreSQL de prueba no configurado"
+        not os.getenv("POSTGRES_TEST_HOST"),
+        reason="PostgreSQL de prueba no configurado",
     )
     def test_real_postgresql_operations(self, postgresql_url):
         """Test operaciones reales en PostgreSQL."""
@@ -138,25 +141,31 @@ class TestPostgreSQLIntegration:
                 assert row[0] == 1
 
                 # Test creación de tabla temporal
-                conn.execute(text("""
+                conn.execute(
+                    text("""
                     CREATE TEMPORARY TABLE test_table (
                         id SERIAL PRIMARY KEY,
                         name VARCHAR(100),
                         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
                     )
-                """))
+                """)
+                )
 
                 # Test inserción
-                conn.execute(text("""
+                conn.execute(
+                    text("""
                     INSERT INTO test_table (name) VALUES ('test_record')
-                """))
+                """)
+                )
 
                 # Test consulta
-                result = conn.execute(text("""
+                result = conn.execute(
+                    text("""
                     SELECT name FROM test_table WHERE name = 'test_record'
-                """))
+                """)
+                )
                 row = result.fetchone()
-                assert row[0] == 'test_record'
+                assert row[0] == "test_record"
 
                 conn.commit()
 
@@ -177,25 +186,31 @@ class TestPostgreSQLIntegration:
                 assert row[0] == 1
 
                 # Test creación de tabla
-                conn.execute(text("""
+                conn.execute(
+                    text("""
                     CREATE TABLE test_table (
                         id INTEGER PRIMARY KEY AUTOINCREMENT,
                         name TEXT,
                         created_at DATETIME DEFAULT CURRENT_TIMESTAMP
                     )
-                """))
+                """)
+                )
 
                 # Test inserción
-                conn.execute(text("""
+                conn.execute(
+                    text("""
                     INSERT INTO test_table (name) VALUES ('test_record')
-                """))
+                """)
+                )
 
                 # Test consulta
-                result = conn.execute(text("""
+                result = conn.execute(
+                    text("""
                     SELECT name FROM test_table WHERE name = 'test_record'
-                """))
+                """)
+                )
                 row = result.fetchone()
-                assert row[0] == 'test_record'
+                assert row[0] == "test_record"
 
                 conn.commit()
 
@@ -210,9 +225,12 @@ class TestDatabasePerformance:
     def test_connection_pool_performance(self):
         """Test rendimiento del pool de conexiones."""
         sqlite_url = "sqlite:///:memory:"
-        engine = create_engine(sqlite_url, pool_size=5)  # Eliminar max_overflow para SQLite
+        engine = create_engine(
+            sqlite_url, pool_size=5
+        )  # Eliminar max_overflow para SQLite
 
         import time
+
         start_time = time.time()
 
         # Simular múltiples conexiones
@@ -239,31 +257,36 @@ class TestDatabasePerformance:
 
         with engine.connect() as conn:
             # Crear tabla de prueba
-            conn.execute(text("""
+            conn.execute(
+                text("""
                 CREATE TABLE performance_test (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     data TEXT,
                     number INTEGER
                 )
-            """))
+            """)
+            )
 
             import time
+
             start_time = time.time()
 
             # Insertar 1000 registros
             for i in range(1000):
-                conn.execute(text("""
+                conn.execute(
+                    text("""
                     INSERT INTO performance_test (data, number)
                     VALUES (:data, :number)
-                """), {"data": f"test_data_{i}", "number": i})
+                """),
+                    {"data": f"test_data_{i}", "number": i},
+                )
 
             conn.commit()
             end_time = time.time()
             duration = end_time - start_time
 
             # Verificar que se insertaron todos los registros
-            result = conn.execute(
-                text("SELECT COUNT(*) FROM performance_test"))
+            result = conn.execute(text("SELECT COUNT(*) FROM performance_test"))
             count = result.fetchone()[0]
             assert count == 1000
 

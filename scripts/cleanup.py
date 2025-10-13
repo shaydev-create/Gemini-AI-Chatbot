@@ -27,23 +27,14 @@ FILES_TO_REMOVE = [
     "requirements-dev.txt",
     "setup.py",
     "pytest.ini",
-
     # Archivos de entorno duplicados (mantener solo .env y .env.example)
     ".env.backup",
-
     # Scripts redundantes (mantener versiones más recientes o completas)
     "scripts/setup_api_key.py",  # Reemplazado por setup_api_keys.py
 ]
 
 # Directorios temporales a limpiar
-DIRS_TO_CLEAN = [
-    "__pycache__",
-    ".pytest_cache",
-    "build",
-    "dist",
-    "temp",
-    "tmp"
-]
+DIRS_TO_CLEAN = ["__pycache__", ".pytest_cache", "build", "dist", "temp", "tmp"]
 
 # Patrones de archivos temporales a eliminar
 TEMP_FILE_PATTERNS = [
@@ -52,7 +43,7 @@ TEMP_FILE_PATTERNS = [
     r".*~$",
     r".*\.bak$",
     r".*\.swp$",
-    r".*\.tmp$"
+    r".*\.tmp$",
 ]
 
 
@@ -100,7 +91,8 @@ def clean_temp_dirs():
                     rel_path = dir_path.relative_to(PROJECT_ROOT)
                     print(
                         f"  ❌ Error al eliminar directorio {rel_path}: {
-                            str(e)}")
+                            str(e)}"
+                    )
 
     print()
 
@@ -127,7 +119,8 @@ def remove_temp_files():
                         rel_path = file_path.relative_to(PROJECT_ROOT)
                         print(
                             f"  ❌ Error al eliminar archivo {rel_path}: {
-                                str(e)}")
+                                str(e)}"
+                        )
                     break
 
     print()
@@ -173,12 +166,12 @@ def simulate_cleanup():
 
 def main():
     """Función principal"""
-    parser = argparse.ArgumentParser(
-        description="Limpieza de archivos innecesarios")
+    parser = argparse.ArgumentParser(description="Limpieza de archivos innecesarios")
     parser.add_argument(
         "--dry-run",
         action="store_true",
-        help="Mostrar qué se eliminaría sin realizar cambios")
+        help="Mostrar qué se eliminaría sin realizar cambios",
+    )
     args = parser.parse_args()
 
     print_banner()

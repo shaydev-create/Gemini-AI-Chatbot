@@ -4,6 +4,7 @@
 Módulo de autenticación para Gemini AI Chatbot.
 Manejo de usuarios, sesiones y autenticación JWT.
 """
+
 import logging
 from datetime import datetime, timedelta, timezone
 from typing import Any, Dict, Optional
@@ -39,7 +40,9 @@ class AuthManager:
         self.max_attempts = max_attempts
         self.lockout_duration = lockout_duration
 
-    def create_user(self, username: str, password: str, email: str) -> tuple[Optional[User], str]:
+    def create_user(
+        self, username: str, password: str, email: str
+    ) -> tuple[Optional[User], str]:
         """
         Crea un nuevo usuario en la base de datos.
 
@@ -51,8 +54,14 @@ class AuthManager:
 
         try:
             # Verificar si el usuario o el email ya existen
-            if User.query.filter((User.username == username) | (User.email == email)).first():
-                logger.warning("Intento de crear un usuario que ya existe: %s o %s", username, email)
+            if User.query.filter(
+                (User.username == username) | (User.email == email)
+            ).first():
+                logger.warning(
+                    "Intento de crear un usuario que ya existe: %s o %s",
+                    username,
+                    email,
+                )
                 return None, "El nombre de usuario o el email ya están en uso."
 
             new_user = User(username=username, email=email, status="pending")
@@ -65,11 +74,16 @@ class AuthManager:
             return new_user, "Usuario creado con éxito."
         except IntegrityError:
             db.session.rollback()
-            logger.warning("Intento de crear un usuario que ya existe (error de integridad): %s", username)
+            logger.warning(
+                "Intento de crear un usuario que ya existe (error de integridad): %s",
+                username,
+            )
             return None, "El nombre de usuario o el email ya están en uso."
         except SQLAlchemyError:
             db.session.rollback()
-            logger.exception("❌ Error de base de datos al crear el usuario: %s", username)
+            logger.exception(
+                "❌ Error de base de datos al crear el usuario: %s", username
+            )
             return None, "Error en la base de datos al crear el usuario."
 
     def authenticate_user(self, username: str, password: str) -> Optional[User]:
@@ -80,16 +94,24 @@ class AuthManager:
         user = User.query.filter_by(username=username).first()
 
         if not user:
-            logger.warning("Intento de inicio de sesión para usuario no existente: %s", username)
+            logger.warning(
+                "Intento de inicio de sesión para usuario no existente: %s", username
+            )
             return None
 
         if user.is_account_locked():
-            logger.warning("Intento de inicio de sesión para cuenta bloqueada: %s", username)
+            logger.warning(
+                "Intento de inicio de sesión para cuenta bloqueada: %s", username
+            )
             return None
 
         if user.check_password(password):
             if user.status != "active":
-                logger.warning("Intento de inicio de sesión para usuario inactivo: %s (estado: %s)", username, user.status)
+                logger.warning(
+                    "Intento de inicio de sesión para usuario inactivo: %s (estado: %s)",
+                    username,
+                    user.status,
+                )
                 return None
 
             user.unlock_account()
@@ -101,10 +123,16 @@ class AuthManager:
             user.increment_failed_login()
             if user.failed_login_attempts >= self.max_attempts:
                 user.lock_account(minutes=self.lockout_duration // 60)
-                logger.warning("Cuenta bloqueada por %d minutos para el usuario: %s", self.lockout_duration // 60, username)
+                logger.warning(
+                    "Cuenta bloqueada por %d minutos para el usuario: %s",
+                    self.lockout_duration // 60,
+                    username,
+                )
 
             db.session.commit()
-            logger.warning("Intento de inicio de sesión fallido para el usuario: %s", username)
+            logger.warning(
+                "Intento de inicio de sesión fallido para el usuario: %s", username
+            )
             return None
 
     def authenticate_api_key(self, api_key: str) -> Optional[User]:
@@ -129,8 +157,12 @@ class AuthManager:
             "role": "user",  # Asumiendo un rol por defecto
         }
 
-        access_token = create_access_token(identity=identity, expires_delta=timedelta(hours=1))
-        refresh_token = create_refresh_token(identity=identity, expires_delta=timedelta(days=30))
+        access_token = create_access_token(
+            identity=identity, expires_delta=timedelta(hours=1)
+        )
+        refresh_token = create_refresh_token(
+            identity=identity, expires_delta=timedelta(days=30)
+        )
 
         return {
             "access_token": access_token,
@@ -163,7 +195,7 @@ from flask import Blueprint
 
 # Instancia global
 auth_manager = AuthManager()
-auth = Blueprint('auth', __name__)
+auth = Blueprint("auth", __name__)
 
 
 def get_current_user_from_jwt() -> Optional[User]:
@@ -175,7 +207,7 @@ def get_current_user_from_jwt() -> Optional[User]:
     try:
         # Verificar si hay un JWT en la request antes de intentar obtener la identidad
         verify_jwt_in_request(optional=True)
-        
+
         jwt_identity = get_jwt_identity()
         if not jwt_identity or "user_id" not in jwt_identity:
             return None

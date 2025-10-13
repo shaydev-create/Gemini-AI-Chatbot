@@ -21,16 +21,16 @@ def print_banner():
 
 def backup_env_file():
     """Crear backup del archivo .env"""
-    env_file = Path('.env')
-    backup_file = Path('.env.backup')
+    env_file = Path(".env")
+    backup_file = Path(".env.backup")
 
     if not env_file.exists():
         print("❌ Archivo .env no encontrado")
         return False
 
     # Crear backup
-    with open(backup_file, 'w', encoding='utf-8') as f:
-        f.write(open(env_file, 'r', encoding='utf-8').read())
+    with open(backup_file, "w", encoding="utf-8") as f:
+        f.write(open(env_file, "r", encoding="utf-8").read())
 
     print(f"✅ Backup creado en {backup_file}")
     return True
@@ -38,8 +38,8 @@ def backup_env_file():
 
 def clean_env_file():
     """Limpiar credenciales del archivo .env"""
-    env_file = Path('.env')
-    env_example = Path('.env.example')
+    env_file = Path(".env")
+    env_example = Path(".env.example")
 
     if not env_file.exists():
         print("❌ Archivo .env no encontrado")
@@ -50,32 +50,27 @@ def clean_env_file():
         return False
 
     # Leer contenido actual
-    with open(env_file, 'r', encoding='utf-8') as f:
+    with open(env_file, "r", encoding="utf-8") as f:
         content = f.read()
 
     # Leer ejemplo
-    with open(env_example, 'r', encoding='utf-8') as f:
+    with open(env_example, "r", encoding="utf-8") as f:
         f.read()
 
     # Patrones a buscar y reemplazar
     patterns = [
         # API Keys
-        (r'GOOGLE_API_KEY=([^\n]+)', 'GOOGLE_API_KEY=tu_gemini_api_key_aqui'),
-        (r'GEMINI_API_KEY=([^\n]+)', 'GEMINI_API_KEY=tu_gemini_api_key_aqui'),
-
+        (r"GOOGLE_API_KEY=([^\n]+)", "GOOGLE_API_KEY=tu_gemini_api_key_aqui"),
+        (r"GEMINI_API_KEY=([^\n]+)", "GEMINI_API_KEY=tu_gemini_api_key_aqui"),
         # Claves de seguridad
-        (r'SECRET_KEY=([^\n]+)', 'SECRET_KEY=tu_secret_key_muy_seguro_aqui'),
-        (r'JWT_SECRET_KEY=([^\n]+)', 'JWT_SECRET_KEY=tu_jwt_secret_key_aqui'),
-
+        (r"SECRET_KEY=([^\n]+)", "SECRET_KEY=tu_secret_key_muy_seguro_aqui"),
+        (r"JWT_SECRET_KEY=([^\n]+)", "JWT_SECRET_KEY=tu_jwt_secret_key_aqui"),
         # Credenciales de email
-        (r'MAIL_USERNAME=([^\n]+)', 'MAIL_USERNAME=your_email@gmail.com'),
-        (r'MAIL_PASSWORD=([^\n]+)', 'MAIL_PASSWORD=your_app_password'),
-
+        (r"MAIL_USERNAME=([^\n]+)", "MAIL_USERNAME=your_email@gmail.com"),
+        (r"MAIL_PASSWORD=([^\n]+)", "MAIL_PASSWORD=your_app_password"),
         # Claves PWA
-        (r'VAPID_PUBLIC_KEY=([^\n]+)',
-         'VAPID_PUBLIC_KEY=tu_vapid_public_key_aqui'),
-        (r'VAPID_PRIVATE_KEY=([^\n]+)',
-         'VAPID_PRIVATE_KEY=tu_vapid_private_key_aqui'),
+        (r"VAPID_PUBLIC_KEY=([^\n]+)", "VAPID_PUBLIC_KEY=tu_vapid_public_key_aqui"),
+        (r"VAPID_PRIVATE_KEY=([^\n]+)", "VAPID_PRIVATE_KEY=tu_vapid_private_key_aqui"),
     ]
 
     # Aplicar reemplazos
@@ -83,7 +78,7 @@ def clean_env_file():
         content = re.sub(pattern, replacement, content)
 
     # Guardar archivo limpio
-    with open(env_file, 'w', encoding='utf-8') as f:
+    with open(env_file, "w", encoding="utf-8") as f:
         f.write(content)
 
     print("✅ Archivo .env limpiado de credenciales")
@@ -99,7 +94,7 @@ def main():
     print()
 
     response = input("¿Deseas continuar? (s/n): ").lower()
-    if response != 's':
+    if response != "s":
         print("❌ Operación cancelada")
         return False
 

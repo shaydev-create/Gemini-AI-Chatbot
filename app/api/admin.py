@@ -26,11 +26,19 @@ def system_status():
     db_ok, db_msg = check_db_connection(db_url)
 
     # Verificar estado de los servicios de IA
-    ai_service_ok = hasattr(current_app, 'gemini_service') and current_app.gemini_service is not None
+    ai_service_ok = (
+        hasattr(current_app, "gemini_service")
+        and current_app.gemini_service is not None
+    )
 
     status = {
         "database": {"status": "ok" if db_ok else "error", "message": db_msg},
-        "ai_services": {"status": "ok" if ai_service_ok else "error", "message": "Servicios de IA operativos." if ai_service_ok else "Servicios de IA no inicializados."}
+        "ai_services": {
+            "status": "ok" if ai_service_ok else "error",
+            "message": "Servicios de IA operativos."
+            if ai_service_ok
+            else "Servicios de IA no inicializados.",
+        },
     }
 
     http_status = 200 if db_ok and ai_service_ok else 503  # Service Unavailable
@@ -54,18 +62,22 @@ def list_users():
     """
     Obtiene una lista paginada de todos los usuarios.
     """
-    page = request.args.get('page', 1, type=int)
-    per_page = request.args.get('per_page', 10, type=int)
+    page = request.args.get("page", 1, type=int)
+    per_page = request.args.get("per_page", 10, type=int)
 
-    users_pagination = User.query.paginate(page=page, per_page=per_page, error_out=False)
+    users_pagination = User.query.paginate(
+        page=page, per_page=per_page, error_out=False
+    )
     users_list = [user.to_dict() for user in users_pagination.items]
 
-    return jsonify({
-        "users": users_list,
-        "total": users_pagination.total,
-        "pages": users_pagination.pages,
-        "current_page": users_pagination.page
-    }), 200
+    return jsonify(
+        {
+            "users": users_list,
+            "total": users_pagination.total,
+            "pages": users_pagination.pages,
+            "current_page": users_pagination.page,
+        }
+    ), 200
 
 
 @admin_bp.route("/users/<int:user_id>", methods=["GET"])
@@ -93,10 +105,11 @@ def update_user(user_id: int):
         return jsonify({"message": "Se requiere un cuerpo de solicitud JSON."}), 400
 
     # Actualizar campos permitidos
-    user.status = data.get('status', user.status)
+    user.status = data.get("status", user.status)
     # Aquí se podría añadir la lógica para cambiar el rol, con cuidado.
     # user.role = data.get('role', user.role)
 
     db.session.commit()
-    return jsonify({"message": "Usuario actualizado con éxito.", "user": user.to_dict()}), 200
-
+    return jsonify(
+        {"message": "Usuario actualizado con éxito.", "user": user.to_dict()}
+    ), 200

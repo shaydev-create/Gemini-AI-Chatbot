@@ -31,11 +31,11 @@ class LaunchReadinessChecker:
             status = "❌ FAIL"
 
         result = {
-            'test': test_name,
-            'status': status,
-            'message': message,
-            'details': details or [],
-            'timestamp': datetime.now().isoformat()
+            "test": test_name,
+            "status": status,
+            "message": message,
+            "details": details or [],
+            "timestamp": datetime.now().isoformat(),
         }
 
         self.results.append(result)
@@ -51,14 +51,14 @@ class LaunchReadinessChecker:
 
         # Archivos principales requeridos
         required_files = [
-            'app.py',
-            'requirements.txt',
-            'README.md',
-            'app/static/css/style.css',
-            'app/static/js/main.js',
-            'app/templates/index.html',
-            'src/__init__.py',
-            'core/__init__.py'
+            "app.py",
+            "requirements.txt",
+            "README.md",
+            "app/static/css/style.css",
+            "app/static/js/main.js",
+            "app/templates/index.html",
+            "src/__init__.py",
+            "core/__init__.py",
         ]
 
         missing_files = []
@@ -78,40 +78,41 @@ class LaunchReadinessChecker:
                 f"Todos los archivos principales están presentes ({
                     len(existing_files)}/{
                     len(required_files)})",
-                existing_files)
+                existing_files,
+            )
         else:
             self.log_result(
                 "Estructura de Archivos",
                 False,
                 f"Faltan {len(missing_files)} archivos principales",
-                [f"FALTANTE: {f}" for f in missing_files]
+                [f"FALTANTE: {f}" for f in missing_files],
             )
 
     def check_chrome_extension(self):
         """Verificar extensión de Chrome"""
         print("\n🔍 Verificando extensión de Chrome...")
 
-        chrome_dir = self.project_root / 'chrome_extension'
+        chrome_dir = self.project_root / "chrome_extension"
 
         if not chrome_dir.exists():
             self.log_result(
                 "Extensión Chrome - Directorio",
                 False,
-                "Directorio chrome_extension no existe"
+                "Directorio chrome_extension no existe",
             )
             return
 
         # Archivos requeridos para la extensión
         required_extension_files = [
-            'manifest.json',
-            'popup.html',
-            'popup.js',
-            'background.js',
-            'content.js',
-            'index.html',
-            'icons/icon_16.png',
-            'icons/icon_48.png',
-            'icons/icon_128.png'
+            "manifest.json",
+            "popup.html",
+            "popup.js",
+            "background.js",
+            "content.js",
+            "index.html",
+            "icons/icon_16.png",
+            "icons/icon_48.png",
+            "icons/icon_128.png",
         ]
 
         missing_ext_files = []
@@ -130,50 +131,56 @@ class LaunchReadinessChecker:
                 True,
                 f"Todos los archivos de extensión están presentes ({
                     len(existing_ext_files)}/{
-                    len(required_extension_files)})")
+                    len(required_extension_files)})",
+            )
         else:
             self.log_result(
                 "Extensión Chrome - Archivos",
                 False,
                 f"Faltan {len(missing_ext_files)} archivos de extensión",
-                [f"FALTANTE: {f}" for f in missing_ext_files]
+                [f"FALTANTE: {f}" for f in missing_ext_files],
             )
 
         # Verificar manifest.json
-        manifest_path = chrome_dir / 'manifest.json'
+        manifest_path = chrome_dir / "manifest.json"
         if manifest_path.exists():
             try:
-                with open(manifest_path, 'r', encoding='utf-8') as f:
+                with open(manifest_path, "r", encoding="utf-8") as f:
                     manifest = json.load(f)
 
                 required_manifest_fields = [
-                    'name', 'version', 'manifest_version', 'permissions', 'action']
+                    "name",
+                    "version",
+                    "manifest_version",
+                    "permissions",
+                    "action",
+                ]
                 missing_fields = [
-                    field for field in required_manifest_fields if field not in manifest]
+                    field for field in required_manifest_fields if field not in manifest
+                ]
 
                 if not missing_fields:
                     self.log_result(
                         "Extensión Chrome - Manifest",
                         True,
-                        f"Manifest válido - {manifest.get('name')} v{manifest.get('version')}"
+                        f"Manifest válido - {manifest.get('name')} v{manifest.get('version')}",
                     )
                 else:
                     self.log_result(
                         "Extensión Chrome - Manifest",
                         False,
-                        f"Manifest incompleto - faltan campos: {', '.join(missing_fields)}"
+                        f"Manifest incompleto - faltan campos: {', '.join(missing_fields)}",
                     )
 
             except json.JSONDecodeError as e:
                 self.log_result(
                     "Extensión Chrome - Manifest",
                     False,
-                    f"Manifest JSON inválido: {str(e)}"
+                    f"Manifest JSON inválido: {str(e)}",
                 )
 
         # Verificar paquete ZIP
-        zip_files = list(self.project_root.glob(
-            'gemini-ai-chatbot-chrome-*.zip'))
+        zip_files = list(self.project_root.glob("gemini-ai-chatbot-chrome-*.zip"))
         if zip_files:
             latest_zip = max(zip_files, key=lambda x: x.stat().st_mtime)
             zip_size = latest_zip.stat().st_size
@@ -183,30 +190,37 @@ class LaunchReadinessChecker:
                 True,
                 f"Paquete ZIP disponible: {
                     latest_zip.name} ({
-                    zip_size:,        } bytes)")
+                    zip_size:,        } bytes)",
+            )
         else:
             self.log_result(
                 "Extensión Chrome - Paquete",
                 False,
-                "No se encontró paquete ZIP de la extensión"
+                "No se encontró paquete ZIP de la extensión",
             )
 
     def check_server_configuration(self):
         """Verificar configuración del servidor"""
         print("\n🔍 Verificando configuración del servidor...")
 
-        app_py = self.project_root / 'app.py'
+        app_py = self.project_root / "app.py"
         if app_py.exists():
             try:
-                with open(app_py, 'r', encoding='utf-8') as f:
+                with open(app_py, "r", encoding="utf-8") as f:
                     content = f.read()
 
                 # Verificar configuraciones importantes
                 checks = [
-                    ('SSL/HTTPS', 'ssl_context' in content or 'https' in content.lower()),
-                    ('Debug Mode', 'debug=False' in content or 'DEBUG = False' in content),
-                    ('Puerto 5000', 'port=5000' in content or '5000' in content),
-                    ('Host Configuration', 'host=' in content)
+                    (
+                        "SSL/HTTPS",
+                        "ssl_context" in content or "https" in content.lower(),
+                    ),
+                    (
+                        "Debug Mode",
+                        "debug=False" in content or "DEBUG = False" in content,
+                    ),
+                    ("Puerto 5000", "port=5000" in content or "5000" in content),
+                    ("Host Configuration", "host=" in content),
                 ]
 
                 passed_configs = []
@@ -223,49 +237,41 @@ class LaunchReadinessChecker:
                         "Configuración Servidor",
                         True,
                         f"Configuración adecuada ({len(passed_configs)}/4)",
-                        passed_configs
+                        passed_configs,
                     )
                 else:
                     self.log_result(
                         "Configuración Servidor",
                         False,
                         f"Configuración incompleta ({len(passed_configs)}/4)",
-                        failed_configs
+                        failed_configs,
                     )
 
             except Exception as e:
                 self.log_result(
-                    "Configuración Servidor",
-                    False,
-                    f"Error leyendo app.py: {str(e)}"
+                    "Configuración Servidor", False, f"Error leyendo app.py: {str(e)}"
                 )
         else:
             self.log_result(
-                "Configuración Servidor",
-                False,
-                "Archivo app.py no encontrado"
+                "Configuración Servidor", False, "Archivo app.py no encontrado"
             )
 
     def check_static_assets(self):
         """Verificar assets estáticos"""
         print("\n🔍 Verificando assets estáticos...")
 
-        static_dir = self.project_root / 'app' / 'static'
+        static_dir = self.project_root / "app" / "static"
 
         if not static_dir.exists():
-            self.log_result(
-                "Assets Estáticos",
-                False,
-                "Directorio static no existe"
-            )
+            self.log_result("Assets Estáticos", False, "Directorio static no existe")
             return
 
         # Verificar subdirectorios y archivos importantes
         important_assets = [
-            'css/style.css',
-            'js/main.js',
-            'images/icon.svg',
-            'images/icon.png'
+            "css/style.css",
+            "js/main.js",
+            "images/icon.svg",
+            "images/icon.png",
         ]
 
         existing_assets = []
@@ -279,20 +285,21 @@ class LaunchReadinessChecker:
             else:
                 missing_assets.append(asset)
 
-        if len(existing_assets) >= len(important_assets) * \
-                0.75:  # Al menos 75% de assets
+        if (
+            len(existing_assets) >= len(important_assets) * 0.75
+        ):  # Al menos 75% de assets
             self.log_result(
                 "Assets Estáticos",
                 True,
                 f"Assets principales disponibles ({len(existing_assets)}/{len(important_assets)})",
-                existing_assets
+                existing_assets,
             )
         else:
             self.log_result(
                 "Assets Estáticos",
                 False,
                 f"Faltan assets importantes ({len(missing_assets)} faltantes)",
-                missing_assets
+                missing_assets,
             )
 
     def check_documentation(self):
@@ -300,10 +307,10 @@ class LaunchReadinessChecker:
         print("\n🔍 Verificando documentación...")
 
         docs = [
-            ('README.md', 'Documentación principal'),
-            ('docs/INSTALLATION.md', 'Guía de instalación'),
-            ('docs/API_DOCUMENTATION.md', 'Documentación API'),
-            ('docs/USER_GUIDE.md', 'Guía de usuario')
+            ("README.md", "Documentación principal"),
+            ("docs/INSTALLATION.md", "Guía de instalación"),
+            ("docs/API_DOCUMENTATION.md", "Documentación API"),
+            ("docs/USER_GUIDE.md", "Guía de usuario"),
         ]
 
         existing_docs = []
@@ -322,14 +329,14 @@ class LaunchReadinessChecker:
                 "Documentación",
                 True,
                 f"Documentación disponible ({len(existing_docs)}/{len(docs)})",
-                existing_docs
+                existing_docs,
             )
         else:
             self.log_result(
                 "Documentación",
                 False,
                 f"Documentación insuficiente ({len(existing_docs)}/{len(docs)})",
-                missing_docs
+                missing_docs,
             )
 
     def check_security_features(self):
@@ -337,9 +344,9 @@ class LaunchReadinessChecker:
         print("\n🔍 Verificando características de seguridad...")
 
         security_files = [
-            ('src/auth.py', 'Sistema de autenticación'),
-            ('src/security.py', 'Módulo de seguridad'),
-            ('core/security_manager.py', 'Gestor de seguridad')
+            ("src/auth.py", "Sistema de autenticación"),
+            ("src/security.py", "Módulo de seguridad"),
+            ("core/security_manager.py", "Gestor de seguridad"),
         ]
 
         security_features = []
@@ -350,18 +357,19 @@ class LaunchReadinessChecker:
                 security_features.append(description)
 
         # Verificar requirements.txt para dependencias de seguridad
-        req_file = self.project_root / 'requirements.txt'
+        req_file = self.project_root / "requirements.txt"
         security_deps = []
 
         if req_file.exists():
-            with open(req_file, 'r') as f:
+            with open(req_file, "r") as f:
                 content = f.read().lower()
 
             security_packages = [
-                'flask-jwt-extended',
-                'bcrypt',
-                'cryptography',
-                'flask-limiter']
+                "flask-jwt-extended",
+                "bcrypt",
+                "cryptography",
+                "flask-limiter",
+            ]
             for package in security_packages:
                 if package in content:
                     security_deps.append(package)
@@ -373,13 +381,14 @@ class LaunchReadinessChecker:
                 "Características Seguridad",
                 True,
                 f"Características de seguridad implementadas ({total_security_features})",
-                security_features + [f"Dependencia: {dep}" for dep in security_deps]
+                security_features + [f"Dependencia: {dep}" for dep in security_deps],
             )
         else:
             self.log_result(
                 "Características Seguridad",
                 False,
-                f"Características de seguridad insuficientes ({total_security_features})")
+                f"Características de seguridad insuficientes ({total_security_features})",
+            )
 
     def generate_report(self):
         """Generar reporte final"""
@@ -387,33 +396,41 @@ class LaunchReadinessChecker:
         print("🚀 REPORTE DE PREPARACIÓN PARA LANZAMIENTO")
         print("=" * 80)
 
-        success_rate = (self.passed_checks / self.total_checks) * \
-            100 if self.total_checks > 0 else 0
+        success_rate = (
+            (self.passed_checks / self.total_checks) * 100
+            if self.total_checks > 0
+            else 0
+        )
 
         print("\n📊 RESUMEN GENERAL:")
         print(f"   ✅ Pruebas exitosas: {self.passed_checks}")
         print(
             f"   ❌ Pruebas fallidas: {
                 self.total_checks -
-                self.passed_checks}")
+                self.passed_checks}"
+        )
         print(f"   📈 Tasa de éxito: {success_rate:.1f}%")
 
         # Determinar estado de preparación
         if success_rate >= 90:
             status = "🟢 LISTO PARA LANZAMIENTO"
-            recommendation = "El sistema está listo para ser lanzado en Chrome Web Store."
+            recommendation = (
+                "El sistema está listo para ser lanzado en Chrome Web Store."
+            )
         elif success_rate >= 75:
             status = "🟡 CASI LISTO"
             recommendation = "Corrige los problemas menores antes del lanzamiento."
         else:
             status = "🔴 NO LISTO"
-            recommendation = "Se requieren correcciones importantes antes del lanzamiento."
+            recommendation = (
+                "Se requieren correcciones importantes antes del lanzamiento."
+            )
 
         print(f"\n🎯 ESTADO: {status}")
         print(f"💡 RECOMENDACIÓN: {recommendation}")
 
         # Detalles de pruebas fallidas
-        failed_tests = [r for r in self.results if "❌" in r['status']]
+        failed_tests = [r for r in self.results if "❌" in r["status"]]
         if failed_tests:
             print(f"\n❌ PRUEBAS FALLIDAS ({len(failed_tests)}):")
             for test in failed_tests:
@@ -421,22 +438,21 @@ class LaunchReadinessChecker:
 
         # Guardar reporte
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        report_file = self.project_root / \
-            f"launch_readiness_report_{timestamp}.json"
+        report_file = self.project_root / f"launch_readiness_report_{timestamp}.json"
 
         report_data = {
-            'timestamp': datetime.now().isoformat(),
-            'summary': {
-                'total_checks': self.total_checks,
-                'passed_checks': self.passed_checks,
-                'success_rate': success_rate,
-                'status': status,
-                'recommendation': recommendation
+            "timestamp": datetime.now().isoformat(),
+            "summary": {
+                "total_checks": self.total_checks,
+                "passed_checks": self.passed_checks,
+                "success_rate": success_rate,
+                "status": status,
+                "recommendation": recommendation,
             },
-            'results': self.results
+            "results": self.results,
         }
 
-        with open(report_file, 'w', encoding='utf-8') as f:
+        with open(report_file, "w", encoding="utf-8") as f:
             json.dump(report_data, f, indent=2, ensure_ascii=False)
 
         print(f"\n📄 Reporte guardado en: {report_file.name}")
@@ -472,7 +488,8 @@ def main():
             print("\n📋 PRÓXIMOS PASOS:")
             print("   1. Sube la extensión a Chrome Web Store Developer Dashboard")
             print(
-                "   2. Completa la información de la tienda (descripción, capturas, etc.)")
+                "   2. Completa la información de la tienda (descripción, capturas, etc.)"
+            )
             print("   3. Configura el servidor de producción")
             print("   4. Realiza pruebas finales en el entorno de producción")
             print("   5. Publica la extensión")
@@ -480,7 +497,9 @@ def main():
             return True
         else:
             print("\n⚠️  Se requieren correcciones antes del lanzamiento.")
-            print("   Revisa el reporte detallado y corrige los problemas identificados.")
+            print(
+                "   Revisa el reporte detallado y corrige los problemas identificados."
+            )
 
             return False
 

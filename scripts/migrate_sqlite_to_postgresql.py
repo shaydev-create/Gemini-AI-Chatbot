@@ -13,8 +13,7 @@ import psycopg2
 
 # Configurar logging
 logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(levelname)s - %(message)s'
+    level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
 )
 logger = logging.getLogger(__name__)
 
@@ -29,9 +28,9 @@ def get_project_root() -> Path:
 
     # Buscar hacia arriba hasta encontrar requirements.txt o .git
     while current_path.parent != current_path:
-        if (current_path /
-            'requirements.txt').exists() or (current_path /
-                                             '.git').exists():
+        if (current_path / "requirements.txt").exists() or (
+            current_path / ".git"
+        ).exists():
             return current_path
         current_path = current_path.parent
 
@@ -44,14 +43,14 @@ def check_dependencies() -> bool:
     Returns:
         bool: True si todas las dependencias están disponibles
     """
-    required_packages = ['psycopg2', 'sqlalchemy']
+    required_packages = ["psycopg2", "sqlalchemy"]
     missing_packages = []
 
     for package in required_packages:
         try:
-            if package == 'psycopg2':
+            if package == "psycopg2":
                 __import__(package)
-            elif package == 'sqlalchemy':
+            elif package == "sqlalchemy":
                 __import__(package)
             logger.info(f"✅ {package} está disponible")
         except ImportError:
@@ -60,9 +59,9 @@ def check_dependencies() -> bool:
 
     if missing_packages:
         logger.error("\n🔧 Para instalar las dependencias faltantes, ejecuta:")
-        if 'psycopg2' in missing_packages:
+        if "psycopg2" in missing_packages:
             logger.error("pip install psycopg2-binary")
-        if 'sqlalchemy' in missing_packages:
+        if "sqlalchemy" in missing_packages:
             logger.error("pip install sqlalchemy")
         return False
 
@@ -81,13 +80,13 @@ def parse_database_url(url: str) -> Dict[str, str]:
     parsed = urlparse(url)
 
     return {
-        'scheme': parsed.scheme,
-        'host': parsed.hostname or 'localhost',
-        'port': parsed.port or (
-            5432 if parsed.scheme == 'postgresql' else None),
-        'database': parsed.path.lstrip('/') if parsed.path else '',
-        'username': parsed.username or '',
-        'password': parsed.password or ''}
+        "scheme": parsed.scheme,
+        "host": parsed.hostname or "localhost",
+        "port": parsed.port or (5432 if parsed.scheme == "postgresql" else None),
+        "database": parsed.path.lstrip("/") if parsed.path else "",
+        "username": parsed.username or "",
+        "password": parsed.password or "",
+    }
 
 
 def get_sqlite_connection(db_path: str) -> sqlite3.Connection:
@@ -100,8 +99,7 @@ def get_sqlite_connection(db_path: str) -> sqlite3.Connection:
         Conexión a SQLite
     """
     if not os.path.exists(db_path):
-        raise FileNotFoundError(
-            f"Base de datos SQLite no encontrada: {db_path}")
+        raise FileNotFoundError(f"Base de datos SQLite no encontrada: {db_path}")
 
     conn = sqlite3.connect(db_path)
     conn.row_factory = sqlite3.Row  # Para acceso por nombre de columna
@@ -109,7 +107,8 @@ def get_sqlite_connection(db_path: str) -> sqlite3.Connection:
 
 
 def get_postgresql_connection(
-        db_config: Dict[str, str]) -> psycopg2.extensions.connection:
+    db_config: Dict[str, str],
+) -> psycopg2.extensions.connection:
     """Obtener conexión a PostgreSQL.
 
     Args:
@@ -120,11 +119,11 @@ def get_postgresql_connection(
     """
     try:
         conn = psycopg2.connect(
-            host=db_config['host'],
-            port=db_config['port'],
-            database=db_config['database'],
-            user=db_config['username'],
-            password=db_config['password']
+            host=db_config["host"],
+            port=db_config["port"],
+            database=db_config["database"],
+            user=db_config["username"],
+            password=db_config["password"],
         )
         conn.autocommit = False
         return conn
@@ -153,8 +152,9 @@ def get_sqlite_tables(conn: sqlite3.Connection) -> List[str]:
     return tables
 
 
-def get_table_schema(conn: sqlite3.Connection,
-                     table_name: str) -> List[Tuple[str, str]]:
+def get_table_schema(
+    conn: sqlite3.Connection, table_name: str
+) -> List[Tuple[str, str]]:
     """Obtener esquema de una tabla SQLite.
 
     Args:
@@ -187,17 +187,17 @@ def sqlite_to_postgresql_type(sqlite_type: str) -> str:
         Tipo de datos PostgreSQL equivalente
     """
     type_mapping = {
-        'INTEGER': 'INTEGER',
-        'TEXT': 'TEXT',
-        'REAL': 'REAL',
-        'BLOB': 'BYTEA',
-        'NUMERIC': 'NUMERIC',
-        'VARCHAR': 'VARCHAR',
-        'CHAR': 'CHAR',
-        'BOOLEAN': 'BOOLEAN',
-        'DATETIME': 'TIMESTAMP',
-        'DATE': 'DATE',
-        'TIME': 'TIME'
+        "INTEGER": "INTEGER",
+        "TEXT": "TEXT",
+        "REAL": "REAL",
+        "BLOB": "BYTEA",
+        "NUMERIC": "NUMERIC",
+        "VARCHAR": "VARCHAR",
+        "CHAR": "CHAR",
+        "BOOLEAN": "BOOLEAN",
+        "DATETIME": "TIMESTAMP",
+        "DATE": "DATE",
+        "TIME": "TIME",
     }
 
     # Normalizar tipo
@@ -214,11 +214,14 @@ def sqlite_to_postgresql_type(sqlite_type: str) -> str:
 
     # Por defecto, usar TEXT
     logger.warning(f"⚠️ Tipo desconocido '{sqlite_type}', usando TEXT")
-    return 'TEXT'
+    return "TEXT"
 
 
-def create_postgresql_table(pg_conn: psycopg2.extensions.connection,
-                            table_name: str, schema: List[Tuple[str, str]]) -> bool:
+def create_postgresql_table(
+    pg_conn: psycopg2.extensions.connection,
+    table_name: str,
+    schema: List[Tuple[str, str]],
+) -> bool:
     """Crear tabla en PostgreSQL.
 
     Args:
@@ -259,9 +262,10 @@ def create_postgresql_table(pg_conn: psycopg2.extensions.connection,
 
 
 def migrate_table_data(
-        sqlite_conn: sqlite3.Connection,
-        pg_conn: psycopg2.extensions.connection,
-        table_name: str) -> bool:
+    sqlite_conn: sqlite3.Connection,
+    pg_conn: psycopg2.extensions.connection,
+    table_name: str,
+) -> bool:
     """Migrar datos de una tabla de SQLite a PostgreSQL.
 
     Args:
@@ -284,14 +288,13 @@ def migrate_table_data(
             return True
 
         # Obtener nombres de columnas
-        column_names = [description[0]
-                        for description in sqlite_cursor.description]
+        column_names = [description[0] for description in sqlite_cursor.description]
 
         # Preparar inserción en PostgreSQL
         pg_cursor = pg_conn.cursor()
 
         # Construir SQL de inserción
-        placeholders = ', '.join(['%s'] * len(column_names))
+        placeholders = ", ".join(["%s"] * len(column_names))
         insert_sql = f"""
             INSERT INTO {table_name} ({', '.join(column_names)})
             VALUES ({placeholders})
@@ -304,7 +307,7 @@ def migrate_table_data(
         logger.info(f"📊 Migrando {total_rows} filas de {table_name}...")
 
         for i in range(0, total_rows, batch_size):
-            batch = rows[i:i + batch_size]
+            batch = rows[i : i + batch_size]
 
             # Convertir sqlite3.Row a tuplas
             batch_data = [tuple(row) for row in batch]
@@ -329,9 +332,10 @@ def migrate_table_data(
 
 
 def verify_migration(
-        sqlite_conn: sqlite3.Connection,
-        pg_conn: psycopg2.extensions.connection,
-        table_name: str) -> bool:
+    sqlite_conn: sqlite3.Connection,
+    pg_conn: psycopg2.extensions.connection,
+    table_name: str,
+) -> bool:
     """Verificar que la migración fue exitosa.
 
     Args:
@@ -357,11 +361,13 @@ def verify_migration(
 
         if sqlite_count == pg_count:
             logger.info(
-                f"✅ Verificación exitosa para {table_name}: {sqlite_count} filas")
+                f"✅ Verificación exitosa para {table_name}: {sqlite_count} filas"
+            )
             return True
         else:
             logger.error(
-                f"❌ Verificación fallida para {table_name}: SQLite={sqlite_count}, PostgreSQL={pg_count}")
+                f"❌ Verificación fallida para {table_name}: SQLite={sqlite_count}, PostgreSQL={pg_count}"
+            )
             return False
 
     except Exception as e:
@@ -381,7 +387,7 @@ def create_backup(sqlite_path: str) -> str:
     import shutil
     from datetime import datetime
 
-    timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     backup_path = f"{sqlite_path}.backup_{timestamp}"
 
     shutil.copy2(sqlite_path, backup_path)
@@ -394,32 +400,24 @@ def main():
     """Función principal."""
     import argparse
 
-    parser = argparse.ArgumentParser(
-        description='Migrar datos de SQLite a PostgreSQL'
+    parser = argparse.ArgumentParser(description="Migrar datos de SQLite a PostgreSQL")
+    parser.add_argument(
+        "--sqlite-db",
+        default="instance/database.db",
+        help="Ruta a la base de datos SQLite (default: instance/database.db)",
     )
     parser.add_argument(
-        '--sqlite-db',
-        default='instance/database.db',
-        help='Ruta a la base de datos SQLite (default: instance/database.db)'
+        "--postgresql-url",
+        help="URL de PostgreSQL (ej: postgresql://user:pass@localhost/dbname)",
     )
     parser.add_argument(
-        '--postgresql-url',
-        help='URL de PostgreSQL (ej: postgresql://user:pass@localhost/dbname)'
+        "--dry-run", action="store_true", help="Solo mostrar qué se haría, sin ejecutar"
     )
     parser.add_argument(
-        '--dry-run',
-        action='store_true',
-        help='Solo mostrar qué se haría, sin ejecutar'
+        "--backup", action="store_true", help="Crear backup de SQLite antes de migrar"
     )
     parser.add_argument(
-        '--backup',
-        action='store_true',
-        help='Crear backup de SQLite antes de migrar'
-    )
-    parser.add_argument(
-        '--verify',
-        action='store_true',
-        help='Verificar migración después de completar'
+        "--verify", action="store_true", help="Verificar migración después de completar"
     )
 
     args = parser.parse_args()
@@ -437,8 +435,8 @@ def main():
         sqlite_path = str(project_root / args.sqlite_db)
 
         # URL de PostgreSQL
-        postgresql_url = args.postgresql_url or os.getenv('DATABASE_URL')
-        if not postgresql_url or 'sqlite' in postgresql_url:
+        postgresql_url = args.postgresql_url or os.getenv("DATABASE_URL")
+        if not postgresql_url or "sqlite" in postgresql_url:
             logger.error("❌ URL de PostgreSQL no configurada")
             logger.error("💡 Usar --postgresql-url o configurar DATABASE_URL")
             sys.exit(1)
@@ -451,7 +449,8 @@ def main():
             f"🐘 PostgreSQL: {
                 pg_config['host']}:{
                 pg_config['port']}/{
-                pg_config['database']}")
+                pg_config['database']}"
+        )
 
         if args.dry_run:
             logger.info("🔍 Modo dry-run activado")
@@ -513,8 +512,7 @@ def main():
                     verification_failed.append(table_name)
 
             if verification_failed:
-                logger.error(
-                    f"❌ Verificación fallida para: {verification_failed}")
+                logger.error(f"❌ Verificación fallida para: {verification_failed}")
             else:
                 logger.info("✅ Verificación exitosa para todas las tablas")
 
@@ -550,5 +548,5 @@ def main():
         sys.exit(1)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

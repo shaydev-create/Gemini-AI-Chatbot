@@ -5,15 +5,14 @@ Migra desde Gemini API gratuita a Vertex AI con fallback
 Actualizado para usar el nuevo cliente Vertex AI
 """
 
+import logging
 import os
 import sys
-import logging
 from pathlib import Path
 
 # Configurar logging
 logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(levelname)s - %(message)s'
+    level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
 )
 logger = logging.getLogger(__name__)
 
@@ -28,9 +27,9 @@ def get_project_root() -> Path:
 
     # Buscar hacia arriba hasta encontrar requirements.txt o .git
     while current_path.parent != current_path:
-        if (current_path /
-            'requirements.txt').exists() or (current_path /
-                                             '.git').exists():
+        if (current_path / "requirements.txt").exists() or (
+            current_path / ".git"
+        ).exists():
             return current_path
         current_path = current_path.parent
 
@@ -46,17 +45,17 @@ def check_requirements() -> bool:
     logger.info("🔍 Verificando requisitos...")
 
     requirements = {
-        'google-cloud-aiplatform': 'google-cloud-aiplatform',
-        'vertexai': 'vertexai',
-        'google-auth': 'google-auth',
-        'google-auth-oauthlib': 'google-auth-oauthlib',
-        'google-generativeai': 'google-generativeai'
+        "google-cloud-aiplatform": "google-cloud-aiplatform",
+        "vertexai": "vertexai",
+        "google-auth": "google-auth",
+        "google-auth-oauthlib": "google-auth-oauthlib",
+        "google-generativeai": "google-generativeai",
     }
 
     missing = []
     for package, pip_name in requirements.items():
         try:
-            __import__(package.replace('-', '_'))
+            __import__(package.replace("-", "_"))
             logger.info(f"✅ {package}")
         except ImportError:
             logger.error(f"❌ {package}")
@@ -83,10 +82,7 @@ def update_vertex_ai_integration() -> bool:
         # Verificar que los archivos necesarios existen
         project_root = get_project_root()
 
-        required_files = [
-            'src/config/vertex_ai.py',
-            'src/config/vertex_client.py'
-        ]
+        required_files = ["src/config/vertex_ai.py", "src/config/vertex_client.py"]
 
         for file_path in required_files:
             full_path = project_root / file_path
@@ -166,7 +162,7 @@ class VertexAIConfig:
 vertex_config = VertexAIConfig()
 '''
 
-    with open('src/config/vertex_ai.py', 'w', encoding='utf-8') as f:
+    with open("src/config/vertex_ai.py", "w", encoding="utf-8") as f:
         f.write(config_content)
 
     print("✅ Configuración Vertex AI creada: src/config/vertex_ai.py")
@@ -174,8 +170,7 @@ vertex_config = VertexAIConfig()
 
 def create_vertex_ai_client():
     """Crear cliente para Vertex AI (legacy - mantenido por compatibilidad)"""
-    logger.warning(
-        "⚠️ Esta función es legacy. Usar src/config/vertex_client.py")
+    logger.warning("⚠️ Esta función es legacy. Usar src/config/vertex_client.py")
 
     client_content = '''"""
 Cliente para Google Cloud Vertex AI
@@ -349,8 +344,8 @@ class VertexAIClient:
 vertex_client = VertexAIClient()
 '''
 
-    os.makedirs('src/config', exist_ok=True)
-    with open('src/config/vertex_client.py', 'w', encoding='utf-8') as f:
+    os.makedirs("src/config", exist_ok=True)
+    with open("src/config/vertex_client.py", "w", encoding="utf-8") as f:
         f.write(client_content)
 
     print("✅ Cliente Vertex AI creado: src/config/vertex_client.py")
@@ -359,7 +354,7 @@ vertex_client = VertexAIClient()
 def create_env_template():
     """Crear template de variables de entorno"""
 
-    env_content = '''# Google Cloud Vertex AI Configuration
+    env_content = """# Google Cloud Vertex AI Configuration
 GOOGLE_CLOUD_PROJECT_ID=tu-proyecto-id
 GOOGLE_CLOUD_LOCATION=us-central1
 GOOGLE_APPLICATION_CREDENTIALS=path/to/service-account-key.json
@@ -376,9 +371,9 @@ FALLBACK_ORDER=vertex_ai,gemini_api,openai
 # Monitoring
 ENABLE_USAGE_TRACKING=true
 COST_ALERT_THRESHOLD=80
-'''
+"""
 
-    with open('.env.vertex', 'w', encoding='utf-8') as f:
+    with open(".env.vertex", "w", encoding="utf-8") as f:
         f.write(env_content)
 
     print("✅ Template de variables creado: .env.vertex")
@@ -387,7 +382,7 @@ COST_ALERT_THRESHOLD=80
 def create_migration_guide():
     """Crear guía de migración"""
 
-    guide_content = '''# 🚀 Guía de Migración a Vertex AI - Pasos Específicos
+    guide_content = """# 🚀 Guía de Migración a Vertex AI - Pasos Específicos
 
 ## 📋 CHECKLIST DE MIGRACIÓN
 
@@ -534,9 +529,9 @@ A: Dashboard en Google Cloud + alertas automáticas.
 
 **Q: ¿Es reversible la migración?**
 A: Sí, puedes volver a Gemini API en cualquier momento.
-'''
+"""
 
-    with open('docs/VERTEX_AI_MIGRATION_STEPS.md', 'w', encoding='utf-8') as f:
+    with open("docs/VERTEX_AI_MIGRATION_STEPS.md", "w", encoding="utf-8") as f:
         f.write(guide_content)
 
     print("✅ Guía de migración creada: docs/VERTEX_AI_MIGRATION_STEPS.md")
@@ -553,10 +548,10 @@ def test_vertex_ai_integration() -> bool:
     try:
         # Importar el nuevo cliente
         sys.path.insert(0, str(get_project_root()))
-        from app.config.vertex_client import vertex_client
-
         # Intentar inicializar
         import asyncio
+
+        from app.config.vertex_client import vertex_client
 
         async def test_client():
             success = await vertex_client.initialize()
@@ -584,23 +579,17 @@ def main():
     """Función principal del script de migración"""
     import argparse
 
-    parser = argparse.ArgumentParser(
-        description='Migración a Google Cloud Vertex AI'
+    parser = argparse.ArgumentParser(description="Migración a Google Cloud Vertex AI")
+    parser.add_argument(
+        "--check", action="store_true", help="Solo verificar requisitos y configuración"
     )
     parser.add_argument(
-        '--check',
-        action='store_true',
-        help='Solo verificar requisitos y configuración'
+        "--test", action="store_true", help="Probar integración con Vertex AI"
     )
     parser.add_argument(
-        '--test',
-        action='store_true',
-        help='Probar integración con Vertex AI'
-    )
-    parser.add_argument(
-        '--setup',
-        action='store_true',
-        help='Configurar archivos legacy (no recomendado)'
+        "--setup",
+        action="store_true",
+        help="Configurar archivos legacy (no recomendado)",
     )
 
     args = parser.parse_args()
@@ -644,8 +633,7 @@ def main():
         logger.info("\n📋 Próximos pasos:")
         logger.info("1. Configurar variables de entorno (.env)")
         logger.info("2. Configurar Google Cloud credentials")
-        logger.info(
-            "3. Ejecutar: python scripts/migrate_to_vertex_ai.py --test")
+        logger.info("3. Ejecutar: python scripts/migrate_to_vertex_ai.py --test")
         logger.info("4. Usar vertex_client en tu aplicación")
 
     except Exception as e:

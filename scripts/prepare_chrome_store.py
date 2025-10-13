@@ -20,23 +20,23 @@ def convert_svg_to_png():
         {
             "input": "chrome-webstore-icon-128x128.svg",
             "output": "chrome-webstore-icon-128x128.png",
-            "size": (128, 128)
+            "size": (128, 128),
         },
         {
             "input": "chrome-webstore-icon-128x128.svg",
             "output": "chrome-webstore-icon-16x16.png",
-            "size": (16, 16)
+            "size": (16, 16),
         },
         {
             "input": "chrome-webstore-icon-128x128.svg",
             "output": "chrome-webstore-icon-48x48.png",
-            "size": (48, 48)
+            "size": (48, 48),
         },
         {
             "input": "playstore-icon-512x512.svg",
             "output": "chrome-webstore-icon-512x512.png",
-            "size": (512, 512)
-        }
+            "size": (512, 512),
+        },
     ]
 
     print("🎨 Iniciando conversión de iconos SVG a PNG...")
@@ -56,17 +56,18 @@ def convert_svg_to_png():
             print(
                 f"🔄 Convirtiendo {
                     conversion['input']} → {
-                    conversion['output']}")
+                    conversion['output']}"
+            )
 
             # Convertir SVG a PNG usando cairosvg
             png_data = cairosvg.svg2png(
                 url=str(input_path),
                 output_width=conversion["size"][0],
-                output_height=conversion["size"][1]
+                output_height=conversion["size"][1],
             )
 
             # Guardar PNG
-            with open(output_path, 'wb') as f:
+            with open(output_path, "wb") as f:
                 f.write(png_data)
 
             print(f"✅ Creado: {output_path}")
@@ -92,11 +93,12 @@ def convert_svg_to_png():
                 print(
                     f"🔄 Convirtiendo {
                         conversion['input']} → {
-                        conversion['output']}")
+                        conversion['output']}"
+                )
 
                 # Usar Wand (ImageMagick) para SVG
                 with WandImage(filename=str(input_path)) as img:
-                    img.format = 'png'
+                    img.format = "png"
                     img.resize(conversion["size"][0], conversion["size"][1])
                     img.save(filename=str(output_path))
 
@@ -112,7 +114,8 @@ def convert_svg_to_png():
             # Instalar cairosvg
             try:
                 subprocess.check_call(
-                    [sys.executable, "-m", "pip", "install", "cairosvg"])
+                    [sys.executable, "-m", "pip", "install", "cairosvg"]
+                )
                 print("✅ cairosvg instalado. Reintentando conversión...")
                 return convert_svg_to_png()  # Reintentar
             except subprocess.CalledProcessError:
@@ -133,36 +136,34 @@ def create_chrome_manifest():
             "16": "static/icons/chrome-webstore-icon-16x16.png",
             "48": "static/icons/chrome-webstore-icon-48x48.png",
             "128": "static/icons/chrome-webstore-icon-128x128.png",
-            "512": "static/icons/chrome-webstore-icon-512x512.png"},
+            "512": "static/icons/chrome-webstore-icon-512x512.png",
+        },
         "action": {
             "default_popup": "templates/index.html",
             "default_title": "Gemini AI Chatbot",
             "default_icon": {
                 "16": "static/icons/chrome-webstore-icon-16x16.png",
                 "48": "static/icons/chrome-webstore-icon-48x48.png",
-                "128": "static/icons/chrome-webstore-icon-128x128.png"}},
-        "background": {
-            "service_worker": "static/sw.js"},
-        "permissions": [
-            "storage",
-            "activeTab"],
-        "host_permissions": [
-            "https://127.0.0.1:5000/*",
-            "https://localhost:5000/*"],
+                "128": "static/icons/chrome-webstore-icon-128x128.png",
+            },
+        },
+        "background": {"service_worker": "static/sw.js"},
+        "permissions": ["storage", "activeTab"],
+        "host_permissions": ["https://127.0.0.1:5000/*", "https://localhost:5000/*"],
         "content_security_policy": {
-            "extension_pages": "script-src 'self'; object-src 'self'"},
+            "extension_pages": "script-src 'self'; object-src 'self'"
+        },
         "web_accessible_resources": [
-            {
-                "resources": [
-                    "static/*",
-                    "templates/*"],
-                "matches": ["<all_urls>"]}]}
+            {"resources": ["static/*", "templates/*"], "matches": ["<all_urls>"]}
+        ],
+    }
 
     # Guardar manifest para Chrome Web Store
     chrome_manifest_path = Path("chrome_extension_manifest.json")
 
     import json
-    with open(chrome_manifest_path, 'w', encoding='utf-8') as f:
+
+    with open(chrome_manifest_path, "w", encoding="utf-8") as f:
         json.dump(manifest, f, indent=2, ensure_ascii=False)
 
     print(f"✅ Manifest para Chrome creado: {chrome_manifest_path}")

@@ -1,9 +1,10 @@
-﻿#!/usr/bin/env python3
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
 Modelos de base de datos para Gemini AI Chatbot.
 Define las estructuras de datos principales de la aplicación utilizando SQLAlchemy.
 """
+
 import logging
 import secrets
 from datetime import datetime, timedelta, timezone
@@ -47,7 +48,9 @@ class User(db.Model):
     password_hash: str = db.Column(db.String(128), nullable=False)
     first_name: Optional[str] = db.Column(db.String(64))
     last_name: Optional[str] = db.Column(db.String(64))
-    created_at: datetime = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
+    created_at: datetime = db.Column(
+        db.DateTime, default=lambda: datetime.now(timezone.utc)
+    )
     last_login: Optional[datetime] = db.Column(db.DateTime)
     status: str = db.Column(db.String(20), default="pending", nullable=False)
     email_verified: bool = db.Column(db.Boolean, default=False, nullable=False)
@@ -104,7 +107,9 @@ class User(db.Model):
 
     def lock_account(self, minutes: int = 15):
         """Bloquea la cuenta por un número determinado de minutos."""
-        self.account_locked_until = datetime.now(timezone.utc) + timedelta(minutes=minutes)
+        self.account_locked_until = datetime.now(timezone.utc) + timedelta(
+            minutes=minutes
+        )
 
     def unlock_account(self):
         """Desbloquea la cuenta y resetea los intentos fallidos."""
@@ -128,7 +133,9 @@ class User(db.Model):
             db.session.commit()
         except SQLAlchemyError:
             db.session.rollback()
-            logger.exception("Error al auto-desbloquear la cuenta del usuario %s", self.username)
+            logger.exception(
+                "Error al auto-desbloquear la cuenta del usuario %s", self.username
+            )
         return False
 
     def to_dict(self) -> dict:
@@ -156,7 +163,9 @@ class ChatSession(db.Model):
     session_id: str = db.Column(db.String(64), unique=True, nullable=False, index=True)
     user_id: int = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=True)
     title: str = db.Column(db.String(255), nullable=False)
-    created_at: datetime = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
+    created_at: datetime = db.Column(
+        db.DateTime, default=lambda: datetime.now(timezone.utc)
+    )
     updated_at: datetime = db.Column(
         db.DateTime,
         default=lambda: datetime.now(timezone.utc),
@@ -206,7 +215,9 @@ class ChatMessage(db.Model):
     )
     role: str = db.Column(db.String(20), nullable=False)  # 'user' o 'assistant'
     content: str = db.Column(db.Text, nullable=False)
-    created_at: datetime = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
+    created_at: datetime = db.Column(
+        db.DateTime, default=lambda: datetime.now(timezone.utc)
+    )
     tokens: Optional[int] = db.Column(db.Integer)
 
     def __repr__(self) -> str:
@@ -222,4 +233,3 @@ class ChatMessage(db.Model):
             "created_at": self.created_at.isoformat(),
             "tokens": self.tokens,
         }
-

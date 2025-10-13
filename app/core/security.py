@@ -1,4 +1,4 @@
-﻿"""
+"""
 Sistema de seguridad avanzado para la aplicación Flask.
 
 Este módulo proporciona:
@@ -33,6 +33,7 @@ try:
     from cryptography.fernet import Fernet
     from cryptography.hazmat.primitives import hashes
     from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
+
     CRYPTOGRAPHY_AVAILABLE = True
 except ImportError:
     CRYPTOGRAPHY_AVAILABLE = False
@@ -41,30 +42,38 @@ except ImportError:
 try:
     from ..error_handler import AuthenticationError, AuthorizationError, error_handler
 except ImportError:
+
     class AuthenticationError(Exception):
         pass
+
     class AuthorizationError(Exception):
         pass
+
     error_handler = None
 
 try:
     from ..logging_system import get_logger
 except ImportError:
     import logging
+
     get_logger = logging.getLogger
 
 try:
     from ...config.settings import get_current_config
 except ImportError:
+
     def get_current_config():
         """
         Devuelve una configuración simulada para cuando la app no está completamente inicializada.
         """
         import os
-        
+
         class SecurityConfig:
             """Configuración de seguridad simulada."""
-            jwt_secret_key = os.getenv('JWT_SECRET_KEY', 'fallback-dev-key-change-in-production')
+
+            jwt_secret_key = os.getenv(
+                "JWT_SECRET_KEY", "fallback-dev-key-change-in-production"
+            )
             jwt_expiration_hours = 24
             rate_limit_per_minute = 60
             max_login_attempts = 5
@@ -74,6 +83,7 @@ except ImportError:
 
         class Config:
             """Clase de configuración principal simulada."""
+
             security = SecurityConfig()
 
         return Config()
@@ -82,6 +92,7 @@ except ImportError:
 @dataclass
 class SecurityEvent:
     """Evento de seguridad."""
+
     event_type: str
     timestamp: datetime
     user_id: Optional[str] = None
@@ -100,7 +111,7 @@ class SecurityEvent:
             "user_agent": self.user_agent,
             "endpoint": self.endpoint,
             "severity": self.severity,
-            "details": self.details
+            "details": self.details,
         }
 
 
@@ -114,14 +125,16 @@ class TokenManager:
         self.blacklisted_tokens = set()
         self.logger = get_logger(__name__)
 
-    def generate_token(self, user_id: str, additional_claims: Optional[Dict[str, Any]] = None) -> str:
+    def generate_token(
+        self, user_id: str, additional_claims: Optional[Dict[str, Any]] = None
+    ) -> str:
         """Generar token JWT."""
         now = datetime.now(timezone.utc)
         payload = {
             "user_id": user_id,
             "iat": now,
             "exp": now + timedelta(hours=self.expiration_hours),
-            "jti": secrets.token_urlsafe(16)  # JWT ID único
+            "jti": secrets.token_urlsafe(16),  # JWT ID único
         }
 
         if additional_claims:
@@ -163,15 +176,15 @@ class TokenManager:
             return None
 
         # Verificar si el token expira en menos de 1 hora
-        exp_time = datetime.fromtimestamp(payload['exp'], tz=timezone.utc)
+        exp_time = datetime.fromtimestamp(payload["exp"], tz=timezone.utc)
         if exp_time - datetime.now(timezone.utc) < timedelta(hours=1):
             # Invalidar token actual
             self.blacklist_token(token)
 
             # Generar nuevo token
             return self.generate_token(
-                payload['user_id'],
-                {k: v for k, v in payload.items() if k not in ['iat', 'exp', 'jti']}
+                payload["user_id"],
+                {k: v for k, v in payload.items() if k not in ["iat", "exp", "jti"]},
             )
 
         return token
@@ -193,8 +206,10 @@ class RateLimiter:
             now = time.time()
 
             # Limpiar requests antiguos
-            while (self.requests[identifier] and
-                   now - self.requests[identifier][0] > self.window_seconds):
+            while (
+                self.requests[identifier]
+                and now - self.requests[identifier][0] > self.window_seconds
+            ):
                 self.requests[identifier].popleft()
 
             # Verificar límite
@@ -212,8 +227,10 @@ class RateLimiter:
             now = time.time()
 
             # Limpiar requests antiguos
-            while (self.requests[identifier] and
-                   now - self.requests[identifier][0] > self.window_seconds):
+            while (
+                self.requests[identifier]
+                and now - self.requests[identifier][0] > self.window_seconds
+            ):
                 self.requests[identifier].popleft()
 
             return max(0, self.max_requests - len(self.requests[identifier]))
@@ -244,8 +261,7 @@ class LoginAttemptTracker:
             # Limpiar intentos antiguos
             cutoff = now - self.lockout_seconds
             self.attempts[identifier] = [
-                attempt for attempt in self.attempts[identifier]
-                if attempt > cutoff
+                attempt for attempt in self.attempts[identifier] if attempt > cutoff
             ]
 
             # Agregar intento actual
@@ -254,7 +270,9 @@ class LoginAttemptTracker:
             # Verificar si se debe bloquear
             if len(self.attempts[identifier]) >= self.max_attempts:
                 self.lockouts[identifier] = now + self.lockout_seconds
-                self.logger.warning(f"Account locked due to failed attempts: {identifier}")
+                self.logger.warning(
+                    f"Account locked due to failed attempts: {identifier}"
+                )
 
     def record_successful_attempt(self, identifier: str):
         """Registrar intento exitoso."""
@@ -306,7 +324,7 @@ class DataEncryption:
 
     def _derive_key(self, password: bytes) -> bytes:
         """Derivar clave de encriptación desde password."""
-        salt = b'salt_1234567890'  # En producción, usar salt aleatorio
+        salt = b"salt_1234567890"  # En producción, usar salt aleatorio
         kdf = PBKDF2HMAC(
             algorithm=hashes.SHA256(),
             length=32,
@@ -339,9 +357,15 @@ class SecurityAuditor:
         self.lock = threading.Lock()
         self.logger = get_logger(__name__)
         self.threat_patterns = {
-            "sql_injection": [r"union\s+select", r"drop\s+table", r"insert\s+into", r"' or '1'='1'", r"--"],
+            "sql_injection": [
+                r"union\s+select",
+                r"drop\s+table",
+                r"insert\s+into",
+                r"' or '1'='1'",
+                r"--",
+            ],
             "xss": [r"<script", r"javascript:", r"onerror="],
-            "path_traversal": [r"\.\./", r"\\\.\.\\"]
+            "path_traversal": [r"\.\./", r"\\\.\.\\"],
         }
 
     def log_event(self, event: SecurityEvent):
@@ -358,12 +382,12 @@ class SecurityAuditor:
             "info": "info",
             "warning": "warning",
             "error": "error",
-            "critical": "critical"
+            "critical": "critical",
         }.get(event.severity, "info")
 
         getattr(self.logger, log_level)(
             f"Security event: {event.event_type}",
-            extra={"security_event": event.to_dict()}
+            extra={"security_event": event.to_dict()},
         )
 
     def analyze_request(self, request_data: str) -> List[str]:
@@ -383,17 +407,14 @@ class SecurityAuditor:
         """Obtener resumen de seguridad."""
         with self.lock:
             cutoff = datetime.now(timezone.utc) - timedelta(hours=hours)
-            recent_events = [
-                event for event in self.events
-                if event.timestamp > cutoff
-            ]
+            recent_events = [event for event in self.events if event.timestamp > cutoff]
 
             summary = {
                 "total_events": len(recent_events),
                 "events_by_type": defaultdict(int),
                 "events_by_severity": defaultdict(int),
                 "unique_ips": set(),
-                "top_endpoints": defaultdict(int)
+                "top_endpoints": defaultdict(int),
             }
 
             for event in recent_events:
@@ -421,15 +442,11 @@ class SecurityManager:
     def __init__(self, config=None):
         self.config = config or get_current_config().security
         self.token_manager = TokenManager(
-            self.config.jwt_secret_key,
-            self.config.jwt_expiration_hours
+            self.config.jwt_secret_key, self.config.jwt_expiration_hours
         )
-        self.rate_limiter = RateLimiter(
-            self.config.rate_limit_per_minute
-        )
+        self.rate_limiter = RateLimiter(self.config.rate_limit_per_minute)
         self.login_tracker = LoginAttemptTracker(
-            self.config.max_login_attempts,
-            self.config.lockout_duration_minutes
+            self.config.max_login_attempts, self.config.lockout_duration_minutes
         )
         self.auditor = SecurityAuditor()
         self.logger = get_logger(__name__)
@@ -449,14 +466,18 @@ class SecurityManager:
         # Verificar si la cuenta está bloqueada
         if self.login_tracker.is_locked(identifier):
             remaining = self.login_tracker.get_lockout_time_remaining(identifier)
-            self.auditor.log_event(SecurityEvent(
-                event_type="login_attempt_blocked",
-                timestamp=datetime.now(timezone.utc),
-                user_id=username,
-                severity="warning",
-                details={"lockout_remaining_seconds": remaining}
-            ))
-            raise AuthenticationError(f"Account locked. Try again in {remaining} seconds.")
+            self.auditor.log_event(
+                SecurityEvent(
+                    event_type="login_attempt_blocked",
+                    timestamp=datetime.now(timezone.utc),
+                    user_id=username,
+                    severity="warning",
+                    details={"lockout_remaining_seconds": remaining},
+                )
+            )
+            raise AuthenticationError(
+                f"Account locked. Try again in {remaining} seconds."
+            )
 
         # Aquí iría la verificación real del usuario/password
         # Por ahora, simulamos la verificación
@@ -466,23 +487,27 @@ class SecurityManager:
             self.login_tracker.record_successful_attempt(identifier)
             token = self.token_manager.generate_token(username)
 
-            self.auditor.log_event(SecurityEvent(
-                event_type="login_success",
-                timestamp=datetime.now(timezone.utc),
-                user_id=username,
-                severity="info"
-            ))
+            self.auditor.log_event(
+                SecurityEvent(
+                    event_type="login_success",
+                    timestamp=datetime.now(timezone.utc),
+                    user_id=username,
+                    severity="info",
+                )
+            )
 
             return token
         else:
             self.login_tracker.record_failed_attempt(identifier)
 
-            self.auditor.log_event(SecurityEvent(
-                event_type="login_failed",
-                timestamp=datetime.now(timezone.utc),
-                user_id=username,
-                severity="warning"
-            ))
+            self.auditor.log_event(
+                SecurityEvent(
+                    event_type="login_failed",
+                    timestamp=datetime.now(timezone.utc),
+                    user_id=username,
+                    severity="warning",
+                )
+            )
 
             raise AuthenticationError("Invalid credentials")
 
@@ -497,18 +522,22 @@ class SecurityManager:
         payload = self.token_manager.verify_token(token)
 
         if payload:
-            self.auditor.log_event(SecurityEvent(
-                event_type="token_verified",
-                timestamp=datetime.now(timezone.utc),
-                user_id=payload.get('user_id'),
-                severity="info"
-            ))
+            self.auditor.log_event(
+                SecurityEvent(
+                    event_type="token_verified",
+                    timestamp=datetime.now(timezone.utc),
+                    user_id=payload.get("user_id"),
+                    severity="info",
+                )
+            )
         else:
-            self.auditor.log_event(SecurityEvent(
-                event_type="token_verification_failed",
-                timestamp=datetime.now(timezone.utc),
-                severity="warning"
-            ))
+            self.auditor.log_event(
+                SecurityEvent(
+                    event_type="token_verification_failed",
+                    timestamp=datetime.now(timezone.utc),
+                    severity="warning",
+                )
+            )
 
         return payload
 
@@ -517,12 +546,14 @@ class SecurityManager:
         allowed = self.rate_limiter.is_allowed(identifier)
 
         if not allowed:
-            self.auditor.log_event(SecurityEvent(
-                event_type="rate_limit_exceeded",
-                timestamp=datetime.now(timezone.utc),
-                severity="warning",
-                details={"identifier": identifier}
-            ))
+            self.auditor.log_event(
+                SecurityEvent(
+                    event_type="rate_limit_exceeded",
+                    timestamp=datetime.now(timezone.utc),
+                    severity="warning",
+                    details={"identifier": identifier},
+                )
+            )
 
         return allowed
 
@@ -531,12 +562,14 @@ class SecurityManager:
         threats = self.auditor.analyze_request(request_data)
 
         if threats:
-            self.auditor.log_event(SecurityEvent(
-                event_type="security_threat_detected",
-                timestamp=datetime.now(timezone.utc),
-                severity="error",
-                details={"threats": threats, "request_data": request_data[:100]}
-            ))
+            self.auditor.log_event(
+                SecurityEvent(
+                    event_type="security_threat_detected",
+                    timestamp=datetime.now(timezone.utc),
+                    severity="error",
+                    details={"threats": threats, "request_data": request_data[:100]},
+                )
+            )
 
         return threats
 
@@ -548,21 +581,24 @@ security_manager = SecurityManager()
 # Decoradores de seguridad
 def require_auth(func: Callable) -> Callable:
     """Decorador para requerir autenticación."""
+
     @wraps(func)
     def wrapper(*args, **kwargs):
-        auth_header = request.headers.get('Authorization')
+        auth_header = request.headers.get("Authorization")
 
-        if not auth_header or not auth_header.startswith('Bearer '):
+        if not auth_header or not auth_header.startswith("Bearer "):
             if error_handler:
                 context = error_handler.handle_error(
                     AuthenticationError("Missing or invalid authorization header")
                 )
-                response_data, status_code = error_handler.create_error_response(context)
+                response_data, status_code = error_handler.create_error_response(
+                    context
+                )
                 return jsonify(response_data), status_code
             else:
                 return jsonify({"error": "Authentication required"}), 401
 
-        token = auth_header.split(' ')[1]
+        token = auth_header.split(" ")[1]
         payload = security_manager.verify_token(token)
 
         if not payload:
@@ -570,14 +606,16 @@ def require_auth(func: Callable) -> Callable:
                 context = error_handler.handle_error(
                     AuthenticationError("Invalid or expired token")
                 )
-                response_data, status_code = error_handler.create_error_response(context)
+                response_data, status_code = error_handler.create_error_response(
+                    context
+                )
                 return jsonify(response_data), status_code
             else:
                 return jsonify({"error": "Invalid token"}), 401
 
         # Agregar información del usuario al contexto
         g.current_user = payload
-        g.user_id = payload.get('user_id')
+        g.user_id = payload.get("user_id")
 
         return func(*args, **kwargs)
 
@@ -586,27 +624,32 @@ def require_auth(func: Callable) -> Callable:
 
 def require_role(required_role: str):
     """Decorador para requerir rol específico."""
+
     def decorator(func: Callable) -> Callable:
         @wraps(func)
         def wrapper(*args, **kwargs):
-            if not hasattr(g, 'current_user') or not g.current_user:
+            if not hasattr(g, "current_user") or not g.current_user:
                 if error_handler:
                     context = error_handler.handle_error(
                         AuthenticationError("Authentication required")
                     )
-                    response_data, status_code = error_handler.create_error_response(context)
+                    response_data, status_code = error_handler.create_error_response(
+                        context
+                    )
                     return jsonify(response_data), status_code
                 else:
                     return jsonify({"error": "Authentication required"}), 401
 
-            user_roles = g.current_user.get('roles', [])
+            user_roles = g.current_user.get("roles", [])
 
             if required_role not in user_roles:
                 if error_handler:
                     context = error_handler.handle_error(
                         AuthorizationError(f"Role '{required_role}' required")
                     )
-                    response_data, status_code = error_handler.create_error_response(context)
+                    response_data, status_code = error_handler.create_error_response(
+                        context
+                    )
                     return jsonify(response_data), status_code
                 else:
                     return jsonify({"error": "Insufficient permissions"}), 403
@@ -614,11 +657,13 @@ def require_role(required_role: str):
             return func(*args, **kwargs)
 
         return wrapper
+
     return decorator
 
 
 def rate_limit(identifier_func: Optional[Callable] = None):
     """Decorador para rate limiting."""
+
     def decorator(func: Callable) -> Callable:
         @wraps(func)
         def wrapper(*args, **kwargs):
@@ -629,30 +674,31 @@ def rate_limit(identifier_func: Optional[Callable] = None):
                 identifier = request.remote_addr or "unknown"
 
             if not security_manager.check_rate_limit(identifier):
-                return jsonify({
-                    "error": "Rate limit exceeded",
-                    "retry_after": 60
-                }), 429
+                return jsonify({"error": "Rate limit exceeded", "retry_after": 60}), 429
 
             return func(*args, **kwargs)
 
         return wrapper
+
     return decorator
 
 
 def security_headers(func: Callable) -> Callable:
     """Decorador para agregar headers de seguridad."""
+
     @wraps(func)
     def wrapper(*args, **kwargs):
         response = func(*args, **kwargs)
 
         # Agregar headers de seguridad
-        if hasattr(response, 'headers'):
-            response.headers['X-Content-Type-Options'] = 'nosniff'
-            response.headers['X-Frame-Options'] = 'DENY'
-            response.headers['X-XSS-Protection'] = '1; mode=block'
-            response.headers['Strict-Transport-Security'] = 'max-age=31536000; includeSubDomains'
-            response.headers['Content-Security-Policy'] = "default-src 'self'"
+        if hasattr(response, "headers"):
+            response.headers["X-Content-Type-Options"] = "nosniff"
+            response.headers["X-Frame-Options"] = "DENY"
+            response.headers["X-XSS-Protection"] = "1; mode=block"
+            response.headers["Strict-Transport-Security"] = (
+                "max-age=31536000; includeSubDomains"
+            )
+            response.headers["Content-Security-Policy"] = "default-src 'self'"
 
         return response
 
@@ -670,27 +716,27 @@ def setup_security(app: Flask):
         threats = security_manager.analyze_request_security(request_data)
 
         if threats:
-            security_manager.auditor.log_event(SecurityEvent(
-                event_type="request_blocked",
-                timestamp=datetime.now(timezone.utc),
-                ip_address=request.remote_addr,
-                user_agent=request.headers.get('User-Agent'),
-                endpoint=request.endpoint,
-                severity="error",
-                details={"threats": threats}
-            ))
+            security_manager.auditor.log_event(
+                SecurityEvent(
+                    event_type="request_blocked",
+                    timestamp=datetime.now(timezone.utc),
+                    ip_address=request.remote_addr,
+                    user_agent=request.headers.get("User-Agent"),
+                    endpoint=request.endpoint,
+                    severity="error",
+                    details={"threats": threats},
+                )
+            )
 
-            return jsonify({
-                "error": "Request blocked due to security concerns"
-            }), 400
+            return jsonify({"error": "Request blocked due to security concerns"}), 400
 
     # Configurar headers de seguridad globales
     @app.after_request
     def add_security_headers(response):
         """Agregar headers de seguridad a todas las respuestas."""
-        response.headers['X-Content-Type-Options'] = 'nosniff'
-        response.headers['X-Frame-Options'] = 'DENY'
-        response.headers['X-XSS-Protection'] = '1; mode=block'
+        response.headers["X-Content-Type-Options"] = "nosniff"
+        response.headers["X-Frame-Options"] = "DENY"
+        response.headers["X-XSS-Protection"] = "1; mode=block"
         return response
 
     return app
@@ -720,6 +766,7 @@ def get_security_summary() -> Dict[str, Any]:
 # Configurar logging básico si se ejecuta directamente
 if __name__ == "__main__":
     import logging
+
     logging.basicConfig(level=logging.INFO)
     logger = get_logger(__name__)
     logger.info("Sistema de seguridad inicializado")

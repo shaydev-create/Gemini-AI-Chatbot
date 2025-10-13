@@ -1,6 +1,7 @@
 """
 Script para inicializar la base de datos con el contexto de la aplicación Flask.
 """
+
 from app.core.application import create_app
 from app.models import db
 

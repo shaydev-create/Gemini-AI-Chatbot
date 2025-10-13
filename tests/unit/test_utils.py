@@ -29,7 +29,7 @@ class TestHelpers:
         assert len(key1) == 64  # 32 bytes * 2 (hex)
         assert len(key2) == 64
         assert key1 != key2  # Deben ser diferentes
-        assert all(c in '0123456789abcdef' for c in key1)
+        assert all(c in "0123456789abcdef" for c in key1)
 
     def test_hash_string(self):
         """Test hash de strings."""
@@ -48,8 +48,7 @@ class TestHelpers:
         """Test sanitización de nombres de archivo."""
         assert sanitize_filename("normal.txt") == "normal.txt"
         assert sanitize_filename("file<>name.txt") == "file__name.txt"
-        assert sanitize_filename(
-            "file:with|bad*chars.txt") == "file_with_bad_chars.txt"
+        assert sanitize_filename("file:with|bad*chars.txt") == "file_with_bad_chars.txt"
 
         # Test longitud máxima
         long_name = "a" * 300 + ".txt"
@@ -127,14 +126,13 @@ class TestValidators:
         """Test sanitización de entrada."""
         assert sanitize_input("  texto normal  ") == "texto normal"
         assert sanitize_input("texto\x00con\x1fcontrol") == "textoconcontrol"
-        assert sanitize_input(
-            "texto   con    espacios") == "texto con espacios"
+        assert sanitize_input("texto   con    espacios") == "texto con espacios"
         assert sanitize_input("") == ""
         assert sanitize_input(None) == ""
 
     def test_validate_file_upload(self):
         """Test validación de archivos subidos."""
-        allowed = ['jpg', 'png', 'gif']
+        allowed = ["jpg", "png", "gif"]
 
         # Archivo válido
         valid, error = validate_file_upload("image.jpg", allowed)
