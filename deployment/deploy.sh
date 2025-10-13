@@ -8,7 +8,7 @@
 # Uso:
 #   export DOMAIN_NAME="tudominio.com"
 #   export ADMIN_EMAIL="admin@tudominio.com"
-#   export DB_PASSWORD="una-contraseña-muy-segura"
+#   export DB_PASSWORD="your-secure-database-password"
 #   sudo -E bash deploy.sh deploy
 #
 # ===============================================================================

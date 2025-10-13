@@ -86,11 +86,11 @@ class TestingConfig(Config):
     """Configuración para el entorno de pruebas."""
 
     TESTING: bool = True
-    SECRET_KEY: str = "test-secret-key"
+    SECRET_KEY: str = os.environ.get("TEST_SECRET_KEY", "test-secret-key-change-in-production")
     SQLALCHEMY_DATABASE_URI: str = "sqlite:///:memory:"
     WTF_CSRF_ENABLED: bool = False
     # ID de proyecto de Vertex AI para los tests.
-    VERTEXAI_PROJECT_ID: str = "test-project-id"
+    VERTEXAI_PROJECT_ID: str = os.environ.get("TEST_PROJECT_ID", "test-project-id")
     # Desactivar límites de tasa en tests.
     RATE_LIMIT_ENABLED: bool = False
 
