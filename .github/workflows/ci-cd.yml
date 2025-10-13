@@ -52,7 +52,6 @@ jobs:
 
       - name: 📋 Install dependencies
         run: |
-          sudo apt-get update && sudo apt-get install -y libmagic1 libmagic-dev
           poetry install --with dev
 
       - name: 🔍 Lint with ruff
@@ -106,9 +105,8 @@ jobs:
         poetry run bandit -r app/ core/ -f json -o bandit-report.json || true
         
     - name: 🔍 Run Safety check
-      run: |
-        poetry add --group dev safety
-        poetry run safety check --json --output safety-report.json || true
+        run: |
+          poetry run safety check --json --output safety-report.json || true
         
     - name: 📊 Upload security reports
       uses: actions/upload-artifact@v4
