@@ -10,25 +10,51 @@ import sys
 import zipfile
 from datetime import datetime
 
+def check_required_files(extension_dir, required_files):
+    missing_files = [f for f in required_files if not os.path.exists(os.path.join(extension_dir, f))]
+    if missing_files:
+        print(f"❌ Error: Faltan archivos requeridos: {', '.join(missing_files)}")
+        return False
+    return True
+
+def check_icons(extension_dir, icons):
+    icons_dir = os.path.join(extension_dir, "icons")
+    missing_icons = [i for i in icons if not os.path.exists(os.path.join(icons_dir, i))]
+    if missing_icons:
+        print(f"❌ Error: Faltan iconos requeridos: {', '.join(missing_icons)}")
+        return False
+    return True
+
+def validate_manifest(manifest_path):
+    try:
+        with open(manifest_path, "r", encoding="utf-8") as f:
+            manifest = json.load(f)
+        print(f"✅ Manifest válido - Nombre: {manifest.get('name', 'N/A')}")
+        print(f"✅ Versión: {manifest.get('version', 'N/A')}")
+    except json.JSONDecodeError as e:
+        print(f"❌ Error: manifest.json no es válido: {e}")
+        return False
+    except Exception as e:
+        print(f"❌ Error leyendo manifest.json: {e}")
+        return False
+    return True
+
 
 def create_chrome_extension_package():
     """Crear paquete de extensión de Chrome"""
 
     # Rutas
     project_root = os.path.dirname(os.path.abspath(__file__))
-    # Subir un nivel desde scripts/
     project_root = os.path.dirname(project_root)
     chrome_extension_dir = os.path.join(project_root, "chrome_extension")
 
     print(f"📁 Directorio del proyecto: {project_root}")
     print(f"📁 Directorio de extensión: {chrome_extension_dir}")
 
-    # Verificar que existe el directorio de la extensión
     if not os.path.exists(chrome_extension_dir):
         print("❌ Error: No se encontró el directorio chrome_extension")
         return False
 
-    # Archivos requeridos para la extensión
     required_files = [
         "manifest.json",
         "popup.html",
@@ -37,52 +63,14 @@ def create_chrome_extension_package():
         "content.js",
         "index.html",
     ]
-
-    # Verificar archivos requeridos
-    missing_files = []
-    for file in required_files:
-        file_path = os.path.join(chrome_extension_dir, file)
-        if not os.path.exists(file_path):
-            missing_files.append(file)
-
-    if missing_files:
-        print(
-            f"❌ Error: Faltan archivos requeridos: {
-                ', '.join(missing_files)}"
-        )
-        return False
-
-    # Verificar directorio de iconos
-    icons_dir = os.path.join(chrome_extension_dir, "icons")
-    if not os.path.exists(icons_dir):
-        print("❌ Error: No se encontró el directorio icons")
-        return False
-
     required_icons = ["icon_16.png", "icon_48.png", "icon_128.png"]
-    missing_icons = []
-    for icon in required_icons:
-        icon_path = os.path.join(icons_dir, icon)
-        if not os.path.exists(icon_path):
-            missing_icons.append(icon)
-
-    if missing_icons:
-        print(f"❌ Error: Faltan iconos requeridos: {', '.join(missing_icons)}")
-        return False
-
-    # Leer y validar manifest.json
     manifest_path = os.path.join(chrome_extension_dir, "manifest.json")
-    try:
-        with open(manifest_path, "r", encoding="utf-8") as f:
-            manifest = json.load(f)
 
-        print(f"✅ Manifest válido - Nombre: {manifest.get('name', 'N/A')}")
-        print(f"✅ Versión: {manifest.get('version', 'N/A')}")
-
-    except json.JSONDecodeError as e:
-        print(f"❌ Error: manifest.json no es válido: {e}")
+    if not check_required_files(chrome_extension_dir, required_files):
         return False
-    except Exception as e:
-        print(f"❌ Error leyendo manifest.json: {e}")
+    if not check_icons(chrome_extension_dir, required_icons):
+        return False
+    if not validate_manifest(manifest_path):
         return False
 
     # Crear nombre del archivo ZIP
@@ -93,24 +81,19 @@ def create_chrome_extension_package():
     print(f"📦 Creando paquete: {zip_filename}")
 
     try:
-        # Crear archivo ZIP
         with zipfile.ZipFile(zip_path, "w", zipfile.ZIP_DEFLATED) as zipf:
-            # Agregar todos los archivos de la extensión
             for root, _dirs, files in os.walk(chrome_extension_dir):
                 for file in files:
                     file_path = os.path.join(root, file)
-                    # Calcular ruta relativa desde chrome_extension_dir
                     arcname = os.path.relpath(file_path, chrome_extension_dir)
                     zipf.write(file_path, arcname)
                     print(f"  ➕ Agregado: {arcname}")
 
-        # Verificar el archivo creado
         if os.path.exists(zip_path):
             file_size = os.path.getsize(zip_path)
             print(f"✅ Paquete creado exitosamente: {zip_filename}")
             print(f"📊 Tamaño del archivo: {file_size:,} bytes")
 
-            # Listar contenido del ZIP para verificación
             print("\n📋 Contenido del paquete:")
             with zipfile.ZipFile(zip_path, "r") as zipf:
                 for info in zipf.infolist():
@@ -120,7 +103,6 @@ def create_chrome_extension_package():
         else:
             print("❌ Error: No se pudo crear el archivo ZIP")
             return False
-
     except Exception as e:
         print(f"❌ Error creando el paquete: {e}")
         return False
