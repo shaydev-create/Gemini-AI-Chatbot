@@ -73,7 +73,7 @@ ruff = "^0.4.2"
 
 [tool.poetry.scripts]
 start = "app.main:run"
-test = "pytest"
+test = "run_tests:main"
 lint = "ruff_lint:main"
 format = "ruff_format:main"
 
