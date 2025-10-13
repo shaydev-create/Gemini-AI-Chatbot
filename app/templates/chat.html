@@ -12,6 +12,7 @@
     <meta name="author" content="Gemini AI Team">
     <meta name="robots" content="index, follow">
     <link rel="canonical" href="https://gemini-ai.com/chat">
+    <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
     
     <!-- Open Graph Meta Tags -->
     <meta property="og:title" content="Chat - Gemini AI">
@@ -35,6 +36,8 @@
     
     
     <title>{{ translate('title') }}</title>
+    <!-- jsPDF library for PDF export -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     
     <!-- Structured Data -->
     <script type="application/ld+json">
@@ -75,6 +78,18 @@
             --glass-border: rgba(0, 245, 255, 0.03); /* ULTRA TRANSPARENTE */       
             --glow: 0 0 20px var(--primary);
             --neural-grid: linear-gradient(90deg, transparent 98%, rgba(0, 245, 255, 0.1) 100%);
+            
+            /* Variables de personalización */
+            --base-font-size: 1rem;
+            --current-bot-avatar: '🤖';
+            
+            /* Variables para temas (valores por defecto) */
+            --bg-color: #1a1a2e;
+            --text-color: #ffffff;
+            --accent-color: #667eea;
+            --border-color: #333366;
+            --hover-bg: #2a2a3e;
+            --accent-color-rgb: 102, 126, 234;
         }
 
         * {
@@ -155,6 +170,7 @@
             transition: all 0.3s ease;
             position: relative;
             overflow: hidden;
+            font-size: var(--base-font-size);
         }
         
         #neural-canvas {
@@ -334,6 +350,57 @@
             position: relative;
             backdrop-filter: blur(3px); /* Blur mínimo */
             line-height: 1.5;
+            font-size: var(--base-font-size);
+        }
+        
+        /* Estilos para contenido formateado del bot */
+        .message-content h1, .message-content h2, .message-content h3 {
+            color: var(--primary);
+            margin: 10px 0 8px 0;
+            font-weight: 600;
+        }
+        
+        .message-content h1 { font-size: 1.4rem; }
+        .message-content h2 { font-size: 1.2rem; }
+        .message-content h3 { font-size: 1.1rem; }
+        
+        .message-content strong {
+            color: var(--text-primary);
+            font-weight: 700;
+        }
+        
+        .message-content em {
+            color: var(--text-secondary);
+            font-style: italic;
+        }
+        
+        .message-content code {
+            background: rgba(0, 245, 255, 0.1);
+            color: var(--primary);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+        }
+        
+        .message-content ul {
+            margin: 10px 0;
+            padding-left: 0;
+            list-style: none;
+        }
+        
+        .message-content li {
+            margin: 6px 0;
+            padding-left: 20px;
+            position: relative;
+        }
+        
+        .message-content li::before {
+            content: "•";
+            color: var(--primary);
+            font-weight: bold;
+            position: absolute;
+            left: 0;
         }
         
         .message.bot .message-content {
@@ -372,7 +439,8 @@
             position: relative;
         }
         
-        .chat-input input {
+        .chat-input input,
+        .chat-input textarea {
             width: 100%;
             padding: 16px 24px;
             padding-right: 70px;
@@ -381,19 +449,34 @@
             background: rgba(5, 10, 20, 0.2); /* Más transparente */
             color: var(--text-primary);
             font-size: 16px;
+            font-family: inherit;
             outline: none;
             backdrop-filter: blur(3px); /* Blur mínimo */
             transition: all 0.3s ease;
-            resize: none;
+            resize: none !important; /* Forzar sin resize */
             min-height: 54px;
             max-height: 120px;
+            overflow-y: auto;
+            line-height: 1.4;
         }
         
-        .chat-input input::placeholder {
+        /* Asegurar que no haya handle de resize */
+        .chat-input textarea {
+            resize: none !important;
+            overflow: hidden;
+        }
+        
+        .chat-input textarea::-webkit-resizer {
+            display: none !important;
+        }
+        
+        .chat-input input::placeholder,
+        .chat-input textarea::placeholder {
             color: var(--text-secondary);
         }
         
-        .chat-input input:focus {
+        .chat-input input:focus,
+        .chat-input textarea:focus {
             border-color: var(--primary);
             box-shadow: 0 0 20px rgba(0, 245, 255, 0.3);
         }
@@ -456,6 +539,33 @@
             background: rgba(0, 245, 255, 0.2);
             color: var(--text-primary);
             box-shadow: 0 4px 12px rgba(0, 245, 255, 0.3);
+        }
+
+        /* Estilos específicos para estados de voz */
+        .action-btn.playing {
+            animation: pulse-voice 2s infinite;
+        }
+
+        .action-btn.paused {
+            animation: blink-voice 1s infinite;
+        }
+
+        @keyframes pulse-voice {
+            0%, 100% { 
+                box-shadow: 0 0 8px rgba(255, 193, 7, 0.3); 
+            }
+            50% { 
+                box-shadow: 0 0 16px rgba(255, 193, 7, 0.6); 
+            }
+        }
+
+        @keyframes blink-voice {
+            0%, 50% { 
+                opacity: 1; 
+            }
+            51%, 100% { 
+                opacity: 0.7; 
+            }
         }
         
         /* Estilos para los botones de idioma */
@@ -562,19 +672,137 @@
         }
         
         /* Responsive Design Mejorado */
-        @media (max-width: 768px) {
+        /* === RESPONSIVE CHAT OPTIMIZADO === */
+        
+        /* Pantallas Ultra-Wide - Chat optimizado */
+        @media (min-width: 1441px) {
+            .chat-container {
+                max-width: 1200px;
+                height: 85vh;
+                margin: 0 auto;
+            }
+            
+            .chat-messages {
+                padding: 25px 30px;
+            }
+            
+            .message {
+                max-width: 70%;
+            }
+            
+            .chat-header {
+                padding: 20px 30px;
+            }
+            
+            .chat-input {
+                padding: 20px 30px;
+            }
+        }
+        
+        /* Tablets Landscape - Chat híbrido */
+        @media (min-width: 768px) and (max-width: 1440px) {
+            .chat-container {
+                width: 90%;
+                max-width: 900px;
+                height: 88vh;
+                border-radius: 20px;
+            }
+            
+            .chat-messages {
+                padding: 20px;
+            }
+            
+            .message {
+                max-width: 75%;
+            }
+            
+            .message-avatar {
+                width: 42px;
+                height: 42px;
+                font-size: 20px;
+            }
+            
+            .input-container {
+                display: flex;
+                flex-direction: row;
+                align-items: flex-end;
+                gap: 15px;
+            }
+            
+            .message-input {
+                flex: 1;
+            }
+            
+            .send-button {
+                flex-shrink: 0;
+                width: auto;
+                min-width: 100px;
+            }
+        }
+        
+        /* Móviles grandes y tablets portrait */
+        @media (min-width: 481px) and (max-width: 767px) {
+            .chat-container {
+                width: 95%;
+                height: 92vh;
+                border-radius: 18px;
+            }
+            
+            .chat-header {
+                padding: 18px;
+                border-radius: 18px 18px 0 0;
+            }
+            
+            .chat-header h1 {
+                font-size: 1.4rem;
+            }
+            
+            .chat-messages {
+                padding: 18px;
+            }
+            
+            .message {
+                max-width: 85%;
+            }
+            
+            .message-avatar {
+                width: 38px;
+                height: 38px;
+                font-size: 19px;
+            }
+            
+            .chat-input {
+                padding: 18px;
+            }
+            
+            .input-container {
+                flex-direction: column;
+                gap: 12px;
+            }
+            
+            .send-button {
+                width: 100%;
+                justify-content: center;
+                min-height: 48px;
+            }
+        }
+        
+        /* Móviles pequeños - Optimización máxima */
+        @media (max-width: 480px) {
             .chat-container {
                 width: 98%;
                 height: 95vh;
                 border-radius: 16px;
+                margin: 1vh auto;
             }
             
             .chat-header {
                 padding: 15px;
+                border-radius: 16px 16px 0 0;
             }
             
             .chat-header h1 {
-                font-size: 1.5rem;
+                font-size: 1.3rem;
             }
             
             .chat-messages {
@@ -583,6 +811,7 @@
             
             .message {
                 max-width: 90%;
+                margin-bottom: 12px;
             }
             
             .message-avatar {
@@ -591,8 +820,14 @@
                 font-size: 18px;
             }
             
+            .message-content {
+                font-size: 0.9rem;
+                line-height: 1.4;
+            }
+            
             .chat-input {
                 padding: 15px;
+                border-radius: 0 0 16px 16px;
             }
             
             .input-container {
@@ -600,27 +835,97 @@
                 gap: 10px;
             }
             
+            .message-input {
+                min-height: 44px;
+                font-size: 16px; /* Evita zoom en iOS */
+                border-radius: 8px;
+            }
+            
             .send-button {
                 width: 100%;
                 justify-content: center;
+                min-height: 48px;
+                font-size: 1rem;
+                border-radius: 8px;
             }
             
+            /* Optimización de acciones en móvil */
             .input-actions {
                 flex-wrap: wrap;
                 justify-content: center;
                 gap: 6px;
+                margin-top: 8px;
             }
             
             .action-btn {
                 flex: 1;
                 min-width: 80px;
+                max-width: 120px;
                 text-align: center;
                 font-size: 0.75rem;
-                padding: 6px 8px;
+                padding: 8px 6px;
+                min-height: 42px;
+                border-radius: 6px;
             }
             
             .lang-btn {
                 min-width: 70px;
+            }
+        }
+        
+        /* Landscape móvil - Optimización especial */
+        @media (max-height: 500px) and (orientation: landscape) and (max-width: 768px) {
+            .chat-container {
+                height: 98vh;
+                margin: 1vh auto;
+                border-radius: 12px;
+            }
+            
+            .chat-header {
+                padding: 10px 20px;
+                border-radius: 12px 12px 0 0;
+            }
+            
+            .chat-header h1 {
+                font-size: 1.2rem;
+            }
+            
+            .chat-messages {
+                padding: 10px 20px;
+            }
+            
+            .chat-input {
+                padding: 10px 20px;
+                border-radius: 0 0 12px 12px;
+            }
+            
+            .input-container {
+                flex-direction: row;
+                align-items: center;
+                gap: 10px;
+            }
+            
+            .message-input {
+                flex: 1;
+                min-height: 36px;
+            }
+            
+            .send-button {
+                width: auto;
+                min-width: 80px;
+                min-height: 36px;
+                padding: 8px 16px;
+            }
+            
+            .input-actions {
+                gap: 4px;
+                margin-top: 6px;
+            }
+            
+            .action-btn {
+                padding: 6px 8px;
+                font-size: 0.7rem;
+                min-height: 36px;
             }
         }
         
@@ -656,6 +961,994 @@
             .action-btn {
                 padding: 8px 10px;
                 font-size: 0.75rem;
+            }
+        }
+
+        /* Modal de Personalización */
+        .customize-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .customize-modal-content {
+            background: var(--bg-color);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            width: 90%;
+            max-width: 500px;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .customize-modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .customize-modal-header h3 {
+            margin: 0;
+            color: var(--text-color);
+            font-size: 1.2rem;
+        }
+
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: var(--text-color);
+            cursor: pointer;
+            padding: 5px;
+            border-radius: 50%;
+            transition: background-color 0.3s;
+        }
+
+        .close-modal:hover {
+            background: var(--hover-bg);
+        }
+
+        .customize-modal-body {
+            padding: 20px;
+        }
+
+        .customize-section {
+            margin-bottom: 25px;
+        }
+
+        .customize-section h4 {
+            margin: 0 0 15px 0;
+            color: var(--text-color);
+            font-size: 1rem;
+        }
+
+        .theme-options, .font-size-controls, .avatar-options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .theme-btn, .font-btn, .avatar-btn {
+            padding: 10px 15px;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            background: var(--bg-color);
+            color: var(--text-color);
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 0.9rem;
+        }
+
+        .theme-btn:hover, .font-btn:hover, .avatar-btn:hover {
+            border-color: var(--accent-color);
+            transform: translateY(-2px);
+        }
+
+        .theme-btn.active, .font-btn.active, .avatar-btn.active {
+            border-color: var(--accent-color);
+            background: var(--accent-color);
+            color: white;
+        }
+
+        .theme-btn {
+            min-width: 100px;
+            font-weight: bold;
+        }
+
+        .avatar-btn {
+            font-size: 1.2rem;
+        }
+
+        /* === ANIMACIONES SUAVES === */
+        
+        /* Transiciones globales para cambios de tema */
+        :root {
+            transition: 
+                --bg-color 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+                --text-color 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+                --accent-color 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+                --border-color 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+                --hover-bg 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        /* Elementos que participan en las transiciones de tema */
+        body, .chat-container, .customize-modal-content,
+        .message, .chat-header, .chat-input, .action-btn,
+        .theme-btn, .font-btn, .avatar-btn {
+            transition: 
+                background-color 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+                border-color 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+                color 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+                box-shadow 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Modal: Animación de entrada */
+        .customize-modal {
+            backdrop-filter: blur(0px);
+            transition: backdrop-filter 0.3s ease-out;
+        }
+        
+        .customize-modal.show {
+            backdrop-filter: blur(8px);
+        }
+
+        .customize-modal-content {
+            transform: scale(0.85) translateY(-30px);
+            opacity: 0;
+            transition: 
+                transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1),
+                opacity 0.3s ease-out,
+                background-color 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+                border-color 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .customize-modal.show .customize-modal-content {
+            transform: scale(1) translateY(0);
+            opacity: 1;
+        }
+
+        /* Botones: Micro-interacciones */
+        .theme-btn, .font-btn, .avatar-btn, .action-btn {
+            position: relative;
+            overflow: hidden;
+            transition: 
+                transform 0.2s cubic-bezier(0.4, 0, 0.2, 1),
+                box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+                background-color 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+                border-color 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+                color 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Efecto ripple para botones */
+        .theme-btn::before, .font-btn::before, .avatar-btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .theme-btn:active::before, .font-btn:active::before, .avatar-btn:active::before {
+            width: 200px;
+            height: 200px;
+        }
+
+        /* Hover suave */
+        .theme-btn:hover, .font-btn:hover, .avatar-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 
+                0 8px 25px rgba(0, 0, 0, 0.15),
+                0 0 20px rgba(var(--accent-color-rgb, 102, 126, 234), 0.3);
+        }
+
+        /* Click feedback */
+        .theme-btn:active, .font-btn:active, .avatar-btn:active {
+            transform: translateY(0) scale(0.96);
+        }
+
+        /* Botón activo con glow animado */
+        .theme-btn.active, .font-btn.active, .avatar-btn.active {
+            box-shadow: 
+                0 0 20px rgba(var(--accent-color-rgb, 102, 126, 234), 0.5),
+                0 0 40px rgba(var(--accent-color-rgb, 102, 126, 234), 0.3),
+                inset 0 0 20px rgba(255, 255, 255, 0.1);
+            animation: glow-pulse 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes glow-pulse {
+            from {
+                box-shadow: 
+                    0 0 20px rgba(var(--accent-color-rgb, 102, 126, 234), 0.5),
+                    0 0 40px rgba(var(--accent-color-rgb, 102, 126, 234), 0.3);
+            }
+            to {
+                box-shadow: 
+                    0 0 30px rgba(var(--accent-color-rgb, 102, 126, 234), 0.7),
+                    0 0 60px rgba(var(--accent-color-rgb, 102, 126, 234), 0.4);
+            }
+        }
+
+        /* Botón de personalizar con animación especial */
+        .customize-btn {
+            animation: customize-hint 3s ease-in-out infinite;
+        }
+
+        @keyframes customize-hint {
+            0%, 100% { transform: rotate(0deg); }
+            25% { transform: rotate(-5deg); }
+            75% { transform: rotate(5deg); }
+        }
+
+        .customize-btn:hover {
+            animation: none;
+            transform: translateY(-2px) rotate(0deg);
+        }
+
+        /* Close button con rotación suave */
+        .close-modal {
+            transition: 
+                transform 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+                background-color 0.3s ease;
+        }
+
+        .close-modal:hover {
+            transform: rotate(90deg) scale(1.1);
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        /* Animación de carga para cambios de tema */
+        .theme-changing {
+            position: relative;
+            pointer-events: none;
+        }
+
+        .theme-changing::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            animation: shimmer 1s ease-in-out;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        /* Feedback visual para selección de avatar */
+        .avatar-btn:active {
+            animation: avatar-bounce 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        @keyframes avatar-bounce {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2) rotate(10deg); }
+            100% { transform: scale(1); }
+        }
+
+        /* Transición suave para cambios de font-size */
+        .message-content, .chat-header h1, .customize-section h4 {
+            transition: font-size 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Loading indicator para operaciones */
+        .loading-indicator {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-top: 2px solid var(--accent-color);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin-left: 10px;
+            vertical-align: middle;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Optimización de performance para animaciones */
+        .theme-btn, .font-btn, .avatar-btn, .customize-modal-content {
+            will-change: transform, opacity;
+        }
+
+        /* Efecto ripple generado dinámicamente */
+        @keyframes ripple-effect {
+            0% {
+                transform: scale(0);
+                opacity: 1;
+            }
+            100% {
+                transform: scale(1);
+                opacity: 0;
+            }
+        }
+
+        /* Reduce motion para usuarios que prefieren menos animación */
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+            
+            .customize-btn {
+                animation: none;
+            }
+        }
+
+        /* === RESPONSIVE AVANZADO === */
+        
+        /* Pantallas Ultra-Wide (>1440px) */
+        @media (min-width: 1441px) {
+            .chat-container {
+                max-width: 1200px;
+                margin: 0 auto;
+                padding: 0 40px;
+            }
+            
+            .customize-modal-content {
+                max-width: 600px;
+                padding: 0;
+            }
+            
+            .customize-modal-body {
+                padding: 30px;
+            }
+            
+            .theme-options, .font-size-controls, .avatar-options {
+                gap: 15px;
+            }
+            
+            .theme-btn, .font-btn, .avatar-btn {
+                padding: 12px 20px;
+                font-size: 1rem;
+            }
+            
+            /* Aprovechar el espacio horizontal */
+            .input-actions {
+                justify-content: center;
+                gap: 15px;
+            }
+            
+            .action-btn {
+                padding: 12px 18px;
+                font-size: 0.95rem;
+            }
+        }
+
+        /* Tablets en Landscape (1024px-1440px) */
+        @media (min-width: 1024px) and (max-width: 1440px) {
+            .customize-modal-content {
+                max-width: 550px;
+            }
+            
+            .theme-options {
+                display: grid;
+                grid-template-columns: repeat(3, 1fr);
+                gap: 12px;
+            }
+            
+            .font-size-controls, .avatar-options {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+                gap: 12px;
+            }
+            
+            .input-actions {
+                gap: 12px;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+        }
+
+        /* Tablets en Portrait (768px-1023px) */
+        @media (min-width: 768px) and (max-width: 1023px) {
+            .customize-modal-content {
+                width: 85%;
+                max-width: 500px;
+            }
+            
+            .customize-modal-header {
+                padding: 25px;
+            }
+            
+            .customize-modal-body {
+                padding: 25px;
+            }
+            
+            .theme-options {
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 15px;
+            }
+            
+            .font-size-controls {
+                display: flex;
+                justify-content: space-between;
+                gap: 15px;
+            }
+            
+            .avatar-options {
+                display: grid;
+                grid-template-columns: repeat(3, 1fr);
+                gap: 15px;
+            }
+            
+            /* Controles táctiles mejorados */
+            .theme-btn, .font-btn, .avatar-btn {
+                padding: 15px;
+                font-size: 1rem;
+                min-height: 50px;
+                touch-action: manipulation;
+            }
+            
+            .action-btn {
+                padding: 12px 15px;
+                min-height: 48px;
+                touch-action: manipulation;
+            }
+        }
+
+        /* Móviles Grandes (481px-767px) */
+        @media (min-width: 481px) and (max-width: 767px) {
+            .customize-modal-content {
+                width: 90%;
+                margin: 15px;
+                max-height: 85vh;
+            }
+            
+            .customize-modal-header {
+                padding: 20px;
+                flex-direction: column;
+                text-align: center;
+                gap: 10px;
+            }
+            
+            .close-modal {
+                position: absolute;
+                top: 15px;
+                right: 15px;
+            }
+            
+            .theme-options {
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 12px;
+            }
+            
+            .font-size-controls {
+                display: flex;
+                gap: 8px;
+            }
+            
+            .avatar-options {
+                display: grid;
+                grid-template-columns: repeat(3, 1fr);
+                gap: 12px;
+            }
+            
+            .input-actions {
+                flex-wrap: wrap;
+                gap: 8px;
+                justify-content: center;
+            }
+            
+            .action-btn {
+                flex: 1 1 calc(50% - 4px);
+                min-width: 120px;
+                padding: 10px 8px;
+                font-size: 0.85rem;
+            }
+        }
+
+        /* Móviles Pequeños (<480px) */
+        @media (max-width: 480px) {
+            .customize-modal-content {
+                width: 95%;
+                margin: 10px;
+                max-height: 90vh;
+                border-radius: 8px;
+            }
+            
+            .customize-modal-header {
+                padding: 15px;
+                border-radius: 8px 8px 0 0;
+            }
+            
+            .customize-modal-header h3 {
+                font-size: 1.1rem;
+            }
+            
+            .customize-modal-body {
+                padding: 15px;
+            }
+            
+            .customize-section {
+                margin-bottom: 20px;
+            }
+            
+            .customize-section h4 {
+                font-size: 0.95rem;
+                margin-bottom: 12px;
+            }
+            
+            /* Stack vertical para móviles pequeños */
+            .theme-options, .font-size-controls, .avatar-options {
+                display: flex;
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .theme-btn, .font-btn, .avatar-btn {
+                width: 100%;
+                padding: 12px;
+                font-size: 0.9rem;
+                min-height: 45px;
+                border-radius: 6px;
+            }
+            
+            /* Optimización para pantallas muy pequeñas */
+            .input-actions {
+                flex-direction: column;
+                gap: 6px;
+            }
+            
+            .action-btn {
+                width: 100%;
+                padding: 10px;
+                font-size: 0.8rem;
+                min-height: 42px;
+            }
+            
+            /* Gestos táctiles mejorados */
+            .theme-btn:active, .font-btn:active, .avatar-btn:active,
+            .action-btn:active {
+                transform: scale(0.98);
+                transition: transform 0.1s;
+            }
+        }
+
+        /* Optimización para dispositivos con hover limitado */
+        @media (hover: none) and (pointer: coarse) {
+            .theme-btn:hover, .font-btn:hover, .avatar-btn:hover,
+            .action-btn:hover, .close-modal:hover {
+                transform: none;
+            }
+            
+            .theme-btn:active, .font-btn:active, .avatar-btn:active {
+                background: var(--accent-color);
+                color: white;
+                transform: scale(0.95);
+            }
+        }
+
+        /* Orientación Landscape en móviles */
+        @media (max-height: 500px) and (orientation: landscape) {
+            .customize-modal-content {
+                max-height: 95vh;
+                overflow-y: auto;
+            }
+            
+            .customize-modal-header {
+                padding: 10px 20px;
+            }
+            
+            .customize-modal-body {
+                padding: 15px 20px;
+            }
+            
+            .customize-section {
+                margin-bottom: 15px;
+            }
+            
+            .theme-options, .avatar-options {
+                display: grid;
+                grid-template-columns: repeat(3, 1fr);
+                gap: 8px;
+            }
+            
+            .font-size-controls {
+                display: flex;
+                gap: 8px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .customize-modal-content {
+                width: 95%;
+                margin: 20px;
+            }
+            
+            .theme-options, .font-size-controls, .avatar-options {
+                flex-direction: column;
+            }
+            
+            .theme-btn, .font-btn, .avatar-btn {
+                width: 100%;
+            }
+        }
+
+        /* === CHROME AI TOOLS STYLES === */
+        .chrome-ai-tools {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .ai-tool-btn {
+            display: flex !important;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            background: rgba(0, 245, 255, 0.1) !important;
+            border: 1px solid rgba(0, 245, 255, 0.3) !important;
+            border-radius: 12px;
+            color: var(--text-primary) !important;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: left;
+            width: 100%;
+            box-sizing: border-box;
+            margin-bottom: 8px !important;
+            visibility: visible !important;
+            opacity: 1 !important;
+            min-height: 60px !important;
+        }
+
+        .ai-tool-btn:hover {
+            background: rgba(0, 245, 255, 0.2);
+            border-color: rgba(0, 245, 255, 0.5);
+            box-shadow: 0 4px 12px rgba(0, 245, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .ai-tool-icon {
+            font-size: 1.5rem;
+            min-width: 24px;
+            text-align: center;
+        }
+
+        .ai-tool-info {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            flex: 1;
+        }
+
+        .ai-tool-info strong {
+            font-size: 1rem;
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        .ai-tool-info small {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            opacity: 0.8;
+            line-height: 1.2;
+        }
+
+        /* Responsive design para herramientas AI */
+        @media (max-width: 768px) {
+            .ai-tool-btn {
+                padding: 10px 12px;
+                gap: 10px;
+            }
+            
+            .ai-tool-icon {
+                font-size: 1.3rem;
+            }
+            
+            .ai-tool-info strong {
+                font-size: 0.9rem;
+            }
+            
+            .ai-tool-info small {
+                font-size: 0.75rem;
+            }
+        }
+
+        /* === MODALES DE IA === */
+        
+        .ai-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(8px);
+        }
+
+        .ai-modal-content {
+            background: var(--bg-color);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 85vh;
+            overflow-y: auto;
+            box-shadow: 
+                0 25px 50px rgba(0, 0, 0, 0.4),
+                0 0 0 1px rgba(255, 255, 255, 0.05);
+            transform: scale(0.9);
+            opacity: 0;
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .ai-modal.show .ai-modal-content {
+            transform: scale(1);
+            opacity: 1;
+        }
+
+        .ai-modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 24px;
+            border-bottom: 1px solid var(--border-color);
+            background: linear-gradient(135deg, var(--bg-color), var(--hover-bg));
+            border-radius: 16px 16px 0 0;
+        }
+
+        .ai-modal-header h3 {
+            margin: 0;
+            color: var(--text-color);
+            font-size: 1.4rem;
+            font-weight: 600;
+        }
+
+        .close-ai-modal {
+            background: none;
+            border: none;
+            font-size: 1.8rem;
+            color: var(--text-color);
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .close-ai-modal:hover {
+            background: var(--hover-bg);
+            transform: rotate(90deg);
+        }
+
+        .ai-modal-body {
+            padding: 24px;
+        }
+
+        .ai-section {
+            margin-bottom: 24px;
+        }
+
+        .ai-section label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--text-color);
+            font-weight: 500;
+            font-size: 0.95rem;
+        }
+
+        .ai-section textarea,
+        .ai-section select {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            background: var(--hover-bg);
+            color: var(--text-color);
+            font-size: 1rem;
+            font-family: inherit;
+            transition: all 0.3s ease;
+            resize: vertical;
+            min-height: 120px;
+        }
+
+        .ai-section select {
+            min-height: auto;
+            height: 48px;
+            cursor: pointer;
+        }
+
+        .ai-section textarea:focus,
+        .ai-section select:focus {
+            outline: none;
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 3px rgba(var(--accent-color-rgb), 0.2);
+        }
+
+        .translator-languages {
+            display: grid;
+            grid-template-columns: 1fr auto 1fr;
+            gap: 16px;
+            align-items: end;
+        }
+
+        .language-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .language-swap {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .swap-btn {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: var(--accent-color);
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-size: 1.2rem;
+            transition: all 0.3s ease;
+        }
+
+        .swap-btn:hover {
+            transform: rotate(180deg);
+            background: var(--hover-bg);
+        }
+
+        .ai-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+            margin-top: 20px;
+        }
+
+        .ai-btn {
+            padding: 12px 24px;
+            border: 2px solid var(--border-color);
+            border-radius: 10px;
+            background: var(--hover-bg);
+            color: var(--text-color);
+            cursor: pointer;
+            font-size: 0.95rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .ai-btn:hover {
+            border-color: var(--accent-color);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .ai-btn.primary {
+            background: var(--accent-color);
+            border-color: var(--accent-color);
+            color: white;
+        }
+
+        .ai-btn.primary:hover {
+            background: var(--hover-bg);
+            color: var(--accent-color);
+        }
+
+        .ai-btn.secondary {
+            background: transparent;
+            border-color: var(--border-color);
+        }
+
+        .ai-result {
+            margin-top: 24px;
+            padding: 20px;
+            background: var(--hover-bg);
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+        }
+
+        .ai-result h4 {
+            margin: 0 0 16px 0;
+            color: var(--accent-color);
+            font-size: 1.1rem;
+        }
+
+        .ai-output {
+            background: var(--bg-color);
+            padding: 16px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        /* Loading state */
+        .ai-loading {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--accent-color);
+        }
+
+        .ai-loading::after {
+            content: '';
+            width: 16px;
+            height: 16px;
+            border: 2px solid var(--border-color);
+            border-top: 2px solid var(--accent-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        /* Responsive para modales de IA */
+        @media (max-width: 768px) {
+            .ai-modal-content {
+                width: 95%;
+                margin: 20px;
+                max-height: 90vh;
+            }
+            
+            .ai-modal-header {
+                padding: 20px;
+            }
+            
+            .ai-modal-body {
+                padding: 20px;
+            }
+            
+            .translator-languages {
+                grid-template-columns: 1fr;
+                gap: 12px;
+            }
+            
+            .language-swap {
+                order: -1;
+            }
+            
+            .swap-btn {
+                transform: rotate(90deg);
+            }
+            
+            .ai-actions {
+                flex-direction: column;
+            }
+            
+            .ai-btn {
+                width: 100%;
+                justify-content: center;
             }
         }
     </style>
@@ -695,10 +1988,10 @@
                 </div>
             </div>
             <section class="chat-input" aria-label="Área de entrada de mensajes">
-                <form class="input-container" onsubmit="sendMessage(); return false;">
+                <form id="chat-form" class="input-container" onsubmit="sendMessage(); return false;">
                     <div class="input-wrapper">
                         <label for="messageInput" class="sr-only">Escribe tu mensaje</label>
-                        <input type="text" id="messageInput" placeholder="Escribe tu mensaje aquí..." maxlength="1000" aria-describedby="charCounter" aria-required="true" autocomplete="off" />
+                        <textarea id="messageInput" placeholder="Escribe tu mensaje aquí..." maxlength="1000" aria-describedby="charCounter" aria-required="true" autocomplete="off" rows="1"></textarea>
                         <div class="char-counter" id="charCounter" aria-live="polite">0/1000</div>
                     </div>
                     <button type="submit" class="send-button" id="sendButton" aria-label="Enviar mensaje">
@@ -708,11 +2001,29 @@
                 </form>
                 <div class="input-actions" role="toolbar" aria-label="Acciones del chat">
                     <button class="action-btn" aria-label="Limpiar historial del chat" tabindex="0">🗑️ Limpiar chat</button>
-                    <button class="action-btn" aria-label="Exportar conversación" tabindex="0">💾 Exportar</button>
+                    <button class="action-btn" aria-label="Exportar conversación" tabindex="0" id="exportChatBtn">💾 Exportar</button>
+    <!-- Modal de selección de formato de exportación -->
+    <div id="exportFormatModal" class="ai-modal" style="display: none; z-index: 9999;">
+        <div class="ai-modal-content">
+            <div class="ai-modal-header">
+                <h3>Exportar Conversación</h3>
+                <button class="close-ai-modal" data-modal="exportFormatModal">&times;</button>
+            </div>
+            <div class="ai-modal-body">
+                <p>Selecciona el formato para exportar tu conversación:</p>
+                <div style="display: flex; gap: 16px; margin-bottom: 20px;">
+                    <button class="export-format-btn" data-format="txt">TXT</button>
+                    <button class="export-format-btn" data-format="md">Markdown</button>
+                    <button class="export-format-btn" data-format="pdf">PDF</button>
+                </div>
+            </div>
+        </div>
+    </div>
                     <button class="action-btn" aria-label="Activar o desactivar síntesis de voz" tabindex="0">🎤 Voz</button>
                     <button class="action-btn" aria-label="Subir archivo" tabindex="0">📎 Archivo</button>
                     <button class="action-btn lang-btn" data-lang="es" aria-label="Cambiar a español" tabindex="0">🇪🇸 Español</button>
                     <button class="action-btn lang-btn" data-lang="en" aria-label="Cambiar a inglés" tabindex="0">🇬🇧 English</button>
+                    <button class="action-btn customize-btn" aria-label="Personalizar interfaz" tabindex="0">⚙️ Personalizar</button>
                 </div>
                 <input type="file" id="fileInput" style="display: none;" accept=".txt,.pdf,.doc,.docx,.jpg,.jpeg,.png,.gif" multiple aria-label="Seleccionar archivos para subir">
             </section>
@@ -722,6 +2033,9 @@
     <script>
         // === CONFIGURACIÓN OPTIMIZADA Y VARIABLES GLOBALES ===
         let messagesContainer, messageInput, sendButton, typingIndicator, charCounter;
+        let currentUtterance = null;
+        let isPaused = false;
+        let pendingText = '';
         let isVoiceEnabled = false;
         let chatHistory = [];
         let isLoading = false;
@@ -739,6 +2053,123 @@
         let animationId;
         let lastParticleTime = 0;
         const PARTICLE_INTERVAL = 150; // Aumentado para reducir carga
+        
+        // Chrome Built-in AI variables
+        let chromeAI = null;
+        
+        // === SISTEMA DE TRADUCCIONES E IDIOMAS ===
+        const translations = {
+            es: {
+                // Botones de análisis de imagen
+                analyzeButton: '🔍 Analizar',
+                describeButton: '📝 Describir',
+                colorsButton: '🎨 Colores',
+                textButton: '📖 Texto',
+                interpretButton: '🧠 Interpretar',
+                
+                // Mensajes de notificación
+                imageUploaded: '📸 Imagen cargada exitosamente',
+                imageUploadedMultiple: '📸 {count} imagen(es) cargada(s)',
+                imageUploadedDragDrop: '📸 {count} imagen(es) cargada(s) por drag & drop',
+                onlyImagesAllowed: '⚠️ Solo se pueden arrastrar archivos de imagen',
+                invalidImageFile: '⚠️ {filename} no es una imagen válida',
+                
+                // Indicador de drag & drop
+                dropIndicator: '📸 Suelta aquí tu imagen para analizarla',
+                
+                // Prompts de análisis
+                analyzePrompt: 'Analiza esta imagen en detalle',
+                describePrompt: 'Describe detalladamente esta imagen',
+                colorsPrompt: 'Analiza los colores y la paleta de esta imagen',
+                textPrompt: 'Extrae y transcribe todo el texto visible en esta imagen',
+                interpretPrompt: 'Interpreta el significado y contexto de esta imagen',
+                
+                // Contexto de imagen para IA
+                contextMessage: 'El usuario ha subido una imagen llamada "{imageName}" y está preguntando: "{message}". Por favor analiza la imagen y responde a su pregunta.',
+                
+                // Botones de modo AI
+                aiModeHybrid: '🔄 Híbrido',
+                aiModeServer: '☁️ Nube', 
+                aiModeChrome: '🧠 Local',
+                aiModeMainButton: 'Chrome AI',
+                aiModeHybridLabel: 'Modo AI Híbrido - Selección inteligente automática',
+                aiModeServerLabel: 'Modo AI Servidor - Gemini avanzado en la nube',
+                aiModeChromeLabel: 'Modo AI Chrome - Procesamiento local privado',
+                aiModeMainLabel: 'Selector de modo Chrome AI',
+                aiModeChanged: '🤖 Modo AI: {mode}'
+            },
+            en: {
+                // Botones de análisis de imagen
+                analyzeButton: '🔍 Analyze',
+                describeButton: '📝 Describe',
+                colorsButton: '🎨 Colors',
+                textButton: '📖 Text',
+                interpretButton: '🧠 Interpret',
+                
+                // Mensajes de notificación
+                imageUploaded: '📸 Image uploaded successfully',
+                imageUploadedMultiple: '📸 {count} image(s) uploaded',
+                imageUploadedDragDrop: '📸 {count} image(s) uploaded by drag & drop',
+                onlyImagesAllowed: '⚠️ Only image files can be dragged',
+                invalidImageFile: '⚠️ {filename} is not a valid image',
+                
+                // Indicador de drag & drop
+                dropIndicator: '📸 Drop your image here to analyze it',
+                
+                // Prompts de análisis
+                analyzePrompt: 'Analyze this image in detail',
+                describePrompt: 'Describe this image in detail',
+                colorsPrompt: 'Analyze the colors and palette of this image',
+                textPrompt: 'Extract and transcribe all visible text in this image',
+                interpretPrompt: 'Interpret the meaning and context of this image',
+                
+                // Contexto de imagen para IA
+                contextMessage: 'The user has uploaded an image called "{imageName}" and is asking: "{message}". Please analyze the image and respond to their question.',
+                
+                // Botones de modo AI
+                aiModeHybrid: '🔄 Hybrid',
+                aiModeServer: '☁️ Cloud', 
+                aiModeChrome: '🧠 Local',
+                aiModeMainButton: 'Chrome AI',
+                aiModeHybridLabel: 'Hybrid AI Mode - Smart automatic selection',
+                aiModeServerLabel: 'Server AI Mode - Advanced Gemini in the cloud',
+                aiModeChromeLabel: 'Chrome AI Mode - Private local processing',
+                aiModeMainLabel: 'Chrome AI mode selector',
+                aiModeChanged: '🤖 AI Mode: {mode}'
+            }
+        };
+        
+        // Variables de contexto de imagen
+        let currentImageContext = null;
+        let currentImageName = '';
+        let currentImageData = '';
+        
+        // Función para obtener el idioma actual
+        function getCurrentLanguage() {
+            return document.documentElement.lang || 'es';
+        }
+        
+        // Función para obtener texto traducido
+        function t(key, params = {}) {
+            const lang = getCurrentLanguage();
+            let text = translations[lang]?.[key] || translations.es[key] || key;
+            
+            // Reemplazar parámetros {key} en el texto
+            Object.keys(params).forEach(param => {
+                text = text.replace(new RegExp(`\\{${param}\\}`, 'g'), params[param]);
+            });
+            
+            return text;
+        }
+        
+        // Chrome Built-in AI variables
+        let chromeAIAvailable = false;
+        let preferChromeAI = false; // User preference for Chrome AI vs Server AI
+        let currentAIMode = 'hybrid'; // 'chrome', 'server', 'hybrid'
+        
+        // Image context management
+        let uploadedImages = []; // Store uploaded images with metadata
+        let currentImageIndex = 0; // Track current image for analysis
         
         // requestAnimationFrame loop to guarantee input is always enabled
         function forceEnableInput() {
@@ -863,14 +2294,21 @@
                 if (sender === 'user') {
                     avatar.innerHTML = '👨‍💻';
                 } else {
-                    avatar.innerHTML = '🤖';
+                    // Usar el avatar personalizado guardado
+                    avatar.innerHTML = customization.currentAvatar || '🤖';
                 }
                 
                 const contentWrapper = document.createElement('div');
                 
                 const content = document.createElement('div');
                 content.className = 'message-content';
-                content.textContent = text;
+                
+                // Procesar texto según el remitente
+                if (sender === 'bot') {
+                    content.innerHTML = formatBotResponse(text);
+                } else {
+                    content.textContent = text;
+                }
                 
                 const timeDiv = document.createElement('div');
                 timeDiv.className = 'message-time';
@@ -908,6 +2346,61 @@
             }
         }
         
+        function formatBotResponse(text) {
+            // Función para formatear respuestas del bot con Markdown básico
+            if (!text) return '';
+            
+            // Escapar HTML para seguridad
+            let formatted = text
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;');
+            
+            // Procesar Markdown básico
+            formatted = formatted
+                // Títulos
+                .replace(/^### (.*$)/gim, '<h3>$1</h3>')
+                .replace(/^## (.*$)/gim, '<h2>$1</h2>')
+                .replace(/^# (.*$)/gim, '<h1>$1</h1>')
+                
+                // Negrita
+                .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+                
+                // Cursiva
+                .replace(/\*(.+?)\*/g, '<em>$1</em>')
+                
+                // Código en línea
+                .replace(/`(.+?)`/g, '<code>$1</code>')
+                
+                // Listas con viñetas
+                .replace(/^\* (.+$)/gim, '<li>$1</li>')
+                
+                // Saltos de línea
+                .replace(/\n/g, '<br>');
+            
+            // Envolver listas en <ul>
+            formatted = formatted.replace(/(<li>.*<\/li>)/gs, '<ul>$1</ul>');
+            
+            // Limpiar listas anidadas incorrectas
+            formatted = formatted.replace(/<\/ul>\s*<ul>/g, '');
+            
+            return formatted;
+        }
+        
+        function autoResizeTextarea(textarea) {
+            // Función para auto-redimensionar el textarea
+            if (!textarea) return;
+            
+            // Resetear altura para obtener el scrollHeight correcto
+            textarea.style.height = 'auto';
+            
+            // Calcular nueva altura basada en el contenido
+            const newHeight = Math.max(54, Math.min(120, textarea.scrollHeight));
+            
+            // Aplicar nueva altura
+            textarea.style.height = newHeight + 'px';
+        }
+        
         function showTyping() {
             if (typingIndicator) {
                 typingIndicator.style.display = 'flex';
@@ -929,7 +2422,483 @@
             }
         }
         
+        // Setup drag and drop functionality
+        function setupDragAndDrop() {
+            const chatContainer = document.getElementById('chat-container') || document.body;
+            
+            // Prevent default drag behaviors
+            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                chatContainer.addEventListener(eventName, preventDefaults, false);
+                document.body.addEventListener(eventName, preventDefaults, false);
+            });
+            
+            // Highlight drop area
+            ['dragenter', 'dragover'].forEach(eventName => {
+                chatContainer.addEventListener(eventName, highlight, false);
+            });
+            
+            ['dragleave', 'drop'].forEach(eventName => {
+                chatContainer.addEventListener(eventName, unhighlight, false);
+            });
+            
+            // Handle dropped files
+            chatContainer.addEventListener('drop', handleDrop, false);
+            
+            function preventDefaults(e) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+            
+            function highlight(e) {
+                if (isDraggedFileImage(e)) {
+                    chatContainer.style.backgroundColor = 'rgba(0, 212, 255, 0.1)';
+                    chatContainer.style.border = '2px dashed var(--accent-color)';
+                    
+                    // Show drop indicator
+                    showDropIndicator();
+                }
+            }
+            
+            function unhighlight(e) {
+                chatContainer.style.backgroundColor = '';
+                chatContainer.style.border = '';
+                hideDropIndicator();
+            }
+            
+            function handleDrop(e) {
+                const dt = e.dataTransfer;
+                const files = dt.files;
+                
+                if (files.length > 0) {
+                    // Filter for images only
+                    const imageFiles = Array.from(files).filter(file => 
+                        file.type.startsWith('image/')
+                    );
+                    
+                    if (imageFiles.length > 0) {
+                        handleFileUpload(imageFiles);
+                        showNotification(t('imageUploadedDragDrop', { count: imageFiles.length }), 'success');
+                    } else {
+                        showNotification(t('onlyImagesAllowed'), 'warning');
+                    }
+                }
+            }
+            
+            function isDraggedFileImage(e) {
+                const types = e.dataTransfer.types;
+                return types.includes('Files');
+            }
+            
+            function showDropIndicator() {
+                if (document.getElementById('drop-indicator')) return;
+                
+                const indicator = document.createElement('div');
+                indicator.id = 'drop-indicator';
+                indicator.style.cssText = `
+                    position: fixed;
+                    top: 50%;
+                    left: 50%;
+                    transform: translate(-50%, -50%);
+                    background: rgba(0, 212, 255, 0.9);
+                    color: white;
+                    padding: 20px 40px;
+                    border-radius: 12px;
+                    font-size: 18px;
+                    font-weight: bold;
+                    z-index: 10000;
+                    pointer-events: none;
+                    backdrop-filter: blur(10px);
+                    box-shadow: 0 8px 32px rgba(0, 212, 255, 0.3);
+                `;
+                indicator.innerHTML = t('dropIndicator');
+                document.body.appendChild(indicator);
+            }
+            
+            function hideDropIndicator() {
+                const indicator = document.getElementById('drop-indicator');
+                if (indicator) {
+                    indicator.remove();
+                }
+            }
+        }
+        
+        // Handle file upload for drag & drop and button click
+        function handleFileUpload(files) {
+            const fileArray = Array.isArray(files) ? files : Array.from(files);
+            
+            fileArray.forEach((file, index) => {
+                if (file.type.startsWith('image/')) {
+                    processImageFile(file, index > 0); // Add spacing for multiple files
+                } else {
+                    showNotification(t('invalidImageFile', { filename: file.name }), 'warning');
+                }
+            });
+        }
+        
+        // === CHROME BUILT-IN AI INTEGRATION ===
+        
+        async function initializeChromeAI() {
+            try {
+                if (typeof ChromeAIManager === 'undefined') {
+                    console.log('Chrome AI Manager not available');
+                    chromeAIAvailable = false;
+                } else {
+                    chromeAI = new ChromeAIManager();
+                    chromeAIAvailable = await chromeAI.initialize();
+                }
+                
+                // Always add AI mode selector, regardless of Chrome AI availability
+                addAIModeSelector();
+                
+                if (chromeAIAvailable) {
+                    console.log('🚀 Chrome Built-in AI disponible (se iniciará al primer uso)');
+                    
+                    // Listen for download progress
+                    document.addEventListener('chrome-ai-download-progress', (e) => {
+                        showAIDownloadProgress(e.detail.progress);
+                    });
+                    
+                    // Show notification about Chrome AI availability
+                    showNotification('🧠 Chrome Built-in AI disponible! Se activará cuando envíes tu primer mensaje.', 'success');
+                    
+                } else {
+                    console.log('Chrome Built-in AI not available on this device');
+                    showNotification('ℹ️ Chrome Built-in AI no disponible. Usa Chrome Canary para activarlo.', 'info');
+                }
+                
+            } catch (error) {
+                console.error('Failed to initialize Chrome AI:', error);
+                chromeAIAvailable = false;
+                // Still add the selector even if there's an error
+                addAIModeSelector();
+            }
+        }
+        
+        function addAIModeSelector() {
+            // Add AI mode dropdown to the existing input-actions toolbar
+            const inputActions = document.querySelector('.input-actions');
+            if (!inputActions) return;
+            
+            // Check if AI mode button already exists
+            if (document.querySelector('.ai-mode-dropdown')) return;
+            
+            // Create AI mode dropdown container
+            const aiModeContainer = document.createElement('div');
+            aiModeContainer.className = 'ai-mode-dropdown';
+            aiModeContainer.style.cssText = `
+                position: relative;
+                display: inline-block;
+            `;
+            
+            // Create main Chrome AI button
+            const mainButton = document.createElement('button');
+            mainButton.className = 'action-btn ai-mode-main-btn';
+            mainButton.setAttribute('aria-label', t('aiModeMainLabel'));
+            mainButton.setAttribute('tabindex', '0');
+            mainButton.innerHTML = `🤖 ${t('aiModeMainButton')} <span style="margin-left: 4px;">▼</span>`;
+            
+            // Create dropdown menu
+            const dropdownMenu = document.createElement('div');
+            dropdownMenu.className = 'ai-mode-menu';
+            dropdownMenu.style.cssText = `
+                position: absolute;
+                bottom: 100%;
+                left: 0;
+                background: rgba(0, 0, 0, 0.95);
+                border: 1px solid rgba(0, 212, 255, 0.3);
+                border-radius: 8px;
+                padding: 8px 0;
+                min-width: 180px;
+                box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+                backdrop-filter: blur(10px);
+                z-index: 1000;
+                display: none;
+                margin-bottom: 8px;
+            `;
+            
+            // Create menu options
+            const menuOptions = [
+                {
+                    mode: 'hybrid',
+                    label: t('aiModeHybrid'),
+                    description: getCurrentLanguage() === 'es' ? 'Selección inteligente automática' : 'Smart automatic selection'
+                },
+                {
+                    mode: 'server',
+                    label: t('aiModeServer'),
+                    description: getCurrentLanguage() === 'es' ? 'Gemini avanzado en la nube' : 'Advanced Gemini in the cloud'
+                },
+                {
+                    mode: 'chrome',
+                    label: t('aiModeChrome'),
+                    description: getCurrentLanguage() === 'es' ? 'Procesamiento local privado' : 'Private local processing'
+                }
+            ];
+            
+            menuOptions.forEach(option => {
+                const menuItem = document.createElement('div');
+                menuItem.className = 'ai-mode-menu-item';
+                menuItem.setAttribute('data-mode', option.mode);
+                menuItem.style.cssText = `
+                    padding: 8px 16px;
+                    cursor: pointer;
+                    color: #fff;
+                    font-size: 14px;
+                    transition: background-color 0.2s ease;
+                    border-left: 3px solid transparent;
+                `;
+                
+                menuItem.innerHTML = `
+                    <div style="font-weight: bold; margin-bottom: 2px;">${option.label}</div>
+                    <div style="font-size: 11px; color: rgba(255,255,255,0.7);">${option.description}</div>
+                `;
+                
+                // Add hover and click events
+                menuItem.addEventListener('mouseenter', function() {
+                    this.style.backgroundColor = 'rgba(0, 212, 255, 0.2)';
+                    this.style.borderLeftColor = 'var(--accent-color)';
+                });
+                
+                menuItem.addEventListener('mouseleave', function() {
+                    if (this.getAttribute('data-mode') !== currentAIMode) {
+                        this.style.backgroundColor = 'transparent';
+                        this.style.borderLeftColor = 'transparent';
+                    }
+                });
+                
+                menuItem.addEventListener('click', function() {
+                    const mode = this.getAttribute('data-mode');
+                    
+                    // Check Chrome AI availability
+                    if (mode === 'chrome' && !chromeAIAvailable) {
+                        showNotification('🚫 Chrome Built-in AI no está disponible. Usa Chrome Canary con flags habilitados.', 'warning');
+                        return;
+                    }
+                    
+                    // Update current mode
+                    currentAIMode = mode;
+                    localStorage.setItem('preferredAIMode', currentAIMode);
+                    
+                    // Update UI
+                    updateAIModeDisplay();
+                    
+                    // Hide dropdown
+                    dropdownMenu.style.display = 'none';
+                    
+                    // Show notification
+                    const modeNames = {
+                        'hybrid': getCurrentLanguage() === 'es' ? 'Híbrido (Inteligente)' : 'Hybrid (Smart)',
+                        'server': getCurrentLanguage() === 'es' ? 'Servidor (Nube)' : 'Server (Cloud)',
+                        'chrome': getCurrentLanguage() === 'es' ? 'Chrome (Local)' : 'Chrome (Local)'
+                    };
+                    showNotification(t('aiModeChanged', { mode: modeNames[mode] }), 'success');
+                });
+                
+                dropdownMenu.appendChild(menuItem);
+            });
+            
+            // Add click event to main button
+            mainButton.addEventListener('click', function(e) {
+                e.stopPropagation();
+                const isVisible = dropdownMenu.style.display === 'block';
+                dropdownMenu.style.display = isVisible ? 'none' : 'block';
+                
+                // Update arrow direction
+                const arrow = this.querySelector('span');
+                arrow.textContent = isVisible ? '▼' : '▲';
+            });
+            
+            // Close dropdown when clicking outside
+            document.addEventListener('click', function() {
+                dropdownMenu.style.display = 'none';
+                const arrow = mainButton.querySelector('span');
+                if (arrow) arrow.textContent = '▼';
+            });
+            
+            // Assemble the dropdown
+            aiModeContainer.appendChild(mainButton);
+            aiModeContainer.appendChild(dropdownMenu);
+            
+            // Insert before language buttons
+            const langButtons = inputActions.querySelector('.lang-btn');
+            if (langButtons) {
+                inputActions.insertBefore(aiModeContainer, langButtons);
+            } else {
+                inputActions.appendChild(aiModeContainer);
+            }
+            
+            // Load saved preference and update display
+            const savedMode = localStorage.getItem('preferredAIMode');
+            if (savedMode && ['chrome', 'server', 'hybrid'].includes(savedMode)) {
+                currentAIMode = savedMode;
+            }
+            updateAIModeDisplay();
+        }
+        
+        // Function to update AI mode display
+        function updateAIModeDisplay() {
+            const mainButton = document.querySelector('.ai-mode-main-btn');
+            const menuItems = document.querySelectorAll('.ai-mode-menu-item');
+            
+            if (!mainButton) return;
+            
+            // Keep the button text always as "Chrome AI" - don't change it
+            mainButton.innerHTML = `🤖 ${t('aiModeMainButton')} <span style="margin-left: 4px;">▼</span>`;
+            
+            // Update main button style based on selection
+            if (currentAIMode && currentAIMode !== 'hybrid') {
+                mainButton.style.background = 'rgba(0, 255, 136, 0.2)';
+                mainButton.style.borderColor = 'rgba(0, 255, 136, 0.5)';
+                mainButton.style.color = 'var(--success-color)';
+            } else {
+                mainButton.style.background = 'rgba(0, 245, 255, 0.1)';
+                mainButton.style.borderColor = 'rgba(0, 245, 255, 0.3)';
+                mainButton.style.color = 'var(--text-secondary)';
+            }
+            
+            // Update menu items
+            menuItems.forEach(item => {
+                const mode = item.getAttribute('data-mode');
+                
+                if (mode === currentAIMode) {
+                    item.style.backgroundColor = 'rgba(0, 212, 255, 0.3)';
+                    item.style.borderLeftColor = 'var(--accent-color)';
+                } else {
+                    item.style.backgroundColor = 'transparent';
+                    item.style.borderLeftColor = 'transparent';
+                }
+                
+                // Handle Chrome AI availability
+                if (mode === 'chrome' && !chromeAIAvailable) {
+                    item.style.opacity = '0.5';
+                    item.style.cursor = 'not-allowed';
+                    const label = item.querySelector('div:first-child');
+                    if (label) {
+                        label.textContent = t('aiModeChrome') + ' (N/A)';
+                    }
+                } else {
+                    item.style.opacity = '1';
+                    item.style.cursor = 'pointer';
+                }
+            });
+        }
+        
+        function showAIDownloadProgress(progress) {
+            // Show download progress for Chrome AI model
+            const existingProgress = document.getElementById('ai-download-progress');
+            if (existingProgress) {
+                existingProgress.remove();
+            }
+            
+            if (progress >= 100) return;
+            
+            const progressContainer = document.createElement('div');
+            progressContainer.id = 'ai-download-progress';
+            progressContainer.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: rgba(0,0,0,0.8);
+                color: white;
+                padding: 12px 16px;
+                border-radius: 8px;
+                backdrop-filter: blur(10px);
+                z-index: 1000;
+                font-size: 14px;
+                min-width: 250px;
+            `;
+            
+            progressContainer.innerHTML = `
+                <div style="margin-bottom: 8px;">🧠 Downloading Chrome AI Model...</div>
+                <div style="width: 100%; height: 4px; background: rgba(255,255,255,0.3); border-radius: 2px; overflow: hidden;">
+                    <div style="width: ${progress}%; height: 100%; background: linear-gradient(90deg, #4CAF50, #8BC34A); transition: width 0.3s ease;"></div>
+                </div>
+                <div style="margin-top: 4px; font-size: 12px; text-align: center;">${Math.round(progress)}%</div>
+            `;
+            
+            document.body.appendChild(progressContainer);
+            
+            if (progress >= 100) {
+                setTimeout(() => {
+                    progressContainer.remove();
+                    showNotification('✅ Chrome AI Model ready!', 'success');
+                }, 1000);
+            }
+        }
+        
+        async function sendMessageWithChromeAI(message) {
+            try {
+                if (!chromeAI || !chromeAIAvailable) {
+                    throw new Error('Chrome AI not available');
+                }
+                
+                // Show initialization message on first use
+                if (!chromeAI.promptSession) {
+                    showNotification('🚀 Activando Chrome AI...', 'info');
+                }
+                
+                // Get current language
+                const currentLang = getCurrentLanguage();
+                
+                // Try non-streaming first for better reliability
+                console.log('🧠 Sending message to Chrome AI:', message);
+                
+                try {
+                    const response = await chromeAI.prompt(message, { 
+                        streaming: false,
+                        language: currentLang
+                    });
+                    
+                    console.log('🧠 Chrome AI response received:', response);
+                    
+                    if (response) {
+                        addMessage(response, 'bot');
+                        return response;
+                    }
+                    
+                    throw new Error('No response from Chrome AI');
+                    
+                } catch (streamError) {
+                    console.warn('Non-streaming failed, fallback not needed:', streamError);
+                    throw streamError; // Don't try streaming fallback to avoid duplication
+                }
+                
+            } catch (error) {
+                console.error('Chrome AI error:', error);
+                throw error;
+            }
+        }
+        
+        function shouldUseChromeAI(message) {
+            // Smart routing logic based on message complexity and AI mode
+            switch (currentAIMode) {
+                case 'chrome':
+                    return chromeAIAvailable;
+                case 'server':
+                    return false;
+                case 'hybrid':
+                    // Optimized: More aggressive Chrome AI usage for speed
+                    if (!chromeAIAvailable) return false;
+                    
+                    // Use Chrome AI for most queries (faster decision)
+                    const shouldUseCloud = message.length > 300 || 
+                                         message.includes('imagen') || 
+                                         message.includes('image') ||
+                                         message.includes('analiza') ||
+                                         message.includes('analyze') ||
+                                         message.includes('código') ||
+                                         message.includes('code') ||
+                                         message.includes('programm');
+                    
+                    return !shouldUseCloud; // Default to Chrome AI unless complex
+                default:
+                    return false;
+            }
+        }
+        
         // === ENVÍO DE MENSAJES OPTIMIZADO ===
+        let isProcessingMessage = false; // Flag to prevent duplicate processing
+        
         async function sendMessage() {
             const messageInput = getElement('messageInput') || document.getElementById('messageInput');
             const sendButton = getElement('sendButton') || document.getElementById('sendButton');
@@ -938,13 +2907,15 @@
             
             const message = messageInput.value.trim();
             
-            if (!message || isLoading) return;
+            if (!message || isLoading || isProcessingMessage) return;
             
             if (message.length > 1000) {
                 showNotification('El mensaje es demasiado largo (máximo 1000 caracteres)', 'warning');
                 return;
             }
-            
+
+            // Set processing flag
+            isProcessingMessage = true;
             const startTime = performance.now();
             
             // Solo deshabilitar el botón, nunca el input
@@ -957,41 +2928,76 @@
             // Agregar mensaje del usuario
             addMessage(message, 'user');
             messageInput.value = '';
+            autoResizeTextarea(messageInput); // Resetear tamaño del textarea
             updateCharCounter();
             
             // Mostrar indicador de escritura
             showTyping();
             
             try {
-                // Usar AbortController para timeout
-                const controller = new AbortController();
-                const timeoutId = setTimeout(() => controller.abort(), 30000); // 30s timeout
-                
-                // Determinar la URL base (preferir HTTPS)
-                const protocol = window.location.protocol;
-                const host = window.location.host;
-                let apiUrl = '/api/chat/send';
-                
-                // Usar siempre el mismo protocolo que la página
-                // Comentado el intento de actualizar a HTTPS ya que causa problemas
-                /*
-                if (protocol === 'http:' && (host.includes('localhost') || host.includes('127.0.0.1'))) {
-                    // Verificar si HTTPS está disponible
+                // Check if we should use Chrome AI
+                if (shouldUseChromeAI(message)) {
+                    console.log('🧠 Using Chrome Built-in AI for response');
+                    
                     try {
-                        const httpsUrl = `https://${host}/api/chat/send`;
-                        const testResponse = await fetch(httpsUrl, {
-                            method: 'HEAD',
-                            signal: AbortSignal.timeout(2000)
-                        });
-                        if (testResponse.ok || testResponse.status < 500) {
-                            apiUrl = httpsUrl;
-                            console.log('✅ Usando HTTPS para API requests');
+                        const chromeResponse = await sendMessageWithChromeAI(message);
+                        
+                        // Actualizar métricas de rendimiento
+                        const responseTime = performance.now() - startTime;
+                        updateClientMetrics(responseTime);
+                        
+                        hideTyping();
+                        
+                        if (chromeResponse) {
+                            retryCount = 0;
+                            
+                            // Síntesis de voz si está habilitada
+                            if (isVoiceEnabled && 'speechSynthesis' in window) {
+                                speakText(chromeResponse);
+                            }
+                            
+                            // Success with Chrome AI, return early
+                            return;
                         }
-                    } catch (httpsError) {
-                        console.warn('⚠️ HTTPS no disponible, usando HTTP:', httpsError.message);
+                        
+                    } catch (chromeError) {
+                        console.warn('Chrome AI failed, falling back to server:', chromeError);
+                        // Fall through to server AI
                     }
                 }
-                */
+                
+                console.log('☁️ Using Server AI for response');
+                
+                const apiUrl = '/api/chat/send';
+                
+                // Prepare message payload with image context if needed
+                const messagePayload = { 
+                    message: message,
+                    conversation_id: conversationId || 'default',
+                    stream: false,
+                    language: getCurrentLanguage() // Agregar idioma seleccionado
+                };
+                
+                // Add image context if user is asking about an image
+                if (hasImageAnalysisRequest(message) && uploadedImages.length > 0) {
+                    const imageContext = getCurrentImageContext();
+                    if (imageContext) {
+                        messagePayload.image_context = {
+                            has_image: true,
+                            image_name: imageContext.imageName,
+                            image_data: imageContext.imageData,
+                            context_message: t('contextMessage', { 
+                                imageName: imageContext.imageName, 
+                                message: message 
+                            })
+                        };
+                        
+                        // Mark image as analyzed
+                        uploadedImages[currentImageIndex].analyzed = true;
+                        
+                        console.log('🖼️ Including image context in request');
+                    }
+                }
                 
                 const response = await fetch(apiUrl, {
                     method: 'POST',
@@ -999,17 +3005,9 @@
                         'Content-Type': 'application/json',
                         'X-Requested-With': 'XMLHttpRequest'
                     },
-                    body: JSON.stringify({ 
-                        message: message,
-                        conversation_id: conversationId || 'default',
-                        model: 'gemini-pro',
-                        stream: false
-                    }),
-                    signal: controller.signal,
+                    body: JSON.stringify(messagePayload),
                     credentials: 'same-origin'
                 });
-                
-                clearTimeout(timeoutId);
                 
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
@@ -1023,26 +3021,28 @@
                 
                 hideTyping();
                 
-                if (data.success) {
-                    addMessage(data.message, 'bot');
+                // =================== CÓDIGO CORREGIDO ===================
+                if (data.response) {
+                    // Usamos 'data.response' directamente como devuelve nuestra API
+                    addMessage(data.response, 'bot');
                     retryCount = 0; // Reset retry count on success
                     
                     // Síntesis de voz si está habilitada
                     if (isVoiceEnabled && 'speechSynthesis' in window) {
-                        speakText(data.message);
+                        speakText(data.response);
                     }
                 } else {
-                    addMessage('❌ Error: ' + (data.message || 'Error desconocido'), 'bot');
-                    showNotification('Error al enviar el mensaje', 'error');
+                    // Si no hay response, mostramos error
+                    addMessage('❌ Error: ' + (data.message || 'Error desconocido del servidor'), 'bot');
+                    showNotification('Error al procesar el mensaje', 'error');
                 }
+                // =================== FIN DE LA CORRECCIÓN ===================
                 
             } catch (error) {
                 hideTyping();
                 console.error('Error:', error);
                 
-                if (error.name === 'AbortError') {
-                    showNotification('Tiempo de espera agotado. Por favor, inténtalo de nuevo.', 'error');
-                } else if (retryCount < MAX_RETRIES) {
+                if (retryCount < MAX_RETRIES) {
                     retryCount++;
                     showNotification(`Error de conexión. Reintentando... (${retryCount}/${MAX_RETRIES})`, 'warning');
                     setTimeout(() => sendMessage(), RETRY_DELAY * retryCount);
@@ -1055,7 +3055,7 @@
             } finally {
                 // Rehabilitar input y garantizar interactividad
                 isLoading = false;
-                // Forzar input siempre habilitado
+                isProcessingMessage = false; // Reset processing flag
                 if (messageInput) {
                     messageInput.disabled = false;
                     messageInput.focus();
@@ -1112,16 +3112,22 @@
                 
                 console.log('✅ Elementos DOM encontrados correctamente');
                 
-                // 1. Inicializar cache DOM
+                // 1. Inicializar Chrome Built-in AI
+                initializeChromeAI();
+                
+                // 2. Inicializar cache DOM
                 initDOMCache();
                 
-                // 2. Inicializar estilos CSS
+                // 3. Inicializar estilos CSS
                 initializeStyles();
                 
-                // 3. Configurar event listeners
+                
                 setupEventListeners();
                 
-                // 4. Inicializar contadores y UI
+                // 4. Setup drag & drop for images
+                setupDragAndDrop();
+                
+                // 5. Inicializar contadores y UI
                 updateCharCounter();
                 
                 // 5. Agregar mensaje de bienvenida
@@ -1214,28 +3220,81 @@
             }
         }
         
-        function exportChat() {
+        // Exportar chat en formato seleccionado
+        function exportChat(format) {
             if (chatHistory.length === 0) {
                 showNotification('No hay mensajes para exportar', 'warning');
                 return;
             }
-            
             const chatText = chatHistory.map(msg => 
                 `[${new Date(msg.timestamp).toLocaleString('es-ES')}] ${msg.sender.toUpperCase()}: ${msg.text}`
             ).join('\n\n');
-            
-            const blob = new Blob([chatText], { type: 'text/plain' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `chat-gemini-${new Date().toISOString().split('T')[0]}.txt`;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-            
-            showNotification('Chat exportado exitosamente', 'success');
+
+            if (format === 'txt') {
+                const blob = new Blob([chatText], { type: 'text/plain' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `chat-gemini-${new Date().toISOString().split('T')[0]}.txt`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                showNotification('Chat exportado como TXT', 'success');
+            } else if (format === 'md') {
+                // Markdown: Formato simple
+                const mdText = chatHistory.map(msg => 
+                    `**${msg.sender.toUpperCase()}** _${new Date(msg.timestamp).toLocaleString('es-ES')}_\n\n${msg.text}`
+                ).join('\n\n---\n\n');
+                const blob = new Blob([mdText], { type: 'text/markdown' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `chat-gemini-${new Date().toISOString().split('T')[0]}.md`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                showNotification('Chat exportado como Markdown', 'success');
+            } else if (format === 'pdf') {
+                // PDF: Usar jsPDF UMD (window.jspdf.jsPDF)
+                if (window.jspdf && window.jspdf.jsPDF) {
+                    const jsPDF = window.jspdf.jsPDF;
+                    const doc = new jsPDF();
+                    let y = 10;
+                    chatHistory.forEach(msg => {
+                        doc.text(`[${new Date(msg.timestamp).toLocaleString('es-ES')}] ${msg.sender.toUpperCase()}:`, 10, y);
+                        y += 7;
+                        doc.text(msg.text, 12, y);
+                        y += 12;
+                    });
+                    doc.save(`chat-gemini-${new Date().toISOString().split('T')[0]}.pdf`);
+                    showNotification('Chat exportado como PDF', 'success');
+                } else {
+                    showNotification('jsPDF no está disponible. No se puede exportar como PDF.', 'error');
+                }
+            }
         }
+        // Abrir modal de selección de formato
+        document.getElementById('exportChatBtn').addEventListener('click', function() {
+            document.getElementById('exportFormatModal').style.display = 'flex';
+            setTimeout(() => {
+                document.getElementById('exportFormatModal').classList.add('show');
+            }, 10);
+        });
+
+        // Event listeners para botones de formato
+        document.querySelectorAll('.export-format-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const format = btn.getAttribute('data-format');
+                exportChat(format);
+                // Cerrar modal
+                document.getElementById('exportFormatModal').classList.remove('show');
+                setTimeout(() => {
+                    document.getElementById('exportFormatModal').style.display = 'none';
+                }, 300);
+            });
+        });
         
         function toggleVoice() {
             if (!('speechSynthesis' in window)) {
@@ -1243,26 +3302,114 @@
                 return;
             }
             
-            isVoiceEnabled = !isVoiceEnabled;
-            const voiceBtn = document.querySelector('.input-actions .action-btn:nth-child(3)');
-            if (voiceBtn) {
-                voiceBtn.innerHTML = isVoiceEnabled ? '🔊 Voz ON' : '🎤 Voz';
-                voiceBtn.style.background = isVoiceEnabled ? 'rgba(0, 255, 136, 0.2)' : 'rgba(0, 245, 255, 0.1)';
-                voiceBtn.style.borderColor = isVoiceEnabled ? 'rgba(0, 255, 136, 0.5)' : 'rgba(0, 245, 255, 0.3)';
-                voiceBtn.style.color = isVoiceEnabled ? 'var(--success-color)' : 'var(--text-secondary)';
+            if (currentUtterance && speechSynthesis.speaking) {
+                // Si hay audio reproduciéndose
+                if (isPaused) {
+                    // Reanudar
+                    speechSynthesis.resume();
+                    isPaused = false;
+                    updateVoiceButton('playing');
+                    showNotification('Voz reanudada', 'success');
+                } else {
+                    // Pausar
+                    speechSynthesis.pause();
+                    isPaused = true;
+                    updateVoiceButton('paused');
+                    showNotification('Voz pausada', 'info');
+                }
+            } else {
+                // Activar/desactivar voz
+                isVoiceEnabled = !isVoiceEnabled;
+                
+                if (isVoiceEnabled) {
+                    updateVoiceButton('enabled');
+                    showNotification('Síntesis de voz activada', 'success');
+                    
+                    // Si hay texto pendiente, reproducirlo
+                    if (pendingText) {
+                        speakText(pendingText);
+                        pendingText = '';
+                    }
+                } else {
+                    updateVoiceButton('disabled');
+                    // Detener cualquier voz en reproducción
+                    speechSynthesis.cancel();
+                    currentUtterance = null;
+                    isPaused = false;
+                    showNotification('Síntesis de voz desactivada', 'info');
+                }
             }
+        }
+
+        function updateVoiceButton(state) {
+            const voiceBtn = document.querySelector('.input-actions .action-btn:nth-child(3)');
+            if (!voiceBtn) return;
             
-            showNotification(`Síntesis de voz ${isVoiceEnabled ? 'activada' : 'desactivada'}`, 'success');
+            switch(state) {
+                case 'playing':
+                    voiceBtn.innerHTML = '⏸️ Pausar';
+                    voiceBtn.style.background = 'rgba(255, 193, 7, 0.2)';
+                    voiceBtn.style.borderColor = 'rgba(255, 193, 7, 0.5)';
+                    voiceBtn.style.color = '#ffc107';
+                    break;
+                case 'paused':
+                    voiceBtn.innerHTML = '▶️ Continuar';
+                    voiceBtn.style.background = 'rgba(13, 202, 240, 0.2)';
+                    voiceBtn.style.borderColor = 'rgba(13, 202, 240, 0.5)';
+                    voiceBtn.style.color = '#0dcaf0';
+                    break;
+                case 'enabled':
+                    voiceBtn.innerHTML = '🔊 Voz ON';
+                    voiceBtn.style.background = 'rgba(0, 255, 136, 0.2)';
+                    voiceBtn.style.borderColor = 'rgba(0, 255, 136, 0.5)';
+                    voiceBtn.style.color = 'var(--success-color)';
+                    break;
+                case 'disabled':
+                    voiceBtn.innerHTML = '🎤 Voz';
+                    voiceBtn.style.background = 'rgba(0, 245, 255, 0.1)';
+                    voiceBtn.style.borderColor = 'rgba(0, 245, 255, 0.3)';
+                    voiceBtn.style.color = 'var(--text-secondary)';
+                    break;
+            }
         }
         
         function speakText(text) {
-            if ('speechSynthesis' in window) {
-                const utterance = new SpeechSynthesisUtterance(text);
-                utterance.lang = 'es-ES';
-                utterance.rate = 0.9;
-                utterance.pitch = 1;
-                speechSynthesis.speak(utterance);
+            if (!('speechSynthesis' in window)) return;
+            
+            if (!isVoiceEnabled) {
+                // Guardar texto para cuando se active la voz
+                pendingText = text;
+                return;
             }
+            
+            // Cancelar cualquier voz anterior
+            speechSynthesis.cancel();
+            
+            currentUtterance = new SpeechSynthesisUtterance(text);
+            currentUtterance.lang = 'es-ES';
+            currentUtterance.rate = 0.9;
+            currentUtterance.pitch = 1;
+            
+            // Eventos del utterance
+            currentUtterance.onstart = function() {
+                isPaused = false;
+                updateVoiceButton('playing');
+            };
+            
+            currentUtterance.onend = function() {
+                currentUtterance = null;
+                isPaused = false;
+                updateVoiceButton('enabled');
+            };
+            
+            currentUtterance.onerror = function() {
+                currentUtterance = null;
+                isPaused = false;
+                updateVoiceButton('enabled');
+                showNotification('Error en la síntesis de voz', 'error');
+            };
+            
+            speechSynthesis.speak(currentUtterance);
         }
         
         function showNotification(message, type = 'info') {
@@ -1360,24 +3507,64 @@
         function processImageFile(file) {
             const reader = new FileReader();
             reader.onload = function(e) {
+                // Store image in context for future analysis
+                const imageData = {
+                    id: Date.now() + Math.random(), // Unique ID
+                    name: file.name,
+                    size: file.size,
+                    type: file.type,
+                    dataUrl: e.target.result,
+                    uploadedAt: new Date(),
+                    analyzed: false
+                };
+                
+                uploadedImages.push(imageData);
+                currentImageIndex = uploadedImages.length - 1;
+                
+                // Create image preview
                 const img = document.createElement('img');
                 img.src = e.target.result;
                 img.style.maxWidth = '200px';
                 img.style.maxHeight = '200px';
                 img.style.borderRadius = '8px';
                 img.style.marginTop = '8px';
+                img.style.cursor = 'pointer';
+                img.title = 'Click to view full size';
+                
+                // Add click event to view full size
+                img.onclick = () => {
+                    const fullSizeWindow = window.open('', '_blank');
+                    fullSizeWindow.document.write(`
+                        <html>
+                            <head><title>${file.name}</title></head>
+                            <body style="margin:0;display:flex;justify-content:center;align-items:center;min-height:100vh;background:#1a1a2e;">
+                                <img src="${e.target.result}" style="max-width:100%;max-height:100%;object-fit:contain;">
+                            </body>
+                        </html>
+                    `);
+                };
                 
                 const messageDiv = document.createElement('div');
                 messageDiv.className = 'message bot';
                 
                 const avatar = document.createElement('div');
                 avatar.className = 'message-avatar';
-                avatar.innerHTML = '🤖';
+                avatar.innerHTML = customization.currentAvatar || '🤖';
                 
                 const contentWrapper = document.createElement('div');
                 const content = document.createElement('div');
                 content.className = 'message-content';
-                content.innerHTML = `🖼️ Imagen recibida: ${file.name}`;
+                
+                // Enhanced message with context info
+                content.innerHTML = `
+                    🖼️ <strong>${t('imageUploaded')}:</strong> ${file.name}<br>
+                    📊 <em>Tamaño:</em> ${formatFileSize(file.size)}<br>
+                    🎯 <strong>Ahora puedes:</strong><br>
+                    • Escribir "analiza la imagen" o "describe la imagen"<br>
+                    • Escribir "¿qué ves en la imagen?"<br>
+                    • Hacer preguntas específicas sobre el contenido<br>
+                    <small style="color: #00d4ff;">💡 Esta imagen queda en el contexto de la conversación</small>
+                `;
                 content.appendChild(img);
                 
                 const timeDiv = document.createElement('div');
@@ -1394,8 +3581,100 @@
                 
                 messagesContainer.appendChild(messageDiv);
                 messagesContainer.scrollTop = messagesContainer.scrollHeight;
+                
+                // Show quick action buttons
+                addImageAnalysisButtons(imageData.id);
             };
             reader.readAsDataURL(file);
+        }
+        
+        // Add quick analysis buttons for uploaded images
+        function addImageAnalysisButtons(imageId) {
+            const buttonsContainer = document.createElement('div');
+            buttonsContainer.className = 'image-analysis-buttons';
+            buttonsContainer.style.cssText = `
+                display: flex;
+                flex-wrap: wrap;
+                gap: 8px;
+                margin-top: 12px;
+                padding: 12px;
+                background: rgba(0, 212, 255, 0.1);
+                border-radius: 8px;
+                border-left: 3px solid var(--accent-color);
+            `;
+            
+            const buttons = [
+                { text: t('analyzeButton'), action: t('analyzePrompt') },
+                { text: t('describeButton'), action: t('describePrompt') },
+                { text: t('colorsButton'), action: t('colorsPrompt') },
+                { text: t('textButton'), action: t('textPrompt') },
+                { text: t('interpretButton'), action: t('interpretPrompt') }
+            ];
+            
+            buttons.forEach(btn => {
+                const button = document.createElement('button');
+                button.textContent = btn.text;
+                button.style.cssText = `
+                    background: linear-gradient(135deg, var(--accent-color), var(--accent-color-dark));
+                    border: none;
+                    border-radius: 6px;
+                    color: white;
+                    padding: 6px 12px;
+                    font-size: 12px;
+                    cursor: pointer;
+                    transition: all 0.3s ease;
+                    flex: 1;
+                    min-width: 80px;
+                `;
+                
+                button.onmouseover = () => {
+                    button.style.transform = 'translateY(-2px)';
+                    button.style.boxShadow = '0 4px 12px rgba(0, 212, 255, 0.4)';
+                };
+                
+                button.onmouseout = () => {
+                    button.style.transform = 'translateY(0)';
+                    button.style.boxShadow = 'none';
+                };
+                
+                button.onclick = () => {
+                    // Auto-send the analysis request
+                    messageInput.value = btn.action;
+                    sendMessage();
+                };
+                
+                buttonsContainer.appendChild(button);
+            });
+            
+            messagesContainer.appendChild(buttonsContainer);
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+        
+        // Enhanced message detection for image analysis
+        function hasImageAnalysisRequest(message) {
+            const imageKeywords = [
+                'analiza', 'describe', 'imagen', 'foto', 'picture', 'analyze', 'describe',
+                '¿qué ves', 'what do you see', 'explica', 'explain', 'interpreta', 'interpret',
+                'colores', 'colors', 'texto', 'text', 'lee', 'read', 'contenido', 'content'
+            ];
+            
+            return imageKeywords.some(keyword => 
+                message.toLowerCase().includes(keyword.toLowerCase())
+            );
+        }
+        
+        // Get current image context for AI processing
+        function getCurrentImageContext() {
+            if (uploadedImages.length === 0) return null;
+            
+            const currentImage = uploadedImages[currentImageIndex];
+            return {
+                hasImage: true,
+                imageName: currentImage.name,
+                imageData: currentImage.dataUrl,
+                imageId: currentImage.id,
+                uploadedAt: currentImage.uploadedAt
+            };
         }
         
         function formatFileSize(bytes) {
@@ -1411,7 +3690,10 @@
             try {
                 // Event Listeners para input
                 if (messageInput) {
-                    messageInput.addEventListener('input', updateCharCounter);
+                    messageInput.addEventListener('input', function() {
+                        updateCharCounter();
+                        autoResizeTextarea(messageInput);
+                    });
                     
                     messageInput.addEventListener('keypress', function(e) {
                         if (e.key === 'Enter' && !e.shiftKey) {
@@ -1419,6 +3701,9 @@
                             sendMessage();
                         }
                     });
+                    
+                    // Inicializar altura del textarea
+                    autoResizeTextarea(messageInput);
                     
                     // Focus inicial
                     messageInput.focus();
@@ -1440,6 +3725,9 @@
                         e.target.value = '';
                     });
                 }
+                
+                // Setup drag and drop functionality
+                setupDragAndDrop();
                 
                 // Event listeners para botones de acción
                 const actionButtons = document.querySelectorAll('.action-btn');
@@ -1918,6 +4206,82 @@
             }
         });
 
+        // Función para actualizar textos de botones de análisis cuando cambia el idioma
+        function updateImageAnalysisButtons() {
+            // Update image analysis buttons
+            const analysisButtons = document.querySelectorAll('.image-analysis-buttons button');
+            if (analysisButtons.length > 0) {
+                const buttonTexts = [
+                    t('analyzeButton'),
+                    t('describeButton'),
+                    t('colorsButton'),
+                    t('textButton'),
+                    t('interpretButton')
+                ];
+                
+                const buttonActions = [
+                    t('analyzePrompt'),
+                    t('describePrompt'),
+                    t('colorsPrompt'),
+                    t('textPrompt'),
+                    t('interpretPrompt')
+                ];
+                
+                analysisButtons.forEach((button, index) => {
+                    if (index < buttonTexts.length) {
+                        button.textContent = buttonTexts[index];
+                        // Actualizar también el action del onclick
+                        button.onclick = function() {
+                            const messageInput = document.getElementById('messageInput');
+                            if (messageInput) {
+                                messageInput.value = buttonActions[index];
+                                sendMessage();
+                            }
+                        };
+                    }
+                });
+            }
+            
+            // Update AI mode display
+            updateAIModeDisplay();
+        }
+        
+        // Function to update AI mode dropdown texts when language changes
+        function updateAIModeDropdownTexts() {
+            const menuItems = document.querySelectorAll('.ai-mode-menu-item');
+            
+            const options = [
+                {
+                    mode: 'hybrid',
+                    label: t('aiModeHybrid'),
+                    description: getCurrentLanguage() === 'es' ? 'Selección inteligente automática' : 'Smart automatic selection'
+                },
+                {
+                    mode: 'server',
+                    label: t('aiModeServer'),
+                    description: getCurrentLanguage() === 'es' ? 'Gemini avanzado en la nube' : 'Advanced Gemini in the cloud'
+                },
+                {
+                    mode: 'chrome',
+                    label: t('aiModeChrome'),
+                    description: getCurrentLanguage() === 'es' ? 'Procesamiento local privado' : 'Private local processing'
+                }
+            ];
+            
+            menuItems.forEach((item, index) => {
+                if (index < options.length) {
+                    const option = options[index];
+                    item.innerHTML = `
+                        <div style="font-weight: bold; margin-bottom: 2px;">${option.label}</div>
+                        <div style="font-size: 11px; color: rgba(255,255,255,0.7);">${option.description}</div>
+                    `;
+                }
+            });
+            
+            // Update main button text and labels
+            updateAIModeDisplay();
+        }
+
         // Internacionalización básica con botones
         function setupLanguageButtons() {
             const langButtons = document.querySelectorAll('.lang-btn');
@@ -1937,6 +4301,12 @@
                     this.style.background = 'rgba(0, 255, 136, 0.2)';
                     this.style.borderColor = 'rgba(0, 255, 136, 0.5)';
                     this.style.color = 'var(--success-color)';
+                    
+                    // Actualizar textos de botones de análisis de imagen existentes
+                    updateImageAnalysisButtons();
+                    
+                    // Actualizar textos del dropdown de AI mode
+                    updateAIModeDropdownTexts();
                     
                     showNotification(`Idioma cambiado a ${lang === 'es' ? 'Español' : 'English'}`, 'success');
                 });
@@ -1958,6 +4328,590 @@
         // Para ejecutar pruebas, usar los comandos específicos desde la terminal
     </script>
     
+    <!-- Sistema de Personalización -->
+    <script>
+        // Configuración de personalización
+        const customization = {
+            currentTheme: localStorage.getItem('chatTheme') || 'default',
+            currentFontSize: localStorage.getItem('chatFontSize') || 'medium',
+            currentAvatar: localStorage.getItem('chatAvatar') || '🤖'
+        };
+
+        // Temas disponibles
+        const themes = {
+            default: {
+                '--bg-color': '#1a1a2e',
+                '--text-color': '#ffffff',
+                '--accent-color': '#667eea',
+                '--border-color': '#333366',
+                '--hover-bg': '#2a2a3e',
+                '--accent-color-rgb': '102, 126, 234'
+            },
+            cyberpunk: {
+                '--bg-color': '#0a0a0a',
+                '--text-color': '#ff006e',
+                '--accent-color': '#00f5ff',
+                '--border-color': '#ff006e',
+                '--hover-bg': '#1a0a1a',
+                '--accent-color-rgb': '0, 245, 255'
+            },
+            'neon-green': {
+                '--bg-color': '#001100',
+                '--text-color': '#39ff14',
+                '--accent-color': '#00ff88',
+                '--border-color': '#39ff14',
+                '--hover-bg': '#002200',
+                '--accent-color-rgb': '0, 255, 136'
+            },
+            sunset: {
+                '--bg-color': '#2d1b0e',
+                '--text-color': '#ffffff',
+                '--accent-color': '#ff6b35',
+                '--border-color': '#f7931e',
+                '--hover-bg': '#3d2b1e',
+                '--accent-color-rgb': '255, 107, 53'
+            },
+            'purple-rain': {
+                '--bg-color': '#1a1a2e',
+                '--text-color': '#ffffff',
+                '--accent-color': '#667eea',
+                '--border-color': '#764ba2',
+                '--hover-bg': '#2a2a3e',
+                '--accent-color-rgb': '102, 126, 234'
+            }
+        };
+
+        // Aplicar tema
+        function applyTheme(themeName) {
+            const theme = themes[themeName];
+            if (theme) {
+                console.log(`🎨 Aplicando tema: ${themeName}`);
+                Object.entries(theme).forEach(([property, value]) => {
+                    console.log(`   ${property}: ${value}`);
+                    document.documentElement.style.setProperty(property, value);
+                });
+                customization.currentTheme = themeName;
+                localStorage.setItem('chatTheme', themeName);
+                updateActiveButtons();
+                console.log('✅ Tema aplicado correctamente');
+            } else {
+                console.error(`❌ Tema no encontrado: ${themeName}`);
+            }
+        }
+
+        // Aplicar tamaño de fuente
+        function applyFontSize(size) {
+            const sizes = {
+                small: '0.85rem',
+                medium: '1rem',
+                large: '1.15rem'
+            };
+            const fontSize = sizes[size];
+            if (fontSize) {
+                console.log(`📝 Aplicando tamaño de fuente: ${size} (${fontSize})`);
+                document.documentElement.style.setProperty('--base-font-size', fontSize);
+                customization.currentFontSize = size;
+                localStorage.setItem('chatFontSize', size);
+                updateActiveButtons();
+                console.log('✅ Tamaño de fuente aplicado correctamente');
+            } else {
+                console.error(`❌ Tamaño de fuente no encontrado: ${size}`);
+            }
+        }
+
+        // Aplicar avatar
+        function applyAvatar(avatar) {
+            console.log(`🤖 Aplicando avatar: ${avatar}`);
+            customization.currentAvatar = avatar;
+            localStorage.setItem('chatAvatar', avatar);
+            
+            // Actualizar todos los avatares del bot en la interfaz existente
+            const existingAvatars = document.querySelectorAll('.message.bot .message-avatar');
+            console.log(`   Encontrados ${existingAvatars.length} avatares existentes`);
+            existingAvatars.forEach(el => {
+                el.textContent = avatar;
+            });
+            
+            // También actualizar la variable CSS para futuros mensajes
+            document.documentElement.style.setProperty('--current-bot-avatar', `'${avatar}'`);
+            
+            updateActiveButtons();
+            console.log('✅ Avatar aplicado correctamente');
+        }
+
+        // Actualizar botones activos
+        function updateActiveButtons() {
+            // Temas
+            document.querySelectorAll('.theme-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.theme === customization.currentTheme);
+            });
+            // Fuentes
+            document.querySelectorAll('.font-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.size === customization.currentFontSize);
+            });
+            // Avatares
+            document.querySelectorAll('.avatar-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.avatar === customization.currentAvatar);
+            });
+        }
+
+        // Funciones de animación del modal
+        function openModal() {
+            const modal = document.getElementById('customizeModal');
+            modal.style.display = 'flex';
+            
+            // Forzar reflow para que la animación funcione
+            modal.offsetHeight;
+            
+            // Añadir clase show para activar animaciones
+            requestAnimationFrame(() => {
+                modal.classList.add('show');
+            });
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('customizeModal');
+            modal.classList.remove('show');
+            
+            // Esperar a que termine la animación antes de ocultar
+            setTimeout(() => {
+                modal.style.display = 'none';
+            }, 300);
+        }
+
+        // Función para aplicar tema con animación
+        function applyThemeWithAnimation(themeName) {
+            const body = document.body;
+            body.classList.add('theme-changing');
+            
+            // Aplicar el tema después de un pequeño delay para mostrar el loading
+            setTimeout(() => {
+                applyTheme(themeName);
+                
+                // Remover el indicador de carga después de que termine la transición
+                setTimeout(() => {
+                    body.classList.remove('theme-changing');
+                }, 400);
+            }, 100);
+        }
+
+        // Función para feedback visual en botones
+        function addButtonFeedback(button, callback) {
+            button.addEventListener('click', (e) => {
+                // Crear efecto ripple
+                const rect = button.getBoundingClientRect();
+                const ripple = document.createElement('span');
+                const size = Math.max(rect.width, rect.height);
+                const x = e.clientX - rect.left - size / 2;
+                const y = e.clientY - rect.top - size / 2;
+                
+                ripple.style.cssText = `
+                    position: absolute;
+                    width: ${size}px;
+                    height: ${size}px;
+                    left: ${x}px;
+                    top: ${y}px;
+                    background: rgba(255, 255, 255, 0.3);
+                    border-radius: 50%;
+                    transform: scale(0);
+                    animation: ripple-effect 0.6s ease-out;
+                    pointer-events: none;
+                `;
+                
+                button.style.position = 'relative';
+                button.style.overflow = 'hidden';
+                button.appendChild(ripple);
+                
+                // Ejecutar callback después del feedback visual
+                setTimeout(() => {
+                    if (callback) callback();
+                    setTimeout(() => ripple.remove(), 600);
+                }, 150);
+            });
+        }
+
+        // Inicializar personalización
+        function initCustomization() {
+            // Aplicar configuración guardada
+            applyTheme(customization.currentTheme);
+            applyFontSize(customization.currentFontSize);
+            applyAvatar(customization.currentAvatar);
+
+            // Event listeners con animaciones suaves
+            document.querySelector('.customize-btn').addEventListener('click', () => {
+                openModal();
+                updateActiveButtons();
+            });
+
+            document.querySelector('.close-modal').addEventListener('click', () => {
+                closeModal();
+            });
+
+            // Cerrar modal al hacer click fuera
+            document.getElementById('customizeModal').addEventListener('click', (e) => {
+                if (e.target === document.getElementById('customizeModal')) {
+                    closeModal();
+                }
+            });
+
+            // Event listeners para temas con animación
+            document.querySelectorAll('.theme-btn').forEach(btn => {
+                addButtonFeedback(btn, () => {
+                    applyThemeWithAnimation(btn.dataset.theme);
+                });
+            });
+
+            // Event listeners para fuentes con animación
+            document.querySelectorAll('.font-btn').forEach(btn => {
+                addButtonFeedback(btn, () => {
+                    applyFontSize(btn.dataset.size);
+                });
+            });
+
+            // Event listeners para avatares con animación
+            document.querySelectorAll('.avatar-btn').forEach(btn => {
+                addButtonFeedback(btn, () => {
+                    applyAvatar(btn.dataset.avatar);
+                });
+            });
+        }
+
+        // Inicializar cuando el DOM esté listo
+        document.addEventListener('DOMContentLoaded', initCustomization);
+    </script>
+
+    <!-- Sistema de Chrome AI Extendido -->
+    <script>
+        // Variables globales para Chrome AI Extendido
+        let chromeAIExtended = null;
+        let aiCapabilities = {};
+
+        // Inicializar Chrome AI al cargar la página
+        document.addEventListener('DOMContentLoaded', async () => {
+            // Mostrar botones por defecto
+            updateAIButtonsVisibility();
+            
+            // Configurar event listeners de inmediato
+            setupAIEventListeners();
+            
+            // Intentar inicializar Chrome AI Manager
+            await initializeChromeAIExtended();
+        });
+
+        // Función para inicializar Chrome AI de forma asíncrona
+        async function initializeChromeAIExtended() {
+            try {
+                // Esperar a que ChromeAIManager esté disponible
+                let attempts = 0;
+                const maxAttempts = 50; // 5 segundos máximo
+                
+                while (!window.ChromeAIManager && attempts < maxAttempts) {
+                    await new Promise(resolve => setTimeout(resolve, 100));
+                    attempts++;
+                }
+                
+                if (window.ChromeAIManager) {
+                    chromeAIExtended = new ChromeAIManager();
+                    const initialized = await chromeAIExtended.initialize();
+                    aiCapabilities = chromeAIExtended.capabilities || {};
+                    
+                    console.log('🧠 Chrome AI Capabilities:', aiCapabilities);
+                    
+                    // Actualizar visibilidad con las capacidades reales
+                    updateAIButtonsVisibility();
+                } else {
+                    console.log('⚠️ ChromeAIManager no disponible, manteniendo botones visibles como fallback');
+                    // Mantener botones visibles como fallback
+                    aiCapabilities = {
+                        writer: true,
+                        proofreader: true,
+                        translator: true
+                    };
+                }
+            } catch (error) {
+                console.error('Error inicializando Chrome AI:', error);
+                // En caso de error, mantener botones visibles
+                aiCapabilities = {
+                    writer: true,
+                    proofreader: true,
+                    translator: true
+                };
+            }
+        }
+
+        // Configurar event listeners para modales de IA
+        function setupAIEventListeners() {
+            // Botones para abrir modales (ahora desde el modal de personalización)
+            const writerBtn = document.querySelector('.ai-writer-btn');
+            const correctorBtn = document.querySelector('.ai-corrector-btn');
+            const translatorBtn = document.querySelector('.ai-translator-btn');
+            
+            // Event listeners para abrir modales AI
+            writerBtn?.addEventListener('click', () => {
+                closeModal(); // Cerrar modal de personalización primero
+                setTimeout(() => openAIModal('writerModal'), 300); // Pequeño delay para la transición
+            });
+            correctorBtn?.addEventListener('click', () => {
+                closeModal();
+                setTimeout(() => openAIModal('correctorModal'), 300);
+            });
+            translatorBtn?.addEventListener('click', () => {
+                closeModal();
+                setTimeout(() => openAIModal('translatorModal'), 300);
+            });
+
+            // Botones para cerrar modales
+            document.querySelectorAll('.close-ai-modal').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const modalId = e.target.getAttribute('data-modal');
+                    closeAIModal(modalId);
+                });
+            });
+
+            // Cerrar modal al hacer click fuera
+            document.querySelectorAll('.ai-modal').forEach(modal => {
+                modal.addEventListener('click', (e) => {
+                    if (e.target === modal) {
+                        closeAIModal(modal.id);
+                    }
+                });
+            });
+        }
+
+        // Abrir modal de IA con animación
+        function openAIModal(modalId) {
+            const modal = document.getElementById(modalId);
+            if (modal) {
+                modal.style.display = 'flex';
+                requestAnimationFrame(() => {
+                    modal.classList.add('show');
+                });
+            }
+        }
+
+        // Cerrar modal de IA con animación
+        function closeAIModal(modalId) {
+            const modal = document.getElementById(modalId);
+            if (modal) {
+                modal.classList.remove('show');
+                setTimeout(() => {
+                    modal.style.display = 'none';
+                }, 300);
+            }
+        }
+
+        // Actualizar visibilidad de botones según capacidades
+        function updateAIButtonsVisibility() {
+            const writerBtn = document.querySelector('.ai-writer-btn');
+            const correctorBtn = document.querySelector('.ai-corrector-btn');
+            const translatorBtn = document.querySelector('.ai-translator-btn');
+
+            // Mostrar botones por defecto - solo ocultar si específicamente no están disponibles
+            if (writerBtn) {
+                const shouldShow = (aiCapabilities.writer !== false);
+                writerBtn.style.display = shouldShow ? 'flex' : 'none';
+            }
+            if (correctorBtn) {
+                const shouldShow = (aiCapabilities.proofreader !== false);
+                correctorBtn.style.display = shouldShow ? 'flex' : 'none';
+            }
+            if (translatorBtn) {
+                const shouldShow = (aiCapabilities.translator !== false);
+                translatorBtn.style.display = shouldShow ? 'flex' : 'none';
+            }
+        }
+
+        // === ESCRITOR AI ===
+        async function generateText() {
+            const prompt = document.getElementById('writerPrompt').value.trim();
+            const tone = document.getElementById('writerTone').value;
+            const length = document.getElementById('writerLength').value;
+            const outputDiv = document.getElementById('writerOutput');
+            const resultDiv = document.getElementById('writerResult');
+
+            if (!prompt) {
+                alert('Por favor, describe lo que quieres escribir.');
+                return;
+            }
+
+            if (!aiCapabilities.writer) {
+                alert('Writer API no está disponible en este navegador.');
+                return;
+            }
+
+            try {
+                // Mostrar loading
+                outputDiv.innerHTML = '<div class="ai-loading">Generando texto...</div>';
+                resultDiv.style.display = 'block';
+
+                // Crear prompt completo
+                const fullPrompt = `Escribe un texto ${tone} de longitud ${length} sobre: ${prompt}`;
+
+                // Usar Chrome AI Writer
+                const result = await chromeAIExtended.write(fullPrompt, {
+                    tone: tone,
+                    length: length
+                });
+
+                // Mostrar resultado
+                outputDiv.textContent = result;
+
+            } catch (error) {
+                console.error('Error generating text:', error);
+                outputDiv.innerHTML = '<div style="color: var(--error-color);">Error al generar el texto. Inténtalo de nuevo.</div>';
+            }
+        }
+
+        function clearWriter() {
+            document.getElementById('writerPrompt').value = '';
+            document.getElementById('writerResult').style.display = 'none';
+        }
+
+        // === CORRECTOR ===
+        async function correctText() {
+            const text = document.getElementById('correctorText').value.trim();
+            const outputDiv = document.getElementById('correctorOutput');
+            const resultDiv = document.getElementById('correctorResult');
+
+            if (!text) {
+                alert('Por favor, introduce el texto que quieres corregir.');
+                return;
+            }
+
+            if (!aiCapabilities.proofreader) {
+                alert('Proofreader API no está disponible en este navegador.');
+                return;
+            }
+
+            try {
+                // Mostrar loading
+                outputDiv.innerHTML = '<div class="ai-loading">Corrigiendo texto...</div>';
+                resultDiv.style.display = 'block';
+
+                // Usar Chrome AI Proofreader
+                const result = await chromeAIExtended.proofread(text);
+
+                // Mostrar resultado
+                outputDiv.textContent = result;
+
+            } catch (error) {
+                console.error('Error correcting text:', error);
+                outputDiv.innerHTML = '<div style="color: var(--error-color);">Error al corregir el texto. Inténtalo de nuevo.</div>';
+            }
+        }
+
+        function clearCorrector() {
+            document.getElementById('correctorText').value = '';
+            document.getElementById('correctorResult').style.display = 'none';
+        }
+
+        // === TRADUCTOR ===
+        async function translateText() {
+            const text = document.getElementById('translatorText').value.trim();
+            const sourceLang = document.getElementById('sourceLang').value;
+            const targetLang = document.getElementById('targetLang').value;
+            const outputDiv = document.getElementById('translatorOutput');
+            const resultDiv = document.getElementById('translatorResult');
+
+            if (!text) {
+                alert('Por favor, introduce el texto que quieres traducir.');
+                return;
+            }
+
+            if (sourceLang === targetLang && sourceLang !== 'auto') {
+                alert('Por favor, selecciona idiomas diferentes.');
+                return;
+            }
+
+            if (!aiCapabilities.translator) {
+                alert('Translator API no está disponible en este navegador.');
+                return;
+            }
+
+            try {
+                // Mostrar loading
+                outputDiv.innerHTML = '<div class="ai-loading">Traduciendo...</div>';
+                resultDiv.style.display = 'block';
+
+                // Usar Chrome AI Translator
+                const result = await chromeAIExtended.translate(text, sourceLang, targetLang);
+
+                // Mostrar resultado
+                outputDiv.textContent = result;
+
+            } catch (error) {
+                console.error('Error translating text:', error);
+                outputDiv.innerHTML = '<div style="color: var(--error-color);">Error al traducir el texto. Inténtalo de nuevo.</div>';
+            }
+        }
+
+        function swapLanguages() {
+            const sourceLang = document.getElementById('sourceLang');
+            const targetLang = document.getElementById('targetLang');
+            
+            if (sourceLang.value !== 'auto') {
+                const temp = sourceLang.value;
+                sourceLang.value = targetLang.value;
+                targetLang.value = temp;
+            }
+        }
+
+        function clearTranslator() {
+            document.getElementById('translatorText').value = '';
+            document.getElementById('translatorResult').style.display = 'none';
+        }
+
+        // === UTILIDADES COMUNES ===
+        function copyToClipboard(elementId) {
+            const element = document.getElementById(elementId);
+            const text = element.textContent;
+            
+            navigator.clipboard.writeText(text).then(() => {
+                // Feedback visual
+                const button = event.target;
+                const originalText = button.textContent;
+                button.textContent = '✅ ¡Copiado!';
+                button.style.background = 'var(--success-color)';
+                
+                setTimeout(() => {
+                    button.textContent = originalText;
+                    button.style.background = '';
+                }, 2000);
+            }).catch(err => {
+                console.error('Error copying to clipboard:', err);
+                alert('Error al copiar al portapapeles');
+            });
+        }
+
+        function insertToChat(elementId) {
+            const element = document.getElementById(elementId);
+            const text = element.textContent;
+            const messageInput = document.getElementById('messageInput');
+            
+            if (messageInput) {
+                messageInput.value = text;
+                messageInput.focus();
+                
+                // Cerrar el modal
+                const modal = element.closest('.ai-modal');
+                if (modal) {
+                    closeAIModal(modal.id);
+                }
+                
+                // Feedback visual
+                const button = event.target;
+                const originalText = button.textContent;
+                button.textContent = '✅ ¡Enviado!';
+                button.style.background = 'var(--success-color)';
+                
+                setTimeout(() => {
+                    button.textContent = originalText;
+                    button.style.background = '';
+                }, 2000);
+            }
+        }
+    </script>
+
     <!-- Scripts de desarrollo (solo se cargan en entorno local) -->
     <script>
         // Verificar si estamos en entorno de desarrollo
@@ -1986,6 +4940,254 @@
             // Habilitar herramientas de desarrollo
             enableDevTools();
         }
+    </script>
+    
+    <!-- Modal de Personalización -->
+    <div id="customizeModal" class="customize-modal" style="display: none;">
+        <div class="customize-modal-content">
+            <div class="customize-modal-header">
+                <h3>⚙️ Personalizar Interfaz</h3>
+                <button class="close-modal" aria-label="Cerrar personalización">&times;</button>
+            </div>
+            <div class="customize-modal-body">
+                <!-- Temas de Color -->
+                <div class="customize-section">
+                    <h4>🎨 Tema de Color</h4>
+                    <div class="theme-options">
+                        <button class="theme-btn" data-theme="cyberpunk" style="background: linear-gradient(45deg, #ff006e, #00f5ff);">Cyberpunk</button>
+                        <button class="theme-btn" data-theme="neon-green" style="background: linear-gradient(45deg, #39ff14, #00ff88);">Neon Verde</button>
+                        <button class="theme-btn" data-theme="sunset" style="background: linear-gradient(45deg, #ff6b35, #f7931e);">Atardecer</button>
+                        <button class="theme-btn" data-theme="purple-rain" style="background: linear-gradient(45deg, #667eea, #764ba2);">Lluvia Púrpura</button>
+                        <button class="theme-btn" data-theme="default" style="background: linear-gradient(45deg, #667eea, #764ba2);">Original</button>
+                    </div>
+                </div>
+                
+                <!-- Tamaño de Fuente -->
+                <div class="customize-section">
+                    <h4>📝 Tamaño de Fuente</h4>
+                    <div class="font-size-controls">
+                        <button class="font-btn" data-size="small">Pequeño</button>
+                        <button class="font-btn" data-size="medium">Mediano</button>
+                        <button class="font-btn" data-size="large">Grande</button>
+                    </div>
+                </div>
+                
+                <!-- Avatar del Bot -->
+                <div class="customize-section">
+                    <h4>🤖 Avatar del Bot</h4>
+                    <div class="avatar-options">
+                        <button class="avatar-btn" data-avatar="🤖">🤖 Robot</button>
+                        <button class="avatar-btn" data-avatar="🧠">🧠 Cerebro</button>
+                        <button class="avatar-btn" data-avatar="✨">✨ Estrella</button>
+                        <button class="avatar-btn" data-avatar="💎">💎 Diamante</button>
+                        <button class="avatar-btn" data-avatar="🔮">🔮 Cristal</button>
+                    </div>
+                </div>
+
+                <!-- Chrome AI Tools -->
+                <div class="customize-section">
+                    <h4>🧠 Herramientas Chrome AI</h4>
+                    <p style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 15px;">
+                        Herramientas de IA que funcionan localmente en tu navegador
+                    </p>
+                    <div class="chrome-ai-tools">
+                        <button class="ai-tool-btn ai-writer-btn" aria-label="Escritor AI" style="display: flex !important; visibility: visible !important;">
+                            <span class="ai-tool-icon">✍️</span>
+                            <div class="ai-tool-info">
+                                <strong>Escritor AI</strong>
+                                <small>Genera texto con diferentes tonos</small>
+                            </div>
+                        </button>
+                        <button class="ai-tool-btn ai-corrector-btn" aria-label="Corrector automático" style="display: flex !important; visibility: visible !important;">
+                            <span class="ai-tool-icon">✅</span>
+                            <div class="ai-tool-info">
+                                <strong>Corrector</strong>
+                                <small>Corrige gramática automáticamente</small>
+                            </div>
+                        </button>
+                        <button class="ai-tool-btn ai-translator-btn" aria-label="Traductor instantáneo" style="display: flex !important; visibility: visible !important;">
+                            <span class="ai-tool-icon">🌐</span>
+                            <div class="ai-tool-info">
+                                <strong>Traductor</strong>
+                                <small>Traduce a 9 idiomas instantáneamente</small>
+                            </div>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal Escritor AI -->
+    <div id="writerModal" class="ai-modal" style="display: none;">
+        <div class="ai-modal-content">
+            <div class="ai-modal-header">
+                <h3>✍️ Escritor AI</h3>
+                <button class="close-ai-modal" data-modal="writerModal">&times;</button>
+            </div>
+            <div class="ai-modal-body">
+                <div class="ai-section">
+                    <label for="writerPrompt">Describe lo que quieres escribir:</label>
+                    <textarea id="writerPrompt" placeholder="Ej: Escribe un email profesional para solicitar una reunión..."></textarea>
+                </div>
+                <div class="ai-section">
+                    <label for="writerTone">Tono:</label>
+                    <select id="writerTone">
+                        <option value="formal">Formal</option>
+                        <option value="casual">Casual</option>
+                        <option value="friendly">Amigable</option>
+                        <option value="professional">Profesional</option>
+                        <option value="creative">Creativo</option>
+                    </select>
+                </div>
+                <div class="ai-section">
+                    <label for="writerLength">Longitud:</label>
+                    <select id="writerLength">
+                        <option value="short">Corto</option>
+                        <option value="medium">Mediano</option>
+                        <option value="long">Largo</option>
+                    </select>
+                </div>
+                <div class="ai-actions">
+                    <button class="ai-btn primary" onclick="generateText()">✨ Generar Texto</button>
+                    <button class="ai-btn secondary" onclick="clearWriter()">🗑️ Limpiar</button>
+                </div>
+                <div class="ai-result" id="writerResult" style="display: none;">
+                    <h4>📝 Resultado:</h4>
+                    <div class="ai-output" id="writerOutput"></div>
+                    <div class="ai-actions">
+                        <button class="ai-btn" onclick="copyToClipboard('writerOutput')">📋 Copiar</button>
+                        <button class="ai-btn" onclick="insertToChat('writerOutput')">💬 Enviar al Chat</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Corrector -->
+    <div id="correctorModal" class="ai-modal" style="display: none;">
+        <div class="ai-modal-content">
+            <div class="ai-modal-header">
+                <h3>✅ Corrector Automático</h3>
+                <button class="close-ai-modal" data-modal="correctorModal">&times;</button>
+            </div>
+            <div class="ai-modal-body">
+                <div class="ai-section">
+                    <label for="correctorText">Texto a corregir:</label>
+                    <textarea id="correctorText" placeholder="Pega aquí el texto que quieres corregir..."></textarea>
+                </div>
+                <div class="ai-actions">
+                    <button class="ai-btn primary" onclick="correctText()">🔍 Corregir Texto</button>
+                    <button class="ai-btn secondary" onclick="clearCorrector()">🗑️ Limpiar</button>
+                </div>
+                <div class="ai-result" id="correctorResult" style="display: none;">
+                    <h4>✅ Texto Corregido:</h4>
+                    <div class="ai-output" id="correctorOutput"></div>
+                    <div class="ai-actions">
+                        <button class="ai-btn" onclick="copyToClipboard('correctorOutput')">📋 Copiar</button>
+                        <button class="ai-btn" onclick="insertToChat('correctorOutput')">💬 Enviar al Chat</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Traductor -->
+    <div id="translatorModal" class="ai-modal" style="display: none;">
+        <div class="ai-modal-content">
+            <div class="ai-modal-header">
+                <h3>🌐 Traductor Instantáneo</h3>
+                <button class="close-ai-modal" data-modal="translatorModal">&times;</button>
+            </div>
+            <div class="ai-modal-body">
+                <div class="ai-section">
+                    <label for="translatorText">Texto a traducir:</label>
+                    <textarea id="translatorText" placeholder="Escribe o pega el texto que quieres traducir..."></textarea>
+                </div>
+                <div class="ai-section">
+                    <div class="translator-languages">
+                        <div class="language-group">
+                            <label for="sourceLang">Desde:</label>
+                            <select id="sourceLang">
+                                <option value="auto">Detectar automáticamente</option>
+                                <option value="es">Español</option>
+                                <option value="en">Inglés</option>
+                                <option value="fr">Francés</option>
+                                <option value="de">Alemán</option>
+                                <option value="it">Italiano</option>
+                                <option value="pt">Portugués</option>
+                                <option value="ja">Japonés</option>
+                                <option value="ko">Coreano</option>
+                                <option value="zh">Chino</option>
+                            </select>
+                        </div>
+                        <div class="language-swap">
+                            <button class="ai-btn swap-btn" onclick="swapLanguages()">🔄</button>
+                        </div>
+                        <div class="language-group">
+                            <label for="targetLang">Hacia:</label>
+                            <select id="targetLang">
+                                <option value="en">Inglés</option>
+                                <option value="es">Español</option>
+                                <option value="fr">Francés</option>
+                                <option value="de">Alemán</option>
+                                <option value="it">Italiano</option>
+                                <option value="pt">Portugués</option>
+                                <option value="ja">Japonés</option>
+                                <option value="ko">Coreano</option>
+                                <option value="zh">Chino</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="ai-actions">
+                    <button class="ai-btn primary" onclick="translateText()">🌐 Traducir</button>
+                    <button class="ai-btn secondary" onclick="clearTranslator()">🗑️ Limpiar</button>
+                </div>
+                <div class="ai-result" id="translatorResult" style="display: none;">
+                    <h4>🌐 Traducción:</h4>
+                    <div class="ai-output" id="translatorOutput"></div>
+                    <div class="ai-actions">
+                        <button class="ai-btn" onclick="copyToClipboard('translatorOutput')">📋 Copiar</button>
+                        <button class="ai-btn" onclick="insertToChat('translatorOutput')">💬 Enviar al Chat</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Chrome Built-in AI Integration -->
+    <script src="{{ url_for('static', filename='js/chrome-ai-manager.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/chat.js') }}"></script>
+    
+    <!-- DEBUG CHROME AI BUTTONS -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(() => {
+                console.log('🔍 DEBUGGING CHROME AI BUTTONS...');
+                const chromeAISection = document.querySelector('.chrome-ai-tools');
+                const aiButtons = document.querySelectorAll('.ai-tool-btn');
+                
+                console.log('Chrome AI Section:', chromeAISection);
+                console.log('AI Tool Buttons found:', aiButtons.length);
+                
+                aiButtons.forEach((btn, index) => {
+                    console.log(`Button ${index}:`, btn);
+                    console.log(`Button ${index} style:`, window.getComputedStyle(btn));
+                    console.log(`Button ${index} display:`, window.getComputedStyle(btn).display);
+                    console.log(`Button ${index} visibility:`, window.getComputedStyle(btn).visibility);
+                });
+                
+                // Forzar visibilidad adicional
+                aiButtons.forEach(btn => {
+                    btn.style.display = 'flex';
+                    btn.style.visibility = 'visible';
+                    btn.style.opacity = '1';
+                    btn.style.height = '60px';
+                    btn.style.border = '2px solid red'; // Para debugging visual
+                });
+            }, 2000);
+        });
     </script>
 </body>
 </html>

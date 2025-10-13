@@ -1,151 +1,52 @@
-# Configuración de Docker para desarrollo
-version: '3.8'
+# ===============================================================================
+# 🚀 DOCKER COMPOSE PARA DESARROLLO - GEMINI AI CHATBOT
+#
+# Este archivo extiende la configuración base (docker-compose.yml) para
+# crear un entorno de desarrollo optimizado con live-reloading.
+#
+# Uso:
+#   1. Asegúrate de tener un archivo .env configurado.
+#   2. Ejecuta: docker-compose -f docker-compose.yml -f docker-compose.dev.yml up --build
+#
+# ===============================================================================
+
+version: '3.9'
 
 services:
-  # Aplicación principal
+  # -------------------------------------------------------------------------------
+  # Servicio de la Aplicación (Desarrollo)
+  # -------------------------------------------------------------------------------
+  # Sobrescribe el servicio 'app' del archivo base.
   app:
+    # Construye la imagen usando el Dockerfile pero sin un target específico,
+    # lo que permite instalar dependencias de desarrollo si se definen.
     build:
       context: .
       dockerfile: Dockerfile
-      target: development
-    container_name: gemini-chatbot-dev
+    # El comando para desarrollo usa el servidor de Flask con auto-recarga.
+    # Gunicorn no se usa aquí.
+    command: flask run --host=0.0.0.0 --port=5000
     ports:
-      - "5000:5000"
-      - "5001:5001"  # Puerto adicional para debugging
-    volumes:
-      - .:/app
-      - /app/node_modules  # Evitar sobrescribir node_modules
-      - logs_data:/app/logs
-      - uploads_data:/app/uploads
+      - "5000:5000" # Expone el puerto de Flask al host.
+      - "5678:5678" # Expone el puerto para el depurador remoto (ej. debugpy).
     environment:
-      - FLASK_ENV=development
-      - FLASK_DEBUG=1
-      - PYTHONPATH=/app
-      - GEMINI_API_KEY=${GEMINI_API_KEY}
-    env_file:
-      - .env.dev
-    depends_on:
-      - redis
-      - postgres
-    networks:
-      - gemini-network
-    restart: unless-stopped
-    command: python app/main.py
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:5000/api/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 40s
+      - FLASK_ENV=development # Activa el modo de desarrollo de Flask.
+      - FLASK_DEBUG=1         # Activa el depurador interactivo.
+    volumes:
+      # Monta el código fuente completo en el contenedor.
+      # Cualquier cambio en el host se refleja inmediatamente, activando el live-reload.
+      - .:/app
+    # No se necesita 'restart' en desarrollo, ya que se gestiona manualmente.
 
-  # Base de datos PostgreSQL
-  postgres:
-    image: postgres:15-alpine
-    container_name: gemini-postgres-dev
+  # -------------------------------------------------------------------------------
+  # Servicios de Base y Caché (Desarrollo)
+  # -------------------------------------------------------------------------------
+  # Exponemos los puertos de la base de datos y la caché para que puedan ser
+  # accedidos desde herramientas de escritorio (ej. DBeaver, Redis Insight).
+  db:
     ports:
       - "5432:5432"
-    environment:
-      POSTGRES_DB: gemini_chatbot_dev
-      POSTGRES_USER: gemini_user
-      POSTGRES_PASSWORD: gemini_password_dev
-      POSTGRES_INITDB_ARGS: "--encoding=UTF-8"
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-      - ./config/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
-    networks:
-      - gemini-network
-    restart: unless-stopped
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U gemini_user -d gemini_chatbot_dev"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
 
-  # Redis para caché y sesiones
-  redis:
-    image: redis:7-alpine
-    container_name: gemini-redis-dev
+  cache:
     ports:
       - "6379:6379"
-    volumes:
-      - redis_data:/data
-      - ./config/redis.conf:/usr/local/etc/redis/redis.conf:ro
-    networks:
-      - gemini-network
-    restart: unless-stopped
-    command: redis-server /usr/local/etc/redis/redis.conf
-    healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
-      interval: 10s
-      timeout: 5s
-      retries: 3
-
-  # Nginx para desarrollo (opcional)
-  nginx:
-    image: nginx:alpine
-    container_name: gemini-nginx-dev
-    ports:
-      - "80:80"
-      - "443:443"
-    volumes:
-      - ./docker/nginx.conf:/etc/nginx/nginx.conf:ro
-      - ./ssl:/etc/nginx/ssl:ro
-      - ./app/static:/var/www/static:ro
-    depends_on:
-      - app
-    networks:
-      - gemini-network
-    restart: unless-stopped
-    profiles:
-      - nginx  # Solo se ejecuta si se especifica el perfil
-
-  # Herramientas de desarrollo
-  adminer:
-    image: adminer:latest
-    container_name: gemini-adminer-dev
-    ports:
-      - "8080:8080"
-    environment:
-      ADMINER_DEFAULT_SERVER: postgres
-    depends_on:
-      - postgres
-    networks:
-      - gemini-network
-    restart: unless-stopped
-    profiles:
-      - tools
-
-  # Monitor de Redis
-  redis-commander:
-    image: rediscommander/redis-commander:latest
-    container_name: gemini-redis-commander-dev
-    ports:
-      - "8081:8081"
-    environment:
-      REDIS_HOSTS: local:redis:6379
-    depends_on:
-      - redis
-    networks:
-      - gemini-network
-    restart: unless-stopped
-    profiles:
-      - tools
-
-# Volúmenes persistentes
-volumes:
-  postgres_data:
-    driver: local
-  redis_data:
-    driver: local
-  logs_data:
-    driver: local
-  uploads_data:
-    driver: local
-
-# Red personalizada
-networks:
-  gemini-network:
-    driver: bridge
-    ipam:
-      config:
-        - subnet: 172.20.0.0/16

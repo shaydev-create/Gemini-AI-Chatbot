@@ -7,7 +7,6 @@ Script para verificar y corregir la codificación de archivos de documentación
 import os
 import chardet
 import glob
-from pathlib import Path
 
 
 def detect_encoding(file_path):
@@ -95,7 +94,7 @@ def main():
                     print(f"❌ Error de decodificación UTF-8 en {file_path}")
                     issues_found += 1
 
-    print(f"\n📊 Resumen:")
+    print("\n📊 Resumen:")
     print(f"   - Archivos verificados: {len(files_to_check)}")
     print(f"   - Problemas encontrados: {issues_found}")
     print(f"   - Archivos convertidos: {files_converted}")

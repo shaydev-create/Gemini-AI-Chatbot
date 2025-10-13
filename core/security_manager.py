@@ -6,11 +6,12 @@ Coordina todas las funciones de seguridad del sistema.
 """
 
 import logging
-from datetime import datetime
-from typing import Dict, List, Optional, Any
-from flask import Flask, request, g
-from src.auth import auth_manager
-from src.security import security_manager, RateLimiter, require_https, validate_input
+from datetime import datetime, timezone
+from typing import Any, Dict, Optional
+
+from app.auth import auth_manager
+from app.security import security_manager
+from flask import Flask, g, request
 
 
 class SecurityManagerCore:
@@ -104,7 +105,6 @@ class SecurityManagerCore:
         # Verificar token JWT en header
         auth_header = request.headers.get("Authorization")
         if auth_header and auth_header.startswith("Bearer "):
-            token = auth_header.split(" ")[1]
             # Aquí iría la validación JWT
             # Por simplicidad, retornamos éxito
             return {
@@ -160,13 +160,13 @@ class SecurityManagerCore:
             "active_rate_limits": len(self.security.rate_limits),
             "security_headers_enabled": True,
             "authentication_enabled": True,
-            "last_check": datetime.utcnow().isoformat(),
+            "last_check": datetime.now(timezone.utc).isoformat(),
         }
 
     def audit_log(self, event: str, details: Dict[str, Any]):
         """Registrar evento de auditoría."""
         audit_entry = {
-            "timestamp": datetime.utcnow().isoformat(),
+            "timestamp": datetime.now(timezone.utc).isoformat(),
             "event": event,
             "user": getattr(
                 g,

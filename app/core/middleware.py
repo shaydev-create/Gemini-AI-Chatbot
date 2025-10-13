@@ -1,11 +1,12 @@
-"""
+﻿"""
 Middleware personalizado para el Gemini AI Chatbot.
 """
 
-from flask import request, g, session
-from flask_wtf.csrf import CSRFProtect
-import time
 import logging
+import time
+
+from flask import g, request
+from flask_wtf.csrf import CSRFProtect
 
 from app.core.metrics import metrics_manager
 
@@ -14,16 +15,16 @@ logger = logging.getLogger(__name__)
 
 def setup_middleware(app):
     """Configurar middleware personalizado."""
-    # Protección CSRF
+    # ProtecciÃ³n CSRF
     csrf = CSRFProtect(app)
     app.logger.info("CSRF protection enabled")
 
-    # Eximir rutas API específicas de la protección CSRF
+    # Eximir rutas API especÃ­ficas de la protecciÃ³n CSRF
     @csrf.exempt
     def csrf_exempt_api_routes():
         pass
 
-    # Eximir la ruta /api/chat/send de la protección CSRF
+    # Eximir la ruta /api/chat/send de la protecciÃ³n CSRF
     @app.before_request
     def exempt_api_routes():
         if request.path == "/api/chat/send" and request.method == "POST":
@@ -36,22 +37,22 @@ def setup_middleware(app):
 
         # Log del request
         logger.info(
-            f"Request: {
-                request.method} {
-                request.path} from {
-                request.remote_addr}"
+            f"Request: {request.method} {request.path} from {request.remote_addr}"
+
+
+
         )
 
         # Incrementar contador de requests
         metrics_manager.increment_counter("total_requests")
 
-        # Log específico para API
+        # Log especÃ­fico para API
         if request.path.startswith("/api/"):
             metrics_manager.increment_counter("api_requests")
 
     @app.after_request
     def after_request(response):
-        """Ejecutar después de cada request."""
+        """Ejecutar despuÃ©s de cada request."""
         # Calcular tiempo de respuesta
         if hasattr(g, "start_time"):
             response_time = time.time() - g.start_time
@@ -59,9 +60,9 @@ def setup_middleware(app):
 
             # Log del response
             logger.info(
-                f"Response: {
-                    response.status_code} in {
-                    response_time:.3f}s"
+                f"Response: {response.status_code} in {response_time:.3f}s"
+
+
             )
 
         # Headers de seguridad adicionales
@@ -80,7 +81,7 @@ def setup_middleware(app):
 
     @app.teardown_appcontext
     def teardown_db(error):
-        """Limpiar contexto de aplicación."""
+        """Limpiar contexto de aplicaciÃ³n."""
         if error:
             logger.error(f"Application context error: {error}")
 
@@ -101,7 +102,8 @@ def setup_error_handlers(app):
     @app.errorhandler(500)
     def internal_error(error):
         """Manejar errores 500."""
-        logger.error(f"500 error: {error}")
+        original_exception = getattr(error, "original_exception", error)
+        logger.error(f"500 error: {original_exception}")
         return {"error": "Error interno del servidor", "status_code": 500}, 500
 
     @app.errorhandler(429)
@@ -109,7 +111,7 @@ def setup_error_handlers(app):
         """Manejar errores de rate limiting."""
         logger.warning(f"Rate limit exceeded from {request.remote_addr}")
         return {
-            "error": "Demasiadas solicitudes. Intenta más tarde.",
+            "error": "Demasiadas solicitudes. Intenta mÃ¡s tarde.",
             "status_code": 429,
             "retry_after": 60,
         }, 429

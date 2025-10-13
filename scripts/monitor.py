@@ -10,17 +10,18 @@ Sistema completo de monitoreo y métricas para la aplicación:
 - Dashboard de estadísticas
 """
 
-from src.models import db, User, ChatSession
-from app import create_app
+import logging
 import os
 import sys
 import time
+from dataclasses import dataclass
+from datetime import datetime, timezone
+from typing import Any, Dict, List
+
 import psutil
 import requests
-import logging
-from datetime import datetime, timezone
-from typing import Dict, List, Any
-from dataclasses import dataclass
+from app import create_app
+from app.models import ChatSession, User
 
 # Agregar el directorio raíz al path
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -156,15 +157,13 @@ class SystemMonitor:
     def check_ssl_certificates(self) -> HealthStatus:
         """Verificar certificados SSL."""
         try:
-            import ssl
-            import socket
             from datetime import datetime
 
             # Verificar certificado local
             cert_path = "ssl/cert.pem"
             if os.path.exists(cert_path):
                 with open(cert_path, 'r') as f:
-                    cert_data = f.read()
+                    f.read()
 
                 # Aquí se podría agregar validación más avanzada
                 return HealthStatus(

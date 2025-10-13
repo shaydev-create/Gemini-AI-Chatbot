@@ -4,9 +4,9 @@
 Crea iconos PNG básicos para Chrome Web Store
 """
 
-from PIL import Image, ImageDraw, ImageFont
-import os
 from pathlib import Path
+
+from PIL import Image, ImageDraw, ImageFont
 
 
 def create_chrome_icons():
@@ -293,7 +293,7 @@ def main():
         return False
 
     # Crear manifest para Chrome
-    manifest_path = create_chrome_manifest()
+    create_chrome_manifest()
 
     # Crear popup HTML
     create_popup_html()

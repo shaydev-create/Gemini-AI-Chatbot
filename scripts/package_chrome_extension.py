@@ -4,12 +4,10 @@
 Crea un paquete completo listo para subir a Chrome Web Store
 """
 
-import os
-import shutil
-import zipfile
-from pathlib import Path
 import json
+import os
 import sys
+import zipfile
 from datetime import datetime
 
 
@@ -167,7 +165,7 @@ def validate_extension_structure():
     total_files = len(validation_results)
     valid_files = sum(1 for exists, _ in validation_results if exists)
 
-    print(f"\n📊 Resumen de validación:")
+    print("\n📊 Resumen de validación:")
     print(f"  ✅ Archivos válidos: {valid_files}/{total_files}")
     print(
         f"  📈 Porcentaje de completitud: {(valid_files / total_files) * 100:.1f}%")

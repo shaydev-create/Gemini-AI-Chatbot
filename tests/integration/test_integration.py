@@ -1,7 +1,6 @@
 # Test de integración básico
 
 import os
-import pytest
 
 
 def test_environment_variables():

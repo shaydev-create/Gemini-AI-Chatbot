@@ -11,8 +11,8 @@ import os
 import re
 import subprocess
 import sys
-from pathlib import Path
 from datetime import datetime
+from pathlib import Path
 
 # Patrones de credenciales a buscar
 PATTERNS = {

@@ -7,11 +7,9 @@ Este script limpia el archivo .env de credenciales reales y las reemplaza con pl
 Úsalo antes de hacer commit para evitar exponer información sensible.
 """
 
-import os
 import re
-from pathlib import Path
-import secrets
 import sys
+from pathlib import Path
 
 
 def print_banner():
@@ -57,7 +55,7 @@ def clean_env_file():
 
     # Leer ejemplo
     with open(env_example, 'r', encoding='utf-8') as f:
-        example = f.read()
+        f.read()
 
     # Patrones a buscar y reemplazar
     patterns = [

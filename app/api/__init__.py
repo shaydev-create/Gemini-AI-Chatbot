@@ -1,5 +1,5 @@
-"""Rutas API del Gemini AI Chatbot."""
+from flask import Blueprint
 
-from .routes import register_api_routes
+api = Blueprint('api', __name__)
 
-__all__ = ["register_api_routes"]
+from . import routes, admin, auth

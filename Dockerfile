@@ -1,63 +1,81 @@
-﻿# Dockerfile para Gemini AI Chatbot - Optimizado
-FROM python:3.11-slim as base
+# --- Build Stage ---
+# Use a specific, slim version of Python for a smaller base image.
+FROM python:3.11-slim as builder
 
-# Metadatos
-LABEL maintainer="Gemini AI Chatbot Team"
-LABEL version="2.0"
-LABEL description="Gemini AI Chatbot con Python 3.11"
-
-# Variables de entorno
+# Set environment variables for a clean and efficient build.
 ENV PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1 \
-    PIP_NO_CACHE_DIR=1 \
-    PIP_DISABLE_PIP_VERSION_CHECK=1
+    PIP_NO_CACHE_DIR=off \
+    PIP_DISABLE_PIP_VERSION_CHECK=1 \
+    PIP_DEFAULT_TIMEOUT=100 \
+    POETRY_HOME="/opt/poetry" \
+    POETRY_VIRTUALENVS_IN_PROJECT=true \
+    POETRY_NO_INTERACTION=1
 
-# Establecer directorio de trabajo
+# Install system dependencies required for building Python packages.
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends curl build-essential && \
+    rm -rf /var/lib/apt/lists/*
+
+# Install Poetry, a modern dependency management tool.
+RUN curl -sSL https://install.python-poetry.org | python3 -
+
+# Add Poetry to the system's PATH.
+ENV PATH="$POETRY_HOME/bin:$PATH"
+
+# Set the working directory.
 WORKDIR /app
 
-# Instalar dependencias del sistema
-RUN apt-get update && apt-get install -y \
-    gcc \
-    g++ \
-    curl \
-    && rm -rf /var/lib/apt/lists/* \
-    && apt-get clean
+# Copy only the files necessary for installing dependencies.
+# This leverages Docker's layer caching.
+COPY poetry.lock pyproject.toml ./
 
-# Crear usuario no-root para seguridad
-RUN groupadd -r appuser && useradd -r -g appuser appuser
+# Install dependencies using Poetry.
+# --only main installs only production dependencies.
+RUN poetry install --no-root --only main
 
-# Copiar archivos de requisitos primero (para cache de Docker)
-COPY requirements-minimal.txt requirements.txt ./
 
-# Actualizar pip e instalar dependencias
-RUN pip install --upgrade pip && \
-    pip install --no-cache-dir -r requirements-minimal.txt
+# --- Final Stage ---
+# Use a clean, minimal base image for the final application.
+FROM python:3.11-slim as final
 
-# Copiar código de la aplicación
-COPY app/ ./app/
-COPY config/ ./config/
-COPY scripts/ ./scripts/
-COPY .env.example .env
-COPY app.py .
+# Set environment variables for the runtime.
+ENV PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    FLASK_APP="app:create_app()" \
+    FLASK_ENV="production" \
+    GUNICORN_CONF="/app/deployment/gunicorn.conf.py"
 
-# Crear directorios necesarios
-RUN mkdir -p logs uploads instance && \
-    chown -R appuser:appuser /app
+# Install only runtime system dependencies.
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends libpq-dev && \
+    rm -rf /var/lib/apt/lists/*
 
-# Cambiar a usuario no-root
+# Create a non-root user for running the application.
+RUN addgroup --system appgroup && adduser --system --ingroup appgroup appuser
+
+# Set the working directory.
+WORKDIR /app
+
+# Copy the virtual environment from the builder stage.
+COPY --from=builder /app/.venv .venv
+
+# Copy the application code.
+COPY . .
+
+# Create and set permissions for necessary directories.
+RUN mkdir -p instance logs uploads && \
+    chown -R appuser:appgroup /app
+
+# Switch to the non-root user.
 USER appuser
 
-# Exponer puerto
+# Expose the port the app runs on.
 EXPOSE 5000
 
-# Variables de entorno de la aplicación
-ENV FLASK_APP=app.py \
-    FLASK_ENV=production \
-    PYTHONPATH=/app
+# Healthcheck to ensure the application is running correctly.
+HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
+    CMD [ "curl", "-f", "http://localhost:5000/api/status" ]
 
-# Healthcheck
-HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
-    CMD curl -f http://localhost:5000/api/health || exit 1
-
-# Comando para ejecutar la aplicación
-CMD ["python", "app.py"]
+# Set the entrypoint to activate the virtual environment.
+ENTRYPOINT [ "/app/.venv/bin/gunicorn", "--config", "deployment/gunicorn.conf.py", "app:create_app()" ]

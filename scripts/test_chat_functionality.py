@@ -8,12 +8,13 @@ Autor: Gemini AI Chatbot Team
 Fecha: 2025-01-15
 """
 
-import requests
 import json
-import time
-import sys
 import os
+import sys
+import time
 from datetime import datetime
+
+import requests
 
 # Configuración
 BASE_URL = "https://localhost:5000"
@@ -76,9 +77,7 @@ def test_server_connection():
             print_info(f"Código de estado: {response.status_code}")
             return True
         else:
-            print_error(
-                f"Servidor respondió con código: {
-                    response.status_code}")
+            print_error(f"Servidor respondió con código: {response.status_code}")
             return False
     except requests.exceptions.ConnectionError:
         print_error("No se pudo conectar al servidor")
@@ -164,7 +163,11 @@ def test_chat_api():
     print(f"   ✅ Exitosas: {success_count}/{total_tests}")
     print(f"   ❌ Fallidas: {total_tests - success_count}/{total_tests}")
 
-    return success_count == total_tests
+    if success_count == total_tests:
+        return True
+    else:
+        print_error(f"{success_count}/{total_tests} pruebas de API pasaron")
+        return False
 
 
 def test_chat_page():
@@ -230,9 +233,7 @@ def test_chat_page():
                 return False
 
         else:
-            print_error(
-                f"No se pudo cargar la página del chat: {
-                    response.status_code}")
+            print_error(f"No se pudo cargar la página del chat: {response.status_code}")
             return False
 
     except Exception as e:
@@ -280,7 +281,11 @@ def test_file_structure():
     print(f"   ✅ Presentes: {len(present_files)}/{len(required_files)}")
     print(f"   ❌ Faltantes: {len(missing_files)}/{len(required_files)}")
 
-    return len(missing_files) == 0
+    if len(missing_files) == 0:
+        return True
+    else:
+        print_error(f"Archivos faltantes: {missing_files}")
+        return False
 
 
 def test_chrome_extension_package():
@@ -334,22 +339,9 @@ def test_chrome_extension_package():
                         'manifest.json').decode('utf-8')
                     manifest_data = json.loads(manifest_content)
 
-                    print_info(
-                        f"Nombre: {
-                            manifest_data.get(
-                                'name',
-                                'No especificado')}")
-                    print_info(
-                        f"Versión: {
-                            manifest_data.get(
-                                'version',
-                                'No especificada')}")
-                    print_info(
-                        f"Descripción: {
-                            manifest_data.get(
-                                'description',
-                                'No especificada')[
-                                :50]}...")
+                    print_info(f"Nombre: {manifest_data.get('name', 'No especificado')}")
+                    print_info(f"Versión: {manifest_data.get('version', 'No especificada')}")
+                    print_info(f"Descripción: {manifest_data.get('description', 'No especificada')[:50]}...")
 
                 except Exception as e:
                     print_warning(f"No se pudo leer manifest.json: {str(e)}")
@@ -407,7 +399,7 @@ def generate_test_report(results):
 
     try:
         with open(report_file, 'w', encoding='utf-8') as f:
-            f.write(f"REPORTE DE PRUEBAS - GEMINI AI CHATBOT\n")
+            f.write("REPORTE DE PRUEBAS - GEMINI AI CHATBOT\n")
             f.write(f"Fecha: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n")
             f.write(f"{'=' * 50}\n\n")
             f.write(f"Total de pruebas: {total_tests}\n")

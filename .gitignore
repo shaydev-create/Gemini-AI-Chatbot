@@ -38,6 +38,8 @@ venv.bak/
 .env.production
 .env.test
 .env.backup
+.env.local.backup
+*.env.backup
 !.env.example
 !.env-sample
 

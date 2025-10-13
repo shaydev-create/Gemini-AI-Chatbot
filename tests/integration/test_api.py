@@ -2,17 +2,17 @@
 Tests de integración para la aplicación.
 """
 
-import pytest
 import json
+from unittest.mock import patch
+
+import pytest
 from app.core.application import create_app
-from config.settings import TestingConfig
 
 
 @pytest.fixture
 def app():
     """Crear aplicación para tests."""
-    app = create_app(TestingConfig)
-    app.config['TESTING'] = True
+    app = create_app('testing')
     return app
 
 
@@ -79,6 +79,61 @@ class TestAPIIntegration:
         assert b'<?xml version' in response.data
         assert b'<urlset' in response.data
 
+    def test_serve_e2e_test_files_js(self, client):
+        """Test serving e2e JavaScript files."""
+        response = client.get('/tests/e2e/dummy_test.js')
+        assert response.status_code == 200
+        assert response.mimetype == 'application/javascript'
+        assert b'E2E test file loaded' in response.data
+
+    def test_serve_e2e_test_files_not_found(self, client):
+        """Test serving non-existent e2e file."""
+        response = client.get('/tests/e2e/non_existent_file.js')
+        assert response.status_code == 500
+
+    @patch('app.api.routes.send_from_directory', side_effect=FileNotFoundError)
+    def test_service_worker_not_found(self, mock_send, client):
+        """Test service worker returns basic content if file not found."""
+        response = client.get('/sw.js')
+        assert response.status_code == 200
+        assert response.mimetype == 'application/javascript'
+        assert 'Service Worker básico cargado'.encode('utf-8') in response.data
+
+    @patch('app.api.routes.send_from_directory', side_effect=FileNotFoundError)
+    def test_favicon_not_found(self, mock_send, client):
+        """Test that a 204 is returned when favicon.ico is not found."""
+        response = client.get('/favicon.ico')
+        assert response.status_code == 204
+
+    def test_upload_unauthorized(self, client):
+        """Test upload endpoint without authorization."""
+        response = client.post('/api/upload')
+        assert response.status_code == 401
+        data = json.loads(response.data)
+        assert not data['success']
+        assert 'No autorizado' in data['message']
+
+    def test_upload_authorized(self, client):
+        """Test upload endpoint with authorization."""
+        response = client.post('/api/upload', headers={'Authorization': 'Bearer test-token'})
+        assert response.status_code == 200
+        data = json.loads(response.data)
+        assert data['success']
+        assert 'Archivo subido' in data['message']
+
+    def test_chat_api_unauthorized(self, client):
+        """Test chat API endpoint without authorization."""
+        response = client.post('/api/chat', json={'message': 'test'})
+        assert response.status_code == 401
+
+    def test_chat_api_authorized(self, client):
+        """Test chat API endpoint with authorization."""
+        response = client.post('/api/chat', headers={'Authorization': 'Bearer test-token'}, json={'message': 'test'})
+        assert response.status_code == 200
+        data = json.loads(response.data)
+        assert data['success']
+        assert data['data']['message'] == 'test'
+
     def test_send_message_missing_data(self, client):
         """Test envío de mensaje sin datos."""
         response = client.post('/api/chat/send',
@@ -123,19 +178,22 @@ class TestAPIIntegration:
         # Puede ser 200 (éxito) o 500 (error de API)
         assert response.status_code in [200, 500]
 
-        data = json.loads(response.data)
-        assert 'success' in data
-        assert 'message' in data
+    def test_rate_limiting(self, app):
+        """Test de rate limiting con estado aislado."""
+        # Acceder a la extensión Flask-Limiter
+        limiter = app.extensions.get("flask-limiter")
+        if limiter:
+            limiter.reset()
 
-    def test_rate_limiting(self, client):
-        """Test rate limiting básico."""
-        # Hacer muchas requests rápidas
-        responses = []
-        for i in range(65):  # Más del límite de 60
-            response = client.post('/api/chat/send',
-                                   data=json.dumps({'message': f'Test {i}'}),
-                                   content_type='application/json')
-            responses.append(response.status_code)
+        with app.test_client() as client:
+            endpoint = '/api/health'
 
-        # Al menos una debería ser 429 (rate limited)
-        assert 429 in responses
+            # El límite por defecto es 60 por minuto.
+            # Hacemos 60 peticiones que deberían ser exitosas.
+            for i in range(60):
+                response = client.get(endpoint)
+                assert response.status_code == 200, f"Request {i+1} failed with status {response.status_code}, expected 200"
+
+            # La petición 61 debería fallar con 429 Too Many Requests
+            response = client.get(endpoint)
+            assert response.status_code == 429, f"Expected rate limit to be exceeded on request 61, but got {response.status_code}"

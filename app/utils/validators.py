@@ -2,133 +2,139 @@
 Validadores para la aplicación.
 """
 
+import logging
 import re
-from typing import List, Optional
+from typing import List, Optional, Tuple
+
+# Configuración del logger
+logger = logging.getLogger(__name__)
+
+# Expresiones regulares precompiladas para un mejor rendimiento
+EMAIL_PATTERN = re.compile(r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$")
+API_KEY_PATTERN = re.compile(r"^[a-zA-Z0-9_]{10,}$")
+DANGEROUS_SCRIPT_PATTERNS = re.compile(
+    r"<script[^>]*>.*?</script>|javascript:|on\w+\s*=", re.IGNORECASE
+)
+CONTROL_CHARS_PATTERN = re.compile(r"[\x00-\x1f\x7f]")
+WHITESPACE_PATTERN = re.compile(r"\s+")
+DANGEROUS_FILENAME_CHARS = re.compile(r'[<>:"|?*\\/]')
 
 
 def validate_email(email: str) -> bool:
     """
-    Validar formato de email.
+    Valida si una cadena de texto tiene un formato de email válido.
 
     Args:
-        email: Email a validar
+        email: La dirección de email a validar.
 
     Returns:
-        True si es válido
+        True si el formato del email es válido, False en caso contrario.
     """
-    pattern = r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
-    return bool(re.match(pattern, email))
+    if not isinstance(email, str) or not EMAIL_PATTERN.match(email):
+        logger.warning(f"Intento de validación de email fallido para: '{email}'")
+        return False
+    return True
 
 
-def validate_message_content(message: str) -> tuple[bool, Optional[str]]:
+def validate_message_content(message: str) -> Tuple[bool, Optional[str]]:
     """
-    Validar contenido de mensaje.
+    Valida el contenido de un mensaje para asegurar que cumple con las políticas de seguridad y uso.
 
     Args:
-        message: Mensaje a validar
+        message: El mensaje a validar.
 
     Returns:
-        Tupla (es_válido, mensaje_error)
+        Una tupla (es_valido, mensaje_error). Si es válido, mensaje_error es None.
     """
     if not message or not message.strip():
-        return False, "El mensaje no puede estar vacío"
+        return False, "El mensaje no puede estar vacío."
 
-    if len(message) > 4000:
-        return False, "El mensaje es demasiado largo (máximo 4000 caracteres)"
+    if len(message) > 4096:
+        return False, "El mensaje excede la longitud máxima permitida (4096 caracteres)."
 
     if len(message.strip()) < 2:
-        return False, "El mensaje es demasiado corto (mínimo 2 caracteres)"
+        return False, "El mensaje es demasiado corto (mínimo 2 caracteres)."
 
-    # Verificar caracteres peligrosos
-    dangerous_patterns = [
-        r"<script[^>]*>.*?</script>",
-        r"javascript:",
-        r"on\w+\s*=",
-    ]
-
-    for pattern in dangerous_patterns:
-        if re.search(pattern, message, re.IGNORECASE):
-            return False, "El mensaje contiene contenido no permitido"
+    if DANGEROUS_SCRIPT_PATTERNS.search(message):
+        logger.warning(f"Detectado contenido potencialmente peligroso en el mensaje: '{message[:100]}...'")
+        return False, "El mensaje contiene contenido no permitido que podría ser inseguro."
 
     return True, None
 
 
 def validate_api_key(api_key: str) -> bool:
     """
-    Validar formato de API key.
+    Valida el formato de una clave de API.
 
     Args:
-        api_key: API key a validar
+        api_key: La clave de API a validar.
 
     Returns:
-        True si el formato es válido
+        True si el formato es válido, False en caso contrario.
     """
-    if not api_key:
+    if not isinstance(api_key, str) or not API_KEY_PATTERN.match(api_key):
+        logger.warning("Intento de uso de una API key con formato inválido.")
         return False
-
-    # Verificar longitud mínima
-    if len(api_key) < 10:
-        return False
-
-    # Verificar que solo contenga caracteres alfanuméricos y guiones bajos
-    pattern = r"^[a-zA-Z0-9_]+$"
-    return bool(re.match(pattern, api_key))
+    return True
 
 
 def sanitize_input(text: Optional[str]) -> str:
     """
-    Sanitizar entrada de usuario.
+    Limpia y sanitiza una cadena de texto de entrada para remover caracteres no deseados.
 
     Args:
-        text: Texto a sanitizar
+        text: El texto a sanitizar.
 
     Returns:
-        Texto sanitizado
+        El texto sanitizado y normalizado.
     """
     if not text:
         return ""
 
-    # Remover caracteres de control
-    text = re.sub(r"[\x00-\x1f\x7f]", "", text)
+    # Remover caracteres de control que no son visibles
+    sanitized_text = CONTROL_CHARS_PATTERN.sub("", text)
 
-    # Normalizar espacios en blanco
-    text = re.sub(r"\s+", " ", text)
+    # Normalizar espacios en blanco (reemplaza múltiples espacios/saltos de línea por uno solo)
+    sanitized_text = WHITESPACE_PATTERN.sub(" ", sanitized_text)
 
-    return text.strip()
+    if text != sanitized_text:
+        logger.debug(f"Texto sanitizado de '{text[:100]}' a '{sanitized_text[:100]}'")
+
+    return sanitized_text.strip()
 
 
 def validate_file_upload(
     filename: str, allowed_extensions: List[str]
-) -> tuple[bool, Optional[str]]:
+) -> Tuple[bool, Optional[str]]:
     """
-    Validar archivo subido.
+    Valida el nombre de un archivo subido, su extensión y caracteres.
 
     Args:
-        filename: Nombre del archivo
-        allowed_extensions: Extensiones permitidas
+        filename: El nombre original del archivo.
+        allowed_extensions: Una lista de extensiones de archivo permitidas (sin punto).
 
     Returns:
-        Tupla (es_válido, mensaje_error)
+        Una tupla (es_valido, mensaje_error). Si es válido, mensaje_error es None.
     """
     if not filename:
-        return False, "Nombre de archivo requerido"
+        return False, "El nombre del archivo no puede estar vacío."
 
-    # Verificar extensión
     if "." not in filename:
-        return False, "Archivo sin extensión"
+        return False, "El archivo no tiene una extensión."
 
     extension = filename.rsplit(".", 1)[1].lower()
     if extension not in [ext.lower() for ext in allowed_extensions]:
+        allowed_str = ", ".join(allowed_extensions)
+        logger.warning(
+            f"Intento de subir archivo con extensión no permitida: '{extension}'. Permitidas: {allowed_str}"
+        )
         return (
             False,
-            f"Extensión no permitida. Permitidas: {
-                ', '.join(allowed_extensions)}",
+            f"Extensión de archivo no permitida. Solo se aceptan: {allowed_str}",
         )
 
-    # Verificar caracteres peligrosos en el nombre
-    dangerous_chars = ["<", ">", ":", '"', "|", "?", "*", "\\", "/"]
-    for char in dangerous_chars:
-        if char in filename:
-            return False, "Nombre de archivo contiene caracteres no permitidos"
+    if DANGEROUS_FILENAME_CHARS.search(filename):
+        logger.warning(f"Nombre de archivo '{filename}' contiene caracteres no permitidos.")
+        return False, "El nombre del archivo contiene caracteres no válidos."
 
     return True, None

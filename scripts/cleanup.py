@@ -11,27 +11,28 @@ Identifica y elimina:
 - Archivos de configuración duplicados
 """
 
+import argparse
 import os
-import sys
+import re
 import shutil
 from pathlib import Path
-import re
-import json
-import argparse
 
 # Constantes
 PROJECT_ROOT = Path(__file__).parent.parent.absolute()
 
 # Archivos a eliminar (rutas relativas al directorio raíz del proyecto)
 FILES_TO_REMOVE = [
+    # Archivos de configuración antiguos reemplazados por pyproject.toml
+    "requirements.txt",
+    "requirements-dev.txt",
+    "setup.py",
+    "pytest.ini",
+
     # Archivos de entorno duplicados (mantener solo .env y .env.example)
     ".env.backup",
 
     # Scripts redundantes (mantener versiones más recientes o completas)
     "scripts/setup_api_key.py",  # Reemplazado por setup_api_keys.py
-    "scripts/package_chrome_store.py",  # Reemplazado por package_chrome_extension.py
-    # Reemplazado por create_chrome_icons.py y create_futuristic_icons.py
-    "scripts/create_icons.py",
 ]
 
 # Directorios temporales a limpiar

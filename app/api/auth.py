@@ -1,49 +1,84 @@
-from flask import Blueprint, request, jsonify
-from src.models import User
-from config.database import db
+from flask import Blueprint, jsonify, request
+from flask_jwt_extended import jwt_required
 
-# Blueprint para autenticación
-auth_bp = Blueprint("auth", __name__, url_prefix="/auth")
+from app.auth import auth_manager, get_current_user_from_jwt
 
-
-@auth_bp.route("/login", methods=["POST"])
-def login():
-    data = request.get_json()
-    if not data:
-        return jsonify({"success": False, "message": "Datos requeridos"}), 400
-    user = User.query.filter_by(email=data.get("email")).first()
-    if user and user.check_password(data.get("password")):
-        # Mock access_token
-        access_token = user.api_key or "mocktoken123"
-        return (
-            jsonify(
-                {
-                    "success": True,
-                    "message": "Login exitoso",
-                    "access_token": access_token,
-                }
-            ),
-            200,
-        )
-    return jsonify({"success": False, "message": "Credenciales inválidas"}), 401
+auth_bp = Blueprint("auth_api", __name__)
 
 
 @auth_bp.route("/register", methods=["POST"])
 def register():
+    """
+    Registra un nuevo usuario.
+    """
     data = request.get_json()
-    if not data:
-        return jsonify({"success": False, "message": "Datos requeridos"}), 400
-    if User.query.filter_by(email=data.get("email")).first():
-        return jsonify({"success": False, "message": "Email ya registrado"}), 409
-    user = User(
-        username=data.get("username"),
-        email=data.get("email"),
-        first_name=data.get("first_name"),
-        last_name=data.get("last_name"),
-        status="active",
-        email_verified=True,
+    if not data or not data.get('username') or not data.get('password') or not data.get('email'):
+        return jsonify({"message": "Se requieren nombre de usuario, contraseña y email."}), 400
+
+    user, message = auth_manager.create_user(
+        username=data['username'],
+        password=data['password'],
+        email=data['email']
     )
-    user.set_password(data.get("password"))
-    db.session.add(user)
+
+    if not user:
+        return jsonify({"message": message}), 409  # Conflict or Bad Request
+
+    return jsonify({"message": "Usuario registrado con éxito. Por favor, verifique su email."}), 201
+
+
+@auth_bp.route("/login", methods=["POST"])
+def login():
+    """
+    Autentica a un usuario y devuelve tokens JWT.
+    """
+    data = request.get_json()
+    if not data or not data.get('username') or not data.get('password'):
+        return jsonify({"message": "Se requieren nombre de usuario y contraseña."}), 400
+
+    user = auth_manager.authenticate_user(
+        username=data['username'],
+        password=data['password']
+    )
+
+    if not user:
+        return jsonify({"message": "Credenciales inválidas o cuenta inactiva/bloqueada."}), 401
+
+    tokens = auth_manager.create_tokens(user)
+    return jsonify(tokens), 200
+
+
+@auth_bp.route("/profile", methods=["GET"])
+@jwt_required()
+def profile():
+    """
+    Obtiene el perfil del usuario autenticado.
+    """
+    current_user = get_current_user_from_jwt()
+    if not current_user:
+        return jsonify({"message": "Usuario no encontrado o inactivo."}), 404
+
+    return jsonify(current_user.to_dict()), 200
+
+
+@auth_bp.route("/profile", methods=["PUT"])
+@jwt_required()
+def update_profile():
+    """
+    Actualiza el perfil del usuario autenticado.
+    """
+    data = request.get_json()
+    current_user = get_current_user_from_jwt()
+
+    if not current_user:
+        return jsonify({"message": "Usuario no encontrado."}), 404
+
+    # Actualizar campos permitidos
+    current_user.first_name = data.get('first_name', current_user.first_name)
+    current_user.last_name = data.get('last_name', current_user.last_name)
+
+    # Guardar cambios en la base de datos
+    from app.config.database import db
     db.session.commit()
-    return jsonify({"success": True, "message": "Usuario registrado"}), 201
+
+    return jsonify({"message": "Perfil actualizado con éxito.", "user": current_user.to_dict()}), 200

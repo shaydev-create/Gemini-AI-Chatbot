@@ -1,6 +1,5 @@
 """Pruebas para las rutas de la aplicación."""
 
-import pytest
 
 
 def test_index_route(client):

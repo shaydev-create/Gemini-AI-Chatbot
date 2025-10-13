@@ -11,12 +11,11 @@ Script automatizado para tareas de mantenimiento del sistema:
 - Generación de reportes de uso
 """
 
-from src.models import db, User, TokenBlacklist, ChatSession
+from app.models import db, User, TokenBlacklist, ChatSession
 from app import create_app
 import os
 import sys
 import logging
-import shutil
 from datetime import datetime, timezone, timedelta
 from pathlib import Path
 

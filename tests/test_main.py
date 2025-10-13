@@ -1,192 +1,240 @@
-#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
 🧪 TESTS UNITARIOS - GEMINI AI CHATBOT
 
 Suite completa de tests para validar todas las funcionalidades del sistema.
 """
-
-from src.auth import get_current_user_with_verification, validate_password_strength
-from src.models import db, User, ChatSession
-from app.core.application import create_app
 import pytest
-import os
-import sys
-from datetime import datetime, timezone
-from flask import Flask
-from flask_testing import TestCase
-
-# Agregar el directorio raíz al path
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from app.auth import AuthManager
+from app.models import User, db
 
 
-class BaseTestCase(TestCase):
-    """Clase base para todos los tests."""
-
-    def create_app(self):
-        """Crear aplicación para testing."""
-        app = create_app()
-        app.config['TESTING'] = True
-        app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///:memory:'
-        app.config['WTF_CSRF_ENABLED'] = False
-        app.config['JWT_SECRET_KEY'] = 'test-secret-key'
-        return app
-
-    def setUp(self):
-        """Configurar antes de cada test."""
+@pytest.fixture(scope='function')
+def init_database(app):
+    """
+    Fixture para inicializar y limpiar la base de datos para cada función de test.
+    Usa el contexto de la aplicación del fixture 'app' de conftest.
+    """
+    with app.app_context():
         db.create_all()
 
-        # Crear usuario de prueba
-        self.test_user = User(
+        # Crear un usuario de prueba estándar
+        test_user = User(
             username='testuser',
             email='test@example.com',
             first_name='Test',
             last_name='User'
         )
-        self.test_user.set_password('testpassword123')
-        self.test_user.email_verified = True
-        self.test_user.status = 'active'
-
-        db.session.add(self.test_user)
+        test_user.set_password('testpassword123')
+        test_user.email_verified = True
+        test_user.status = 'active'
+        db.session.add(test_user)
         db.session.commit()
 
-    def tearDown(self):
-        """Limpiar después de cada test."""
+        yield db  # Proporciona la instancia de la BD al test
+
         db.session.remove()
         db.drop_all()
 
 
-class TestUserModel(BaseTestCase):
+class TestUserModel:
     """Tests para el modelo User."""
 
-    def test_user_creation(self):
+    def test_user_creation(self, app, init_database):
         """Test creación de usuario."""
-        user = User(
-            username='newuser',
-            email='new@example.com'
-        )
-        user.set_password('password123')
+        with app.app_context():
+            user = User(
+                username='newuser',
+                email='new@example.com'
+            )
+            user.set_password('password123')
 
-        db.session.add(user)
-        db.session.commit()
+            init_database.session.add(user)
+            init_database.session.commit()
 
-        self.assertIsNotNone(user.id)
-        self.assertEqual(user.username, 'newuser')
-        self.assertTrue(user.check_password('password123'))
+            assert user.id is not None
+            assert user.username == 'newuser'
+            assert user.check_password('password123')
 
-    def test_password_hashing(self):
+    def test_password_hashing(self, app):
         """Test hashing de contraseñas."""
-        user = User(username='test', email='test@test.com')
-        user.set_password('secret')
+        with app.app_context():
+            user = User(username='test', email='test@test.com')
+            user.set_password('secret')
 
-        self.assertNotEqual(user.password_hash, 'secret')
-        self.assertTrue(user.check_password('secret'))
-        self.assertFalse(user.check_password('wrong'))
+            assert user.password_hash != 'secret'
+            assert user.check_password('secret')
+            assert not user.check_password('wrong')
 
-    def test_account_locking(self):
+    def test_account_locking(self, app, init_database):
         """Test bloqueo de cuenta."""
-        user = self.test_user
+        with app.app_context():
+            user = init_database.session.query(User).filter_by(email='test@example.com').one()
 
-        # Incrementar intentos fallidos
-        for _ in range(5):
-            user.increment_failed_login()
+            # Incrementar intentos fallidos
+            for _ in range(5):
+                user.increment_failed_login()
 
-        # Bloquear cuenta
-        user.lock_account(15)
+            # Bloquear cuenta
+            user.lock_account(15)
 
-        self.assertTrue(user.is_account_locked())
+            assert user.is_account_locked()
 
-        # Desbloquear
-        user.unlock_account()
-        self.assertFalse(user.is_account_locked())
+            # Desbloquear
+            user.unlock_account()
+            assert not user.is_account_locked()
 
 
-class TestAuthentication(BaseTestCase):
+class TestAuthentication:
     """Tests para autenticación."""
 
-    def test_login_success(self):
+    def test_login_success(self, client, init_database):
         """Test login exitoso."""
-        response = self.client.post('/auth/login', json={
+        response = client.post('/auth/login', json={
+            'email': 'test@example.com',
+            'password': 'testpassword123'
+        })
+        assert response.status_code == 200
+        assert 'access_token' in response.json
+
+    def test_login_invalid_credentials(self, client, init_database):
+        """Test login con credenciales inválidas."""
+        response = client.post('/auth/login', json={
+            'email': 'test@example.com',
+            'password': 'wrongpassword'
+        })
+        assert response.status_code == 401
+
+    def test_register_user(self, client, init_database):
+        """Test registro de nuevo usuario."""
+        response = client.post('/auth/register', json={
+            'username': 'newuser2',
+            'email': 'new2@example.com',
+            'password': 'a_strong_password_123'
+        })
+        assert response.status_code == 201
+        assert 'Usuario registrado' in response.json['message']
+
+
+class TestPasswordStrength:
+    """Tests para la validación de fortaleza de contraseña."""
+
+    def test_password_strength_valid(self):
+        """Test de contraseña válida."""
+        auth_manager = AuthManager()
+        is_strong, message = auth_manager.validate_password_strength('Str0ngP@ssw0rd!')
+        assert is_strong
+        assert message == "La contraseña es segura."
+
+    def test_password_strength_invalid_length(self):
+        """Test de contraseña con longitud inválida."""
+        auth_manager = AuthManager()
+        is_strong, message = auth_manager.validate_password_strength('Sh0rt')
+        assert not is_strong
+        assert "La contraseña debe tener al menos 8 caracteres." in message
+
+    def test_password_strength_missing_digit(self):
+        """Test de contraseña sin dígitos."""
+        auth_manager = AuthManager()
+        is_strong, message = auth_manager.validate_password_strength('NoDigitsHere!')
+        assert not is_strong
+        assert "La contraseña debe contener al menos un dígito." in message
+
+    def test_password_strength_missing_uppercase(self):
+        """Test de contraseña sin mayúsculas."""
+        is_strong, message = AuthManager().validate_password_strength('nouppercase1!')
+        assert not is_strong
+        assert "La contraseña debe contener al menos una letra mayúscula." in message
+
+    def test_password_strength_missing_lowercase(self):
+        """Test de contraseña sin minúsculas."""
+        is_strong, message = AuthManager().validate_password_strength('NOLOWERCASE1!')
+        assert not is_strong
+        assert "La contraseña debe contener al menos una letra minúscula." in message
+
+    def test_password_strength_missing_special_char(self):
+        """Test de contraseña sin caracteres especiales."""
+        is_strong, message = AuthManager().validate_password_strength('NoSpecialChar1')
+        assert not is_strong
+        assert "La contraseña debe contener al menos un carácter especial" in message
+    def test_login_success(self, client, init_database):
+        """Test login exitoso."""
+        response = client.post('/auth/login', json={
             'email': 'test@example.com',
             'password': 'testpassword123'
         })
 
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         data = response.get_json()
-        self.assertIn('access_token', data)
+        assert 'access_token' in data
 
-    def test_login_invalid_credentials(self):
+    def test_login_invalid_credentials(self, client, init_database):
         """Test login con credenciales inválidas."""
-        response = self.client.post('/auth/login', json={
+        response = client.post('/auth/login', json={
             'email': 'test@example.com',
             'password': 'wrongpassword'
         })
 
-        self.assertEqual(response.status_code, 401)
+        assert response.status_code == 401
 
-    def test_register_user(self):
+    def test_register_user(self, client, init_database, app):
         """Test registro de usuario."""
-        response = self.client.post('/auth/register', json={
-            'username': 'newuser',
-            'email': 'newuser@example.com',
+        response = client.post('/auth/register', json={
+            'username': 'newuser_register',
+            'email': 'newuser_register@example.com',
             'password': 'newpassword123',
             'first_name': 'New',
             'last_name': 'User'
         })
 
-        self.assertEqual(response.status_code, 201)
+        assert response.status_code == 201
 
         # Verificar que el usuario fue creado
-        user = User.query.filter_by(email='newuser@example.com').first()
-        self.assertIsNotNone(user)
-        self.assertEqual(user.username, 'newuser')
+        with app.app_context():
+            user = User.query.filter_by(email='newuser_register@example.com').first()
+            assert user is not None
+            assert user.username == 'newuser_register'
 
 
-class TestPasswordValidation(BaseTestCase):
-    """Tests para validación de contraseñas."""
+@pytest.mark.usefixtures("init_database")
+class TestPasswordValidation:
+    def test_strong_password(self, client):
+        """Test a strong password passes validation."""
+        is_valid, message = AuthManager().validate_password_strength("Str0ngP@ssw0rd!")
+        assert is_valid
+        assert message == "La contraseña es segura."
 
-    def test_strong_password(self):
-        """Test contraseña fuerte."""
-        result = validate_password_strength('MyStr0ngP@ssw0rd!')
-        self.assertTrue(result['valid'])
-        self.assertGreaterEqual(result['score'], 80)
-
-    def test_weak_password(self):
-        """Test contraseña débil."""
-        result = validate_password_strength('123')
-        self.assertFalse(result['valid'])
-        self.assertLess(result['score'], 50)
+    def test_weak_password(self, client):
+        """Test a weak password fails validation."""
+        is_valid, message = AuthManager().validate_password_strength("weak")
+        assert not is_valid
+        assert message == "La contraseña debe tener al menos 8 caracteres."
 
 
-class TestChatAPI(BaseTestCase):
+class TestChatAPI:
     """Tests para API de chat."""
 
-    def test_chat_without_auth(self):
+    def test_chat_without_auth(self, client):
         """Test chat sin autenticación."""
-        response = self.client.post('/api/chat', json={
+        response = client.post('/api/chat', json={
             'message': 'Hello'
         })
 
-        self.assertEqual(response.status_code, 401)
+        assert response.status_code == 401
 
-    def test_health_check(self):
+    def test_health_check(self, client):
         """Test health check endpoint."""
-        response = self.client.get('/api/health')
+        response = client.get('/api/health')
 
-        self.assertEqual(response.status_code, 200)
+        assert response.status_code == 200
         data = response.get_json()
-        self.assertEqual(data['status'], 'healthy')
+        assert data['status'] == 'healthy'
 
 
-class TestFileUpload(BaseTestCase):
+class TestFileUpload:
     """Tests para carga de archivos."""
 
-    def test_upload_without_auth(self):
+    def test_upload_without_auth(self, client):
         """Test upload sin autenticación."""
-        response = self.client.post('/api/upload')
-
-        self.assertEqual(response.status_code, 401)
-
-
-if __name__ == '__main__':
-    pytest.main([__file__])
+        response = client.post('/api/upload')
+        assert response.status_code == 401

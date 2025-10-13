@@ -103,33 +103,40 @@ Cualquier otro contexto o screenshots sobre el feature request.
 
 ## 🔧 Configuración de Desarrollo
 
-### 1. Entorno Virtual
+### 1. Instalar Poetry
+Asegúrate de tener Poetry instalado.
 ```bash
-python -m venv venv
-source venv/bin/activate  # Linux/Mac
-# venv\Scripts\activate   # Windows
+# Instrucciones en https://python-poetry.org/docs/#installation
 ```
 
 ### 2. Instalar Dependencias
+Poetry manejará el entorno virtual y las dependencias.
 ```bash
-pip install -r requirements.txt
-pip install -r requirements-dev.txt  # Dependencias de desarrollo
+poetry install
 ```
 
-### 3. Configurar Pre-commit Hooks
+### 3. Activar el Entorno Virtual
+```bash
+poetry shell
+```
+
+### 4. Configurar Pre-commit Hooks
 ```bash
 pre-commit install
 ```
 
-### 4. Variables de Entorno
+### 5. Variables de Entorno
 ```bash
-cp .env.example .env.development
-# Editar .env.development con configuraciones de desarrollo
+cp .env.example .env
+# Editar .env con tus claves de API y configuraciones
 ```
 
-### 5. Base de Datos de Desarrollo
+### 6. Inicializar la Base de Datos
+(Si es necesario para tu tarea)
 ```bash
-python -c "from app import app; from src.models import init_db; init_db(app)"
+flask db init  # Solo la primera vez
+flask db migrate -m "Initial migration"
+flask db upgrade
 ```
 
 ## 📝 Estándares de Código

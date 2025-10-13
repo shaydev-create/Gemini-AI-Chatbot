@@ -1,167 +1,173 @@
-"""
+﻿"""
 Sistema de métricas para monitoreo de rendimiento.
 """
 
-import time
+import logging
 import threading
+import time
 from collections import defaultdict, deque
-from typing import Dict, Any
-from flask import Blueprint, Response
+from typing import Any, Deque, Dict, List
+
+from flask import Blueprint, Response, current_app
+
+logger = logging.getLogger(__name__)
 
 
 class MetricsManager:
-    """Gestor de métricas de rendimiento."""
+    """
+    Gestor de métricas de rendimiento, thread-safe, para monitoreo de la aplicación.
+    """
 
     def __init__(self, max_history: int = 1000):
         """
-        Inicializar el gestor de métricas.
+        Inicializa el gestor de métricas.
 
         Args:
-            max_history: Máximo número de entradas en el historial
+            max_history: Número máximo de entradas a mantener en historiales (ej. tiempos de respuesta).
         """
-        self.max_history = max_history
-        self.lock = threading.Lock()
+        self.max_history: int = max_history
+        self._lock = threading.Lock()
 
-        # Contadores
-        self.counters = defaultdict(int)
+        self.counters: Dict[str, int] = defaultdict(int)
+        self.response_times: Deque[float] = deque(maxlen=max_history)
+        self.request_history: Deque[Dict[str, Any]] = deque(maxlen=max_history)
+        self.start_time: float = time.time()
 
-        # Tiempos de respuesta
-        self.response_times = deque(maxlen=max_history)
+        logger.info("📈 MetricsManager inicializado con un historial máximo de %d entradas.", max_history)
 
-        # Historial de requests
-        self.request_history = deque(maxlen=max_history)
-
-        # Tiempo de inicio
-        self.start_time = time.time()
-
-    def increment_counter(self, name: str, value: int = 1) -> None:
-        """
-        Incrementar un contador.
-
-        Args:
-            name: Nombre del contador
-            value: Valor a incrementar
-        """
-        with self.lock:
+    def increment_counter(self, name: str, value: int = 1):
+        """Incrementa un contador específico."""
+        with self._lock:
             self.counters[name] += value
 
-    def record_response_time(self, duration: float) -> None:
-        """
-        Registrar tiempo de respuesta.
-
-        Args:
-            duration: Duración en segundos
-        """
-        with self.lock:
+    def record_response_time(self, duration: float):
+        """Registra la duración de una respuesta."""
+        with self._lock:
             self.response_times.append(duration)
 
-    def record_request(self, endpoint: str, method: str, status_code: int) -> None:
+    def record_request(self, endpoint: str, method: str, status_code: int):
         """
-        Registrar una request.
-
-        Args:
-            endpoint: Endpoint solicitado
-            method: Método HTTP
-            status_code: Código de estado
+        Registra una solicitud entrante y actualiza los contadores relacionados.
         """
-        with self.lock:
-            self.request_history.append(
-                {
-                    "timestamp": time.time(),
-                    "endpoint": endpoint,
-                    "method": method,
-                    "status_code": status_code,
-                }
-            )
-
-            # Incrementar contadores
+        with self._lock:
+            timestamp = time.time()
+            self.request_history.append({
+                "timestamp": timestamp,
+                "endpoint": endpoint,
+                "method": method,
+                "status_code": status_code,
+            })
             self.increment_counter("total_requests")
-            self.increment_counter(f"requests_{method.lower()}")
-            self.increment_counter(f"status_{status_code}")
+            self.increment_counter(f"requests_method_{method.lower()}")
+            self.increment_counter(f"requests_status_{status_code}")
+            self.increment_counter(f"requests_endpoint_{endpoint.replace('.', '_')}")
 
     def get_metrics(self) -> Dict[str, Any]:
         """
-        Obtener todas las métricas.
-
-        Returns:
-            Dict con métricas actuales
+        Obtiene un diccionario con todas las métricas actuales.
         """
-        with self.lock:
+        with self._lock:
             current_time = time.time()
             uptime = current_time - self.start_time
 
-            # Calcular estadísticas de tiempo de respuesta
             response_stats = {}
             if self.response_times:
                 times = list(self.response_times)
                 response_stats = {
-                    "avg": sum(times) / len(times),
-                    "min": min(times),
-                    "max": max(times),
+                    "avg_seconds": sum(times) / len(times),
+                    "min_seconds": min(times),
+                    "max_seconds": max(times),
                     "count": len(times),
                 }
 
-            # Requests por minuto (últimos 60 segundos)
-            recent_requests = [
-                req
-                for req in self.request_history
-                if current_time - req["timestamp"] <= 60
-            ]
+            recent_requests = [req for req in self.request_history if current_time - req["timestamp"] <= 60]
 
             return {
                 "uptime_seconds": uptime,
                 "counters": dict(self.counters),
-                "response_times": response_stats,
+                "response_time_stats": response_stats,
                 "requests_per_minute": len(recent_requests),
-                "total_requests_history": len(self.request_history),
+                "request_history_count": len(self.request_history),
                 "timestamp": current_time,
             }
 
-    def reset_metrics(self) -> None:
-        """Reiniciar todas las métricas."""
-        with self.lock:
+    def reset_metrics(self):
+        """Reinicia todas las métricas a su estado inicial."""
+        with self._lock:
             self.counters.clear()
             self.response_times.clear()
             self.request_history.clear()
             self.start_time = time.time()
+        logger.warning("Todas las métricas han sido reseteadas.")
 
 
 # Instancia global del gestor de métricas
 metrics_manager = MetricsManager()
 
+# Blueprint para el endpoint de métricas
 metrics_bp = Blueprint("metrics", __name__)
+
+
+def _format_prometheus_metric(name: str, value: Any, metric_type: str, help_text: str, labels: Dict[str, str] = None) -> str:
+    """Formatea una métrica individual para la salida de Prometheus."""
+    label_str = ""
+    if labels:
+        label_str = "{" + ",".join([f'{k}="{v}"' for k, v in labels.items()]) + "}"
+
+    return f"# HELP {name} {help_text}\n# TYPE {name} {metric_type}\n{name}{label_str} {value}\n"
 
 
 @metrics_bp.route("/metrics")
 def prometheus_metrics():
+    """
+    Endpoint que expone las métricas en un formato compatible con Prometheus.
+    """
+    if current_app.config.get("TESTING", False):
+        # Deshabilitar en modo de prueba para no interferir con los tests
+        return Response("Métricas deshabilitadas en modo de prueba.", mimetype="text/plain")
+
     metrics = metrics_manager.get_metrics()
-    output = []
-    # Contadores
-    for key, value in metrics["counters"].items():
-        output.append(f"gemini_{key} {value}")
-    # Requests por minuto
-    output.append(
-        f"gemini_requests_per_minute {
-            metrics['requests_per_minute']}"
-    )
+    output: List[str] = []
+
     # Uptime
-    output.append(f"gemini_uptime_seconds {metrics['uptime_seconds']}")
-    # Tiempos de respuesta
-    if metrics["response_times"]:
-        output.append(
-            f"gemini_response_time_avg {
-                metrics['response_times']['avg']}"
-        )
-        output.append(
-            f"gemini_response_time_min {
-                metrics['response_times']['min']}"
-        )
-        output.append(
-            f"gemini_response_time_max {
-                metrics['response_times']['max']}"
-        )
-        output.append(
-            f"gemini_response_time_count {
-                metrics['response_times']['count']}"
-        )
-    return Response("\n".join(output), mimetype="text/plain")
+    output.append(_format_prometheus_metric(
+        "gemini_uptime_seconds",
+        metrics["uptime_seconds"],
+        "gauge",
+        "Tiempo de actividad de la aplicación en segundos."
+    ))
+
+    # Contadores generales
+    for key, value in metrics["counters"].items():
+        output.append(_format_prometheus_metric(
+            f"gemini_{key}",
+            value,
+            "counter",
+            f"Contador para {key}."
+        ))
+
+    # Estadísticas de tiempo de respuesta
+    if "response_time_stats" in metrics and metrics["response_time_stats"]:
+        stats = metrics["response_time_stats"]
+        output.append(_format_prometheus_metric(
+            "gemini_response_time_avg_seconds",
+            stats["avg_seconds"],
+            "gauge",
+            "Tiempo de respuesta promedio."
+        ))
+        output.append(_format_prometheus_metric(
+            "gemini_response_time_max_seconds",
+            stats["max_seconds"],
+            "gauge",
+            "Tiempo de respuesta máximo."
+        ))
+
+    # Solicitudes por minuto
+    output.append(_format_prometheus_metric(
+        "gemini_requests_per_minute",
+        metrics["requests_per_minute"],
+        "gauge",
+        "Número de solicitudes en los últimos 60 segundos."
+    ))
+
+    return Response("\n".join(output), mimetype="text/plain; version=0.0.4")

@@ -6,12 +6,9 @@ Actualizado para usar el nuevo cliente Vertex AI
 """
 
 import os
-import json
-import subprocess
 import sys
 import logging
 from pathlib import Path
-from typing import Dict, Optional
 
 # Configurar logging
 logging.basicConfig(
@@ -448,7 +445,7 @@ pip install google-auth
 
 1. **Test básico**
    ```python
-   from src.config.vertex_client import vertex_client
+   from app.config.vertex_client import vertex_client
 
    # Test de conexión
    await vertex_client.initialize()
@@ -556,7 +553,7 @@ def test_vertex_ai_integration() -> bool:
     try:
         # Importar el nuevo cliente
         sys.path.insert(0, str(get_project_root()))
-        from src.config.vertex_client import vertex_client
+        from app.config.vertex_client import vertex_client
 
         # Intentar inicializar
         import asyncio

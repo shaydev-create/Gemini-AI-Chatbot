@@ -7,10 +7,27 @@ Extensión de Chrome que proporciona acceso directo a Google Gemini AI con una i
 ## ✨ Características
 
 - 🤖 **Chat con IA**: Conversaciones naturales con Google Gemini
-- 🔒 **Privacidad Total**: No recopilamos ni almacenamos datos personales
-- ⚡ **Respuestas Rápidas**: Conexión directa con la API de Google
+- 🧠 **Resumen Inteligente**: Resume cualquier página web con un solo clic usando la IA integrada de Chrome (Gemini Nano).
+- 🔒 **Privacidad Total**: No recopilamos ni almacenamos datos personales. El resumen se procesa localmente en tu dispositivo.
+- ⚡ **Respuestas Rápidas**: Conexión directa con la API de Google para el chat y procesamiento local para resúmenes.
 - 🎨 **Interfaz Moderna**: Diseño futurista con gradientes y animaciones
-- 🔑 **Configuración Simple**: Solo necesitas tu API Key de Google
+- 🔑 **Configuración Simple**: Solo necesitas tu API Key de Google para la función de chat.
+
+## 🚀 Cómo Usar
+
+### Chat con IA
+
+1. **Configura tu API Key** de Google AI Studio.
+2. Abre la extensión y comienza a chatear con Gemini.
+
+### Resumen Inteligente
+
+1. Navega a cualquier página web con contenido de texto.
+2. Abre la extensión.
+3. Haz clic en el botón **"Resumir Página"**.
+4. ¡Obtén un resumen al instante!
+
+**Nota:** La función de Resumen Inteligente requiere un dispositivo compatible y que la IA integrada de Chrome esté habilitada. Puedes verificarlo en `chrome://settings/ai`.
 
 ## 🛠️ Instalación para Desarrollo
 
@@ -52,7 +69,12 @@ Extensión de Chrome que proporciona acceso directo a Google Gemini AI con una i
    - [ ] Los mensajes se muestran correctamente
    - [ ] El botón de limpiar conversación funciona
 
-4. **Interfaz**:
+4. **Funcionalidad de Resumen**:
+   - [ ] El botón "Resumir Página" está visible.
+   - [ ] Al hacer clic, se muestra un resumen del contenido de la página activa.
+   - [ ] Se manejan correctamente las páginas sin contenido textual.
+
+5. **Interfaz**:
    - [ ] El diseño es responsive
    - [ ] Los colores y gradientes se muestran correctamente
    - [ ] Las animaciones funcionan suavemente
@@ -63,7 +85,8 @@ Extensión de Chrome que proporciona acceso directo a Google Gemini AI con una i
 chrome_extension/
 ├── manifest.json          # Configuración de la extensión
 ├── popup.html             # Interfaz principal del popup
-├── popup.js               # Lógica del chat y API
+├── popup.js               # Lógica del chat, resumen y API
+├── content.js             # Script para extraer contenido de la página
 ├── background.js          # Service worker
 ├── welcome.html           # Página de bienvenida
 ├── privacy_policy.html    # Política de privacidad

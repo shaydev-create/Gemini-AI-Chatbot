@@ -4,7 +4,6 @@
 Convierte los iconos SVG optimizados a PNG para cumplir con los requisitos de Chrome Web Store
 """
 
-import os
 import subprocess
 import sys
 from pathlib import Path
@@ -45,8 +44,6 @@ def convert_svg_to_png():
     # Intentar usar cairosvg primero
     try:
         import cairosvg
-        from PIL import Image
-        import io
 
         for conversion in conversions:
             input_path = icons_dir / conversion["input"]
@@ -82,7 +79,6 @@ def convert_svg_to_png():
 
         # Método alternativo usando Pillow (limitado para SVG)
         try:
-            from PIL import Image
             from wand.image import Image as WandImage
 
             for conversion in conversions:
@@ -186,7 +182,7 @@ def main():
         return False
 
     # Crear manifest para Chrome
-    manifest_path = create_chrome_manifest()
+    create_chrome_manifest()
 
     print("\n🎯 PRÓXIMOS PASOS:")
     print("1. ✅ Iconos PNG creados")

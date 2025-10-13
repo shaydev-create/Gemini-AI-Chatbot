@@ -1,12 +1,10 @@
 #!/usr/bin/env python3
 """Script para configurar autenticación de Google Cloud y Vertex AI."""
 
+import logging
 import os
 import sys
-import json
-import logging
 from pathlib import Path
-from typing import Dict, Optional
 
 # Configurar logging
 logging.basicConfig(
@@ -204,9 +202,8 @@ def verify_authentication() -> bool:
     """
     try:
         from google.auth import default
-        from google.cloud import aiplatform
+        __import__('google.cloud.aiplatform')
         import vertexai
-
         logger.info("🔍 Verificando autenticación...")
 
         # Verificar credenciales por defecto
@@ -240,7 +237,7 @@ def verify_authentication() -> bool:
         # Verificar acceso a modelos
         try:
             from vertexai.generative_models import GenerativeModel
-            model = GenerativeModel('gemini-1.5-flash')
+            GenerativeModel('gemini-1.5-flash')
             logger.info("✅ Modelo Gemini accesible")
         except Exception as e:
             logger.warning(f"⚠️ Advertencia con modelo: {e}")

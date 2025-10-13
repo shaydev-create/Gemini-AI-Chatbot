@@ -1,116 +1,173 @@
 #!/bin/bash
 # ===============================================================================
-# 🚀 SCRIPT DE DEPLOYMENT - GEMINI AI CHATBOT
+# 🚀 SCRIPT DE DEPLOYMENT AUTOMATIZADO - GEMINI AI CHATBOT
+#
+# Este script automatiza el despliegue completo de la aplicación, incluyendo
+# la configuración del servidor, base de datos, Gunicorn y Nginx.
+#
+# Uso:
+#   export DOMAIN_NAME="tudominio.com"
+#   export ADMIN_EMAIL="admin@tudominio.com"
+#   export DB_PASSWORD="una-contraseña-muy-segura"
+#   sudo -E bash deploy.sh deploy
+#
 # ===============================================================================
 
-set -e  # Salir si hay errores
+set -euo pipefail # Salir en caso de error, variables no definidas o errores en pipes
 
-echo "🚀 Iniciando deployment de Gemini AI Chatbot..."
+# --- Configuración (Editable) ---
+# Variables que pueden ser sobrescritas por variables de entorno.
+readonly APP_NAME="gemini-ai-chatbot"
+readonly APP_USER="${APP_USER:-gemini}" # Usuario del sistema para la aplicación
+readonly APP_GROUP="${APP_GROUP:-gemini}"
+readonly APP_DIR="/var/www/${APP_NAME}"
+readonly GIT_REPO="https://github.com/shaydev-create/Gemini-AI-Chatbot.git"
+readonly VENV_DIR="${APP_DIR}/venv"
 
-# Variables
-APP_NAME="gemini-chatbot"
-APP_DIR="/var/www/$APP_NAME"
-BACKUP_DIR="/var/backups/$APP_NAME"
-DATE=$(date +%Y%m%d_%H%M%S)
+readonly DB_NAME="${DB_NAME:-gemini_prod}"
+readonly DB_USER="${DB_USER:-gemini_user}"
 
-# Funciones
-create_backup() {
-    echo "📦 Creando backup..."
-    mkdir -p $BACKUP_DIR
-    if [ -d "$APP_DIR" ]; then
-        tar -czf "$BACKUP_DIR/backup_$DATE.tar.gz" -C "$APP_DIR" .
-        echo "✅ Backup creado: $BACKUP_DIR/backup_$DATE.tar.gz"
-    fi
+# --- Variables de Entorno Requeridas ---
+: "${DOMAIN_NAME:?La variable de entorno DOMAIN_NAME debe estar definida (ej: tudominio.com)}"
+: "${ADMIN_EMAIL:?La variable de entorno ADMIN_EMAIL debe estar definida (ej: admin@tudominio.com)}"
+: "${DB_PASSWORD:?La variable de entorno DB_PASSWORD debe estar definida}"
+
+# --- Funciones de Logging ---
+log() {
+    echo "INFO: $1"
 }
 
-install_dependencies() {
-    echo "📦 Instalando dependencias del sistema..."
+log_error() {
+    echo "ERROR: $1" >&2
+    exit 1
+}
+
+# --- Funciones de Despliegue ---
+
+function setup_system() {
+    log "Configurando el sistema..."
+    # Crear usuario y grupo para la aplicación si no existen
+    if ! id -u "${APP_USER}" >/dev/null 2>&1; then
+        log "Creando usuario del sistema '${APP_USER}'..."
+        useradd -m -r -s /bin/false "${APP_USER}"
+    fi
+
+    log "Instalando dependencias del sistema..."
     apt-get update
-    apt-get install -y python3 python3-pip python3-venv nginx postgresql postgresql-contrib
+    apt-get install -y python3-pip python3-venv nginx postgresql certbot python3-certbot-nginx git curl
 }
 
-setup_database() {
-    echo "🗄️ Configurando base de datos PostgreSQL..."
-    sudo -u postgres createdb gemini_chatbot_prod || true
-    sudo -u postgres psql -c "CREATE USER gemini_user WITH PASSWORD 'secure_password';" || true
-    sudo -u postgres psql -c "GRANT ALL PRIVILEGES ON DATABASE gemini_chatbot_prod TO gemini_user;" || true
+function setup_database() {
+    log "Configurando la base de datos PostgreSQL..."
+    # Usar -U postgres para ejecutar comandos como el usuario postgres
+    sudo -u postgres psql -c "CREATE DATABASE ${DB_NAME};" || log "La base de datos '${DB_NAME}' ya existe."
+    sudo -u postgres psql -c "CREATE USER ${DB_USER} WITH PASSWORD '${DB_PASSWORD}';" || log "El usuario '${DB_USER}' ya existe."
+    sudo -u postgres psql -c "GRANT ALL PRIVILEGES ON DATABASE ${DB_NAME} TO ${DB_USER};"
+    sudo -u postgres psql -c "ALTER DATABASE ${DB_NAME} OWNER TO ${DB_USER};"
+    log "Base de datos configurada."
 }
 
-deploy_app() {
-    echo "🚀 Desplegando aplicación..."
-    
-    # Crear directorio de aplicación
-    mkdir -p $APP_DIR
-    cd $APP_DIR
-    
-    # Clonar o actualizar código
-    if [ ! -d ".git" ]; then
-        git clone https://github.com/tu-usuario/gemini-chatbot.git .
+function deploy_code() {
+    log "Desplegando el código de la aplicación..."
+    mkdir -p "${APP_DIR}"
+
+    if [ ! -d "${APP_DIR}/.git" ]; then
+        log "Clonando el repositorio..."
+        git clone "${GIT_REPO}" "${APP_DIR}"
     else
-        git pull origin main
+        log "Actualizando el repositorio..."
+        # Asegurarse de que el directorio pertenece al usuario correcto antes de hacer pull
+        chown -R "${APP_USER}:${APP_GROUP}" "${APP_DIR}"
+        sudo -u "${APP_USER}" git -C "${APP_DIR}" pull
     fi
-    
-    # Crear entorno virtual
-    python3 -m venv venv
-    source venv/bin/activate
-    
-    # Instalar dependencias Python
-    pip install --upgrade pip
-    pip install -r requirements.txt
-    pip install gunicorn psycopg2-binary
-    
-    # Configurar variables de entorno
-    cp .env.production .env
-    
-    # Inicializar base de datos
-    python -c "from app import app, db; app.app_context().push(); db.create_all()"
+
+    log "Configurando el entorno virtual de Python..."
+    # Crear venv como el usuario de la app
+    sudo -u "${APP_USER}" python3 -m venv "${VENV_DIR}"
+
+    log "Instalando dependencias de Python..."
+    # Activar venv y instalar dependencias
+    sudo -u "${APP_USER}" "${VENV_DIR}/bin/pip" install --upgrade pip
+    sudo -u "${APP_USER}" "${VENV_DIR}/bin/pip" install -r "${APP_DIR}/requirements.txt"
+
+    log "Aplicando migraciones de la base de datos..."
+    # Las variables de entorno para la DB deben estar disponibles
+    export DATABASE_URL="postgresql://${DB_USER}:${DB_PASSWORD}@localhost/${DB_NAME}"
+    sudo -u "${APP_USER}" -E "${VENV_DIR}/bin/flask" db upgrade
+
+    # Establecer permisos finales
+    chown -R "${APP_USER}:${APP_GROUP}" "${APP_DIR}"
+    log "Código desplegado y dependencias instaladas."
 }
 
-setup_gunicorn() {
-    echo "⚙️ Configurando Gunicorn..."
-    
-    cat > /etc/systemd/system/gemini-chatbot.service << EOF
+function setup_gunicorn() {
+    log "Configurando el servicio de Gunicorn..."
+    # Crear archivo de entorno para el servicio systemd
+    cat > "/etc/${APP_NAME}.conf" << EOF
+FLASK_ENV=production
+PORT=5000
+DATABASE_URL=postgresql://${DB_USER}:${DB_PASSWORD}@localhost/${DB_NAME}
+# Añade aquí otras variables de entorno necesarias (ej. SECRET_KEY, JWT_SECRET_KEY)
+SECRET_KEY=$(openssl rand -hex 32)
+JWT_SECRET_KEY=$(openssl rand -hex 32)
+EOF
+
+    # Crear el archivo de servicio systemd
+    cat > "/etc/systemd/system/${APP_NAME}.service" << EOF
 [Unit]
-Description=Gemini AI Chatbot
+Description=Gunicorn service for ${APP_NAME}
 After=network.target
 
 [Service]
-User=www-data
-Group=www-data
-WorkingDirectory=$APP_DIR
-Environment="PATH=$APP_DIR/venv/bin"
-ExecStart=$APP_DIR/venv/bin/gunicorn --workers 4 --bind 127.0.0.1:5000 app:app
+User=${APP_USER}
+Group=${APP_GROUP}
+WorkingDirectory=${APP_DIR}
+EnvironmentFile=/etc/${APP_NAME}.conf
+ExecStart=${VENV_DIR}/bin/gunicorn --config ${APP_DIR}/deployment/gunicorn.conf.py app:create_app()
 Restart=always
+RestartSec=5s
 
 [Install]
 WantedBy=multi-user.target
 EOF
 
+    log "Habilitando e iniciando el servicio Gunicorn..."
     systemctl daemon-reload
-    systemctl enable gemini-chatbot
-    systemctl start gemini-chatbot
+    systemctl enable "${APP_NAME}"
+    systemctl start "${APP_NAME}"
+    log "Servicio Gunicorn configurado y en ejecución."
 }
 
-setup_nginx() {
-    echo "🌐 Configurando Nginx..."
-    
-    cat > /etc/nginx/sites-available/gemini-chatbot << EOF
+function setup_nginx() {
+    log "Configurando Nginx como reverse proxy..."
+    # Deshabilitar el sitio por defecto
+    rm -f /etc/nginx/sites-enabled/default
+
+    cat > "/etc/nginx/sites-available/${APP_NAME}" << EOF
 server {
     listen 80;
-    server_name tu-dominio.com www.tu-dominio.com;
-    return 301 https://\$server_name\$request_uri;
+    server_name ${DOMAIN_NAME} www.${DOMAIN_NAME};
+
+    # Redirigir HTTP a HTTPS
+    location / {
+        return 301 https://\$host\$request_uri;
+    }
 }
 
 server {
     listen 443 ssl http2;
-    server_name tu-dominio.com www.tu-dominio.com;
+    server_name ${DOMAIN_NAME} www.${DOMAIN_NAME};
 
-    ssl_certificate /etc/ssl/certs/tu-dominio.com.crt;
-    ssl_certificate_key /etc/ssl/private/tu-dominio.com.key;
-    
-    ssl_protocols TLSv1.2 TLSv1.3;
-    ssl_ciphers ECDHE-RSA-AES256-GCM-SHA512:DHE-RSA-AES256-GCM-SHA512;
-    ssl_prefer_server_ciphers off;
+    # Ubicaciones de los certificados (serán gestionadas por Certbot)
+    ssl_certificate /etc/letsencrypt/live/${DOMAIN_NAME}/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/${DOMAIN_NAME}/privkey.pem;
+    include /etc/letsencrypt/options-ssl-nginx.conf;
+    ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;
+
+    # Headers de seguridad
+    add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
+    add_header X-Content-Type-Options "nosniff" always;
+    add_header X-Frame-Options "SAMEORIGIN" always;
 
     location / {
         proxy_pass http://127.0.0.1:5000;
@@ -121,81 +178,63 @@ server {
     }
 
     location /static {
-        alias $APP_DIR/static;
+        alias ${APP_DIR}/app/static;
         expires 1y;
+        access_log off;
         add_header Cache-Control "public, immutable";
     }
 }
 EOF
 
-    ln -sf /etc/nginx/sites-available/gemini-chatbot /etc/nginx/sites-enabled/
-    nginx -t
+    ln -sf "/etc/nginx/sites-available/${APP_NAME}" "/etc/nginx/sites-enabled/"
+    nginx -t || log_error "La configuración de Nginx tiene errores."
     systemctl reload nginx
+    log "Nginx configurado."
 }
 
-setup_ssl() {
-    echo "🔒 Configurando SSL con Let's Encrypt..."
-    apt-get install -y certbot python3-certbot-nginx
-    certbot --nginx -d tu-dominio.com -d www.tu-dominio.com --non-interactive --agree-tos --email admin@tu-dominio.com
+function setup_ssl() {
+    log "Configurando SSL con Certbot (Let's Encrypt)..."
+    # Detener Nginx temporalmente para que Certbot pueda usar el puerto 80
+    systemctl stop nginx
+    certbot certonly --standalone -d "${DOMAIN_NAME}" -d "www.${DOMAIN_NAME}" --non-interactive --agree-tos -m "${ADMIN_EMAIL}"
+    # Volver a iniciar Nginx
+    systemctl start nginx
+    log "Certificados SSL generados e instalados."
 }
 
-setup_monitoring() {
-    echo "📊 Configurando monitoreo..."
-    
-    # Logrotate
-    cat > /etc/logrotate.d/gemini-chatbot << EOF
-/var/log/gemini-chatbot/*.log {
-    daily
-    missingok
-    rotate 52
-    compress
-    delaycompress
-    notifempty
-    create 644 www-data www-data
-}
-EOF
-
-    # Cron para backup
-    echo "0 2 * * * root $0 backup" >> /etc/crontab
-}
-
-# Función principal
+# --- Función Principal ---
 main() {
-    case "$1" in
+    case "${1:-}" in
         "deploy")
-            create_backup
-            install_dependencies
+            log "Iniciando despliegue completo..."
+            setup_system
             setup_database
-            deploy_app
+            deploy_code
             setup_gunicorn
             setup_nginx
             setup_ssl
-            setup_monitoring
-            echo "✅ Deployment completado!"
-            echo "🌐 Tu aplicación está disponible en: https://tu-dominio.com"
-            ;;
-        "backup")
-            create_backup
+            log "✅ Despliegue completado exitosamente."
+            log "🌐 Tu aplicación debería estar disponible en: https://${DOMAIN_NAME}"
             ;;
         "restart")
-            systemctl restart gemini-chatbot
+            log "Reiniciando servicios..."
+            systemctl restart "${APP_NAME}"
             systemctl reload nginx
-            echo "✅ Servicios reiniciados"
+            log "✅ Servicios reiniciados."
             ;;
         *)
-            echo "Uso: $0 {deploy|backup|restart}"
-            echo "  deploy  - Despliega la aplicación completa"
-            echo "  backup  - Crea backup de la aplicación"
-            echo "  restart - Reinicia los servicios"
+            echo "Uso: $0 {deploy|restart}"
+            echo "  deploy  - Ejecuta el proceso de despliegue completo."
+            echo "  restart - Reinicia los servicios de Gunicorn y Nginx."
             exit 1
             ;;
     esac
 }
 
+# --- Punto de Entrada ---
 # Verificar que se ejecuta como root
 if [ "$EUID" -ne 0 ]; then
-    echo "❌ Este script debe ejecutarse como root"
-    exit 1
+    log_error "Este script debe ejecutarse como root. Usa 'sudo -E bash $0 ...' para preservar las variables de entorno."
 fi
 
 main "$@"

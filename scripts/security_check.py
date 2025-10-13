@@ -7,9 +7,8 @@ Este script ejecuta todas las verificaciones de seguridad en un solo comando.
 Verifica credenciales expuestas, limpia archivos sensibles y muestra recomendaciones.
 """
 
-import os
-import sys
 import subprocess
+import sys
 from pathlib import Path
 
 

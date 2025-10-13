@@ -10,10 +10,10 @@ Permite configurar y probar las claves API de Gemini sin exponerlas.
 import os
 import re
 import sys
-import json
-import requests
 from pathlib import Path
-from dotenv import load_dotenv, set_key
+
+import requests
+from dotenv import load_dotenv
 
 # Constantes
 ENV_FILE = '.env'

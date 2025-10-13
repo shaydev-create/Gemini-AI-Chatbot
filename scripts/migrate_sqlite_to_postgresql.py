@@ -1,14 +1,15 @@
 #!/usr/bin/env python3
 """Script para migrar datos de SQLite a PostgreSQL."""
 
-import os
-import sys
 import logging
+import os
 import sqlite3
-import psycopg2
+import sys
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple, Any
+from typing import Dict, List, Tuple
 from urllib.parse import urlparse
+
+import psycopg2
 
 # Configurar logging
 logging.basicConfig(
@@ -49,9 +50,9 @@ def check_dependencies() -> bool:
     for package in required_packages:
         try:
             if package == 'psycopg2':
-                import psycopg2
+                __import__(package)
             elif package == 'sqlalchemy':
-                import sqlalchemy
+                __import__(package)
             logger.info(f"✅ {package} está disponible")
         except ImportError:
             missing_packages.append(package)

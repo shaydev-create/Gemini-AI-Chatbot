@@ -3,178 +3,97 @@
 ##  Arquitectura General
 
 ```
+# Estructura del Proyecto - Gemini AI Chatbot (v2)
+
+## Arquitectura General con Poetry y Docker
+
+```
 Gemini-AI-Chatbot/
-  app.py                     # Aplicación principal Flask
-  requirements.txt           # Dependencias Python
-  requirements-dev.txt       # Dependencias de desarrollo
-  requirements-minimal.txt   # Dependencias mínimas
-  pytest.ini               # Configuración de tests
-  pyproject.toml            # Configuración del proyecto
-  .gitignore                # Archivos ignorados por Git
-  .env.example              # Ejemplo de variables de entorno
-  setup.py                  # Configuración de instalación
+├── app/                     # Lógica principal de la aplicación Flask
+│   ├── __init__.py          # Inicializa el paquete de la aplicación
+│   ├── api/                 # Endpoints de la API RESTful
+│   ├── auth/                # Autenticación y gestión de usuarios
+│   ├── core/                # Lógica de negocio central (seguridad, caché)
+│   ├── main/                # Rutas principales y manejo de errores
+│   ├── models.py            # Modelos de datos (SQLAlchemy)
+│   ├── services/            # Integraciones con servicios externos (Gemini, DB)
+│   ├── static/              # Archivos estáticos (CSS, JS, imágenes, PWA)
+│   └── templates/           # Plantillas HTML (Jinja2)
+├── chrome_extension/        # Código fuente de la extensión de Chrome
+├── docs/                    # Documentación del proyecto
+├── instance/                # Archivos de instancia (BD, logs), ignorado por Git
+├── reports/                 # Reportes de pruebas, cobertura y seguridad
+├── scripts/                 # Scripts de utilidad (limpieza, chequeos)
+├── tests/                   # Pruebas unitarias y de integración
+├── .dockerignore            # Archivos ignorados por Docker
+├── .env.example             # Plantilla para variables de entorno
+├── .gitignore               # Archivos y carpetas ignorados por Git
+├── app.py                   # Punto de entrada de la aplicación Flask
+├── docker-compose.dev.yml   # Orquestación Docker para desarrollo
+├── docker-compose.prod.yml  # Orquestación Docker para producción
+├── docker-compose.yml       # Configuración base de Docker Compose
+├── Dockerfile               # Define la imagen Docker multi-etapa
+├── poetry.lock              # Lockfile de dependencias de Poetry
+└── pyproject.toml           # Configuración del proyecto y dependencias (Poetry)
+```
 
-  app/                       # Aplicación Flask principal
-     __init__.py
-     main.py               # Punto de entrada principal
-     api/                  # Endpoints de API
-        __init__.py
-        auth.py           # Autenticación API
-        admin.py          # Rutas de administración
-        routes.py         # Rutas principales
-     core/                 # Núcleo de la aplicación
-        __init__.py
-        application.py    # Configuración de la app
-        cache.py          # Sistema de caché
-        decorators.py     # Decoradores personalizados
-        metrics.py        # Métricas y monitoreo
-        middleware.py     # Middleware personalizado
-     services/             # Servicios de negocio
-        __init__.py
-        gemini_service.py # Servicio de Gemini AI
-        multimodal_service.py # Servicio multimodal
-        conversation_memory.py # Memoria de conversaciones
-     static/               # Archivos estáticos
-        css/              # Hojas de estilo
-        js/               # JavaScript
-        images/           # Imágenes
-        icons/            # Iconos
-        manifest.json     # Manifiesto PWA
-        sw.js             # Service Worker
-        favicon.ico       # Favicon
-     templates/            # Plantillas HTML
-        chat.html         # Interfaz de chat
-        index.html        # Página principal
-        admin.html        # Panel de administración
-        auth/             # Plantillas de autenticación
-        errors/           # Páginas de error
-        privacy_policy.html # Política de privacidad
-        terms_of_service.html # Términos de servicio
-     utils/                # Utilidades
-        __init__.py
-        helpers.py        # Funciones auxiliares
-        i18n.py           # Internacionalización
-        validators.py     # Validadores
-     i18n/                 # Archivos de idiomas
-         en.json          # Inglés
-         es.json          # Español
+## Componentes Principales
 
-  src/                       # Código fuente adicional
-     __init__.py
-     auth.py               # Sistema de autenticación
-     models.py            # Modelos de base de datos
-     security.py          # Funciones de seguridad
+### Aplicación Flask (`app/`)
+- **`__init__.py`**: Crea y configura la instancia de la aplicación Flask (App Factory).
+- **`api/`**: Endpoints REST para la comunicación con el frontend y la extensión.
+- **`auth/`**: Manejo de registro, login, y sesiones de usuario con JWT.
+- **`core/`**: Lógica de negocio, como el `SecurityManager` y la gestión de la caché.
+- **`main/`**: Rutas principales de la aplicación web y manejo de errores globales.
+- **`models.py`**: Define las tablas de la base de datos usando SQLAlchemy.
+- **`services/`**: Abstracciones para interactuar con la API de Gemini y la base de datos.
+- **`static/`**: Recursos web como CSS, JavaScript, imágenes, y los archivos para la PWA (`manifest.json`, `sw.js`).
+- **`templates/`**: Plantillas HTML renderizadas por el servidor con Jinja2.
 
-  core/                      # Coordinación de seguridad
-     __init__.py
-     security_manager.py  # Gestor de seguridad
+### Configuración y Dependencias
+- **`pyproject.toml`**: Archivo central que define el proyecto, sus dependencias (producción y desarrollo), y la configuración de herramientas como `pytest`, `ruff`, y `mypy`. Reemplaza `requirements.txt` y `setup.py`.
+- **`poetry.lock`**: Archivo autogenerado que asegura instalaciones determinísticas de las dependencias.
+- **`.env.example`**: Plantilla que documenta todas las variables de entorno necesarias para correr la aplicación.
 
-  config/                    # Configuraciones
-     __init__.py
-     database.py          # Configuración de BD
-     settings.py          # Configuraciones generales
-     ssl_config.py        # Configuración SSL
+### Contenerización (`Dockerfile`, `docker-compose.*.yml`)
+- **`Dockerfile`**: Utiliza una construcción multi-etapa para crear una imagen de producción ligera y segura, usando Poetry para instalar dependencias.
+- **`docker-compose.yml`**: Define los servicios base (app, db, redis).
+- **`docker-compose.dev.yml`**: Extiende la base para desarrollo, montando el código fuente para live-reloading.
+- **`docker-compose.prod.yml`**: Extiende la base para producción, añadiendo Nginx como reverse proxy y usando Gunicorn como servidor WSGI.
 
-  data/                      # Datos de la aplicación
-     __init__.py
+### Testing (`tests/`)
+- **`conftest.py`**: Fixtures y configuración global para `pytest`.
+- El directorio contiene pruebas unitarias y de integración, organizadas por funcionalidad.
 
-  scripts/                   # Scripts de utilidad
-     README.md
-     __init__.py
-     check_exposed_credentials.py # Verificar credenciales
-     cleanup.py            # Limpieza del proyecto
-     create_chrome_icons.py # Crear iconos de Chrome
-     final_check.py        # Verificación final
-     init_db.py            # Inicializar base de datos
-     launch_readiness_check.py # Verificar preparación
-     maintenance.py        # Mantenimiento
-     migrate_to_vertex_ai.py # Migración a Vertex AI
-     monitor.py            # Monitoreo del sistema
-     package_chrome_extension.py # Empaquetar extensión
-     prepare_chrome_store.py # Preparar Chrome Store
-     secure_env.py         # Asegurar variables de entorno
-     security_check.py     # Verificación de seguridad
-     setup_api_keys.py     # Configurar API keys
-     test_chat_functionality.py # Probar funcionalidad
+### Despliegue y CI/CD
+- **`deployment/`**: Scripts y configuraciones para el despliegue (ej. `gunicorn.conf.py`).
+- **`.github/workflows/`**: Pipelines de GitHub Actions para integración continua, pruebas y despliegue.
 
-  tests/                     # Pruebas automatizadas
-     README.md
-     __init__.py
-     conftest.py           # Configuración de pytest
-     test_basic.py         # Pruebas básicas
-     test_main.py          # Pruebas principales
-     test_routes.py        # Pruebas de rutas
-     test_version.py       # Pruebas de versión
-     unit/                 # Pruebas unitarias
-        __init__.py
-        test_application.py # Pruebas de aplicación
-        test_basic.py     # Pruebas básicas unitarias
-        test_gemini_service.py # Pruebas de Gemini
-        test_security.py  # Pruebas de seguridad
-        test_utils.py     # Pruebas de utilidades
-     integration/          # Pruebas de integración
-        __init__.py
-        test_api.py       # Pruebas de API
-        test_integration.py # Pruebas de integración
-     e2e/                  # Pruebas end-to-end
-         README.md
-         __init__.py
-         package.json      # Dependencias Node.js
-         package-lock.json # Lock de dependencias
-         test_e2e.py       # Pruebas E2E
+## Flujo de Datos
 
-  chrome_extension/          # Extensión de Chrome
-     manifest.json         # Manifiesto de la extensión
-     background.js         # Script de fondo
-     content.js            # Script de contenido
-     popup.html            # Popup de la extensión
-     popup.js              # JavaScript del popup
-     index.html            # Página principal
-     privacy_policy.html   # Política de privacidad
-     icons/                # Iconos de la extensión
-         icon_16.png       # Icono 16x16
-         icon_48.png       # Icono 48x48
-         icon_128.png      # Icono 128x128
+1.  **Usuario** interactúa con la Interfaz Web (PWA) o la Extensión de Chrome.
+2.  **Frontend** (JS en `static/` o `chrome_extension/`) envía peticiones a la **API Flask** (`app/api/`).
+3.  La **API** procesa la petición, usando `auth/` para verificar la identidad y `services/` para la lógica de negocio.
+4.  **`services/`** se comunica con la API de **Google Gemini** y/o la base de datos (`models.py`).
+5.  La respuesta se devuelve al frontend y se presenta al usuario.
 
-  deployment/                # Archivos de despliegue
-     Dockerfile            # Imagen Docker
-     docker-compose.yml    # Orquestación Docker
-     deploy.sh             # Script de despliegue
-     gunicorn.conf.py      # Configuración Gunicorn
+## Tecnologías Utilizadas
 
-  docker/                    # Configuraciones Docker
-     nginx.conf            # Configuración Nginx
+- **Backend**: Flask, Python 3.11+
+- **Gestor de Dependencias**: Poetry
+- **Servidor WSGI**: Gunicorn con workers `gevent`
+- **Frontend**: HTML5, CSS3, JavaScript (Vanilla)
+- **AI**: Google Gemini API
+- **Base de datos**: PostgreSQL
+- **Caché**: Redis
+- **Contenerización**: Docker, Docker Compose
+- **Proxy Inverso**: Nginx
+- **Testing**: pytest
+- **Calidad de Código**: Ruff, Black, MyPy
 
-  monitoring/                # Monitoreo
-     prometheus.yml        # Configuración Prometheus
+---
 
-  docs/                      # Documentación
-     index.md              # Índice de documentación
-     _config.yml           # Configuración Jekyll
-     LICENSE               # Licencia del proyecto
-     API_DOCUMENTATION.md  # Documentación de API
-     API_MIGRATION_SPECIFIC.md # Migración de API
-     CHROME_STORE_PRIVACY_SETUP.md # Configuración Chrome
-     CONTRIBUTING.md       # Guía de contribución
-     DEPENDENCIAS_MAGIC.md # Dependencias mágicas
-     MANTENIMIENTO_CODIGO.md # Mantenimiento de código
-     PRIVACY_POLICY.md     # Política de privacidad
-     PROJECT_STRUCTURE.md  # Este archivo
-     PYTHON_3_13_COMPATIBILIDAD.md # Compatibilidad Python
-     SEGURIDAD_CREDENCIALES.md # Seguridad de credenciales
-     SYSTEM_ANALYSIS.md    # Análisis del sistema
-     SYSTEM_DOCUMENTATION.md # Documentación completa
-     USER_GUIDE.md         # Guía de usuario
-     VERTEX_AI_MIGRATION_STEPS.md # Migración Vertex AI
-
-  .github/                   # Configuración GitHub
-     workflows/            # GitHub Actions
-         ci-cd.yml         # CI/CD Pipeline
-         github-pages.yml  # GitHub Pages
-
-  docker-compose.dev.yml    # Docker para desarrollo
-  docker-compose.prod.yml   # Docker para producción
-  chrome_extension.crx       # Extensión empaquetada
+*Última actualización: Octubre 2025*
 ```
 
 ##  Componentes Principales

@@ -8,22 +8,23 @@
 
 ### 1. Acceso a la Aplicación
 
-#### Aplicación Web
-1. Abre tu navegador web
-2. Ve a: `https://localhost:5000` (desarrollo) o tu URL de producción
-3. ¡Listo! Ya puedes comenzar a chatear
+#### Usando Docker (Recomendado)
+1.  Abre una terminal en la raíz del proyecto.
+2.  Ejecuta `docker-compose up -d`.
+3.  Abre tu navegador y ve a `http://localhost:8000`.
 
-#### Extensión de Chrome
-1. Instala la extensión desde Chrome Web Store
-2. Haz clic en el ícono de Gemini AI en la barra de herramientas
-3. La extensión se abrirá en una ventana emergente
+#### Desarrollo Local (Sin Docker)
+1.  Asegúrate de tener Poetry instalado y las dependencias listas (`poetry install`).
+2.  Activa el entorno virtual (`poetry shell`).
+3.  Ejecuta `flask run`.
+4.  Abre tu navegador y ve a `http://localhost:5000`.
 
 ### 2. Primera Conversación
 
-1. **Escribe tu mensaje** en el campo de texto
-2. **Presiona Enter** o haz clic en el botón de enviar
-3. **Espera la respuesta** de Gemini AI
-4. **Continúa la conversación** de forma natural
+1.  **Escribe tu mensaje** en el campo de texto en la parte inferior.
+2.  **Presiona Enter** o haz clic en el botón de enviar (icono de avión de papel).
+3.  La respuesta de Gemini aparecerá en la ventana de chat.
+4.  ¡Continúa la conversación! El historial se mantiene para dar contexto.
 
 ## 💬 Cómo Usar el Chat
 

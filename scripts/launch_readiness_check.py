@@ -6,12 +6,8 @@ Gemini AI Chatbot - Chrome Web Store Launch
 Este script verifica que todos los componentes estén listos para el lanzamiento.
 """
 
-import os
-import sys
 import json
-import zipfile
-import requests
-import time
+import sys
 from datetime import datetime
 from pathlib import Path
 
@@ -394,7 +390,7 @@ class LaunchReadinessChecker:
         success_rate = (self.passed_checks / self.total_checks) * \
             100 if self.total_checks > 0 else 0
 
-        print(f"\n📊 RESUMEN GENERAL:")
+        print("\n📊 RESUMEN GENERAL:")
         print(f"   ✅ Pruebas exitosas: {self.passed_checks}")
         print(
             f"   ❌ Pruebas fallidas: {
