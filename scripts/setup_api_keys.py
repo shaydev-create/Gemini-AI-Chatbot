@@ -1,3 +1,42 @@
+def show_api_key_status(gemini_key, google_key):
+    print("📋 ESTADO ACTUAL DE LAS CLAVES API:")
+    if gemini_key:
+        masked_key = gemini_key[:4] + "*" * (len(gemini_key) - 8) + gemini_key[-4:]
+        print(f"✅ GEMINI_API_KEY: {masked_key}")
+    else:
+        print("❌ GEMINI_API_KEY: No configurada")
+    if google_key:
+        masked_key = google_key[:4] + "*" * (len(google_key) - 8) + google_key[-4:]
+        print(f"✅ GOOGLE_API_KEY: {masked_key}")
+    else:
+        print("❌ GOOGLE_API_KEY: No configurada")
+    print()
+
+def prompt_for_new_api_key():
+    print("🔑 CONFIGURACIÓN DE NUEVA API KEY")
+    print("Obtén tu API key en: https://aistudio.google.com/")
+    print()
+    new_key = input("Ingresa tu API key de Gemini: ").strip()
+    if not new_key:
+        print("❌ No se ingresó ninguna API key")
+        return None
+    if not is_valid_api_key(new_key):
+        print("⚠️ El formato de la API key no parece correcto")
+        response = input("¿Deseas continuar de todos modos? (s/n): ").lower()
+        if response != "s":
+            print("❌ Configuración cancelada")
+            return None
+    print("🔍 Probando nueva API key...")
+    success, message = test_gemini_api(new_key)
+    if success:
+        print(f"✅ API key válida: {message}")
+    else:
+        print(f"❌ API key inválida: {message}")
+        response = input("¿Deseas guardar esta API key de todos modos? (s/n): ").lower()
+        if response != "s":
+            print("❌ Configuración cancelada")
+            return None
+    return new_key
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
@@ -174,37 +213,16 @@ def update_env_file(key_name, key_value):
 
 def setup_api_keys():
     """Configurar claves API interactivamente"""
-    # Cargar claves actuales
     current_keys = load_current_keys()
     gemini_key = current_keys["GEMINI_API_KEY"]
     google_key = current_keys["GOOGLE_API_KEY"]
-
-    # Mostrar estado actual
-    print("📋 ESTADO ACTUAL DE LAS CLAVES API:")
-
-    if gemini_key:
-        masked_key = gemini_key[:4] + "*" * (len(gemini_key) - 8) + gemini_key[-4:]
-        print(f"✅ GEMINI_API_KEY: {masked_key}")
-    else:
-        print("❌ GEMINI_API_KEY: No configurada")
-
-    if google_key:
-        masked_key = google_key[:4] + "*" * (len(google_key) - 8) + google_key[-4:]
-        print(f"✅ GOOGLE_API_KEY: {masked_key}")
-    else:
-        print("❌ GOOGLE_API_KEY: No configurada")
-
-    print()
-
-    # Verificar si ya hay una clave válida
+    show_api_key_status(gemini_key, google_key)
     if gemini_key and is_valid_api_key(gemini_key):
         print("🔍 Probando API key actual...")
         success, message = test_gemini_api(gemini_key)
-
         if success:
             print(f"✅ API key actual válida: {message}")
             print()
-
             response = input("¿Deseas configurar una nueva API key? (s/n): ").lower()
             if response != "s":
                 print("✅ Configuración actual mantenida")
@@ -212,44 +230,11 @@ def setup_api_keys():
         else:
             print(f"❌ API key actual inválida: {message}")
             print()
-
-    # Solicitar nueva API key
-    print("🔑 CONFIGURACIÓN DE NUEVA API KEY")
-    print("Obtén tu API key en: https://aistudio.google.com/")
-    print()
-
-    new_key = input("Ingresa tu API key de Gemini: ").strip()
-
+    new_key = prompt_for_new_api_key()
     if not new_key:
-        print("❌ No se ingresó ninguna API key")
         return False
-
-    if not is_valid_api_key(new_key):
-        print("⚠️ El formato de la API key no parece correcto")
-        response = input("¿Deseas continuar de todos modos? (s/n): ").lower()
-        if response != "s":
-            print("❌ Configuración cancelada")
-            return False
-
-    # Probar nueva API key
-    print("🔍 Probando nueva API key...")
-    success, message = test_gemini_api(new_key)
-
-    if success:
-        print(f"✅ API key válida: {message}")
-    else:
-        print(f"❌ API key inválida: {message}")
-        response = input("¿Deseas guardar esta API key de todos modos? (s/n): ").lower()
-        if response != "s":
-            print("❌ Configuración cancelada")
-            return False
-
-    # Actualizar archivo .env
     print("💾 Guardando API key en archivo .env...")
-
-    if update_env_file("GEMINI_API_KEY", new_key) and update_env_file(
-        "GOOGLE_API_KEY", new_key
-    ):
+    if update_env_file("GEMINI_API_KEY", new_key) and update_env_file("GOOGLE_API_KEY", new_key):
         print("✅ API key guardada correctamente")
         return True
     else:
