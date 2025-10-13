@@ -1,12 +1,12 @@
 import unittest
 
-from app.core.application import create_app
+from app.core.application import get_flask_app
 
 
 class TestMainApp(unittest.TestCase):
     def setUp(self):
         """Configura el entorno para cada prueba."""
-        app = create_app("testing")
+        app = get_flask_app("testing")
         self.client = app.test_client()
 
     def test_app_creation(self):

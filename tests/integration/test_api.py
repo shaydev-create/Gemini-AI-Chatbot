@@ -6,13 +6,14 @@ import json
 from unittest.mock import patch
 
 import pytest
-from app.core.application import create_app
+from app.core.application import get_flask_app
+
 
 
 @pytest.fixture
 def app():
-    """Crear aplicación para tests."""
-    app = create_app("testing")
+    """Crear aplicación Flask para tests."""
+    app = get_flask_app("testing")
     return app
 
 

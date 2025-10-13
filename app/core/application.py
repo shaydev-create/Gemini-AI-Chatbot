@@ -67,4 +67,12 @@ def create_app(config_class=DevelopmentConfig):
         db.create_all()
 
     app.logger.info("Aplicación creada y configurada exitosamente.")
+
     return app, socketio
+
+def get_flask_app(config_class=DevelopmentConfig):
+    """
+    Devuelve solo la instancia Flask para pruebas (pytest, Flask test client).
+    """
+    app, _ = create_app(config_class)
+    return app
