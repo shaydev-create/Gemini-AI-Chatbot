@@ -75,7 +75,7 @@ ruff = "^0.4.2"
 start = "app.main:run"
 test = "pytest"
 lint = "ruff check ."
-format = "scripts.format_code:main"
+format = "ruff_format:main"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]

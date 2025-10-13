@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-Script para formatear el código usando ruff.
-Este script proporciona un punto de entrada de función para el CI/CD.
+Módulo de formateo de código usando ruff.
+Proporciona una función main() para el punto de entrada del script.
 """
 
 import subprocess
@@ -12,15 +12,12 @@ from pathlib import Path
 def main():
     """
     Función principal para formatear el código con ruff.
+    Esta función es requerida por el formato de script module:function.
     """
     try:
-        # Obtener el directorio raíz del proyecto
-        project_root = Path(__file__).parent.parent
-        
-        # Ejecutar ruff format
+        # Ejecutar ruff format con verificación
         result = subprocess.run(
-            ["poetry", "run", "ruff", "format", "--check", "."],
-            cwd=project_root,
+            ["ruff", "format", "--check", "."],
             capture_output=True,
             text=True
         )
@@ -32,15 +29,15 @@ def main():
             print(result.stderr, file=sys.stderr)
         
         # Salir con el código de retorno de ruff
-        sys.exit(result.returncode)
+        return result.returncode
         
     except FileNotFoundError:
-        print("Error: No se pudo encontrar poetry o ruff. Asegúrate de que estén instalados.", file=sys.stderr)
-        sys.exit(1)
+        print("Error: No se pudo encontrar ruff. Asegúrate de que esté instalado.", file=sys.stderr)
+        return 1
     except Exception as e:
         print(f"Error inesperado: {e}", file=sys.stderr)
-        sys.exit(1)
+        return 1
 
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main())
