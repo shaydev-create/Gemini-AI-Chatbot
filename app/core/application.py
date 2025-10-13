@@ -3,7 +3,7 @@ from flask import Flask
 from flask_babel import Babel
 from app.config.settings import DevelopmentConfig, ProductionConfig
 from app.main import main as main_blueprint
-from app.api import api as api_blueprint
+from app.api.routes import api_bp as api_blueprint
 from app.auth import auth as auth_blueprint
 from app.config.extensions import db, migrate, socketio
 from app.utils.translation_utils import register_translation_functions

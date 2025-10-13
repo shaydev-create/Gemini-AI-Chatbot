@@ -60,9 +60,11 @@ except ImportError:
         """
         Devuelve una configuración simulada para cuando la app no está completamente inicializada.
         """
+        import os
+        
         class SecurityConfig:
             """Configuración de seguridad simulada."""
-            jwt_secret_key = "your-secret-key"
+            jwt_secret_key = os.getenv('JWT_SECRET_KEY', 'fallback-dev-key-change-in-production')
             jwt_expiration_hours = 24
             rate_limit_per_minute = 60
             max_login_attempts = 5

@@ -2,13 +2,13 @@
 Rutas API del Gemini AI Chatbot.
 """
 
-from flask import current_app, jsonify, request
+from flask import Blueprint, current_app, jsonify, request
 
-from app.api import api
+api_bp = Blueprint("api_bp", __name__)
 from app.auth import get_current_user_from_jwt
 
 
-@api.route("/chat/send", methods=["POST"])
+@api_bp.route("/chat/send", methods=["POST"])
 def send_message():
     """
     Endpoint para enviar un mensaje al chatbot y recibir una respuesta.
@@ -82,7 +82,7 @@ Por favor, analiza la imagen proporcionada y responde a la pregunta del usuario 
         return jsonify({"message": "Error interno al procesar la solicitud."}), 500
 
 
-@api.route("/chat/stream", methods=["POST"])
+@api_bp.route("/chat/stream", methods=["POST"])
 def stream_message():
     """
     Endpoint para enviar un mensaje y recibir una respuesta en streaming.
@@ -92,9 +92,21 @@ def stream_message():
     return jsonify({"message": "Endpoint de streaming no implementado aún."}), 501
 
 
-@api.route("/health", methods=["GET"])
+
+@api_bp.route("/health", methods=["GET"])
 def health_check():
     """
     Endpoint de health check para verificar que la API está activa.
     """
-    return jsonify({"status": "healthy"}), 200
+    import time
+    metrics = {}
+    uptime_seconds = int(time.time() - getattr(current_app, 'start_time', time.time()))
+    metrics['uptime_seconds'] = uptime_seconds
+    return jsonify({
+        "status": "healthy",
+        "timestamp": int(time.time()),
+        "metrics": metrics
+    }), 200
+
+# Export Blueprint for import in app and tests
+__all__ = ["api_bp"]

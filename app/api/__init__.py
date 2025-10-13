@@ -1,5 +1,1 @@
-from flask import Blueprint
-
-api = Blueprint('api', __name__)
-
-from . import routes, admin, auth
+from .routes import api_bp

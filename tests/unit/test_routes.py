@@ -24,7 +24,7 @@ def app():
             return text  # Simplemente devuelve el texto original
         return dict(translate=translate)
 
-    api_bp.app)
+    # api_bp.app  # Línea corregida, elimina el paréntesis suelto
 
     # Añadir una ruta de 'static' para que send_from_directory funcione en pruebas
     # Esto es un workaround para el contexto de las pruebas
