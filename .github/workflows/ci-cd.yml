@@ -56,7 +56,7 @@ jobs:
 
       - name: 🔍 Lint with ruff
         run: |
-          poetry run ruff check .
+          poetry run lint
           poetry run format
 
       - name: 🔍 Type check with mypy
