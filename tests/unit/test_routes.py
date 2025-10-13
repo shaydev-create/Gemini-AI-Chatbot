@@ -26,7 +26,7 @@ def app():
         def translate(text):
             return text  # Simplemente devuelve el texto original
 
-        return dict(translate=translate)
+        return {"translate": translate}
 
     # api_bp.app  # Línea corregida, elimina el paréntesis suelto
 

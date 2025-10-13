@@ -165,7 +165,7 @@ class ScreenshotGenerator:
                     "03_chat_response",
                     "AI response with formatted text and neural animations",
                 )
-            except:
+            except Exception:
                 print("⚠️ Send button not found, skipping response screenshot")
 
         except Exception as e:

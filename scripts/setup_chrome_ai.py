@@ -48,7 +48,7 @@ class ChromeAISetup:
 
             response = requests.get("http://127.0.0.1:5000", timeout=3)
             return response.status_code == 200
-        except:
+        except Exception:
             return False
 
     def launch_chrome_ai(self, chrome_path, url="http://127.0.0.1:5000"):

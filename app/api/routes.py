@@ -2,10 +2,13 @@
 Rutas API del Gemini AI Chatbot.
 """
 
+import time
+
 from flask import Blueprint, current_app, jsonify, request
 
-api_bp = Blueprint("api_bp", __name__)
 from app.auth import get_current_user_from_jwt
+
+api_bp = Blueprint("api_bp", __name__)
 
 
 @api_bp.route("/chat/send", methods=["POST"])
@@ -36,7 +39,7 @@ def send_message():
     try:
         current_user = get_current_user_from_jwt()
         user_id = current_user.id if current_user else None
-    except:
+    except Exception:
         user_id = None  # Usuario anónimo
 
     gemini_service = current_app.gemini_service
@@ -105,8 +108,6 @@ def health_check():
     """
     Endpoint de health check para verificar que la API está activa.
     """
-    import time
-
     metrics = {}
     uptime_seconds = int(time.time() - getattr(current_app, "start_time", time.time()))
     metrics["uptime_seconds"] = uptime_seconds

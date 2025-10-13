@@ -38,4 +38,4 @@ def register_translation_functions(app):
 
     @app.context_processor
     def inject_translate():
-        return dict(translate=translate)
+        return {"translate": translate}

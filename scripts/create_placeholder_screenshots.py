@@ -30,7 +30,7 @@ def create_placeholder_screenshot(
         title_font = ImageFont.truetype("arial.ttf", 48)
         desc_font = ImageFont.truetype("arial.ttf", 24)
         small_font = ImageFont.truetype("arial.ttf", 16)
-    except:
+    except Exception:
         title_font = ImageFont.load_default()
         desc_font = ImageFont.load_default()
         small_font = ImageFont.load_default()

@@ -81,7 +81,9 @@ class TestDatabaseInitialization:
         try:
             reset_db(app)
         except Exception:
-            assert False, "reset_db no debe lanzar excepción"
+            import pytest
+
+            pytest.fail("reset_db no debe lanzar excepción")
         mock_drop_all.assert_called_once()
         mock_create_all.assert_called_once()
 

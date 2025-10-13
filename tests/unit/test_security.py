@@ -7,6 +7,7 @@ import pytest
 # Asumimos que app.core.security está en el path.
 # Si no, necesitaríamos ajustar el sys.path, pero pytest suele manejarlo.
 from app.core.security import (
+    AuthenticationError,
     DataEncryption,
     LoginAttemptTracker,
     RateLimiter,
@@ -260,13 +261,13 @@ def test_security_manager_account_lockout(security_manager):
     security_manager._verify_user_credentials.return_value = False
 
     # Intentos fallidos
-    with pytest.raises(Exception):
+    with pytest.raises(AuthenticationError):
         security_manager.authenticate_user("locked_user", "p1")
-    with pytest.raises(Exception):
+    with pytest.raises(AuthenticationError):
         security_manager.authenticate_user("locked_user", "p2")
-    with pytest.raises(Exception):
+    with pytest.raises(AuthenticationError):
         security_manager.authenticate_user("locked_user", "p3")
 
     # Siguiente intento debería fallar por bloqueo
-    with pytest.raises(Exception, match="Account locked"):
+    with pytest.raises(AuthenticationError, match="Account locked"):
         security_manager.authenticate_user("locked_user", "p4")

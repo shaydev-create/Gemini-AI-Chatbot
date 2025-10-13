@@ -455,7 +455,7 @@ class TestErrorHandlingIntegration:
         try:
             # Intentar inicializar debería fallar
             client._initialize_vertex_ai()
-            assert False, "Debería haber fallado la inicialización"
+            pytest.fail("Debería haber fallado la inicialización")
         except Exception:
             # Se espera que falle
             pass

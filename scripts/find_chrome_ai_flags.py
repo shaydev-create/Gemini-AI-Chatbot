@@ -171,7 +171,7 @@ def open_chrome_flags():
         webbrowser.open("chrome://flags/")
         time.sleep(2)
         print("✅ Página abierta! Busca los flags arriba mencionados.")
-    except:
+    except Exception:
         print("⚠️  No se pudo abrir automáticamente.")
         print("📋 Copia y pega manualmente: chrome://flags/")
     print()
