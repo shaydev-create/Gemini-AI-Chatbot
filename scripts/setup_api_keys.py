@@ -1,6 +1,4 @@
-ENV_FILE = ".env"
-ENV_SAMPLE_FILE = ".env-sample"
-ENV_EXAMPLE_FILE = ".env.example"
+
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 import os
@@ -9,6 +7,10 @@ import sys
 from pathlib import Path
 import requests
 from dotenv import load_dotenv
+
+ENV_FILE = ".env"
+ENV_SAMPLE_FILE = ".env-sample"
+ENV_EXAMPLE_FILE = ".env.example"
 
 def show_api_key_status(gemini_key, google_key):
     print("📋 ESTADO ACTUAL DE LAS CLAVES API:")
