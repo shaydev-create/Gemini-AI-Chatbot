@@ -1,6 +1,7 @@
 from unittest.mock import patch
 
 import pytest
+
 from app.core.application import get_flask_app
 
 

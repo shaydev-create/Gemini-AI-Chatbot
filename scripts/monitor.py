@@ -20,6 +20,7 @@ from typing import Any, Dict, List
 
 import psutil
 import requests
+
 from app import create_app
 from app.models import ChatSession, User
 

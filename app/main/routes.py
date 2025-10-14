@@ -1,6 +1,6 @@
-from flask import Blueprint, current_app, render_template, send_from_directory
+from flask import current_app, render_template, send_from_directory
 
-main = Blueprint("main", __name__)
+from . import main
 
 
 @main.route("/")

@@ -1,6 +1,6 @@
 from flask import Blueprint
 
-# Importar las rutas para que se registren en el blueprint
-from . import routes as routes
-
 main = Blueprint("main", __name__)
+
+# Importar las rutas DESPUÉS de crear el blueprint para que se registren correctamente
+from . import routes

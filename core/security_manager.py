@@ -9,9 +9,10 @@ import logging
 from datetime import datetime, timezone
 from typing import Any, Dict, Optional
 
+from flask import Flask, g, request
+
 from app.auth import auth_manager
 from app.security import security_manager
-from flask import Flask, g, request
 
 
 class SecurityManagerCore:

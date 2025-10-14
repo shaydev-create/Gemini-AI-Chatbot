@@ -4,9 +4,10 @@ import os
 from unittest.mock import patch
 
 import pytest
+from google.auth.exceptions import DefaultCredentialsError
+
 from app.config.vertex_ai import VertexAIConfig
 from app.config.vertex_client import VertexAIClient
-from google.auth.exceptions import DefaultCredentialsError
 
 
 class TestVertexAIConfig:

@@ -434,7 +434,7 @@ def connect_databases(sqlite_path, pg_config, dry_run):
     pg_conn = None
     if not dry_run:
         pg_conn = get_postgresql_connection(pg_config)
-        logger.info("✅ Conectado a PostgreSQL")
+    logger.info("✅ Conectado a PostgreSQL")
     return sqlite_conn, pg_conn
 
 

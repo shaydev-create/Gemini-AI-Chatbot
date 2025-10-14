@@ -1,4 +1,5 @@
 import pytest
+
 from app.core.application import get_flask_app
 from app.models import User
 

@@ -5,11 +5,12 @@ import os
 from unittest.mock import patch
 
 import pytest
+from sqlalchemy import create_engine, text
+from sqlalchemy.exc import OperationalError
+
 from app.config.database import check_db_connection
 from app.config.vertex_ai import VertexAIConfig
 from app.config.vertex_client import VertexAIClient
-from sqlalchemy import create_engine, text
-from sqlalchemy.exc import OperationalError
 
 
 @pytest.mark.integration

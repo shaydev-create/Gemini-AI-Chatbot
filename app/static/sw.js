@@ -11,7 +11,7 @@ const STATIC_FILES = [
     '/chat',
     '/static/css/style.css',
     '/static/manifest.json',
-    '/static/icons/favicon.ico',
+    '/favicon.ico',
     '/static/icons/icon-192x192.svg',
     '/static/images/icon.svg'
 ];

@@ -6,6 +6,7 @@ Suite completa de tests para validar todas las funcionalidades del sistema.
 """
 
 import pytest
+
 from app.auth import AuthManager
 from app.models import User, db
 

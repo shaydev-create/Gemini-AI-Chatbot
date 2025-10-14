@@ -148,7 +148,7 @@ def permission_required(required_permission: str):
     return decorator
 
 
-def get_user_permissions(user_role: str) -> list:
+def get_user_permissions(user_role: str) -> list[str]:
     """
     Obtiene la lista de permisos para un rol específico.
 

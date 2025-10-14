@@ -10,7 +10,7 @@ db = SQLAlchemy()
 logger = logging.getLogger(__name__)
 
 
-def init_db(app):
+def init_db(app) -> None:
     """
     Inicializar la base de datos con la aplicación Flask.
 
@@ -29,7 +29,7 @@ def init_db(app):
         raise
 
 
-def reset_db(app):
+def reset_db(app) -> None:
     """
     Resetear la base de datos (eliminar y recrear todas las tablas).
 

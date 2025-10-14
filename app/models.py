@@ -8,7 +8,8 @@ Define las estructuras de datos principales de la aplicación utilizando SQLAlch
 import logging
 import secrets
 from datetime import datetime, timedelta, timezone
-from typing import Optional
+from typing import Any, Optional
+from sqlalchemy.orm import Mapped
 
 import bcrypt
 from sqlalchemy.exc import SQLAlchemyError
@@ -59,7 +60,7 @@ class User(db.Model):
     failed_login_attempts: int = db.Column(db.Integer, default=0, nullable=False)
     account_locked_until: Optional[datetime] = db.Column(db.DateTime, nullable=True)
 
-    chat_sessions = db.relationship("ChatSession", backref="user", lazy="dynamic")
+    chat_sessions: Mapped[list["ChatSession"]] = db.relationship("ChatSession", backref="user", lazy="select")
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -69,7 +70,7 @@ class User(db.Model):
     def __repr__(self) -> str:
         return f"<User id={self.id} username='{self.username}' email='{self.email}' status='{self.status}'>"
 
-    def set_password(self, password: str):
+    def set_password(self, password: str) -> None:
         """
         Hashea y establece la contraseña del usuario, validando su fortaleza.
         """
@@ -94,25 +95,25 @@ class User(db.Model):
         """Genera una nueva API key segura."""
         return secrets.token_urlsafe(32)
 
-    def regenerate_api_key(self):
+    def regenerate_api_key(self) -> None:
         """Asigna una nueva API key al usuario."""
         self.api_key = self.generate_new_api_key()
 
-    def increment_failed_login(self):
+    def increment_failed_login(self) -> None:
         """Incrementa el contador de intentos de inicio de sesión fallidos."""
         self.failed_login_attempts = (self.failed_login_attempts or 0) + 1
 
-    def reset_failed_login(self):
+    def reset_failed_login(self) -> None:
         """Resetea el contador de intentos de inicio de sesión fallidos."""
         self.failed_login_attempts = 0
 
-    def lock_account(self, minutes: int = 15):
+    def lock_account(self, minutes: int = 15) -> None:
         """Bloquea la cuenta por un número determinado de minutos."""
         self.account_locked_until = datetime.now(timezone.utc) + timedelta(
             minutes=minutes
         )
 
-    def unlock_account(self):
+    def unlock_account(self) -> None:
         """Desbloquea la cuenta y resetea los intentos fallidos."""
         self.account_locked_until = None
         self.reset_failed_login()
@@ -139,7 +140,7 @@ class User(db.Model):
             )
         return False
 
-    def to_dict(self) -> dict:
+    def to_dict(self) -> dict[str, Any]:
         """Devuelve una representación del usuario en un diccionario."""
         return {
             "id": self.id,
@@ -176,8 +177,8 @@ class ChatSession(db.Model):
     status: str = db.Column(db.String(20), default="active", nullable=False)
     model: str = db.Column(db.String(50), default="gemini-flash-latest", nullable=False)
 
-    messages = db.relationship(
-        "ChatMessage", backref="session", lazy="dynamic", cascade="all, delete-orphan"
+    messages: Mapped[list["ChatMessage"]] = db.relationship(
+        "ChatMessage", backref="session", lazy="select", cascade="all, delete-orphan"
     )
 
     def __init__(self, **kwargs):
@@ -190,7 +191,7 @@ class ChatSession(db.Model):
     def __repr__(self) -> str:
         return f"<ChatSession id={self.id} session_id='{self.session_id}' user_id={self.user_id} status='{self.status}'>"
 
-    def to_dict(self) -> dict:
+    def to_dict(self) -> dict[str, Any]:
         """Devuelve una representación de la sesión en un diccionario."""
         return {
             "id": self.id,
@@ -225,7 +226,7 @@ class ChatMessage(db.Model):
     def __repr__(self) -> str:
         return f"<ChatMessage id={self.id} session_id={self.session_id} role='{self.role}'>"
 
-    def to_dict(self) -> dict:
+    def to_dict(self) -> dict[str, Any]:
         """Devuelve una representación del mensaje en un diccionario."""
         return {
             "id": self.id,

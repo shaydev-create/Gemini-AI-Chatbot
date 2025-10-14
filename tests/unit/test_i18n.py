@@ -8,6 +8,8 @@ from pathlib import Path
 from unittest.mock import Mock, patch
 
 import pytest
+from flask import Flask
+
 from app.utils.i18n import (
     DEFAULT_LANG,
     SUPPORTED_LANGS,
@@ -15,7 +17,6 @@ from app.utils.i18n import (
     get_locale,
     translate,
 )
-from flask import Flask
 
 
 class TestI18n:

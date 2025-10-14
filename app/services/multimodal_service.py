@@ -3,7 +3,7 @@
 import base64
 import logging
 from pathlib import Path
-from typing import List, Union
+from typing import Any, List, Union
 
 from vertexai.generative_models import GenerationResponse, Part
 
@@ -56,7 +56,7 @@ class MultimodalService:
             f"Formato de imagen no válido o ruta no encontrada: {image_data}"
         )
 
-    def generate_response(
+    async def generate_response(
         self, prompt: str, images: List[Union[str, Path]], model_type: str = "pro"
     ) -> str:
         """
@@ -74,7 +74,8 @@ class MultimodalService:
         logger.debug("Generando respuesta multimodal con el modelo %s", model_type)
 
         try:
-            content_parts = [prompt]
+            content_parts = []
+            content_parts.append(prompt)
             for image_source in images:
                 try:
                     image_part = self._create_image_part(image_source)
@@ -90,11 +91,10 @@ class MultimodalService:
                 return "Por favor, proporciona al menos una imagen válida para el análisis."
 
             # Usar el cliente centralizado para generar contenido
-            response: GenerationResponse = self.client.generate_content(
-                prompt=content_parts, model_type=model_type, stream=False
+            response_data: dict[str, Any] = await self.client.generate_response(
+                prompt=str(content_parts), model_type=model_type, max_tokens=1000
             )
-
-            response_text = response.text
+            response_text = response_data["response"]
             logger.info("Respuesta multimodal generada con éxito.")
             return response_text
 

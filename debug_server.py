@@ -5,8 +5,9 @@
 Para diagnosticar problemas con la API.
 """
 
-from app.core.application import create_app
 from dotenv import load_dotenv
+
+from app.core.application import create_app
 
 load_dotenv()
 

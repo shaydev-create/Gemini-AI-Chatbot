@@ -1,11 +1,12 @@
 import unittest
 from unittest.mock import MagicMock, patch
 
+from flask import Flask
+from flask_jwt_extended import create_access_token
+
 from app.api.admin import admin_bp
 from app.config.extensions import db, jwt
 from app.models import User
-from flask import Flask
-from flask_jwt_extended import create_access_token
 
 
 class TestAdminRoutes(unittest.TestCase):

@@ -1,8 +1,9 @@
 from unittest.mock import patch
 
 import pytest
-from app.core.middleware import setup_error_handlers, setup_middleware
 from flask import Flask, jsonify
+
+from app.core.middleware import setup_error_handlers, setup_middleware
 
 
 @pytest.fixture

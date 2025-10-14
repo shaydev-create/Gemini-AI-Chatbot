@@ -18,7 +18,7 @@
     <!-- Open Graph Meta Tags -->
     <meta property="og:title" content="Gemini AI - Futuro de la Inteligencia Artificial">
     <meta property="og:description" content="La plataforma de inteligencia artificial más avanzada. Experimenta el futuro de la IA con tecnología de vanguardia.">
-    <meta property="og:image" content="https://gemini-ai.com/static/images/og-image.jpg">
+    <meta property="og:image" content="{{ url_for('static', filename='images/icon.png') }}">
     <meta property="og:url" content="https://gemini-ai.com/">
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="Gemini AI">
@@ -28,7 +28,7 @@
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="Gemini AI - Futuro de la Inteligencia Artificial">
     <meta name="twitter:description" content="La plataforma de inteligencia artificial más avanzada. Experimenta el futuro de la IA.">
-    <meta name="twitter:image" content="https://gemini-ai.com/static/images/twitter-card.jpg">
+    <meta name="twitter:image" content="{{ url_for('static', filename='images/icon.png') }}">
     <meta name="twitter:site" content="@GeminiAI">
     
     <!-- PWA Meta Tags -->
@@ -40,10 +40,10 @@
     <link rel="manifest" href="/static/manifest.json">
     
     <!-- Favicon and Icons -->
-    <link rel="icon" type="image/x-icon" href="/static/favicon.ico">
-    <link rel="apple-touch-icon" sizes="180x180" href="/static/icons/apple-touch-icon.png">
-    <link rel="icon" type="image/png" sizes="32x32" href="/static/icons/favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="/static/icons/favicon-16x16.png">
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
+    <link rel="apple-touch-icon" sizes="180x180" href="{{ url_for('static', filename='icons/apple-touch-icon.png') }}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ url_for('static', filename='icons/favicon-32x32.png') }}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{{ url_for('static', filename='icons/favicon-16x16.png') }}">
     
     <title>Gemini AI Chatbot</title>
     

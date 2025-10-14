@@ -101,11 +101,7 @@ profile = "black"
 line_length = 88
 known_first_party = ["app"]
 
-[tool.ruff]
-line-length = 88
-select = ["E", "W", "F", "I", "C", "B"]
-ignore = ["E203", "E501"]
-src = ["app"]
+
 
 [tool.ruff.format]
 quote-style = "double"

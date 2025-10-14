@@ -6,6 +6,7 @@ import os
 from unittest.mock import MagicMock, patch
 
 import pytest
+
 from app.services.gemini_service import GeminiService
 
 

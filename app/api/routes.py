@@ -3,6 +3,7 @@ Rutas API del Gemini AI Chatbot.
 """
 
 import time
+from typing import Tuple
 
 from flask import Blueprint, current_app, jsonify, request
 
@@ -12,7 +13,7 @@ api_bp = Blueprint("api_bp", __name__)
 
 
 @api_bp.route("/chat/send", methods=["POST"])
-def send_message():
+def send_message() -> Tuple:
     """
     Endpoint para enviar un mensaje al chatbot y recibir una respuesta.
     Ahora soporta contexto de imagen para análisis multimodal.
@@ -42,7 +43,7 @@ def send_message():
     except Exception:
         user_id = None  # Usuario anónimo
 
-    gemini_service = current_app.gemini_service
+    gemini_service = current_app.config.get('GEMINI_SERVICE')
     if not gemini_service:
         return jsonify(
             {"message": "El servicio de IA no está disponible en este momento."}
@@ -94,7 +95,7 @@ Por favor, analiza la imagen proporcionada y responde a la pregunta del usuario 
 
 
 @api_bp.route("/chat/stream", methods=["POST"])
-def stream_message():
+def stream_message() -> Tuple:
     """
     Endpoint para enviar un mensaje y recibir una respuesta en streaming.
     """
@@ -104,7 +105,7 @@ def stream_message():
 
 
 @api_bp.route("/health", methods=["GET"])
-def health_check():
+def health_check() -> Tuple:
     """
     Endpoint de health check para verificar que la API está activa.
     """

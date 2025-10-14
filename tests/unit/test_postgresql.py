@@ -4,14 +4,15 @@ import os
 from unittest.mock import Mock, patch
 
 import pytest
+from sqlalchemy import create_engine, text
+from sqlalchemy.exc import OperationalError, SQLAlchemyError
+
 from app.config.database import (
     check_db_connection,
     init_db,
     migrate_to_postgresql,
     reset_db,
 )
-from sqlalchemy import create_engine, text
-from sqlalchemy.exc import OperationalError, SQLAlchemyError
 
 
 class TestDatabaseConnection:

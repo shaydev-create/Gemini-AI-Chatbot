@@ -2,6 +2,8 @@ from datetime import datetime, timedelta, timezone
 from unittest.mock import patch
 
 import pytest
+from flask import Flask, make_response
+
 from app.core.security import (
     DataEncryption,
     RateLimiter,
@@ -16,7 +18,6 @@ from app.core.security import (
     setup_security,
     verify_password,
 )
-from flask import Flask, make_response
 
 # --- Pruebas para TokenManager ---
 

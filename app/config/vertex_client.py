@@ -158,7 +158,7 @@ class VertexAIClient:
             logger.exception("❌ Error al configurar o verificar la API de Gemini.")
             return False
 
-    def _reset_daily_limits(self):
+    def _reset_daily_limits(self) -> None:
         """
         Reinicia los contadores de uso diario si han pasado 24 horas.
         """
@@ -223,7 +223,7 @@ class VertexAIClient:
         cost: float,
         response_time: float,
         success: bool,
-    ):
+    ) -> None:
         """Actualizar métricas de uso.
 
         Args:
@@ -281,6 +281,9 @@ class VertexAIClient:
 
         model = self.models[model_type]
         model_info = self.config.get_model_info(model_type)
+        
+        if model_info is None:
+            raise Exception(f"Información del modelo {model_type} no disponible")
 
         # Configurar generación
         generation_config = GenerationConfig(

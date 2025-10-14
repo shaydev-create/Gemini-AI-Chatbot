@@ -1,9 +1,10 @@
 import unittest
 from unittest.mock import MagicMock
 
+from flask import Flask, jsonify, request
+
 from app.security import RateLimiter, SecurityManager, require_https, validate_input
 from app.security import security_manager as global_security_manager
-from flask import Flask, jsonify, request
 
 
 class TestSecurityManager(unittest.TestCase):

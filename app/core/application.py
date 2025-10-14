@@ -59,11 +59,12 @@ def create_app(config_class=DevelopmentConfig):
         from app.services.gemini_service import GeminiService
 
         # Usar la versión simple que funcionaba antes
-        app.gemini_service = GeminiService()
+        # Usar app.config en lugar de atributo directo para mejor compatibilidad
+        app.config['GEMINI_SERVICE'] = GeminiService()
         app.logger.info("Servicio de Gemini inicializado exitosamente.")
     except Exception as e:
         app.logger.warning(f"No se pudo inicializar el servicio de Gemini: {e}")
-        app.gemini_service = None
+        app.config['GEMINI_SERVICE'] = None
 
     with app.app_context():
         # Crea las tablas de la base de datos si no existen

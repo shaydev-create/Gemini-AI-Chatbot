@@ -1,6 +1,7 @@
 # Test end-to-end básico
 
 import pytest
+
 from app.core.application import get_flask_app
 
 

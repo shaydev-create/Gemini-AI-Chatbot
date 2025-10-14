@@ -111,16 +111,9 @@ def _display_final_results(all_good: bool):
         print("Revisa los errores arriba y ejecuta los scripts necesarios")
 
 
-def main():
-    """Verificación completa pre-lanzamiento."""
-    print("🔍 VERIFICACIÓN FINAL PRE-LANZAMIENTO")
-    print("=" * 50)
-
-    base_path = Path(".")
-    all_good = True
-
-    # Definir secciones de verificación
-    sections = [
+def _get_verification_sections():
+    """Definir las secciones de verificación para el checklist."""
+    return [
         (
             "📸 2. SCREENSHOTS",
             [
@@ -169,17 +162,41 @@ def main():
         ),
     ]
 
-    # Verificar ZIP package
-    if not _check_zip_package(base_path):
-        all_good = False
 
-    # Verificar todas las secciones
+def _verify_zip_package(base_path):
+    """Verificar el paquete ZIP."""
+    return _check_zip_package(base_path)
+
+
+def _verify_all_sections(sections):
+    """Verificar todas las secciones del checklist."""
+    all_good = True
     for section_name, files_list in sections:
         if not _check_files_section(section_name, files_list):
             all_good = False
+    return all_good
+
+
+def main():
+    """Verificación completa pre-lanzamiento."""
+    print("🔍 VERIFICACIÓN FINAL PRE-LANZAMIENTO")
+    print("=" * 50)
+
+    base_path = Path(".")
+
+    # Obtener secciones de verificación
+    sections = _get_verification_sections()
+
+    # Verificar ZIP package
+    zip_ok = _verify_zip_package(base_path)
+
+    # Verificar todas las secciones
+    sections_ok = _verify_all_sections(sections)
 
     # Mostrar resultados finales
+    all_good = zip_ok and sections_ok
     _display_final_results(all_good)
+
     return all_good
 
 
