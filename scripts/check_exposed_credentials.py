@@ -30,11 +30,13 @@ PATTERNS = {
     "Claves PWA": [r'VAPID_PRIVATE_KEY\s*=\s*["\']([^"\'\s]{20,})["\']'],
 }
 
+
 def print_banner():
     """Mostrar banner del script"""
     print("🔍 DETECTOR DE CREDENCIALES EXPUESTAS - GEMINI AI CHATBOT")
     print("=" * 70)
     print()
+
 
 def run_command(command):
     """Ejecutar comando y devolver salida"""
@@ -51,12 +53,14 @@ def run_command(command):
         print(f"❌ Error al ejecutar comando: {e}")
         return ""
 
+
 def _is_git_repository() -> bool:
     """Verificar si estamos en un repositorio Git."""
     if not os.path.exists(".git"):
         print("❌ No se encontró un repositorio Git en este directorio")
         return False
     return True
+
 
 def _get_commits_list() -> List[str]:
     """Obtener lista de commits del repositorio."""
@@ -68,6 +72,7 @@ def _get_commits_list() -> List[str]:
         return []
 
     return commits
+
 
 def _get_commit_metadata(commit_hash: str) -> Optional[Dict[str, str]]:
     """Obtener metadatos de un commit específico."""
@@ -88,12 +93,15 @@ def _get_commit_metadata(commit_hash: str) -> Optional[Dict[str, str]]:
             "short_hash": commit_meta[0],
             "author": commit_meta[1],
             "date": commit_meta[2],
-            "subject": commit_meta[3]
+            "subject": commit_meta[3],
         }
     except (IndexError, ValueError):
         return None
 
-def _analyze_commit_for_credentials(commit_hash: str, metadata: Dict[str, str]) -> List[str]:
+
+def _analyze_commit_for_credentials(
+    commit_hash: str, metadata: Dict[str, str]
+) -> List[str]:
     """Analizar un commit específico en busca de credenciales."""
     commit_content = run_command(f"git show {commit_hash}")
     report_lines = []
@@ -112,15 +120,18 @@ def _analyze_commit_for_credentials(commit_hash: str, metadata: Dict[str, str]) 
                     safe_matches.append(safe_match)
 
                 # Añadir al reporte
-                report_lines.extend([
-                    f"⚠️  {cred_type} encontrada en commit {metadata['short_hash']}",
-                    f"   Fecha: {metadata['date']}, Autor: {metadata['author']}",
-                    f"   Asunto: {metadata['subject']}",
-                    f"   Credencial parcial: {', '.join(safe_matches)}",
-                    ""
-                ])
+                report_lines.extend(
+                    [
+                        f"⚠️  {cred_type} encontrada en commit {metadata['short_hash']}",
+                        f"   Fecha: {metadata['date']}, Autor: {metadata['author']}",
+                        f"   Asunto: {metadata['subject']}",
+                        f"   Credencial parcial: {', '.join(safe_matches)}",
+                        "",
+                    ]
+                )
 
     return report_lines
+
 
 def _display_results(found_credentials: bool, report_lines: List[str]):
     """Mostrar resultados del análisis."""
@@ -139,6 +150,7 @@ def _display_results(found_credentials: bool, report_lines: List[str]):
         print("")
     else:
         print("✅ No se encontraron credenciales expuestas en el historial de Git")
+
 
 def check_git_history():
     """Analizar historial de Git para buscar credenciales."""
@@ -177,6 +189,7 @@ def check_git_history():
     _display_results(found_credentials, report_lines)
     return found_credentials
 
+
 def generate_report(found_credentials):
     """Generar reporte de análisis"""
     report_dir = Path("reports")
@@ -189,8 +202,7 @@ def generate_report(found_credentials):
         f.write("🔍 REPORTE DE ANÁLISIS DE CREDENCIALES - GEMINI AI CHATBOT\n")
         f.write("=" * 70 + "\n\n")
         f.write(
-            f"Fecha de análisis: {
-                datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n\n"
+            f"Fecha de análisis: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n\n"
         )
 
         if found_credentials:
@@ -213,6 +225,7 @@ def generate_report(found_credentials):
 
     print(f"\n📋 Reporte guardado en: {report_file}")
 
+
 def main():
     """Función principal"""
     print_banner()
@@ -222,6 +235,7 @@ def main():
 
     print("\n✅ ANÁLISIS COMPLETADO")
     return 0 if not found_credentials else 1
+
 
 if __name__ == "__main__":
     try:

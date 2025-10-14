@@ -12,11 +12,14 @@ from datetime import datetime
 
 
 def check_required_files(extension_dir, required_files):
-    missing_files = [f for f in required_files if not os.path.exists(os.path.join(extension_dir, f))]
+    missing_files = [
+        f for f in required_files if not os.path.exists(os.path.join(extension_dir, f))
+    ]
     if missing_files:
         print(f"❌ Error: Faltan archivos requeridos: {', '.join(missing_files)}")
         return False
     return True
+
 
 def check_icons(extension_dir, icons):
     icons_dir = os.path.join(extension_dir, "icons")
@@ -25,6 +28,7 @@ def check_icons(extension_dir, icons):
         print(f"❌ Error: Faltan iconos requeridos: {', '.join(missing_icons)}")
         return False
     return True
+
 
 def validate_manifest(manifest_path):
     try:

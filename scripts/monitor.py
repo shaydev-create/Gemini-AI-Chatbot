@@ -263,10 +263,7 @@ class SystemMonitor:
 
             print(f"{status_emoji} {check.name.upper()}: {check.status}")
             if check.response_time > 0:
-                print(
-                    f"   ⏱️ Tiempo de respuesta: {
-                        check.response_time:.2f}ms"
-                )
+                print(f"   ⏱️ Tiempo de respuesta: {check.response_time:.2f}ms")
 
             if check.details:
                 for key, value in check.details.items():
@@ -274,13 +271,7 @@ class SystemMonitor:
                         if "percent" in key:
                             print(f"   📊 {key}: {value:.1f}%")
                         elif "bytes" in key or "available" in key or "free" in key:
-                            print(
-                                f"   💾 {key}: {
-                                    value /
-                                    1024 /
-                                    1024 /
-                                    1024:.2f} GB"
-                            )
+                            print(f"   💾 {key}: {value / 1024 / 1024 / 1024:.2f} GB")
                         else:
                             print(f"   📈 {key}: {value}")
                     else:
@@ -291,37 +282,17 @@ class SystemMonitor:
         metrics = self.get_application_metrics()
         if metrics:
             print("📈 MÉTRICAS DE LA APLICACIÓN:")
+            print(f"   👥 Usuarios totales: {metrics.get('users', {}).get('total', 0)}")
             print(
-                f"   👥 Usuarios totales: {
-                    metrics.get(
-                        'users',
-                        {}).get(
-                        'total',
-                        0)}"
+                f"   ✅ Usuarios activos: {metrics.get('users', {}).get('active', 0)}"
             )
             print(
-                f"   ✅ Usuarios activos: {
-                    metrics.get(
-                        'users',
-                        {}).get(
-                        'active',
-                        0)}"
-            )
-            print(
-                f"   💬 Sesiones totales: {
-                    metrics.get(
-                        'sessions',
-                        {}).get(
-                        'total',
-                        0)}"
+                f"   💬 Sesiones totales: {metrics.get('sessions', {}).get('total', 0)}"
             )
             print(
                 f"   🔄 Sesiones activas: {
-                    metrics.get(
-                        'sessions',
-                        {}).get(
-                        'active',
-                        0)}"
+                    metrics.get('sessions', {}).get('active', 0)
+                }"
             )
 
         print("=" * 60)

@@ -76,8 +76,8 @@ class LaunchReadinessChecker:
                 "Estructura de Archivos",
                 True,
                 f"Todos los archivos principales están presentes ({
-                    len(existing_files)}/{
-                    len(required_files)})",
+                    len(existing_files)
+                }/{len(required_files)})",
                 existing_files,
             )
         else:
@@ -130,8 +130,8 @@ class LaunchReadinessChecker:
                 "Extensión Chrome - Archivos",
                 True,
                 f"Todos los archivos de extensión están presentes ({
-                    len(existing_ext_files)}/{
-                    len(required_extension_files)})",
+                    len(existing_ext_files)
+                }/{len(required_extension_files)})",
             )
         else:
             self.log_result(
@@ -188,8 +188,7 @@ class LaunchReadinessChecker:
             self.log_result(
                 "Extensión Chrome - Paquete",
                 True,
-                f"Paquete ZIP disponible: {
-                    latest_zip.name} ({
+                f"Paquete ZIP disponible: {latest_zip.name} ({
                     zip_size:,        } bytes)",
             )
         else:
@@ -404,11 +403,7 @@ class LaunchReadinessChecker:
 
         print("\n📊 RESUMEN GENERAL:")
         print(f"   ✅ Pruebas exitosas: {self.passed_checks}")
-        print(
-            f"   ❌ Pruebas fallidas: {
-                self.total_checks -
-                self.passed_checks}"
-        )
+        print(f"   ❌ Pruebas fallidas: {self.total_checks - self.passed_checks}")
         print(f"   📈 Tasa de éxito: {success_rate:.1f}%")
 
         # Determinar estado de preparación

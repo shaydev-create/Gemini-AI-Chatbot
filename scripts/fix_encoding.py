@@ -40,12 +40,12 @@ def convert_to_utf8(file_path, original_encoding):
         return False
 
 
-
 def get_files_to_check(patterns):
     files = []
     for pattern in patterns:
         files.extend(glob.glob(pattern))
     return files
+
 
 def check_and_convert_file(file_path):
     issues = 0
@@ -72,6 +72,7 @@ def check_and_convert_file(file_path):
             issues += 1
     return issues, converted
 
+
 def print_summary(total, issues, converted):
     print("\n📊 Resumen:")
     print(f"   - Archivos verificados: {total}")
@@ -81,6 +82,7 @@ def print_summary(total, issues, converted):
         print("✅ Todos los archivos tienen codificación correcta")
     else:
         print("⚠️  Se encontraron problemas de codificación")
+
 
 def main():
     print("🔍 Verificando codificación de archivos de documentación...")

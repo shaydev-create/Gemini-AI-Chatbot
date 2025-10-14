@@ -113,9 +113,7 @@ class CacheManager:
         """
         current_time = time.time()
         expired_keys = [
-            key
-            for key, (_, expiry) in self._cache.items()
-            if current_time >= expiry
+            key for key, (_, expiry) in self._cache.items() if current_time >= expiry
         ]
 
         for key in expired_keys:

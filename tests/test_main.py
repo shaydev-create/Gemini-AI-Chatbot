@@ -106,7 +106,10 @@ class TestAuthentication:
             json={"username": "testuser", "password": "WrongPassword123!"},
         )
         assert response.status_code == 401
-        assert response.json["message"] == "Credenciales inválidas o cuenta inactiva/bloqueada."
+        assert (
+            response.json["message"]
+            == "Credenciales inválidas o cuenta inactiva/bloqueada."
+        )
 
     def test_register_user(self, client, init_database):
         """Test registro de nuevo usuario."""

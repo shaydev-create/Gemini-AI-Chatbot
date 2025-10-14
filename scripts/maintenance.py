@@ -162,8 +162,8 @@ class MaintenanceManager:
 
         # Generar reporte
         report = f"""
-📊 REPORTE DE USO - {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
-{'=' * 60}
+📊 REPORTE DE USO - {datetime.now().strftime("%Y-%m-%d %H:%M:%S")}
+{"=" * 60}
 
 👥 USUARIOS:
    Total: {total_users}
@@ -175,13 +175,13 @@ class MaintenanceManager:
    Activas: {active_sessions}
 
 🧹 MANTENIMIENTO:
-   Logs limpiados: {self.stats['logs_cleaned']}
-   Archivos temp limpiados: {self.stats['temp_files_cleaned']}
-   Tokens limpiados: {self.stats['tokens_cleaned']}
-   Sesiones archivadas: {self.stats['sessions_archived']}
-   Espacio liberado: {self.stats['space_freed'] / 1024 / 1024:.2f} MB
+   Logs limpiados: {self.stats["logs_cleaned"]}
+   Archivos temp limpiados: {self.stats["temp_files_cleaned"]}
+   Tokens limpiados: {self.stats["tokens_cleaned"]}
+   Sesiones archivadas: {self.stats["sessions_archived"]}
+   Espacio liberado: {self.stats["space_freed"] / 1024 / 1024:.2f} MB
 
-{'=' * 60}
+{"=" * 60}
         """
 
         # Guardar reporte
@@ -201,18 +201,10 @@ class MaintenanceManager:
         print("🔧 RESUMEN DE MANTENIMIENTO")
         print("=" * 60)
         print(f"📄 Logs limpiados: {self.stats['logs_cleaned']}")
-        print(
-            f"🗑️ Archivos temp limpiados: {
-                self.stats['temp_files_cleaned']}"
-        )
+        print(f"🗑️ Archivos temp limpiados: {self.stats['temp_files_cleaned']}")
         print(f"🔑 Tokens limpiados: {self.stats['tokens_cleaned']}")
         print(f"📚 Sesiones archivadas: {self.stats['sessions_archived']}")
-        print(
-            f"💾 Espacio liberado: {
-                self.stats['space_freed'] /
-                1024 /
-                1024:.2f} MB"
-        )
+        print(f"💾 Espacio liberado: {self.stats['space_freed'] / 1024 / 1024:.2f} MB")
         print("=" * 60)
 
 

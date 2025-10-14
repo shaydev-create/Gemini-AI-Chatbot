@@ -18,7 +18,9 @@ class TestAdminRoutes(unittest.TestCase):
         self.app.config["JWT_TOKEN_LOCATION"] = ["headers"]
         self.app.config["JWT_HEADER_NAME"] = "Authorization"
         self.app.config["JWT_HEADER_TYPE"] = "Bearer"
-        self.app.config["JWT_ACCESS_TOKEN_EXPIRES"] = False  # Deshabilitar expiración para tests
+        self.app.config["JWT_ACCESS_TOKEN_EXPIRES"] = (
+            False  # Deshabilitar expiración para tests
+        )
         self.app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///:memory:"
         self.app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
@@ -40,9 +42,7 @@ class TestAdminRoutes(unittest.TestCase):
 
             # Crear un usuario admin de prueba
             test_user = User(
-                username="test-admin",
-                email="admin@test.com",
-                status="active"
+                username="test-admin", email="admin@test.com", status="active"
             )
             test_user.set_password("Testpassword123!")
             db.session.add(test_user)
@@ -52,7 +52,7 @@ class TestAdminRoutes(unittest.TestCase):
             identity = {
                 "user_id": test_user.id,
                 "username": "test-admin",
-                "role": "admin"  # Rol admin para acceder a las rutas de administración
+                "role": "admin",  # Rol admin para acceder a las rutas de administración
             }
             self.valid_token = create_access_token(identity=identity)
 
@@ -68,11 +68,14 @@ class TestAdminRoutes(unittest.TestCase):
             "events_by_type": {},
             "events_by_severity": {},
             "unique_ips": 0,
-            "top_endpoints": {}
+            "top_endpoints": {},
         }
         mock_get_security_summary.return_value = expected_summary
 
-        response = self.client.get("/api/admin/security-summary", headers={"Authorization": f"Bearer {self.valid_token}"})
+        response = self.client.get(
+            "/api/admin/security-summary",
+            headers={"Authorization": f"Bearer {self.valid_token}"},
+        )
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.get_json(), expected_summary)
@@ -89,11 +92,14 @@ class TestAdminRoutes(unittest.TestCase):
             "response_time_stats": {},
             "requests_per_minute": 0,
             "request_history_count": 0,
-            "timestamp": 0.0
+            "timestamp": 0.0,
         }
         mock_metrics_manager.get_metrics.return_value = expected_metrics
 
-        response = self.client.get("/api/admin/metrics", headers={"Authorization": f"Bearer {self.valid_token}"})
+        response = self.client.get(
+            "/api/admin/metrics",
+            headers={"Authorization": f"Bearer {self.valid_token}"},
+        )
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.get_json(), expected_metrics)
@@ -103,7 +109,9 @@ class TestAdminRoutes(unittest.TestCase):
         """
         Prueba que la ruta /api/admin/status funciona correctamente.
         """
-        response = self.client.get("/api/admin/status", headers={"Authorization": f"Bearer {self.valid_token}"})
+        response = self.client.get(
+            "/api/admin/status", headers={"Authorization": f"Bearer {self.valid_token}"}
+        )
 
         self.assertEqual(response.status_code, 200)
         self.assertIn("database", response.get_json())

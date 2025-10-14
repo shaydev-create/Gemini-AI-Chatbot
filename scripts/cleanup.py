@@ -89,10 +89,7 @@ def clean_temp_dirs():
                     print(f"  ✅ Eliminado directorio: {rel_path}")
                 except Exception as e:
                     rel_path = dir_path.relative_to(PROJECT_ROOT)
-                    print(
-                        f"  ❌ Error al eliminar directorio {rel_path}: {
-                            str(e)}"
-                    )
+                    print(f"  ❌ Error al eliminar directorio {rel_path}: {str(e)}")
 
     print()
 
@@ -117,9 +114,7 @@ def remove_temp_files():
                         print(f"  ✅ Eliminado archivo temporal: {rel_path}")
                     except Exception as e:
                         rel_path = file_path.relative_to(PROJECT_ROOT)
-                        print(
-                            f"  ❌ Error al eliminar archivo {rel_path}: {str(e)}"
-                        )
+                        print(f"  ❌ Error al eliminar archivo {rel_path}: {str(e)}")
                     break
 
     print()

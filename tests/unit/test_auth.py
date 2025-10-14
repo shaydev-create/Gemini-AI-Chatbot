@@ -11,6 +11,7 @@ def app():
     # Crear tablas de la base de datos
     with app.app_context():
         from app.config.extensions import db
+
         db.create_all()
 
     yield app
@@ -18,6 +19,7 @@ def app():
     # Limpiar la base de datos después de cada test
     with app.app_context():
         from app.config.extensions import db
+
         db.session.remove()
         db.drop_all()
 
@@ -64,7 +66,9 @@ def test_register_existing_email(app, client, new_user_data):
     """Prueba el registro con un email que ya existe."""
     with app.app_context():
         client.post("/auth/register", json=new_user_data)  # Registrar primero
-        response = client.post("/auth/register", json=new_user_data)  # Intentar de nuevo
+        response = client.post(
+            "/auth/register", json=new_user_data
+        )  # Intentar de nuevo
         assert response.status_code == 409
         assert "message" in response.json
 
@@ -78,6 +82,7 @@ def test_login_success(app, client, new_user_data):
         # Activar el usuario manualmente (ya que por defecto queda en estado "pending")
         from app.config.extensions import db
         from app.models import User
+
         user = User.query.filter_by(email=new_user_data["email"]).first()
         user.status = "active"
         db.session.commit()
@@ -97,7 +102,10 @@ def test_login_invalid_credentials(app, client, new_user_data):
     with app.app_context():
         client.post("/auth/register", json=new_user_data)
 
-        login_data = {"username": new_user_data["username"], "password": "wrongpassword"}
+        login_data = {
+            "username": new_user_data["username"],
+            "password": "wrongpassword",
+        }
         response = client.post("/auth/login", json=login_data)
 
         assert response.status_code == 401

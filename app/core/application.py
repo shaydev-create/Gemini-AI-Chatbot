@@ -73,6 +73,7 @@ def create_app(config_class=DevelopmentConfig):
 
     return app, socketio
 
+
 def get_flask_app(config_class=DevelopmentConfig):
     """
     Devuelve solo la instancia Flask para pruebas (pytest, Flask test client).
@@ -81,6 +82,7 @@ def get_flask_app(config_class=DevelopmentConfig):
     # Si se pasa un string, buscar la clase de configuración correspondiente
     if isinstance(config_class, str):
         from app.config.settings import config
+
         config_class = config.get(config_class, DevelopmentConfig)
 
     app, _ = create_app(config_class)

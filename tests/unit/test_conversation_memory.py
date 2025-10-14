@@ -17,7 +17,9 @@ class TestConversationMemory(unittest.TestCase):
         # Crear tablas de la base de datos
         db.create_all()
 
-        self.memory = ConversationMemory(session_id="test-session", user_id=1, max_history=5)
+        self.memory = ConversationMemory(
+            session_id="test-session", user_id=1, max_history=5
+        )
 
     def tearDown(self):
         """

@@ -30,12 +30,14 @@ class TestI18n:
 
         # Limpiar caché de traducciones antes de cada test
         from app.utils.i18n import _translations_cache
+
         _translations_cache.clear()
 
     def teardown_method(self):
         """Limpieza después de cada test."""
         # Limpiar caché de traducciones después de cada test
         from app.utils.i18n import _translations_cache
+
         _translations_cache.clear()
 
     def test_get_locale_from_url_parameter(self):
@@ -47,11 +49,11 @@ class TestI18n:
         """Test que get_locale obtiene el idioma de la sesión."""
         with self.app.test_request_context("/"):
             # Mock session para que devuelva "en"
-            with patch('app.utils.i18n.session') as mock_session:
+            with patch("app.utils.i18n.session") as mock_session:
                 # Usar un mock síncrono para evitar problemas de async
                 mock_session.get = Mock(return_value="en")
                 # Mock request para que no tenga parámetro lang
-                with patch('app.utils.i18n.request') as mock_request:
+                with patch("app.utils.i18n.request") as mock_request:
                     mock_request.args = Mock()
                     mock_request.args.get = Mock(return_value=None)
                     assert get_locale() == "en"
@@ -69,7 +71,7 @@ class TestI18n:
     def test_get_locale_saves_to_session(self):
         """Test que get_locale guarda el idioma en la sesión."""
         with self.app.test_request_context("/?lang=en"):
-            with patch('app.utils.i18n.session') as mock_session:
+            with patch("app.utils.i18n.session") as mock_session:
                 mock_session.get.return_value = None
                 # Mock para simular que se guarda en sesión
                 locale = get_locale()
@@ -126,6 +128,7 @@ class TestI18n:
                 with patch("app.utils.i18n.logger") as mock_logger:
                     # Limpiar caché primero para asegurar que se carga desde archivo
                     from app.utils.i18n import _translations_cache
+
                     _translations_cache.clear()
 
                     translations = _load_translations("en")
@@ -135,8 +138,10 @@ class TestI18n:
     def test_translate_existing_key(self):
         """Test que translate devuelve la traducción correcta para una clave existente."""
         with self.app.test_request_context("/?lang=en"):
-            with patch('app.utils.i18n._load_translations') as mock_load:
-                mock_load.return_value = {"welcome_message": "Welcome to Gemini AI Chatbot!"}
+            with patch("app.utils.i18n._load_translations") as mock_load:
+                mock_load.return_value = {
+                    "welcome_message": "Welcome to Gemini AI Chatbot!"
+                }
                 result = translate("welcome_message")
                 assert result == "Welcome to Gemini AI Chatbot!"
 
@@ -149,7 +154,7 @@ class TestI18n:
     def test_translate_with_formatting(self):
         """Test que translate formatea correctamente las cadenas con placeholders."""
         with self.app.test_request_context("/?lang=en"):
-            with patch('app.utils.i18n._load_translations') as mock_load:
+            with patch("app.utils.i18n._load_translations") as mock_load:
                 mock_load.return_value = {"greeting": "Hello, {name}! How are you?"}
                 result = translate("greeting", name="John")
                 assert result == "Hello, John! How are you?"
@@ -158,7 +163,7 @@ class TestI18n:
         """Test que translate maneja errores de formato."""
         with self.app.test_request_context("/?lang=en"):
             # Mock _load_translations para devolver una cadena con placeholders
-            with patch('app.utils.i18n._load_translations') as mock_load:
+            with patch("app.utils.i18n._load_translations") as mock_load:
                 mock_load.return_value = {"greeting": "Hello {name}!"}
                 with patch("app.utils.i18n.logger") as mock_logger:
                     # Intentar formatear con parámetros incorrectos
@@ -170,15 +175,19 @@ class TestI18n:
         """Test que translate funciona con diferentes idiomas."""
         # Test español
         with self.app.test_request_context("/?lang=es"):
-            with patch('app.utils.i18n._load_translations') as mock_load:
-                mock_load.return_value = {"welcome_message": "¡Bienvenido a Gemini AI Chatbot!"}
+            with patch("app.utils.i18n._load_translations") as mock_load:
+                mock_load.return_value = {
+                    "welcome_message": "¡Bienvenido a Gemini AI Chatbot!"
+                }
                 result_es = translate("welcome_message")
                 assert result_es == "¡Bienvenido a Gemini AI Chatbot!"
 
         # Test inglés
         with self.app.test_request_context("/?lang=en"):
-            with patch('app.utils.i18n._load_translations') as mock_load:
-                mock_load.return_value = {"welcome_message": "Welcome to Gemini AI Chatbot!"}
+            with patch("app.utils.i18n._load_translations") as mock_load:
+                mock_load.return_value = {
+                    "welcome_message": "Welcome to Gemini AI Chatbot!"
+                }
                 result_en = translate("welcome_message")
                 assert result_en == "Welcome to Gemini AI Chatbot!"
 
@@ -197,15 +206,18 @@ class TestI18n:
         """Test que las traducciones se cachean correctamente."""
         with self.app.test_request_context("/?lang=en"):
             # Mock get_locale para evitar problemas con session
-            with patch('app.utils.i18n.get_locale') as mock_get_locale:
+            with patch("app.utils.i18n.get_locale") as mock_get_locale:
                 mock_get_locale.return_value = "en"
 
-                with patch('app.utils.i18n._load_translations') as mock_load:
+                with patch("app.utils.i18n._load_translations") as mock_load:
                     # Limpiar caché primero
                     from app.utils.i18n import _translations_cache
+
                     _translations_cache.clear()
 
-                    mock_load.return_value = {"welcome_message": "Welcome to Gemini AI Chatbot!"}
+                    mock_load.return_value = {
+                        "welcome_message": "Welcome to Gemini AI Chatbot!"
+                    }
 
                     # Primera llamada debería cargar el archivo
                     result1 = translate("welcome_message")

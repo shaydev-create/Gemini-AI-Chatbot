@@ -67,7 +67,7 @@ class TestHelpersComprehensive:
         text = "test string"
 
         # Algoritmo inválido debería usar sha256 como fallback
-        with patch('app.utils.helpers.logger') as mock_logger:
+        with patch("app.utils.helpers.logger") as mock_logger:
             hash_result = hash_string(text, "invalid_algorithm")
 
             # Debería devolver un hash válido
@@ -96,8 +96,8 @@ class TestHelpersComprehensive:
     def test_ensure_directory_exists_error_handling(self):
         """Test manejo de errores en creación de directorios."""
         # Mock para simular error de permisos
-        with patch('pathlib.Path.mkdir', side_effect=OSError("Permission denied")):
-            with patch('app.utils.helpers.logger') as mock_logger:
+        with patch("pathlib.Path.mkdir", side_effect=OSError("Permission denied")):
+            with patch("app.utils.helpers.logger") as mock_logger:
                 # Debería manejar el error gracefulmente
                 ensure_directory_exists("/invalid/path")
                 mock_logger.exception.assert_called_once()
@@ -117,7 +117,7 @@ class TestHelpersComprehensive:
 
     def test_get_file_size_nonexistent_file(self):
         """Test obtener tamaño de archivo que no existe."""
-        with patch('app.utils.helpers.logger') as mock_logger:
+        with patch("app.utils.helpers.logger") as mock_logger:
             size = get_file_size("/nonexistent/file.txt")
             assert size is None
             mock_logger.debug.assert_called_once()

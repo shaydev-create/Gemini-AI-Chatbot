@@ -76,6 +76,7 @@ def _check_zip_package(base_path: Path) -> bool:
 
     return check_zip_contents(zip_path)
 
+
 def _check_files_section(section_name: str, files_list: List[Tuple[str, str]]) -> bool:
     """Verificar una sección de archivos."""
     print(f"\n{section_name}")
@@ -86,6 +87,7 @@ def _check_files_section(section_name: str, files_list: List[Tuple[str, str]]) -
             all_exist = False
 
     return all_exist
+
 
 def _display_final_results(all_good: bool):
     """Mostrar resultados finales de la verificación."""
@@ -108,6 +110,7 @@ def _display_final_results(all_good: bool):
         print("⚠️ HAY ARCHIVOS FALTANTES")
         print("Revisa los errores arriba y ejecuta los scripts necesarios")
 
+
 def main():
     """Verificación completa pre-lanzamiento."""
     print("🔍 VERIFICACIÓN FINAL PRE-LANZAMIENTO")
@@ -118,31 +121,52 @@ def main():
 
     # Definir secciones de verificación
     sections = [
-        ("📸 2. SCREENSHOTS", [
-            ("chrome_store_assets/screenshots/screenshot_1_main.png", "Screenshot Principal"),
-            ("chrome_store_assets/screenshots/screenshot_2_features.png", "Screenshot Características"),
-            ("chrome_store_assets/screenshots/promo_tile.png", "Tile Promocional")
-        ]),
-        ("🎨 3. ICONOS", [
-            ("static/icons/chrome-webstore-icon-16x16.png", "Icono 16x16"),
-            ("static/icons/chrome-webstore-icon-48x48.png", "Icono 48x48"),
-            ("static/icons/chrome-webstore-icon-128x128.png", "Icono 128x128"),
-            ("static/icons/chrome-webstore-icon-512x512.png", "Icono 512x512")
-        ]),
-        ("📄 4. DOCUMENTOS LEGALES", [
-            ("templates/privacy_policy.html", "Privacy Policy"),
-            ("templates/terms_of_service.html", "Terms of Service")
-        ]),
-        ("🔧 5. CONFIGURACIÓN API", [
-            ("src/config/vertex_ai.py", "Configuración Vertex AI"),
-            ("src/config/vertex_client.py", "Cliente Vertex AI"),
-            (".env.vertex", "Variables de entorno Vertex AI")
-        ]),
-        ("📚 6. DOCUMENTACIÓN", [
-            ("docs/LAUNCH_STEP_BY_STEP.md", "Guía paso a paso"),
-            ("docs/EXECUTIVE_SUMMARY.md", "Resumen ejecutivo"),
-            ("docs/VERTEX_AI_MIGRATION_STEPS.md", "Migración Vertex AI")
-        ])
+        (
+            "📸 2. SCREENSHOTS",
+            [
+                (
+                    "chrome_store_assets/screenshots/screenshot_1_main.png",
+                    "Screenshot Principal",
+                ),
+                (
+                    "chrome_store_assets/screenshots/screenshot_2_features.png",
+                    "Screenshot Características",
+                ),
+                ("chrome_store_assets/screenshots/promo_tile.png", "Tile Promocional"),
+            ],
+        ),
+        (
+            "🎨 3. ICONOS",
+            [
+                ("static/icons/chrome-webstore-icon-16x16.png", "Icono 16x16"),
+                ("static/icons/chrome-webstore-icon-48x48.png", "Icono 48x48"),
+                ("static/icons/chrome-webstore-icon-128x128.png", "Icono 128x128"),
+                ("static/icons/chrome-webstore-icon-512x512.png", "Icono 512x512"),
+            ],
+        ),
+        (
+            "📄 4. DOCUMENTOS LEGALES",
+            [
+                ("templates/privacy_policy.html", "Privacy Policy"),
+                ("templates/terms_of_service.html", "Terms of Service"),
+            ],
+        ),
+        (
+            "🔧 5. CONFIGURACIÓN API",
+            [
+                ("src/config/vertex_ai.py", "Configuración Vertex AI"),
+                ("src/config/vertex_client.py", "Cliente Vertex AI"),
+                (".env.vertex", "Variables de entorno Vertex AI"),
+            ],
+        ),
+        (
+            "📚 6. DOCUMENTACIÓN",
+            [
+                ("docs/LAUNCH_STEP_BY_STEP.md", "Guía paso a paso"),
+                ("docs/EXECUTIVE_SUMMARY.md", "Resumen ejecutivo"),
+                ("docs/VERTEX_AI_MIGRATION_STEPS.md", "Migración Vertex AI"),
+            ],
+        ),
     ]
 
     # Verificar ZIP package

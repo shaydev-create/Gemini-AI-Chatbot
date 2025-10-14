@@ -129,24 +129,18 @@ def test_chat_api():
             if response.status_code == 200:
                 data = response.json()
                 if data.get("success"):
-                    print_success(
-                        f"Respuesta recibida en {
-                            response_time:.2f}s"
-                    )
+                    print_success(f"Respuesta recibida en {response_time:.2f}s")
                     print(
                         f"   🤖 Respuesta: '{
-                            data.get(
-                                'message',
-                                'Sin mensaje')[
-                                :100]}...'"
+                            data.get('message', 'Sin mensaje')[:100]
+                        }...'"
                     )
                     success_count += 1
                 else:
                     print_error(
                         f"API respondió con error: {
-                            data.get(
-                                'message',
-                                'Error desconocido')}"
+                            data.get('message', 'Error desconocido')
+                        }"
                     )
             else:
                 print_error(f"Error HTTP: {response.status_code}")
@@ -435,10 +429,7 @@ def generate_test_report(results):
 def main():
     """Función principal"""
     print_header("🤖 GEMINI AI CHATBOT - PRUEBAS PRE-LANZAMIENTO")
-    print_info(
-        f"Iniciando pruebas en: {
-            datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"
-    )
+    print_info(f"Iniciando pruebas en: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
 
     # Ejecutar todas las pruebas
     results = {}

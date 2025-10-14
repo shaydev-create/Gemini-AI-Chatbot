@@ -49,11 +49,7 @@ def test_user(app):
             db.session.commit()
 
         # Crear nuevo usuario de prueba
-        user = User(
-            username="testuser",
-            email="test@example.com",
-            role="user"
-        )
+        user = User(username="testuser", email="test@example.com", role="user")
         user.set_password("TestPassword123!")
         db.session.add(user)
         db.session.commit()

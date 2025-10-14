@@ -14,56 +14,76 @@ logger = logging.getLogger(__name__)
 # Definición de permisos disponibles
 PERMISSIONS = {
     # Permisos de administración
-    'admin.users.read': 'Leer información de usuarios',
-    'admin.users.write': 'Crear/editar usuarios',
-    'admin.users.delete': 'Eliminar usuarios',
-    'admin.sessions.read': 'Ver sesiones de chat',
-    'admin.sessions.delete': 'Eliminar sesiones de chat',
-    'admin.system.stats': 'Ver estadísticas del sistema',
-
+    "admin.users.read": "Leer información de usuarios",
+    "admin.users.write": "Crear/editar usuarios",
+    "admin.users.delete": "Eliminar usuarios",
+    "admin.sessions.read": "Ver sesiones de chat",
+    "admin.sessions.delete": "Eliminar sesiones de chat",
+    "admin.system.stats": "Ver estadísticas del sistema",
     # Permisos de usuario
-    'user.chat.create': 'Crear sesiones de chat',
-    'user.chat.read': 'Leer sesiones propias',
-    'user.chat.delete': 'Eliminar sesiones propias',
-    'user.profile.read': 'Leer perfil propio',
-    'user.profile.write': 'Editar perfil propio',
-
+    "user.chat.create": "Crear sesiones de chat",
+    "user.chat.read": "Leer sesiones propias",
+    "user.chat.delete": "Eliminar sesiones propias",
+    "user.profile.read": "Leer perfil propio",
+    "user.profile.write": "Editar perfil propio",
     # Permisos premium
-    'premium.chat.history': 'Acceso a historial extendido',
-    'premium.chat.export': 'Exportar conversaciones',
-    'premium.models.access': 'Acceso a modelos avanzados',
+    "premium.chat.history": "Acceso a historial extendido",
+    "premium.chat.export": "Exportar conversaciones",
+    "premium.models.access": "Acceso a modelos avanzados",
 }
 
 # Mapeo de roles a permisos por defecto
 ROLE_PERMISSIONS = {
-    'superadmin': list(PERMISSIONS.keys()),  # Todos los permisos
-    'admin': [
-        'admin.users.read', 'admin.users.write', 'admin.users.delete',
-        'admin.sessions.read', 'admin.sessions.delete',
-        'admin.system.stats',
-        'user.chat.create', 'user.chat.read', 'user.chat.delete',
-        'user.profile.read', 'user.profile.write',
-        'premium.chat.history', 'premium.chat.export', 'premium.models.access'
+    "superadmin": list(PERMISSIONS.keys()),  # Todos los permisos
+    "admin": [
+        "admin.users.read",
+        "admin.users.write",
+        "admin.users.delete",
+        "admin.sessions.read",
+        "admin.sessions.delete",
+        "admin.system.stats",
+        "user.chat.create",
+        "user.chat.read",
+        "user.chat.delete",
+        "user.profile.read",
+        "user.profile.write",
+        "premium.chat.history",
+        "premium.chat.export",
+        "premium.models.access",
     ],
-    'moderator': [
-        'admin.users.read',
-        'admin.sessions.read', 'admin.sessions.delete',
-        'user.chat.create', 'user.chat.read', 'user.chat.delete',
-        'user.profile.read', 'user.profile.write',
+    "moderator": [
+        "admin.users.read",
+        "admin.sessions.read",
+        "admin.sessions.delete",
+        "user.chat.create",
+        "user.chat.read",
+        "user.chat.delete",
+        "user.profile.read",
+        "user.profile.write",
     ],
-    'premium': [
-        'user.chat.create', 'user.chat.read', 'user.chat.delete',
-        'user.profile.read', 'user.profile.write',
-        'premium.chat.history', 'premium.chat.export', 'premium.models.access'
+    "premium": [
+        "user.chat.create",
+        "user.chat.read",
+        "user.chat.delete",
+        "user.profile.read",
+        "user.profile.write",
+        "premium.chat.history",
+        "premium.chat.export",
+        "premium.models.access",
     ],
-    'user': [
-        'user.chat.create', 'user.chat.read', 'user.chat.delete',
-        'user.profile.read', 'user.profile.write',
+    "user": [
+        "user.chat.create",
+        "user.chat.read",
+        "user.chat.delete",
+        "user.profile.read",
+        "user.profile.write",
     ],
-    'guest': [
-        'user.chat.create', 'user.chat.read',
-    ]
+    "guest": [
+        "user.chat.create",
+        "user.chat.read",
+    ],
 }
+
 
 def permission_required(required_permission: str):
     """
@@ -78,14 +98,17 @@ def permission_required(required_permission: str):
         def wrapper(*args, **kwargs):
             try:
                 from .decorators import get_current_user_from_jwt
+
                 current_user = get_current_user_from_jwt()
 
                 if not current_user:
                     logger.warning("Acceso denegado: usuario no autenticado")
-                    return jsonify({
-                        "message": "Se requiere autenticación para acceder a este recurso.",
-                        "error": "authentication_required"
-                    }), 401
+                    return jsonify(
+                        {
+                            "message": "Se requiere autenticación para acceder a este recurso.",
+                            "error": "authentication_required",
+                        }
+                    ), 401
 
                 jwt_identity = get_jwt_identity()
                 user_role = jwt_identity.get("role", "user")
@@ -106,7 +129,7 @@ def permission_required(required_permission: str):
                             "message": "No tienes permiso para realizar esta acción.",
                             "error": "insufficient_permissions",
                             "required_permission": required_permission,
-                            "user_role": user_role
+                            "user_role": user_role,
                         }
                     ), 403
 
@@ -124,6 +147,7 @@ def permission_required(required_permission: str):
 
     return decorator
 
+
 def get_user_permissions(user_role: str) -> list:
     """
     Obtiene la lista de permisos para un rol específico.
@@ -135,6 +159,7 @@ def get_user_permissions(user_role: str) -> list:
         Lista de permisos para el rol
     """
     return ROLE_PERMISSIONS.get(user_role, [])
+
 
 def has_permission(user_role: str, permission: str) -> bool:
     """

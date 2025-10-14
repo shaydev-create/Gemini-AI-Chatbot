@@ -111,8 +111,9 @@ class TestVertexAIClient:
     @pytest.mark.asyncio
     async def test_initialize_no_clients_available(self):
         """Test initialization when no clients are available."""
-        with patch("app.config.vertex_client.VERTEX_AI_AVAILABLE", False), patch(
-            "app.config.vertex_client.GEMINI_API_AVAILABLE", False
+        with (
+            patch("app.config.vertex_client.VERTEX_AI_AVAILABLE", False),
+            patch("app.config.vertex_client.GEMINI_API_AVAILABLE", False),
         ):
             from app.config.vertex_client import VertexAIClient
 
@@ -359,10 +360,13 @@ class TestVertexAIClient:
         self.client.gemini_client = True
         self.mock_vertex_config.models = {"basic": {"name": "test-model"}}
 
-        with patch.object(
-            self.client, "_generate_with_vertex_ai", new_callable=AsyncMock
-        ), patch.object(
-            self.client, "_generate_with_gemini_api", new_callable=AsyncMock
+        with (
+            patch.object(
+                self.client, "_generate_with_vertex_ai", new_callable=AsyncMock
+            ),
+            patch.object(
+                self.client, "_generate_with_gemini_api", new_callable=AsyncMock
+            ),
         ):
             result = await self.client.health_check()
 
@@ -381,12 +385,15 @@ class TestVertexAIClient:
         self.client.gemini_client = True
         self.mock_vertex_config.models = {"basic": {"name": "test-model"}}
 
-        with patch.object(
-            self.client,
-            "_generate_with_vertex_ai",
-            side_effect=Exception("Vertex Down"),
-        ), patch.object(
-            self.client, "_generate_with_gemini_api", new_callable=AsyncMock
+        with (
+            patch.object(
+                self.client,
+                "_generate_with_vertex_ai",
+                side_effect=Exception("Vertex Down"),
+            ),
+            patch.object(
+                self.client, "_generate_with_gemini_api", new_callable=AsyncMock
+            ),
         ):
             result = await self.client.health_check()
 

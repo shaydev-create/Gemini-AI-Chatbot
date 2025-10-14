@@ -189,9 +189,8 @@ class VertexAIClient:
         if self.daily_cost + estimated_cost > self.config.limits["max_daily_cost"]:
             return (
                 False,
-                f"Límite de costo diario alcanzado (${
-                self.daily_cost:.2f}/${
-                self.config.limits['max_daily_cost']:.2f})",
+                f"Límite de costo diario alcanzado (${self.daily_cost:.2f}/${
+                    self.config.limits['max_daily_cost']:.2f})",
             )
 
         # Verificar límite de tokens por solicitud
@@ -199,7 +198,8 @@ class VertexAIClient:
             return (
                 False,
                 f"Solicitud excede límite de tokens ({estimated_tokens}/{
-                self.config.limits['max_tokens_per_request']})",
+                    self.config.limits['max_tokens_per_request']
+                })",
             )
 
         return True, "OK"
@@ -449,7 +449,9 @@ class VertexAIClient:
             except Exception as e:
                 logger.error(f"❌ Error en Gemini API: {e}")
                 self._update_metrics(0, 0, 0, 0, False)
-                raise RuntimeError(f"Todos los clientes fallaron. Último error: {e}") from e
+                raise RuntimeError(
+                    f"Todos los clientes fallaron. Último error: {e}"
+                ) from e
 
         raise Exception("No hay clientes disponibles")
 

@@ -23,12 +23,12 @@ def role_required(required_role: str):
     """
     # Definir jerarquía de roles (de mayor a menor privilegio)
     ROLE_HIERARCHY = {
-        'superadmin': 100,
-        'admin': 90,
-        'moderator': 80,
-        'premium': 70,
-        'user': 50,
-        'guest': 10
+        "superadmin": 100,
+        "admin": 90,
+        "moderator": 80,
+        "premium": 70,
+        "user": 50,
+        "guest": 10,
     }
 
     def decorator(fn):
@@ -39,26 +39,29 @@ def role_required(required_role: str):
 
                 if not current_user:
                     logger.warning("Acceso denegado: usuario no autenticado")
-                    return jsonify({
-                        "message": "Se requiere autenticación para acceder a este recurso.",
-                        "error": "authentication_required"
-                    }), 401
+                    return jsonify(
+                        {
+                            "message": "Se requiere autenticación para acceder a este recurso.",
+                            "error": "authentication_required",
+                        }
+                    ), 401
 
                 jwt_identity = get_jwt_identity()
                 user_role = jwt_identity.get("role", "user")
 
                 # Verificar si el usuario tiene el rol requerido o uno superior
-                required_roles = [r.strip() for r in required_role.split(',')]
+                required_roles = [r.strip() for r in required_role.split(",")]
                 user_has_access = False
 
                 # Verificar acceso por rol específico
                 if user_role in required_roles:
                     user_has_access = True
                 # Verificar acceso por jerarquía (si el usuario tiene un rol superior)
-                elif (user_role in ROLE_HIERARCHY and
-                      any(req_role in ROLE_HIERARCHY and
-                          ROLE_HIERARCHY[user_role] >= ROLE_HIERARCHY[req_role]
-                          for req_role in required_roles)):
+                elif user_role in ROLE_HIERARCHY and any(
+                    req_role in ROLE_HIERARCHY
+                    and ROLE_HIERARCHY[user_role] >= ROLE_HIERARCHY[req_role]
+                    for req_role in required_roles
+                ):
                     user_has_access = True
 
                 if not user_has_access:
@@ -73,7 +76,7 @@ def role_required(required_role: str):
                             "message": "No tienes permiso para realizar esta acción.",
                             "error": "insufficient_permissions",
                             "required_role": required_role,
-                            "user_role": user_role
+                            "user_role": user_role,
                         }
                     ), 403
 

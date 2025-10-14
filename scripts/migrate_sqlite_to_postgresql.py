@@ -243,7 +243,7 @@ def create_postgresql_table(
 
         create_sql = f"""
             CREATE TABLE IF NOT EXISTS {table_name} (
-                {', '.join(columns)}
+                {", ".join(columns)}
             )
         """
 
@@ -296,7 +296,7 @@ def migrate_table_data(
         # Construir SQL de inserción
         placeholders = ", ".join(["%s"] * len(column_names))
         insert_sql = f"""
-            INSERT INTO {table_name} ({', '.join(column_names)})
+            INSERT INTO {table_name} ({", ".join(column_names)})
             VALUES ({placeholders})
         """
 
@@ -398,6 +398,7 @@ def create_backup(sqlite_path: str) -> str:
 
 def parse_args():
     import argparse
+
     parser = argparse.ArgumentParser(description="Migrar datos de SQLite a PostgreSQL")
     parser.add_argument(
         "--sqlite-db",
@@ -419,9 +420,13 @@ def parse_args():
     )
     return parser.parse_args()
 
+
 def log_databases(sqlite_path, pg_config):
     logger.info(f"📂 SQLite: {sqlite_path}")
-    logger.info(f"🐘 PostgreSQL: {pg_config['host']}:{pg_config['port']}/{pg_config['database']}")
+    logger.info(
+        f"🐘 PostgreSQL: {pg_config['host']}:{pg_config['port']}/{pg_config['database']}"
+    )
+
 
 def connect_databases(sqlite_path, pg_config, dry_run):
     sqlite_conn = get_sqlite_connection(sqlite_path)
@@ -431,6 +436,7 @@ def connect_databases(sqlite_path, pg_config, dry_run):
         pg_conn = get_postgresql_connection(pg_config)
         logger.info("✅ Conectado a PostgreSQL")
     return sqlite_conn, pg_conn
+
 
 def migrate_tables(sqlite_conn, pg_conn, tables):
     migrated_tables = []
@@ -448,6 +454,7 @@ def migrate_tables(sqlite_conn, pg_conn, tables):
             failed_tables.append(table_name)
     return migrated_tables, failed_tables
 
+
 def verify_tables(sqlite_conn, pg_conn, migrated_tables):
     logger.info("\n🔍 Verificando migración...")
     verification_failed = []
@@ -458,6 +465,7 @@ def verify_tables(sqlite_conn, pg_conn, migrated_tables):
         logger.error(f"❌ Verificación fallida para: {verification_failed}")
     else:
         logger.info("✅ Verificación exitosa para todas las tablas")
+
 
 def print_summary(migrated_tables, failed_tables):
     logger.info("\n" + "=" * 40)
@@ -479,6 +487,7 @@ def print_summary(migrated_tables, failed_tables):
         logger.info("1. Actualizar DATABASE_URL en .env")
         logger.info("2. Reiniciar la aplicación")
         logger.info("3. Verificar funcionamiento")
+
 
 def main():
     args = parse_args()

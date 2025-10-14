@@ -156,6 +156,7 @@ class TestDecorators(unittest.TestCase):
         # Crear un mock de g.current_user
         with self.app.test_request_context("/limited"):
             from flask import g
+
             g.current_user = {"id": "user123"}
 
             # Debería funcionar normalmente
@@ -224,7 +225,9 @@ class TestDecorators(unittest.TestCase):
     def test_validate_input_decorator_max_length_validation(self):
         """Test para cubrir líneas 258-259: validación de longitud máxima."""
         with self.app.test_request_context(
-            "/validated", method="POST", json={"comment": "This is way too long comment that exceeds the limit"}
+            "/validated",
+            method="POST",
+            json={"comment": "This is way too long comment that exceeds the limit"},
         ):
             view_func = self.app.view_functions["validated_route"]
             response, status_code = view_func()
@@ -233,6 +236,7 @@ class TestDecorators(unittest.TestCase):
 
     def test_validate_input_decorator_no_sanitize_rules(self):
         """Test para cubrir línea 268: validate_input sin reglas de sanitización."""
+
         # Crear una ruta con schema que no tiene sanitize
         @self.app.route("/validated-no-sanitize", methods=["POST"])
         @validate_input(schema={"comment": {"max_length": 50}})  # Sin sanitize
@@ -240,7 +244,9 @@ class TestDecorators(unittest.TestCase):
             return jsonify(data=request.validated_data)
 
         with self.app.test_request_context(
-            "/validated-no-sanitize", method="POST", json={"comment": "This is a normal comment"}
+            "/validated-no-sanitize",
+            method="POST",
+            json={"comment": "This is a normal comment"},
         ):
             view_func = self.app.view_functions["validated_no_sanitize_route"]
             result = view_func()

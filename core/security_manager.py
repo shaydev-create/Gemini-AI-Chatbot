@@ -58,18 +58,12 @@ class SecurityManagerCore:
         """Middleware ejecutado antes de cada request."""
         # Verificar IP bloqueada
         if request.remote_addr in self.security.blocked_ips:
-            self.logger.warning(
-                f"Blocked IP attempted access: {
-                    request.remote_addr}"
-            )
+            self.logger.warning(f"Blocked IP attempted access: {request.remote_addr}")
             return "Access denied", 403
 
         # Log de request
         self.logger.info(
-            f"Request: {
-                request.method} {
-                request.path} from {
-                request.remote_addr}"
+            f"Request: {request.method} {request.path} from {request.remote_addr}"
         )
 
         # Verificar autenticación para rutas protegidas
@@ -85,11 +79,7 @@ class SecurityManagerCore:
         response = self.security.apply_security_headers(response)
 
         # Log de respuesta
-        self.logger.info(
-            f"Response: {
-                response.status_code} for {
-                request.path}"
-        )
+        self.logger.info(f"Response: {response.status_code} for {request.path}")
 
         return response
 
@@ -119,10 +109,7 @@ class SecurityManagerCore:
 
     def _handle_unauthorized(self, error):
         """Manejar error 401."""
-        self.logger.warning(
-            f"Unauthorized access attempt: {
-                request.remote_addr}"
-        )
+        self.logger.warning(f"Unauthorized access attempt: {request.remote_addr}")
         return {"error": "Unauthorized", "message": "Acceso no autorizado"}, 401
 
     def _handle_forbidden(self, error):

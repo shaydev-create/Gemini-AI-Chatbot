@@ -1,4 +1,3 @@
-
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 import os
@@ -13,6 +12,7 @@ ENV_FILE = ".env"
 ENV_SAMPLE_FILE = ".env-sample"
 ENV_EXAMPLE_FILE = ".env.example"
 
+
 def show_api_key_status(gemini_key, google_key):
     print("📋 ESTADO ACTUAL DE LAS CLAVES API:")
     if gemini_key:
@@ -26,6 +26,7 @@ def show_api_key_status(gemini_key, google_key):
     else:
         print("❌ GOOGLE_API_KEY: No configurada")
     print()
+
 
 def prompt_for_new_api_key():
     print("🔑 CONFIGURACIÓN DE NUEVA API KEY")
@@ -80,8 +81,7 @@ def setup_env_file():
 
     if not sample_path:
         print(
-            f"❌ No se encontró ningún archivo de ejemplo ({
-                ', '.join(sample_files)})"
+            f"❌ No se encontró ningún archivo de ejemplo ({', '.join(sample_files)})"
         )
         print(f"❌ Crea un archivo {ENV_FILE} manualmente")
         return False
@@ -228,7 +228,9 @@ def setup_api_keys():
     if not new_key:
         return False
     print("💾 Guardando API key en archivo .env...")
-    if update_env_file("GEMINI_API_KEY", new_key) and update_env_file("GOOGLE_API_KEY", new_key):
+    if update_env_file("GEMINI_API_KEY", new_key) and update_env_file(
+        "GOOGLE_API_KEY", new_key
+    ):
         print("✅ API key guardada correctamente")
         return True
     else:

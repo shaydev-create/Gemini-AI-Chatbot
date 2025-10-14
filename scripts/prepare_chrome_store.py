@@ -53,11 +53,7 @@ def convert_svg_to_png():
                 print(f"❌ No se encontró: {input_path}")
                 continue
 
-            print(
-                f"🔄 Convirtiendo {
-                    conversion['input']} → {
-                    conversion['output']}"
-            )
+            print(f"🔄 Convirtiendo {conversion['input']} → {conversion['output']}")
 
             # Convertir SVG a PNG usando cairosvg
             png_data = cairosvg.svg2png(
@@ -90,11 +86,7 @@ def convert_svg_to_png():
                     print(f"❌ No se encontró: {input_path}")
                     continue
 
-                print(
-                    f"🔄 Convirtiendo {
-                        conversion['input']} → {
-                        conversion['output']}"
-                )
+                print(f"🔄 Convirtiendo {conversion['input']} → {conversion['output']}")
 
                 # Usar Wand (ImageMagick) para SVG
                 with WandImage(filename=str(input_path)) as img:

@@ -121,16 +121,18 @@ def update_user(user_id: int):
     user.status = data.get("status", user.status)
 
     # Actualizar rol si se proporciona y es válido
-    if 'role' in data:
-        new_role = data['role']
-        valid_roles = ['superadmin', 'admin', 'moderator', 'premium', 'user', 'guest']
+    if "role" in data:
+        new_role = data["role"]
+        valid_roles = ["superadmin", "admin", "moderator", "premium", "user", "guest"]
         if new_role in valid_roles:
             user.role = new_role
         else:
-            return jsonify({
-                "message": f"Rol inválido: {new_role}. Roles válidos: {', '.join(valid_roles)}",
-                "error": "invalid_role"
-            }), 400
+            return jsonify(
+                {
+                    "message": f"Rol inválido: {new_role}. Roles válidos: {', '.join(valid_roles)}",
+                    "error": "invalid_role",
+                }
+            ), 400
 
     db.session.commit()
     return jsonify(
@@ -148,32 +150,35 @@ def update_user_role(user_id: int):
     """
     try:
         data = request.get_json()
-        if not data or 'role' not in data:
-            return jsonify({
-                'message': 'Se requiere el campo "role"',
-                'error': 'missing_role_field'
-            }), 400
+        if not data or "role" not in data:
+            return jsonify(
+                {
+                    "message": 'Se requiere el campo "role"',
+                    "error": "missing_role_field",
+                }
+            ), 400
 
-        new_role = data['role']
+        new_role = data["role"]
         updated_user = auth_manager.update_user_role(user_id, new_role)
 
         if not updated_user:
-            return jsonify({
-                'message': 'Usuario no encontrado o rol inválido',
-                'error': 'user_not_found_or_invalid_role'
-            }), 404
+            return jsonify(
+                {
+                    "message": "Usuario no encontrado o rol inválido",
+                    "error": "user_not_found_or_invalid_role",
+                }
+            ), 404
 
-        return jsonify({
-            'message': 'Rol actualizado correctamente',
-            'user': updated_user.to_dict(),
-            'new_permissions': auth_manager.get_user_permissions(updated_user.id)
-        }), 200
+        return jsonify(
+            {
+                "message": "Rol actualizado correctamente",
+                "user": updated_user.to_dict(),
+                "new_permissions": auth_manager.get_user_permissions(updated_user.id),
+            }
+        ), 200
 
     except Exception as e:
-        return jsonify({
-            'message': 'Error al actualizar rol',
-            'error': str(e)
-        }), 500
+        return jsonify({"message": "Error al actualizar rol", "error": str(e)}), 500
 
 
 @admin_bp.route("/users/role/<role>", methods=["GET"])
@@ -186,16 +191,17 @@ def get_users_by_role(role: str):
     """
     try:
         users = auth_manager.get_users_by_role(role)
-        return jsonify({
-            'users': [user.to_dict() for user in users],
-            'count': len(users),
-            'role': role
-        }), 200
+        return jsonify(
+            {
+                "users": [user.to_dict() for user in users],
+                "count": len(users),
+                "role": role,
+            }
+        ), 200
     except Exception as e:
-        return jsonify({
-            'message': 'Error al obtener usuarios por rol',
-            'error': str(e)
-        }), 500
+        return jsonify(
+            {"message": "Error al obtener usuarios por rol", "error": str(e)}
+        ), 500
 
 
 @admin_bp.route("/permissions/<int:user_id>", methods=["GET"])
@@ -211,23 +217,21 @@ def get_user_permissions(user_id: int):
         user = User.query.get(user_id)
 
         if not user:
-            return jsonify({
-                'message': 'Usuario no encontrado',
-                'error': 'user_not_found'
-            }), 404
+            return jsonify(
+                {"message": "Usuario no encontrado", "error": "user_not_found"}
+            ), 404
 
-        return jsonify({
-            'user_id': user_id,
-            'username': user.username,
-            'role': user.role,
-            'permissions': permissions,
-            'permissions_count': len(permissions)
-        }), 200
+        return jsonify(
+            {
+                "user_id": user_id,
+                "username": user.username,
+                "role": user.role,
+                "permissions": permissions,
+                "permissions_count": len(permissions),
+            }
+        ), 200
     except Exception as e:
-        return jsonify({
-            'message': 'Error al obtener permisos',
-            'error': str(e)
-        }), 500
+        return jsonify({"message": "Error al obtener permisos", "error": str(e)}), 500
 
 
 @admin_bp.route("/permissions", methods=["GET"])
@@ -238,10 +242,9 @@ def get_all_permissions():
     Obtiene todos los permisos disponibles en el sistema.
     Requiere rol de administrador.
     """
-    return jsonify({
-        'permissions': PERMISSIONS,
-        'role_permissions': ROLE_PERMISSIONS
-    }), 200
+    return jsonify(
+        {"permissions": PERMISSIONS, "role_permissions": ROLE_PERMISSIONS}
+    ), 200
 
 
 @admin_bp.route("/stats/users", methods=["GET"])
@@ -255,7 +258,7 @@ def get_users_stats():
     try:
         # Contar usuarios por rol
         roles_stats = {}
-        valid_roles = ['superadmin', 'admin', 'moderator', 'premium', 'user', 'guest']
+        valid_roles = ["superadmin", "admin", "moderator", "premium", "user", "guest"]
 
         for role in valid_roles:
             count = User.query.filter_by(role=role).count()
@@ -263,14 +266,15 @@ def get_users_stats():
 
         total_users = User.query.count()
 
-        return jsonify({
-            'users_total': total_users,
-            'users_by_role': roles_stats,
-            'active_sessions': 0,  # TODO: Implementar contador de sesiones activas
-        }), 200
+        return jsonify(
+            {
+                "users_total": total_users,
+                "users_by_role": roles_stats,
+                "active_sessions": 0,  # TODO: Implementar contador de sesiones activas
+            }
+        ), 200
 
     except Exception as e:
-        return jsonify({
-            'message': 'Error al obtener estadísticas',
-            'error': str(e)
-        }), 500
+        return jsonify(
+            {"message": "Error al obtener estadísticas", "error": str(e)}
+        ), 500

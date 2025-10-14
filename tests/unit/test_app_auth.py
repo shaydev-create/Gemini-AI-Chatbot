@@ -27,7 +27,9 @@ class TestAuthManager(unittest.TestCase):
             db.create_all()
             self.auth_manager = AuthManager()
             # Pre-populate a user for tests that need an existing user
-            user, _ = self.auth_manager.create_user("testuser", "Password123!", "test@example.com")
+            user, _ = self.auth_manager.create_user(
+                "testuser", "Password123!", "test@example.com"
+            )
             user.status = "active"
             db.session.commit()
 
@@ -44,7 +46,9 @@ class TestAuthManager(unittest.TestCase):
     def test_create_user_success(self):
         """Test successful user creation."""
         with self.app.app_context():
-            user, msg = self.auth_manager.create_user("newuser", "Newpass1!", "new@example.com")
+            user, msg = self.auth_manager.create_user(
+                "newuser", "Newpass1!", "new@example.com"
+            )
             self.assertIsNotNone(user)
             self.assertEqual(user.username, "newuser")
             self.assertEqual(user.email, "new@example.com")
@@ -54,7 +58,9 @@ class TestAuthManager(unittest.TestCase):
     def test_create_user_already_exists(self):
         """Test that creating a user that already exists returns None and error message."""
         with self.app.app_context():
-            user, msg = self.auth_manager.create_user("testuser", "Password123!", "test@example.com")
+            user, msg = self.auth_manager.create_user(
+                "testuser", "Password123!", "test@example.com"
+            )
             self.assertIsNone(user)
             self.assertIn("en uso", msg)
 
@@ -96,7 +102,9 @@ class TestAuthManager(unittest.TestCase):
             user = User.query.filter_by(username="testuser").first()
             # Ensure both datetimes are timezone-aware
             if user.account_locked_until and user.account_locked_until.tzinfo is None:
-                user.account_locked_until = user.account_locked_until.replace(tzinfo=timezone.utc)
+                user.account_locked_until = user.account_locked_until.replace(
+                    tzinfo=timezone.utc
+                )
             self.assertTrue(user.is_account_locked())
             self.assertIsNotNone(user.account_locked_until)
             self.assertIsNotNone(user.account_locked_until.tzinfo)
@@ -173,6 +181,7 @@ class TestGetCurrentUser(unittest.TestCase):
     def setUp(self):
         """Set up a shared AuthManager instance."""
         from flask import Flask
+
         self.app = Flask(__name__)
         self.app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///:memory:"
         self.app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
@@ -211,7 +220,9 @@ class TestGetCurrentUser(unittest.TestCase):
     def test_get_current_user_with_token_success(self, mock_get_identity):
         """Test getting a user by providing a token dictionary."""
         token_payload = {"sub": {"user_id": self.user.id}}
-        found_user = getattr(AuthManager(), "get_current_user", lambda token=None: None)(token=token_payload)
+        found_user = getattr(
+            AuthManager(), "get_current_user", lambda token=None: None
+        )(token=token_payload)
         if found_user:
             self.assertIsNotNone(found_user)
             self.assertEqual(found_user.id, self.user.id)
@@ -219,9 +230,21 @@ class TestGetCurrentUser(unittest.TestCase):
     @patch("app.auth.get_jwt_identity")
     def test_get_current_user_with_invalid_token(self, mock_get_identity):
         """Test getting a user with an invalid or malformed token."""
-        self.assertIsNone(getattr(AuthManager(), "get_current_user", lambda token=None: None)(token={"sub": {}}))
-        self.assertIsNone(getattr(AuthManager(), "get_current_user", lambda token=None: None)(token={}))
-        self.assertIsNone(getattr(AuthManager(), "get_current_user", lambda token=None: None)(token=None))
+        self.assertIsNone(
+            getattr(AuthManager(), "get_current_user", lambda token=None: None)(
+                token={"sub": {}}
+            )
+        )
+        self.assertIsNone(
+            getattr(AuthManager(), "get_current_user", lambda token=None: None)(
+                token={}
+            )
+        )
+        self.assertIsNone(
+            getattr(AuthManager(), "get_current_user", lambda token=None: None)(
+                token=None
+            )
+        )
 
     @patch("app.auth.get_jwt_identity", side_effect=Exception("JWT error"))
     def test_get_current_user_exception_safety(self, mock_get_identity):

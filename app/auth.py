@@ -132,7 +132,7 @@ class AuthManager:
                 logger.warning(
                     "Cuenta bloqueada para el usuario: %s después de %d intentos fallidos",
                     username,
-                    self.max_attempts
+                    self.max_attempts,
                 )
 
             db.session.commit()
@@ -140,23 +140,23 @@ class AuthManager:
                 "Intento de inicio de sesión fallido para el usuario: %s (intento %d/%d)",
                 username,
                 user.failed_login_attempts,
-                self.max_attempts
+                self.max_attempts,
             )
             return None
 
     def update_user_role(self, user_id: int, new_role: str) -> Optional[User]:
         """
         Actualiza el rol de un usuario.
-        
+
         Args:
             user_id: ID del usuario a actualizar
             new_role: Nuevo rol del usuario
-            
+
         Returns:
             El usuario actualizado o None si no se encuentra
         """
         # Validar que el rol sea válido
-        valid_roles = ['superadmin', 'admin', 'moderator', 'premium', 'user', 'guest']
+        valid_roles = ["superadmin", "admin", "moderator", "premium", "user", "guest"]
         if new_role not in valid_roles:
             logger.warning("Intento de asignar rol inválido: %s", new_role)
             return None
@@ -173,10 +173,10 @@ class AuthManager:
     def get_user_permissions(self, user_id: int) -> List[str]:
         """
         Obtiene la lista de permisos de un usuario basado en su rol.
-        
+
         Args:
             user_id: ID del usuario
-            
+
         Returns:
             Lista de permisos del usuario
         """
@@ -188,11 +188,11 @@ class AuthManager:
     def has_permission(self, user_id: int, permission: str) -> bool:
         """
         Verifica si un usuario tiene un permiso específico.
-        
+
         Args:
             user_id: ID del usuario
             permission: Permiso a verificar
-            
+
         Returns:
             True si tiene el permiso, False en caso contrario
         """
@@ -204,7 +204,7 @@ class AuthManager:
     def get_users_by_role(self, role: str) -> List[User]:
         """
         Obtiene todos los usuarios con un rol específico.
-        
+
         Args:
             role: Rol a buscar
 

@@ -59,7 +59,10 @@ class SecurityManager:
             (bool(re.search(r"[A-Z]", password)), "Debe contener mayúsculas"),
             (bool(re.search(r"[a-z]", password)), "Debe contener minúsculas"),
             (bool(re.search(r"\d", password)), "Debe contener números"),
-            (bool(re.search(r'[!@#$%^&*(),.?":{}|<>]', password)), "Debe contener símbolos especiales")
+            (
+                bool(re.search(r'[!@#$%^&*(),.?":{}|<>]', password)),
+                "Debe contener símbolos especiales",
+            ),
         ]
 
         for condition, error_message in requirements:
@@ -93,16 +96,12 @@ class SecurityManager:
         errors = self._check_password_requirements(password)
 
         if errors:
-            return {
-                "valid": False,
-                "errors": errors,
-                "strength": "weak"
-            }
+            return {"valid": False, "errors": errors, "strength": "weak"}
         else:
             return {
                 "valid": True,
                 "errors": [],
-                "strength": self._calculate_password_strength(password)
+                "strength": self._calculate_password_strength(password),
             }
 
     def check_rate_limit(
@@ -173,6 +172,8 @@ class SecurityManager:
         for header, value in self.security_headers.items():
             response.headers[header] = value
         return response
+
+
 class RateLimiter:
     """Decorador para rate limiting."""
 
@@ -206,6 +207,7 @@ class RateLimiter:
 
         return wrapper
 
+
 def require_https(func):
     """Decorador para requerir HTTPS."""
 
@@ -227,6 +229,7 @@ def require_https(func):
         return func(*args, **kwargs)
 
     return wrapper
+
 
 def validate_input(schema: Dict[str, Any]):
     """Decorador para validar entrada."""
@@ -286,6 +289,7 @@ def validate_input(schema: Dict[str, Any]):
         return wrapper
 
     return decorator
+
 
 # Instancia global
 security_manager = SecurityManager()
