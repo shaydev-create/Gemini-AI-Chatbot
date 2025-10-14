@@ -8,10 +8,11 @@ import unittest
 from datetime import datetime, timedelta, timezone
 from unittest.mock import patch
 
+from flask import Flask
+
 from app.auth import AuthManager
 from app.config.extensions import db
 from app.models import User
-from flask import Flask
 
 
 class TestAuthManager(unittest.TestCase):
@@ -19,19 +20,24 @@ class TestAuthManager(unittest.TestCase):
 
     def setUp(self):
         self.app = Flask(__name__)
-        self.app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///test.db"
+        self.app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///:memory:"
         self.app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
         self.app.config["TESTING"] = True
         db.init_app(self.app)
+        self.auth_manager = AuthManager()
         with self.app.app_context():
             db.create_all()
-            self.auth_manager = AuthManager()
             # Pre-populate a user for tests that need an existing user
             user, _ = self.auth_manager.create_user(
                 "testuser", "Password123!", "test@example.com"
             )
             user.status = "active"
             db.session.commit()
+    
+    def tearDown(self):
+        with self.app.app_context():
+            db.session.remove()
+            db.drop_all()
 
     def test_hash_and_verify_password(self):
         """Test that password hashing and verification work correctly."""
