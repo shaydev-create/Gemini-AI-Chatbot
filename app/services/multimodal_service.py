@@ -73,26 +73,33 @@ class MultimodalService:
         """
         logger.debug("Generando respuesta multimodal con el modelo %s", model_type)
 
-        try:
-            content_parts = []
-            content_parts.append(prompt)
-            for image_source in images:
+        # Verificar si hay imágenes válidas
+        valid_images = []
+        for image in images:
+            if isinstance(image, str) and image.startswith("data:image"):
+                valid_images.append(image)
+            elif isinstance(image, (str, Path)):
                 try:
-                    image_part = self._create_image_part(image_source)
-                    content_parts.append(image_part)
-                except (ValueError, FileNotFoundError) as e:
-                    logger.warning(
-                        "⚠️ No se pudo procesar una imagen y será omitida: %s", e
-                    )
-                    continue
+                    if Path(image).exists():
+                        valid_images.append(image)
+                except (OSError, ValueError):
+                    # Ignorar errores de path inválido
+                    pass
 
-            if len(content_parts) <= 1:
-                logger.warning("La solicitud multimodal no contenía imágenes válidas.")
-                return "Por favor, proporciona al menos una imagen válida para el análisis."
+        # El servicio multimodal requiere al menos una imagen válida
+        if not valid_images:
+            logger.warning("No se proporcionaron imágenes válidas.")
+            return "Por favor, proporciona al menos una imagen válida para el análisis."
 
+        # Construir el prompt multimodal
+        multimodal_prompt = f"{prompt}\n\nAnaliza las siguientes imágenes:"
+
+        try:
             # Usar el cliente centralizado para generar contenido
+            # El cliente actual solo maneja texto, así que construimos un prompt que mencione las imágenes
+            multimodal_prompt = f"{prompt}\n\nAnaliza las siguientes imágenes:"
             response_data: dict[str, Any] = await self.client.generate_response(
-                prompt=str(content_parts), model_type=model_type, max_tokens=1000
+                prompt=multimodal_prompt, model_type=model_type, max_tokens=1000
             )
             response_text = response_data["response"]
             logger.info("Respuesta multimodal generada con éxito.")
