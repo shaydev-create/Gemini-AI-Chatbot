@@ -121,7 +121,7 @@ class TestVertexAIConfig:
         """Test inicialización exitosa de Vertex AI."""
         # Mock validate_config to return True so initialize proceeds
         mock_validate_config.return_value = (True, "Configuración válida")
-        
+
         config = VertexAIConfig()
         config.initialize()
         mock_init.assert_called_once_with(

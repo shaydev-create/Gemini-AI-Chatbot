@@ -6,10 +6,9 @@ Para diagnosticar problemas con la API.
 """
 
 from dotenv import load_dotenv
+from app.core.application import create_app
 
 load_dotenv()
-
-from app.core.application import create_app
 
 # Crear la aplicación
 app, socketio = create_app()

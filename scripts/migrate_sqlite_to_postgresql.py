@@ -396,9 +396,6 @@ def create_backup(sqlite_path: str) -> str:
     return backup_path
 
 
-def main():
-    """Función principal."""
-
 def parse_args():
     import argparse
     parser = argparse.ArgumentParser(description="Migrar datos de SQLite a PostgreSQL")

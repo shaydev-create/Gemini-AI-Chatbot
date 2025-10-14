@@ -42,7 +42,7 @@ class TestAPIIntegration:
         response = client.get("/api/metrics")
         # Puede devolver 200 (si está implementado) o 404/500 (si no lo está)
         assert response.status_code in [200, 404, 500]
-        
+
         if response.status_code == 200:
             data = json.loads(response.data)
             assert isinstance(data, dict)
@@ -195,7 +195,7 @@ class TestAPIIntegration:
         limiter = app.extensions.get("limiter")
         if not limiter:
             pytest.skip("Flask-Limiter no está configurado en esta aplicación")
-            
+
         # Resetear el limiter para el test
         limiter.reset()
 

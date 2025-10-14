@@ -13,6 +13,7 @@ import subprocess
 import sys
 from datetime import datetime
 from pathlib import Path
+from typing import Dict, List, Optional
 
 # Patrones de credenciales a buscar
 PATTERNS = {
@@ -29,13 +30,11 @@ PATTERNS = {
     "Claves PWA": [r'VAPID_PRIVATE_KEY\s*=\s*["\']([^"\'\s]{20,})["\']'],
 }
 
-
 def print_banner():
     """Mostrar banner del script"""
     print("🔍 DETECTOR DE CREDENCIALES EXPUESTAS - GEMINI AI CHATBOT")
     print("=" * 70)
     print()
-
 
 def run_command(command):
     """Ejecutar comando y devolver salida"""
@@ -52,84 +51,79 @@ def run_command(command):
         print(f"❌ Error al ejecutar comando: {e}")
         return ""
 
-
-def check_git_history():
-    """Analizar historial de Git para buscar credenciales"""
-    print("🔍 Analizando historial de Git...")
-    print()
-
-    # Verificar si estamos en un repositorio Git
+def _is_git_repository() -> bool:
+    """Verificar si estamos en un repositorio Git."""
     if not os.path.exists(".git"):
         print("❌ No se encontró un repositorio Git en este directorio")
         return False
+    return True
 
-    # Obtener lista de commits
-    commits = run_command("git log --format=%H").strip().split("\n")
+def _get_commits_list() -> List[str]:
+    """Obtener lista de commits del repositorio."""
+    commits_output = run_command("git log --format=%H").strip()
+    commits = commits_output.split("\n") if commits_output else []
+
     if not commits or commits[0] == "":
         print("❌ No se encontraron commits en el repositorio")
-        return False
+        return []
 
-    found_credentials = False
+    return commits
+
+def _get_commit_metadata(commit_hash: str) -> Optional[Dict[str, str]]:
+    """Obtener metadatos de un commit específico."""
+    commit_info = run_command(
+        f"git show --name-only --format='%h|%an|%ad|%s' {commit_hash} --date=short"
+    )
+
+    if not commit_info:
+        return None
+
+    lines = commit_info.split("\n")
+    if not lines:
+        return None
+
+    try:
+        commit_meta = lines[0].split("|")
+        return {
+            "short_hash": commit_meta[0],
+            "author": commit_meta[1],
+            "date": commit_meta[2],
+            "subject": commit_meta[3]
+        }
+    except (IndexError, ValueError):
+        return None
+
+def _analyze_commit_for_credentials(commit_hash: str, metadata: Dict[str, str]) -> List[str]:
+    """Analizar un commit específico en busca de credenciales."""
+    commit_content = run_command(f"git show {commit_hash}")
     report_lines = []
 
-    # Analizar cada commit
-    for commit in commits:
-        if not commit.strip():
-            continue
+    for cred_type, patterns in PATTERNS.items():
+        for pattern in patterns:
+            matches = re.findall(pattern, commit_content)
+            if matches:
+                # Ocultar parte de la credencial para el reporte
+                safe_matches = []
+                for match in matches:
+                    if len(match) > 8:
+                        safe_match = match[:4] + "*" * (len(match) - 8) + match[-4:]
+                    else:
+                        safe_match = "*" * len(match)
+                    safe_matches.append(safe_match)
 
-        # Obtener información del commit
-        commit_info = run_command(
-            f"git show --name-only --format='%h|%an|%ad|%s' {commit} --date=short"
-        )
-        if not commit_info:
-            continue
+                # Añadir al reporte
+                report_lines.extend([
+                    f"⚠️  {cred_type} encontrada en commit {metadata['short_hash']}",
+                    f"   Fecha: {metadata['date']}, Autor: {metadata['author']}",
+                    f"   Asunto: {metadata['subject']}",
+                    f"   Credencial parcial: {', '.join(safe_matches)}",
+                    ""
+                ])
 
-        lines = commit_info.split("\n")
-        if not lines:
-            continue
+    return report_lines
 
-        # Extraer metadatos del commit
-        try:
-            commit_meta = lines[0].split("|")
-            short_hash = commit_meta[0]
-            author = commit_meta[1]
-            date = commit_meta[2]
-            subject = commit_meta[3]
-        except IndexError:
-            continue
-
-        # Obtener contenido del commit
-        commit_content = run_command(f"git show {commit}")
-
-        # Buscar patrones de credenciales
-        for cred_type, patterns in PATTERNS.items():
-            for pattern in patterns:
-                matches = re.findall(pattern, commit_content)
-                if matches:
-                    found_credentials = True
-
-                    # Ocultar parte de la credencial para el reporte
-                    safe_matches = []
-                    for match in matches:
-                        if len(match) > 8:
-                            safe_match = match[:4] + "*" * (len(match) - 8) + match[-4:]
-                        else:
-                            safe_match = "*" * len(match)
-                        safe_matches.append(safe_match)
-
-                    # Añadir al reporte
-                    report_lines.append(
-                        f"⚠️  {cred_type} encontrada en commit {short_hash}"
-                    )
-                    report_lines.append(f"   Fecha: {date}, Autor: {author}")
-                    report_lines.append(f"   Asunto: {subject}")
-                    report_lines.append(
-                        f"   Credencial parcial: {
-                            ', '.join(safe_matches)}"
-                    )
-                    report_lines.append("")
-
-    # Mostrar resultados
+def _display_results(found_credentials: bool, report_lines: List[str]):
+    """Mostrar resultados del análisis."""
     if found_credentials:
         print("⚠️  SE ENCONTRARON CREDENCIALES EXPUESTAS EN EL HISTORIAL DE GIT")
         print("=" * 70)
@@ -146,8 +140,42 @@ def check_git_history():
     else:
         print("✅ No se encontraron credenciales expuestas en el historial de Git")
 
-    return found_credentials
+def check_git_history():
+    """Analizar historial de Git para buscar credenciales."""
+    print("🔍 Analizando historial de Git...")
+    print()
 
+    # Verificar repositorio Git
+    if not _is_git_repository():
+        return False
+
+    # Obtener lista de commits
+    commits = _get_commits_list()
+    if not commits:
+        return False
+
+    found_credentials = False
+    report_lines = []
+
+    # Analizar cada commit
+    for commit in commits:
+        if not commit.strip():
+            continue
+
+        # Obtener metadatos del commit
+        metadata = _get_commit_metadata(commit)
+        if not metadata:
+            continue
+
+        # Analizar commit en busca de credenciales
+        commit_report = _analyze_commit_for_credentials(commit, metadata)
+        if commit_report:
+            found_credentials = True
+            report_lines.extend(commit_report)
+
+    # Mostrar resultados
+    _display_results(found_credentials, report_lines)
+    return found_credentials
 
 def generate_report(found_credentials):
     """Generar reporte de análisis"""
@@ -185,7 +213,6 @@ def generate_report(found_credentials):
 
     print(f"\n📋 Reporte guardado en: {report_file}")
 
-
 def main():
     """Función principal"""
     print_banner()
@@ -195,7 +222,6 @@ def main():
 
     print("\n✅ ANÁLISIS COMPLETADO")
     return 0 if not found_credentials else 1
-
 
 if __name__ == "__main__":
     try:

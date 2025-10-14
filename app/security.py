@@ -10,7 +10,7 @@ import re
 import secrets
 from datetime import datetime, timedelta, timezone
 from functools import wraps
-from typing import Any, Dict
+from typing import Any, Dict, List
 
 import bleach
 from flask import g, jsonify, request
@@ -50,52 +50,60 @@ class SecurityManager:
         pattern = r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
         return bool(re.match(pattern, email))
 
+    def _check_password_requirements(self, password: str) -> List[str]:
+        """Verificar requisitos básicos de la contraseña."""
+        errors = []
+
+        requirements = [
+            (len(password) >= 8, "Mínimo 8 caracteres"),
+            (bool(re.search(r"[A-Z]", password)), "Debe contener mayúsculas"),
+            (bool(re.search(r"[a-z]", password)), "Debe contener minúsculas"),
+            (bool(re.search(r"\d", password)), "Debe contener números"),
+            (bool(re.search(r'[!@#$%^&*(),.?":{}|<>]', password)), "Debe contener símbolos especiales")
+        ]
+
+        for condition, error_message in requirements:
+            if not condition:
+                errors.append(error_message)
+
+        return errors
+
+    def _calculate_password_strength(self, password: str) -> str:
+        """Calcular la fortaleza de la contraseña."""
+        score = 0
+
+        if len(password) >= 12:
+            score += 1
+        if re.search(r"[A-Z]", password) and re.search(r"[a-z]", password):
+            score += 1
+        if re.search(r"\d", password):
+            score += 1
+        if re.search(r'[!@#$%^&*(),.?":{}|<>]', password):
+            score += 1
+
+        if score >= 3:
+            return "strong"
+        elif score >= 2:
+            return "medium"
+        else:
+            return "weak"
+
     def validate_password(self, password: str) -> Dict[str, Any]:
         """Validar fortaleza de contraseña."""
-        result = {"valid": True, "errors": [], "strength": "weak"}
+        errors = self._check_password_requirements(password)
 
-        if len(password) < 8:
-            result["errors"].append("Mínimo 8 caracteres")
-            result["valid"] = False
-
-        if not re.search(r"[A-Z]", password):
-            result["errors"].append("Debe contener mayúsculas")
-            result["valid"] = False
-
-        if not re.search(r"[a-z]", password):
-            result["errors"].append("Debe contener minúsculas")
-            result["valid"] = False
-
-        if not re.search(r"\d", password):
-            result["errors"].append("Debe contener números")
-            result["valid"] = False
-
-        if not re.search(r'[!@#$%^&*(),.?":{}|<>]', password):
-            result["errors"].append("Debe contener símbolos especiales")
-            result["valid"] = False
-
-        # Un password no es válido si tiene algún error
-        if result["errors"]:
-            result["valid"] = False
+        if errors:
+            return {
+                "valid": False,
+                "errors": errors,
+                "strength": "weak"
+            }
         else:
-            result["valid"] = True
-            # Calcular fortaleza solo si es válido
-            score = 0
-            if len(password) >= 12:
-                score += 1
-            if re.search(r"[A-Z]", password) and re.search(r"[a-z]", password):
-                score += 1
-            if re.search(r"\d", password):
-                score += 1
-            if re.search(r'[!@#$%^&*(),.?":{}|<>]', password):
-                score += 1
-
-            if score >= 3:
-                result["strength"] = "strong"
-            elif score >= 2:
-                result["strength"] = "medium"
-
-        return result
+            return {
+                "valid": True,
+                "errors": [],
+                "strength": self._calculate_password_strength(password)
+            }
 
     def check_rate_limit(
         self, identifier: str, limit: int = 100, window: int = 3600
@@ -165,8 +173,6 @@ class SecurityManager:
         for header, value in self.security_headers.items():
             response.headers[header] = value
         return response
-
-
 class RateLimiter:
     """Decorador para rate limiting."""
 
@@ -200,7 +206,6 @@ class RateLimiter:
 
         return wrapper
 
-
 def require_https(func):
     """Decorador para requerir HTTPS."""
 
@@ -222,7 +227,6 @@ def require_https(func):
         return func(*args, **kwargs)
 
     return wrapper
-
 
 def validate_input(schema: Dict[str, Any]):
     """Decorador para validar entrada."""
@@ -282,7 +286,6 @@ def validate_input(schema: Dict[str, Any]):
         return wrapper
 
     return decorator
-
 
 # Instancia global
 security_manager = SecurityManager()

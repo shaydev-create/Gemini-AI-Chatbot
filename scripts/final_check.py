@@ -7,6 +7,7 @@ Verifica que todos los archivos estén listos
 import os
 import zipfile
 from pathlib import Path
+from typing import List, Tuple
 
 
 def check_file_exists(file_path, description):
@@ -60,96 +61,36 @@ def check_zip_contents(zip_path):
         return False
 
 
-def main():
-    """Verificación completa pre-lanzamiento"""
-
-    print("🔍 VERIFICACIÓN FINAL PRE-LANZAMIENTO")
-    print("=" * 50)
-
-    base_path = Path(".")
-    all_good = True
-
-    # 1. Verificar ZIP principal
+def _check_zip_package(base_path: Path) -> bool:
+    """Verificar el paquete ZIP principal."""
     print("\n📦 1. PACKAGE CHROME WEB STORE")
     zip_files = list(base_path.glob("gemini-ai-chatbot-chrome-*.zip"))
-    if zip_files:
-        zip_path = zip_files[0]
-        if check_file_exists(zip_path, "ZIP Package"):
-            check_zip_contents(zip_path)
-        else:
-            all_good = False
-    else:
+
+    if not zip_files:
         print("❌ ZIP Package no encontrado")
-        all_good = False
+        return False
 
-    # 2. Verificar screenshots
-    print("\n📸 2. SCREENSHOTS")
-    screenshots = [
-        (
-            "chrome_store_assets/screenshots/screenshot_1_main.png",
-            "Screenshot Principal",
-        ),
-        (
-            "chrome_store_assets/screenshots/screenshot_2_features.png",
-            "Screenshot Características",
-        ),
-        ("chrome_store_assets/screenshots/promo_tile.png", "Tile Promocional"),
-    ]
+    zip_path = zip_files[0]
+    if not check_file_exists(zip_path, "ZIP Package"):
+        return False
 
-    for path, desc in screenshots:
+    return check_zip_contents(zip_path)
+
+def _check_files_section(section_name: str, files_list: List[Tuple[str, str]]) -> bool:
+    """Verificar una sección de archivos."""
+    print(f"\n{section_name}")
+    all_exist = True
+
+    for path, desc in files_list:
         if not check_file_exists(path, desc):
-            all_good = False
+            all_exist = False
 
-    # 3. Verificar iconos
-    print("\n🎨 3. ICONOS")
-    icons = [
-        ("static/icons/chrome-webstore-icon-16x16.png", "Icono 16x16"),
-        ("static/icons/chrome-webstore-icon-48x48.png", "Icono 48x48"),
-        ("static/icons/chrome-webstore-icon-128x128.png", "Icono 128x128"),
-        ("static/icons/chrome-webstore-icon-512x512.png", "Icono 512x512"),
-    ]
+    return all_exist
 
-    for path, desc in icons:
-        if not check_file_exists(path, desc):
-            all_good = False
-
-    # 4. Verificar documentos legales
-    print("\n📄 4. DOCUMENTOS LEGALES")
-    legal_docs = [
-        ("templates/privacy_policy.html", "Privacy Policy"),
-        ("templates/terms_of_service.html", "Terms of Service"),
-    ]
-
-    for path, desc in legal_docs:
-        if not check_file_exists(path, desc):
-            all_good = False
-
-    # 5. Verificar configuración API
-    print("\n🔧 5. CONFIGURACIÓN API")
-    api_files = [
-        ("src/config/vertex_ai.py", "Configuración Vertex AI"),
-        ("src/config/vertex_client.py", "Cliente Vertex AI"),
-        (".env.vertex", "Variables de entorno Vertex AI"),
-    ]
-
-    for path, desc in api_files:
-        if not check_file_exists(path, desc):
-            all_good = False
-
-    # 6. Verificar documentación
-    print("\n📚 6. DOCUMENTACIÓN")
-    docs = [
-        ("docs/LAUNCH_STEP_BY_STEP.md", "Guía paso a paso"),
-        ("docs/EXECUTIVE_SUMMARY.md", "Resumen ejecutivo"),
-        ("docs/VERTEX_AI_MIGRATION_STEPS.md", "Migración Vertex AI"),
-    ]
-
-    for path, desc in docs:
-        if not check_file_exists(path, desc):
-            all_good = False
-
-    # Resultado final
+def _display_final_results(all_good: bool):
+    """Mostrar resultados finales de la verificación."""
     print("\n" + "=" * 50)
+
     if all_good:
         print("🎉 ¡TODO LISTO PARA LANZAMIENTO!")
         print("\n🚀 PRÓXIMOS PASOS:")
@@ -163,11 +104,58 @@ def main():
         print("\n💰 INVERSIÓN TOTAL: $5 USD")
         print("⏱️ TIEMPO ESTIMADO: 30-45 minutos")
         print("📅 PUBLICACIÓN: 1-3 días")
-
     else:
         print("⚠️ HAY ARCHIVOS FALTANTES")
         print("Revisa los errores arriba y ejecuta los scripts necesarios")
 
+def main():
+    """Verificación completa pre-lanzamiento."""
+    print("🔍 VERIFICACIÓN FINAL PRE-LANZAMIENTO")
+    print("=" * 50)
+
+    base_path = Path(".")
+    all_good = True
+
+    # Definir secciones de verificación
+    sections = [
+        ("📸 2. SCREENSHOTS", [
+            ("chrome_store_assets/screenshots/screenshot_1_main.png", "Screenshot Principal"),
+            ("chrome_store_assets/screenshots/screenshot_2_features.png", "Screenshot Características"),
+            ("chrome_store_assets/screenshots/promo_tile.png", "Tile Promocional")
+        ]),
+        ("🎨 3. ICONOS", [
+            ("static/icons/chrome-webstore-icon-16x16.png", "Icono 16x16"),
+            ("static/icons/chrome-webstore-icon-48x48.png", "Icono 48x48"),
+            ("static/icons/chrome-webstore-icon-128x128.png", "Icono 128x128"),
+            ("static/icons/chrome-webstore-icon-512x512.png", "Icono 512x512")
+        ]),
+        ("📄 4. DOCUMENTOS LEGALES", [
+            ("templates/privacy_policy.html", "Privacy Policy"),
+            ("templates/terms_of_service.html", "Terms of Service")
+        ]),
+        ("🔧 5. CONFIGURACIÓN API", [
+            ("src/config/vertex_ai.py", "Configuración Vertex AI"),
+            ("src/config/vertex_client.py", "Cliente Vertex AI"),
+            (".env.vertex", "Variables de entorno Vertex AI")
+        ]),
+        ("📚 6. DOCUMENTACIÓN", [
+            ("docs/LAUNCH_STEP_BY_STEP.md", "Guía paso a paso"),
+            ("docs/EXECUTIVE_SUMMARY.md", "Resumen ejecutivo"),
+            ("docs/VERTEX_AI_MIGRATION_STEPS.md", "Migración Vertex AI")
+        ])
+    ]
+
+    # Verificar ZIP package
+    if not _check_zip_package(base_path):
+        all_good = False
+
+    # Verificar todas las secciones
+    for section_name, files_list in sections:
+        if not _check_files_section(section_name, files_list):
+            all_good = False
+
+    # Mostrar resultados finales
+    _display_final_results(all_good)
     return all_good
 
 

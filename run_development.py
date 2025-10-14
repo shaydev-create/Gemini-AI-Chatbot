@@ -1,9 +1,8 @@
 from dotenv import load_dotenv
+from app.core.application import create_app
 
 # Cargar variables de entorno desde .env ANTES de importar la app.
 load_dotenv()
-
-from app.core.application import create_app
 
 # La función create_app ahora devuelve una tupla (app, socketio)
 app, socketio = create_app()

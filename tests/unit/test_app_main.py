@@ -17,7 +17,7 @@ class TestAppMain(unittest.TestCase):
 
         # Ejecutar app_original.py como si fuera el script principal
         runpy.run_path("app_original.py", run_name="__main__")
-        
+
         # Verificar que create_app fue llamado para instanciar la app
         mock_create_app.assert_called_once()
 

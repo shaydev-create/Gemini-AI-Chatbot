@@ -3,21 +3,19 @@ Tests para las utilidades de internacionalización (i18n).
 """
 
 import json
-import os
 import tempfile
 from pathlib import Path
 from unittest.mock import Mock, patch
 
 import pytest
-from flask import Flask, session
-
 from app.utils.i18n import (
     DEFAULT_LANG,
     SUPPORTED_LANGS,
+    _load_translations,
     get_locale,
     translate,
-    _load_translations,
 )
+from flask import Flask
 
 
 class TestI18n:
@@ -29,11 +27,11 @@ class TestI18n:
         self.app = Flask(__name__)
         self.app.secret_key = "test_secret_key"
         self.app.config["TESTING"] = True
-        
+
         # Limpiar caché de traducciones antes de cada test
         from app.utils.i18n import _translations_cache
         _translations_cache.clear()
-    
+
     def teardown_method(self):
         """Limpieza después de cada test."""
         # Limpiar caché de traducciones después de cada test
@@ -85,18 +83,18 @@ class TestI18n:
         with tempfile.TemporaryDirectory() as temp_dir:
             temp_i18n_dir = Path(temp_dir) / "i18n"
             temp_i18n_dir.mkdir()
-            
+
             # Crear archivo de traducción
             test_translations = {"test_key": "test_value", "greeting": "Hello {name}"}
             test_file = temp_i18n_dir / "en.json"
             with open(test_file, "w", encoding="utf-8") as f:
                 json.dump(test_translations, f)
-            
+
             # Mock el directorio I18N_DIR
             with patch("app.utils.i18n.I18N_DIR", temp_i18n_dir):
                 translations = _load_translations("en")
                 assert translations == test_translations
-                
+
                 # Verificar que se cachea
                 translations_cached = _load_translations("en")
                 assert translations_cached == test_translations
@@ -106,7 +104,7 @@ class TestI18n:
         with tempfile.TemporaryDirectory() as temp_dir:
             temp_i18n_dir = Path(temp_dir) / "i18n"
             temp_i18n_dir.mkdir()
-            
+
             with patch("app.utils.i18n.I18N_DIR", temp_i18n_dir):
                 with patch("app.utils.i18n.logger") as mock_logger:
                     translations = _load_translations("fr")  # Archivo que no existe
@@ -118,18 +116,18 @@ class TestI18n:
         with tempfile.TemporaryDirectory() as temp_dir:
             temp_i18n_dir = Path(temp_dir) / "i18n"
             temp_i18n_dir.mkdir()
-            
+
             # Crear archivo con JSON inválido
             test_file = temp_i18n_dir / "en.json"
             with open(test_file, "w", encoding="utf-8") as f:
                 f.write("invalid json {}")
-            
+
             with patch("app.utils.i18n.I18N_DIR", temp_i18n_dir):
                 with patch("app.utils.i18n.logger") as mock_logger:
                     # Limpiar caché primero para asegurar que se carga desde archivo
                     from app.utils.i18n import _translations_cache
                     _translations_cache.clear()
-                    
+
                     translations = _load_translations("en")
                     assert translations == {}
                     mock_logger.exception.assert_called_once()
@@ -176,7 +174,7 @@ class TestI18n:
                 mock_load.return_value = {"welcome_message": "¡Bienvenido a Gemini AI Chatbot!"}
                 result_es = translate("welcome_message")
                 assert result_es == "¡Bienvenido a Gemini AI Chatbot!"
-        
+
         # Test inglés
         with self.app.test_request_context("/?lang=en"):
             with patch('app.utils.i18n._load_translations') as mock_load:
@@ -201,27 +199,27 @@ class TestI18n:
             # Mock get_locale para evitar problemas con session
             with patch('app.utils.i18n.get_locale') as mock_get_locale:
                 mock_get_locale.return_value = "en"
-                
+
                 with patch('app.utils.i18n._load_translations') as mock_load:
                     # Limpiar caché primero
                     from app.utils.i18n import _translations_cache
                     _translations_cache.clear()
-                    
+
                     mock_load.return_value = {"welcome_message": "Welcome to Gemini AI Chatbot!"}
-                    
+
                     # Primera llamada debería cargar el archivo
                     result1 = translate("welcome_message")
-                    
+
                     # Segunda llamada debería usar la caché
                     result2 = translate("welcome_message")
-                    
+
                     assert result1 == result2 == "Welcome to Gemini AI Chatbot!"
-                    
+
                     # Verificar que _load_translations se llamó solo una vez
                     # (puede llamarse más veces debido a get_locale, pero la caché debería funcionar)
                     # En lugar de assert_called_once, verificamos que al menos se llamó
                     mock_load.assert_called_with("en")
-                    
+
                     # Verificar que los resultados son iguales (cache funciona)
                     assert result1 == result2
 

@@ -244,10 +244,10 @@ class ChromeExtensionPackager:
         # Validation phase
         print("\n📋 Validating extension...")
 
-        manifest_valid = self.validate_manifest()
-        icons_valid = self.validate_icons()
-        files_valid = self.validate_required_files()
-        privacy_valid = self.validate_privacy_policy()
+        self.validate_manifest()
+        self.validate_icons()
+        self.validate_required_files()
+        self.validate_privacy_policy()
 
         # Generate validation report
         report = self.generate_validation_report()

@@ -1,6 +1,7 @@
 import unittest
-from app.core.application import get_flask_app
+
 from app.config.extensions import db
+from app.core.application import get_flask_app
 from app.services.conversation_memory import ConversationMemory
 
 
@@ -12,12 +13,12 @@ class TestConversationMemory(unittest.TestCase):
         self.app = get_flask_app("testing")
         self.app_context = self.app.app_context()
         self.app_context.push()
-        
+
         # Crear tablas de la base de datos
         db.create_all()
-        
+
         self.memory = ConversationMemory(session_id="test-session", user_id=1, max_history=5)
-    
+
     def tearDown(self):
         """
         Limpia después de cada prueba.

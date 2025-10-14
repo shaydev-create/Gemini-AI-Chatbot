@@ -6,13 +6,13 @@ Solo accesible para usuarios autenticados con rol de administrador.
 from flask import Blueprint, current_app, jsonify, request
 from flask_jwt_extended import jwt_required
 
+from app.auth import auth_manager
 from app.config.database import check_db_connection, db
 from app.core.decorators import role_required
 from app.core.metrics import metrics_manager
-from app.core.security import get_security_summary
 from app.core.permissions import PERMISSIONS, ROLE_PERMISSIONS
+from app.core.security import get_security_summary
 from app.models import User
-from app.auth import auth_manager
 
 admin_bp = Blueprint("admin_api", __name__)
 
@@ -119,7 +119,7 @@ def update_user(user_id: int):
 
     # Actualizar campos permitidos
     user.status = data.get("status", user.status)
-    
+
     # Actualizar rol si se proporciona y es válido
     if 'role' in data:
         new_role = data['role']
@@ -153,22 +153,22 @@ def update_user_role(user_id: int):
                 'message': 'Se requiere el campo "role"',
                 'error': 'missing_role_field'
             }), 400
-        
+
         new_role = data['role']
         updated_user = auth_manager.update_user_role(user_id, new_role)
-        
+
         if not updated_user:
             return jsonify({
                 'message': 'Usuario no encontrado o rol inválido',
                 'error': 'user_not_found_or_invalid_role'
             }), 404
-        
+
         return jsonify({
             'message': 'Rol actualizado correctamente',
             'user': updated_user.to_dict(),
             'new_permissions': auth_manager.get_user_permissions(updated_user.id)
         }), 200
-        
+
     except Exception as e:
         return jsonify({
             'message': 'Error al actualizar rol',
@@ -209,13 +209,13 @@ def get_user_permissions(user_id: int):
     try:
         permissions = auth_manager.get_user_permissions(user_id)
         user = User.query.get(user_id)
-        
+
         if not user:
             return jsonify({
                 'message': 'Usuario no encontrado',
                 'error': 'user_not_found'
             }), 404
-        
+
         return jsonify({
             'user_id': user_id,
             'username': user.username,
@@ -256,19 +256,19 @@ def get_users_stats():
         # Contar usuarios por rol
         roles_stats = {}
         valid_roles = ['superadmin', 'admin', 'moderator', 'premium', 'user', 'guest']
-        
+
         for role in valid_roles:
             count = User.query.filter_by(role=role).count()
             roles_stats[role] = count
-        
+
         total_users = User.query.count()
-        
+
         return jsonify({
             'users_total': total_users,
             'users_by_role': roles_stats,
             'active_sessions': 0,  # TODO: Implementar contador de sesiones activas
         }), 200
-        
+
     except Exception as e:
         return jsonify({
             'message': 'Error al obtener estadísticas',

@@ -57,7 +57,7 @@ class TestSecurityManager(unittest.TestCase):
         result = self.manager.validate_password("StrongPass1!")
         self.assertTrue(result["valid"])
         self.assertEqual(result["strength"], "strong")
-        
+
         # Password con 8 caracteres (score 2 -> medium)
         result = self.manager.validate_password("TestPass1!")
         self.assertTrue(result["valid"])
@@ -157,15 +157,15 @@ class TestDecorators(unittest.TestCase):
         with self.app.test_request_context("/limited"):
             from flask import g
             g.current_user = {"id": "user123"}
-            
+
             # Debería funcionar normalmente
             response1 = self.client.get("/limited")
             self.assertEqual(response1.status_code, 200)
-            
+
             # Segundo request debería funcionar
             response2 = self.client.get("/limited")
             self.assertEqual(response2.status_code, 200)
-            
+
             # Tercer request debería exceder el límite
             response3 = self.client.get("/limited")
             self.assertEqual(response3.status_code, 429)
@@ -238,7 +238,7 @@ class TestDecorators(unittest.TestCase):
         @validate_input(schema={"comment": {"max_length": 50}})  # Sin sanitize
         def validated_no_sanitize_route():
             return jsonify(data=request.validated_data)
-        
+
         with self.app.test_request_context(
             "/validated-no-sanitize", method="POST", json={"comment": "This is a normal comment"}
         ):
@@ -251,7 +251,7 @@ class TestDecorators(unittest.TestCase):
             else:
                 response = result
                 self.assertEqual(response.status_code, 200)
-            
+
             json_data = response.get_json()
             # El input no debería ser sanitizado ya que no hay regla sanitize
             self.assertEqual(json_data["data"]["comment"], "This is a normal comment")

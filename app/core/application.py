@@ -3,9 +3,9 @@ import os
 from flask import Flask
 from flask_babel import Babel
 
-from app.api.routes import api_bp as api_blueprint
-from app.api.auth import auth_bp as auth_blueprint
 from app.api.admin import admin_bp as admin_blueprint
+from app.api.auth import auth_bp as auth_blueprint
+from app.api.routes import api_bp as api_blueprint
 from app.config.extensions import db, jwt, migrate, socketio
 from app.config.settings import DevelopmentConfig, ProductionConfig
 from app.main import main as main_blueprint
@@ -82,6 +82,6 @@ def get_flask_app(config_class=DevelopmentConfig):
     if isinstance(config_class, str):
         from app.config.settings import config
         config_class = config.get(config_class, DevelopmentConfig)
-    
+
     app, _ = create_app(config_class)
     return app

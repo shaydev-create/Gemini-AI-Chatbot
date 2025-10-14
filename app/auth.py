@@ -7,7 +7,7 @@ Manejo de usuarios, sesiones y autenticación JWT.
 
 import logging
 from datetime import datetime, timedelta, timezone
-from typing import Any, Dict, Optional, List
+from typing import Any, Dict, List, Optional
 
 from flask import Blueprint
 from flask_jwt_extended import (
@@ -19,8 +19,8 @@ from flask_jwt_extended import (
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 
 from app.config.extensions import db
-from app.models import User
 from app.core.permissions import get_user_permissions, has_permission
+from app.models import User
 
 logger = logging.getLogger(__name__)
 
@@ -125,7 +125,7 @@ class AuthManager:
         else:
             # Contraseña incorrecta: incrementar intentos fallidos
             user.failed_login_attempts += 1
-            
+
             # Bloquear cuenta si se excede el máximo de intentos
             if user.failed_login_attempts >= self.max_attempts:
                 user.lock_account(self.lockout_duration)
@@ -134,7 +134,7 @@ class AuthManager:
                     username,
                     self.max_attempts
                 )
-            
+
             db.session.commit()
             logger.warning(
                 "Intento de inicio de sesión fallido para el usuario: %s (intento %d/%d)",
@@ -160,14 +160,14 @@ class AuthManager:
         if new_role not in valid_roles:
             logger.warning("Intento de asignar rol inválido: %s", new_role)
             return None
-            
+
         user = User.query.get(user_id)
         if user:
             user.role = new_role
             db.session.commit()
             logger.info("Rol del usuario %s actualizado a: %s", user.username, new_role)
             return user
-        
+
         return None
 
     def get_user_permissions(self, user_id: int) -> List[str]:
@@ -196,6 +196,7 @@ class AuthManager:
         Returns:
             True si tiene el permiso, False en caso contrario
         """
+
         user = User.query.get(user_id)
         if user:
             return has_permission(user.role, permission)
@@ -207,10 +208,11 @@ class AuthManager:
         
         Args:
             role: Rol a buscar
-            
+
         Returns:
             Lista de usuarios con el rol especificado
         """
+
         return User.query.filter_by(role=role).all()
 
     def authenticate_api_key(self, api_key: str) -> Optional[User]:

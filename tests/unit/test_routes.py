@@ -1,4 +1,3 @@
-import json
 from unittest.mock import patch
 
 import pytest
@@ -9,17 +8,17 @@ from app.core.application import get_flask_app
 def app():
     """Crea una instancia de una aplicación Flask para pruebas de rutas."""
     import os
-    from unittest.mock import patch, MagicMock
-    
+    from unittest.mock import MagicMock, patch
+
     # Set test environment variables to avoid GeminiService initialization errors
     with patch.dict(os.environ, {"GEMINI_API_KEY": "test-key"}):
         app = get_flask_app("testing")
-        
+
         # Mock the GeminiService instance that was created during app initialization
         mock_service = MagicMock()
         mock_service.generate_response.return_value = "Mocked response"
         app.gemini_service = mock_service
-        
+
         return app
 
 
@@ -166,7 +165,7 @@ def test_send_message_internal_error(client, app):
     """Prueba el manejo de un error interno en /api/chat/send."""
     # Configure the mock to raise an exception
     app.gemini_service.generate_response.side_effect = Exception("Internal Error")
-    
+
     response = client.post("/api/chat/send", json={"message": "Hola"})
     assert response.status_code == 500
     assert "message" in response.json

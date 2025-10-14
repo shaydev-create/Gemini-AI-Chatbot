@@ -76,7 +76,7 @@ def clean_temp_dirs():
     """Limpiar directorios temporales"""
     print("📋 Limpiando directorios temporales...")
 
-    for root, dirs, files in os.walk(PROJECT_ROOT, topdown=True):
+    for root, dirs, _ in os.walk(PROJECT_ROOT, topdown=True):
         # Excluir directorios .git y venv
         dirs[:] = [d for d in dirs if d not in [".git", "venv", "env"]]
 
@@ -118,8 +118,7 @@ def remove_temp_files():
                     except Exception as e:
                         rel_path = file_path.relative_to(PROJECT_ROOT)
                         print(
-                            f"  ❌ Error al eliminar archivo {rel_path}: {
-                                str(e)}"
+                            f"  ❌ Error al eliminar archivo {rel_path}: {str(e)}"
                         )
                     break
 
@@ -142,7 +141,7 @@ def simulate_cleanup():
 
     for dir_name in DIRS_TO_CLEAN:
         found = False
-        for root, dirs, files in os.walk(PROJECT_ROOT, topdown=True):
+        for root, dirs, _ in os.walk(PROJECT_ROOT, topdown=True):
             # Excluir directorios .git y venv
             if any(excluded in root for excluded in [".git", "venv", "env"]):
                 continue

@@ -7,14 +7,14 @@ from app.models import User
 def app():
     """Fixture para crear una instancia de la aplicación Flask para pruebas."""
     app = get_flask_app("testing")
-    
+
     # Crear tablas de la base de datos
     with app.app_context():
         from app.config.extensions import db
         db.create_all()
-    
+
     yield app
-    
+
     # Limpiar la base de datos después de cada test
     with app.app_context():
         from app.config.extensions import db
@@ -74,10 +74,10 @@ def test_login_success(app, client, new_user_data):
     # Primero, registrar el usuario
     with app.app_context():
         client.post("/auth/register", json=new_user_data)
-        
+
         # Activar el usuario manualmente (ya que por defecto queda en estado "pending")
-        from app.models import User
         from app.config.extensions import db
+        from app.models import User
         user = User.query.filter_by(email=new_user_data["email"]).first()
         user.status = "active"
         db.session.commit()

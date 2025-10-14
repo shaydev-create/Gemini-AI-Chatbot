@@ -78,7 +78,7 @@ class ConversationMemory:
         """
         # Get total count of messages
         total_messages = ChatMessage.query.filter_by(session_id=self.session.id).count()
-        
+
         # If we have more messages than the max_history limit, we need to skip the oldest ones
         if total_messages > self.max_history:
             offset = total_messages - self.max_history

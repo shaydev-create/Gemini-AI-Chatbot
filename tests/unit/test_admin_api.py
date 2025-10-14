@@ -1,12 +1,11 @@
 import unittest
 from unittest.mock import MagicMock, patch
 
-from flask import Flask
-from flask_jwt_extended import create_access_token
-
 from app.api.admin import admin_bp
 from app.config.extensions import db, jwt
 from app.models import User
+from flask import Flask
+from flask_jwt_extended import create_access_token
 
 
 class TestAdminRoutes(unittest.TestCase):
@@ -22,41 +21,41 @@ class TestAdminRoutes(unittest.TestCase):
         self.app.config["JWT_ACCESS_TOKEN_EXPIRES"] = False  # Deshabilitar expiración para tests
         self.app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///:memory:"
         self.app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-        
+
         # Registrar el blueprint
         self.app.register_blueprint(admin_bp, url_prefix="/api/admin")
-        
+
         # Inicializar extensiones
         db.init_app(self.app)
         jwt.init_app(self.app)
-        
+
         # Configurar mocks para las dependencias que requieren inicialización
         self.app.metrics = MagicMock()
         self.app.gemini_service = MagicMock()
-        
+
         # Crear un usuario de prueba en la base de datos
         with self.app.app_context():
             # Crear todas las tablas de la base de datos
             db.create_all()
-            
+
             # Crear un usuario admin de prueba
             test_user = User(
                 username="test-admin",
-                email="admin@test.com", 
+                email="admin@test.com",
                 status="active"
             )
             test_user.set_password("Testpassword123!")
             db.session.add(test_user)
             db.session.commit()
-            
+
             # Crear un token JWT válido para las pruebas (con rol admin)
             identity = {
                 "user_id": test_user.id,
-                "username": "test-admin", 
+                "username": "test-admin",
                 "role": "admin"  # Rol admin para acceder a las rutas de administración
             }
             self.valid_token = create_access_token(identity=identity)
-        
+
         self.client = self.app.test_client()
 
     @patch("app.api.admin.get_security_summary")

@@ -3,9 +3,9 @@ Tests unitarios completos para el servicio Gemini.
 """
 
 import os
-from unittest.mock import Mock, patch, MagicMock
-import pytest
+from unittest.mock import MagicMock, patch
 
+import pytest
 from app.services.gemini_service import GeminiService
 
 
@@ -70,11 +70,11 @@ class TestGeminiService:
         mock_response.text = "Respuesta de prueba"
         mock_model.generate_content.return_value = mock_response
         mock_genai.GenerativeModel.return_value = mock_model
-        
+
         # Ejecutar
         service = GeminiService()
         result = service.generate_response(message="Hola", language="es")
-        
+
         # Verificar
         mock_model.generate_content.assert_called_once()
         assert result == "Respuesta de prueba"
@@ -88,11 +88,11 @@ class TestGeminiService:
         os.environ["GEMINI_API_KEY"] = self.api_key
         mock_model = MagicMock()
         mock_genai.GenerativeModel.return_value = mock_model
-        
+
         # Ejecutar
         service = GeminiService()
         result = service.generate_response(message="", language="es")
-        
+
         # Verificar
         assert result == "Por favor, proporciona un mensaje para procesar."
         mock_model.generate_content.assert_not_called()
@@ -108,11 +108,11 @@ class TestGeminiService:
         mock_response.text = "Test response"
         mock_model.generate_content.return_value = mock_response
         mock_genai.GenerativeModel.return_value = mock_model
-        
+
         # Ejecutar
         service = GeminiService()
         result = service.generate_response(message="Hello", language="en")
-        
+
         # Verificar
         call_args = mock_model.generate_content.call_args[0][0]
         assert "IMPORTANT: Please respond only in English" in call_args
@@ -127,11 +127,11 @@ class TestGeminiService:
         mock_model = MagicMock()
         mock_model.generate_content.side_effect = Exception("API error 429")
         mock_genai.GenerativeModel.return_value = mock_model
-        
+
         # Ejecutar
         service = GeminiService()
         result = service.generate_response(message="Test error")
-        
+
         # Verificar
         assert "Has excedido el límite" in result
         mock_logger.error.assert_called()
@@ -145,11 +145,11 @@ class TestGeminiService:
         mock_response = MagicMock()
         mock_model.generate_content.return_value = mock_response
         mock_genai.GenerativeModel.return_value = mock_model
-        
+
         # Ejecutar
         service = GeminiService()
         result = service.validate_api_key()
-        
+
         # Verificar
         assert result is True
         mock_model.generate_content.assert_called_once_with("Test")
@@ -163,11 +163,11 @@ class TestGeminiService:
         mock_model = MagicMock()
         mock_model.generate_content.side_effect = Exception("Invalid API key")
         mock_genai.GenerativeModel.return_value = mock_model
-        
+
         # Ejecutar
         service = GeminiService()
         result = service.validate_api_key()
-        
+
         # Verificar
         assert result is False
         mock_logger.error.assert_called()
@@ -183,11 +183,11 @@ class TestGeminiService:
         mock_response.text = "Respuesta desde prompt"
         mock_model.generate_content.return_value = mock_response
         mock_genai.GenerativeModel.return_value = mock_model
-        
+
         # Ejecutar
         service = GeminiService()
         result = service.generate_response(prompt="Test prompt")
-        
+
         # Verificar
         mock_model.generate_content.assert_called_once()
         assert result == "Respuesta desde prompt"
@@ -201,11 +201,11 @@ class TestGeminiService:
         mock_model = MagicMock()
         mock_model.generate_content.side_effect = Exception("quota exceeded")
         mock_genai.GenerativeModel.return_value = mock_model
-        
+
         # Ejecutar
         service = GeminiService()
         result = service.generate_response(message="Test quota")
-        
+
         # Verificar
         assert "Has excedido el límite" in result
 
@@ -218,10 +218,10 @@ class TestGeminiService:
         mock_model = MagicMock()
         mock_model.generate_content.side_effect = Exception("API_KEY_INVALID")
         mock_genai.GenerativeModel.return_value = mock_model
-        
+
         # Ejecutar
         service = GeminiService()
         result = service.generate_response(message="Test invalid key")
-        
+
         # Verificar
         assert "API key inválida" in result

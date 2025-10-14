@@ -2,7 +2,6 @@ import logging
 import os
 from datetime import timedelta
 from pathlib import Path
-import tempfile
 
 # Configuración del logger
 logger = logging.getLogger(__name__)

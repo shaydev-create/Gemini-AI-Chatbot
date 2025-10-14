@@ -28,11 +28,11 @@ class TestHelpersComprehensive:
         # Test longitud por defecto
         key_default = generate_secret_key()
         assert len(key_default) == 64  # 32 bytes * 2 (hex)
-        
+
         # Test longitud personalizada
         key_16 = generate_secret_key(16)
         assert len(key_16) == 32  # 16 bytes * 2
-        
+
         key_64 = generate_secret_key(64)
         assert len(key_64) == 128  # 64 bytes * 2
 
@@ -49,15 +49,15 @@ class TestHelpersComprehensive:
     def test_hash_string_different_algorithms(self):
         """Test hash con diferentes algoritmos."""
         text = "test string"
-        
+
         # SHA256 (default)
         sha256_hash = hash_string(text, "sha256")
         assert len(sha256_hash) == 64
-        
+
         # MD5
         md5_hash = hash_string(text, "md5")
         assert len(md5_hash) == 32
-        
+
         # SHA1
         sha1_hash = hash_string(text, "sha1")
         assert len(sha1_hash) == 40
@@ -65,15 +65,15 @@ class TestHelpersComprehensive:
     def test_hash_string_invalid_algorithm_fallback(self):
         """Test que hash_string usa sha256 como fallback para algoritmos inválidos."""
         text = "test string"
-        
+
         # Algoritmo inválido debería usar sha256 como fallback
         with patch('app.utils.helpers.logger') as mock_logger:
             hash_result = hash_string(text, "invalid_algorithm")
-            
+
             # Debería devolver un hash válido
             assert len(hash_result) == 64
             assert all(c in "0123456789abcdef" for c in hash_result)
-            
+
             # Debería registrar el error
             mock_logger.exception.assert_called_once()
 
@@ -81,15 +81,15 @@ class TestHelpersComprehensive:
         """Test creación de directorios."""
         with tempfile.TemporaryDirectory() as temp_dir:
             test_dir = Path(temp_dir) / "new_subdir" / "nested"
-            
+
             # Directorio no debería existir inicialmente
             assert not test_dir.exists()
-            
+
             # Crear directorio
             ensure_directory_exists(test_dir)
             assert test_dir.exists()
             assert test_dir.is_dir()
-            
+
             # Intentar crear de nuevo (no debería fallar)
             ensure_directory_exists(test_dir)
 
@@ -107,10 +107,10 @@ class TestHelpersComprehensive:
         with tempfile.NamedTemporaryFile(delete=False) as temp_file:
             temp_file.write(b"test content")
             temp_file.flush()
-            
+
             size = get_file_size(temp_file.name)
             assert size == len(b"test content")
-            
+
             # Cerrar el archivo antes de intentar eliminarlo
             temp_file.close()
             os.unlink(temp_file.name)
@@ -127,16 +127,16 @@ class TestHelpersComprehensive:
         # Caracteres especiales
         assert sanitize_filename("file<>.txt") == "file__.txt"
         assert sanitize_filename("file:with|bad*chars.txt") == "file_with_bad_chars.txt"
-        
+
         # Nombres muy largos
         long_name = "a" * 300 + ".txt"
         sanitized = sanitize_filename(long_name)
         assert len(sanitized) <= 255
         assert sanitized.endswith(".txt")
-        
+
         # Sin extensión
         assert sanitize_filename("no_extension") == "no_extension"
-        
+
         # Múltiples puntos
         assert sanitize_filename("file.name.with.dots.txt") == "file.name.with.dots.txt"
 
@@ -146,20 +146,20 @@ class TestHelpersComprehensive:
         assert format_bytes(0) == "0.0 B"
         assert format_bytes(1) == "1.0 B"
         assert format_bytes(1023) == "1023.0 B"
-        
+
         # Kilobytes
         assert format_bytes(1024) == "1.0 KB"
         assert format_bytes(1536) == "1.5 KB"
-        
+
         # Megabytes
         assert format_bytes(1048576) == "1.0 MB"
-        
+
         # Gigabytes
         assert format_bytes(1073741824) == "1.0 GB"
-        
+
         # Terabytes
         assert format_bytes(1099511627776) == "1.0 TB"
-        
+
         # Valores inválidos
         assert format_bytes(-1) == "0 B"
         assert format_bytes(None) == "0 B"
@@ -167,23 +167,23 @@ class TestHelpersComprehensive:
     def test_truncate_text_comprehensive(self):
         """Test comprehensivo de truncado de texto."""
         text = "Este es un texto de prueba para truncar"
-        
+
         # No truncar si es más corto que el límite
         assert truncate_text(text, 100) == text
-        
+
         # Truncar con sufijo por defecto
         truncated = truncate_text(text, 20)
         assert len(truncated) <= 20 + len("...")
         assert truncated.endswith("...")
-        
+
         # Truncar con sufijo personalizado
         truncated_custom = truncate_text(text, 20, "***")
         assert truncated_custom.endswith("***")
-        
+
         # Texto exactamente en el límite
         exact_text = "a" * 20
         assert truncate_text(exact_text, 20) == exact_text
-        
+
         # Texto vacío
         assert truncate_text("", 10) == ""
         # None debería devolver None (no es una cadena)
@@ -201,7 +201,7 @@ class TestHelpersComprehensive:
             sanitize_filename,
             truncate_text,
         )
-        
+
         # Verificar que todas son callables
         assert callable(ensure_directory_exists)
         assert callable(format_bytes)

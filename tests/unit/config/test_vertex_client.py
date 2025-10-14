@@ -22,7 +22,7 @@ class TestVertexAIClient:
         """Set up the test environment."""
         # Mock the configuration and external libraries
         self.mock_vertex_config = MagicMock()
-        
+
         # Set default mock values for limits
         self.mock_vertex_config.limits = {
             "max_daily_cost": 100.0,

@@ -132,7 +132,7 @@ class GeminiService:
             bool: True si la API key es válida
         """
         try:
-            test_response = self.model.generate_content("Test")
+            self.model.generate_content("Test")
             return True
         except Exception as e:
             logger.error(f"API key inválida: {e}")

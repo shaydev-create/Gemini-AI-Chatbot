@@ -36,7 +36,7 @@ def role_required(required_role: str):
         def wrapper(*args, **kwargs):
             try:
                 current_user = get_current_user_from_jwt()
-                
+
                 if not current_user:
                     logger.warning("Acceso denegado: usuario no autenticado")
                     return jsonify({
@@ -46,18 +46,18 @@ def role_required(required_role: str):
 
                 jwt_identity = get_jwt_identity()
                 user_role = jwt_identity.get("role", "user")
-                
+
                 # Verificar si el usuario tiene el rol requerido o uno superior
                 required_roles = [r.strip() for r in required_role.split(',')]
                 user_has_access = False
-                
+
                 # Verificar acceso por rol específico
                 if user_role in required_roles:
                     user_has_access = True
                 # Verificar acceso por jerarquía (si el usuario tiene un rol superior)
-                elif (user_role in ROLE_HIERARCHY and 
-                      any(req_role in ROLE_HIERARCHY and 
-                          ROLE_HIERARCHY[user_role] >= ROLE_HIERARCHY[req_role] 
+                elif (user_role in ROLE_HIERARCHY and
+                      any(req_role in ROLE_HIERARCHY and
+                          ROLE_HIERARCHY[user_role] >= ROLE_HIERARCHY[req_role]
                           for req_role in required_roles)):
                     user_has_access = True
 

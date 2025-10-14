@@ -100,7 +100,6 @@ def sanitize_filename(filename: str) -> str:
         Nombre sanitizado
     """
     # Caracteres no permitidos en la mayoría de los sistemas de archivos
-    invalid_chars = r'<>:"/\\|?*'
     sanitized = "".join(c if c.isalnum() or c in "._-" else "_" for c in filename)
 
     # Limitar la longitud total del nombre del archivo
