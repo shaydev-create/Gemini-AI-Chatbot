@@ -59,6 +59,10 @@ psutil = "^5.9.8"
 # Procesamiento de archivos (opcional)
 Pillow = "^10.3.0"
 
+# Seguridad y formularios
+bleach = "^6.1.0"
+flask-wtf = "^1.2.1"
+
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.1.1"
@@ -72,6 +76,8 @@ bandit = "^1.7.8"
 safety = "^3.0.0"
 pre-commit = "^3.7.0"
 ruff = "^0.4.2"
+flask-socketio = "^5.5.1"
+flask-babel = "^4.0.0"
 
 
 [tool.poetry.scripts]

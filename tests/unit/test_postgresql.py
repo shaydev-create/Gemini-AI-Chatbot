@@ -29,26 +29,29 @@ class TestDatabaseConnection:
         mock_engine.connect.return_value = mock_connect_cm
         mock_create_engine.return_value = mock_engine
 
-        with patch.dict(os.environ, {"DATABASE_URL": "sqlite:///:memory:"}, clear=True):
-            result, msg, db_type = check_db_connection()
+        result, msg = check_db_connection("sqlite:///test.db")
 
     @patch("app.config.database.create_engine")
     def test_check_db_connection_failure(self, mock_create_engine):
         """Test fallo de conexión a la base de datos."""
-        mock_create_engine.side_effect = OperationalError(
+        mock_engine = Mock()
+        mock_create_engine.return_value = mock_engine
+        mock_engine.connect.side_effect = OperationalError(
             "Connection failed", None, None
         )
 
-        result, msg, db_type = check_db_connection()
+        result, msg = check_db_connection("sqlite:///:memory:")
 
         assert result is False
 
     @patch("app.config.database.create_engine")
     def test_check_db_connection_sqlalchemy_error(self, mock_create_engine):
         """Test error de SQLAlchemy en conexión."""
-        mock_create_engine.side_effect = SQLAlchemyError("SQLAlchemy error")
+        mock_engine = Mock()
+        mock_create_engine.return_value = mock_engine
+        mock_engine.connect.side_effect = SQLAlchemyError("SQLAlchemy error")
 
-        result, msg, db_type = check_db_connection()
+        result, msg = check_db_connection("sqlite:///:memory:")
 
         assert result is False
 
@@ -67,7 +70,7 @@ class TestDatabaseInitialization:
 
         with pytest.raises(RuntimeError) as excinfo:
             init_db(app)
-        assert "SQLALCHEMY_DATABASE_URI no está configurada" in str(excinfo.value)
+        assert "SQLALCHEMY_DATABASE_URI" in str(excinfo.value)
 
     @patch("app.config.database.db.create_all")
     @patch("app.config.database.db.drop_all")

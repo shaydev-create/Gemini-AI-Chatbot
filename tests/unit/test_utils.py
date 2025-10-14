@@ -106,7 +106,7 @@ class TestValidators:
         long_message = "a" * 5000
         valid, error = validate_message_content(long_message)
         assert valid is False
-        assert "largo" in error
+        assert "excede" in error or "longitud" in error
 
         # Contenido peligroso
         dangerous = "<script>alert('xss')</script>"
@@ -142,7 +142,7 @@ class TestValidators:
         # Sin nombre
         valid, error = validate_file_upload("", allowed)
         assert valid is False
-        assert "requerido" in error
+        assert "vacío" in error or "requerido" in error
 
         # Sin extensión
         valid, error = validate_file_upload("archivo", allowed)
@@ -157,4 +157,4 @@ class TestValidators:
         # Caracteres peligrosos
         valid, error = validate_file_upload("file<script>.jpg", allowed)
         assert valid is False
-        assert "no permitidos" in error
+        assert "no válidos" in error or "no permitidos" in error

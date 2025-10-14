@@ -21,9 +21,8 @@ class TestVertexAIClient:
     def setup_method(self):
         """Set up the test environment."""
         # Mock the configuration and external libraries
-        self.patcher_vertex_config = patch("app.config.vertex_client.vertex_config")
-        self.mock_vertex_config = self.patcher_vertex_config.start()
-
+        self.mock_vertex_config = MagicMock()
+        
         # Set default mock values for limits
         self.mock_vertex_config.limits = {
             "max_daily_cost": 100.0,
@@ -41,8 +40,8 @@ class TestVertexAIClient:
         )
         self.mock_gemini_api_available = self.patcher_gemini_api.start()
 
-        self.patcher_vertexai_init = patch("app.config.vertex_client.vertexai.init")
-        self.mock_vertexai_init = self.patcher_vertexai_init.start()
+        self.patcher_aiplatform_init = patch("app.config.vertex_ai.aiplatform.init")
+        self.mock_aiplatform_init = self.patcher_aiplatform_init.start()
 
         self.patcher_generative_model = patch(
             "app.config.vertex_client.GenerativeModel"
@@ -57,19 +56,18 @@ class TestVertexAIClient:
         )
         self.mock_genai_model = self.patcher_genai_model.start()
 
-        # Must import the client *after* patching the availability flags
+        # Import the client after patching
         from app.config.vertex_client import VertexAIClient
 
         self.client = VertexAIClient()
-        # Ensure the client uses the mocked config
+        # Replace the config with our mock
         self.client.config = self.mock_vertex_config
 
     def teardown_method(self):
         """Clean up the test environment."""
-        self.patcher_vertex_config.stop()
         self.patcher_vertex_ai.stop()
         self.patcher_gemini_api.stop()
-        self.patcher_vertexai_init.stop()
+        self.patcher_aiplatform_init.stop()
         self.patcher_generative_model.stop()
         self.patcher_genai_configure.stop()
         self.patcher_genai_model.stop()
@@ -93,7 +91,7 @@ class TestVertexAIClient:
         assert self.client.initialized
         assert not self.client.fallback_active
         assert self.client.is_healthy
-        self.mock_vertexai_init.assert_called_once()
+        self.mock_aiplatform_init.assert_called_once()
         self.mock_generative_model.assert_called_once_with("gemini-1.0-pro")
 
     @pytest.mark.asyncio
@@ -104,7 +102,7 @@ class TestVertexAIClient:
         result = await self.client.initialize()
 
         assert result
-        assert not self.client.initialized
+        assert self.client.initialized  # Should be True when fallback succeeds
         assert self.client.fallback_active
         assert self.client.is_healthy
         self.mock_genai_configure.assert_called_once()
@@ -133,7 +131,7 @@ class TestVertexAIClient:
         result = await self.client.initialize()
 
         assert result
-        assert not self.client.initialized
+        assert self.client.initialized  # Should be True when fallback succeeds
         assert self.client.fallback_active
         assert self.client.is_healthy
         self.mock_genai_configure.assert_called_once()

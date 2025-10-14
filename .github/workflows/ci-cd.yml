@@ -52,12 +52,14 @@ jobs:
 
       - name: 📋 Install dependencies
         run: |
-          poetry install --with dev
+          poetry install --with dev -v  # Verbose output to debug installation issues
 
+      - name: 🔧 Formatear con Ruff
+        run: |
+          poetry run ruff format .
       - name: 🔧 Auto-fix con Ruff
         run: |
-          poetry run ruff check . --fix || true
-          poetry run ruff format .
+          poetry run ruff check . --fix
       - name: 🔍 Lint con Ruff (check)
         run: |
           poetry run ruff check .
@@ -68,7 +70,7 @@ jobs:
 
       - name: 🧪 Test with pytest
         run: |
-          poetry run pytest tests/ --cov=app --cov-report=xml --cov-report=html
+          APP_ENV=testing poetry run pytest tests/ --cov=app --cov-report=xml --cov-report=html
 
       - name: 📊 Upload coverage to Codecov
         uses: codecov/codecov-action@v4

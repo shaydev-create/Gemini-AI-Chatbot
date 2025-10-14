@@ -34,3 +34,9 @@ def privacy_policy_en():
 @main.route("/sw.js")
 def sw():
     return send_from_directory(current_app.static_folder, "sw.js")
+
+
+@main.route("/favicon.ico")
+def favicon():
+    """Serve the favicon.ico file from the static directory."""
+    return send_from_directory(current_app.static_folder, "favicon.ico")

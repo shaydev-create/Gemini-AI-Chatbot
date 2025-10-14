@@ -20,7 +20,7 @@ class TestVertexAIPostgreSQLIntegration:
     def test_database_url(self):
         """Fixture para URL de base de datos de prueba."""
         # Usar SQLite en memoria para tests rápidos
-        return "sqlite:///:memory:"
+        return "sqlite:///test.db"
 
     @pytest.fixture
     def vertex_config(self):
@@ -426,21 +426,21 @@ class TestErrorHandlingIntegration:
     @patch("app.config.database.create_engine")
     def test_database_connection_failure_handling(self, mock_create_engine):
         """Test que simula un fallo de conexión a la base de datos."""
-        # Forzar a create_engine a lanzar un error de conexión
-        mock_create_engine.side_effect = OperationalError(
+        # Crear un mock engine que lance error al conectar
+        mock_engine = mock_create_engine.return_value
+        mock_engine.connect.side_effect = OperationalError(
             "Simulated connection error", None, None
         )
 
         # Llamar a la función que verifica la conexión, pasando una URL dummy
-        success, message, db_type = check_db_connection("postgresql://dummy")
+        success, message = check_db_connection("postgresql://dummy")
 
         # Verificar que el resultado es el esperado para un fallo de conexión
         assert success is False
         assert "Simulated connection error" in message
-        assert db_type == "Unknown"
 
-    @patch("app.config.vertex_client.vertexai", side_effect=ImportError())
-    def test_vertex_ai_unavailable_with_database_logging(self, mock_vertexai):
+    @patch("app.config.vertex_client.VertexAIClient._initialize_gemini_api", side_effect=ImportError("Gemini API not available"))
+    def test_vertex_ai_unavailable_with_database_logging(self, mock_initialize_gemini_api):
         """Test logging cuando Vertex AI no está disponible."""
 
         client = VertexAIClient()
@@ -454,7 +454,7 @@ class TestErrorHandlingIntegration:
         # Verificar que puede detectar la falta de Vertex AI
         try:
             # Intentar inicializar debería fallar
-            client._initialize_vertex_ai()
+            client.initialize_sync()
             pytest.fail("Debería haber fallado la inicialización")
         except Exception:
             # Se espera que falle

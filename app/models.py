@@ -53,6 +53,7 @@ class User(db.Model):
     )
     last_login: Optional[datetime] = db.Column(db.DateTime)
     status: str = db.Column(db.String(20), default="pending", nullable=False)
+    role: str = db.Column(db.String(20), default="user", nullable=False, index=True)
     email_verified: bool = db.Column(db.Boolean, default=False, nullable=False)
     api_key: str = db.Column(db.String(64), unique=True, index=True, nullable=False)
     failed_login_attempts: int = db.Column(db.Integer, default=0, nullable=False)
@@ -149,6 +150,7 @@ class User(db.Model):
             "created_at": self.created_at.isoformat(),
             "last_login": self.last_login.isoformat() if self.last_login else None,
             "status": self.status,
+            "role": self.role,
         }
 
 

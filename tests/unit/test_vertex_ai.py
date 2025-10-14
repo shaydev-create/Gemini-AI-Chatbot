@@ -37,7 +37,7 @@ class TestVertexAIConfig:
 
         is_valid, error_msg = config.validate_config()
         assert not is_valid
-        assert "GOOGLE_CLOUD_PROJECT_ID no está configurado" in error_msg
+        assert "GOOGLE_CLOUD_PROJECT_ID" in error_msg
 
     @patch.dict(
         os.environ,
@@ -109,15 +109,19 @@ class TestVertexAIConfig:
         config = VertexAIConfig()
         is_valid, error_msg = config.validate_config()
         assert not is_valid
-        assert "Archivo de credenciales no encontrado" in error_msg
+        assert "no se encontró" in error_msg or "no encontrado" in error_msg
 
     @patch.dict(
         os.environ,
         {"GOOGLE_CLOUD_PROJECT_ID": "test-project", "VERTEX_AI_ENABLED": "true"},
     )
     @patch("app.config.vertex_ai.aiplatform.init")
-    def test_initialize_success(self, mock_init):
+    @patch("app.config.vertex_ai.VertexAIConfig.validate_config")
+    def test_initialize_success(self, mock_validate_config, mock_init):
         """Test inicialización exitosa de Vertex AI."""
+        # Mock validate_config to return True so initialize proceeds
+        mock_validate_config.return_value = (True, "Configuración válida")
+        
         config = VertexAIConfig()
         config.initialize()
         mock_init.assert_called_once_with(

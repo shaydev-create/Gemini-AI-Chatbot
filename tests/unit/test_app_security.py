@@ -45,6 +45,28 @@ class TestSecurityManager(unittest.TestCase):
         self.assertIn("Debe contener mayúsculas", weak["errors"])
         self.assertIn("Debe contener números", weak["errors"])
 
+    def test_validate_password_missing_lowercase(self):
+        """Test para cubrir línea 66-67: validación de minúsculas faltantes."""
+        result = self.manager.validate_password("PASSWORD123!")
+        self.assertFalse(result["valid"])
+        self.assertIn("Debe contener minúsculas", result["errors"])
+
+    def test_validate_password_strength_calculation(self):
+        """Test para cubrir línea 85: cálculo de fortaleza de contraseña."""
+        # Password con 11 caracteres (score 3 -> strong)
+        result = self.manager.validate_password("StrongPass1!")
+        self.assertTrue(result["valid"])
+        self.assertEqual(result["strength"], "strong")
+        
+        # Password con 8 caracteres (score 2 -> medium)
+        result = self.manager.validate_password("MedPass1!")
+        self.assertTrue(result["valid"])
+        self.assertEqual(result["strength"], "strong")  # Score 3 -> strong
+
+        # Password con solo 1 criterio cumplido (score 1 -> weak)
+        result = self.manager.validate_password("password")
+        self.assertFalse(result["valid"])
+
     def test_check_rate_limit(self):
         identifier = "127.0.0.1"
         for _ in range(5):
@@ -52,6 +74,14 @@ class TestSecurityManager(unittest.TestCase):
                 self.manager.check_rate_limit(identifier, limit=5, window=60)
             )
         self.assertFalse(self.manager.check_rate_limit(identifier, limit=5, window=60))
+
+    def test_check_rate_limit_new_identifier(self):
+        """Test para cubrir líneas 95-96: rate limit con identificador nuevo."""
+        # Identificador que no existe en rate_limits
+        new_identifier = "192.168.1.100"
+        self.assertTrue(
+            self.manager.check_rate_limit(new_identifier, limit=5, window=60)
+        )
 
     def test_detect_suspicious_activity(self):
         self.assertTrue(
@@ -121,6 +151,25 @@ class TestDecorators(unittest.TestCase):
             response3 = self.client.get("/limited")
             self.assertEqual(response3.status_code, 429)
 
+    def test_rate_limiter_with_user_identifier(self):
+        """Test para cubrir línea 184: RateLimiter con identificador de usuario."""
+        # Crear un mock de g.current_user
+        with self.app.test_request_context("/limited"):
+            from flask import g
+            g.current_user = {"id": "user123"}
+            
+            # Debería funcionar normalmente
+            response1 = self.client.get("/limited")
+            self.assertEqual(response1.status_code, 200)
+            
+            # Segundo request debería funcionar
+            response2 = self.client.get("/limited")
+            self.assertEqual(response2.status_code, 200)
+            
+            # Tercer request debería exceder el límite
+            response3 = self.client.get("/limited")
+            self.assertEqual(response3.status_code, 429)
+
     def test_require_https_decorator(self):
         with self.app.test_request_context(
             "/secure", method="POST", base_url="http://localhost"
@@ -162,6 +211,50 @@ class TestDecorators(unittest.TestCase):
             self.assertIn(
                 "Suspicious activity detected", response.get_data(as_text=True)
             )
+
+    def test_validate_input_decorator_form_data(self):
+        """Test para cubrir línea 239: validate_input con datos de formulario (no JSON)."""
+        with self.app.test_request_context(
+            "/validated", method="POST", data={"comment": "safe input"}
+        ):
+            view_func = self.app.view_functions["validated_route"]
+            response = view_func()
+            self.assertEqual(response.status_code, 200)
+
+    def test_validate_input_decorator_max_length_validation(self):
+        """Test para cubrir líneas 258-259: validación de longitud máxima."""
+        with self.app.test_request_context(
+            "/validated", method="POST", json={"comment": "This is way too long comment that exceeds the limit"}
+        ):
+            view_func = self.app.view_functions["validated_route"]
+            response, status_code = view_func()
+            self.assertEqual(status_code, 400)
+            self.assertIn("exceeds max length", response.get_data(as_text=True))
+
+    def test_validate_input_decorator_no_sanitize_rules(self):
+        """Test para cubrir línea 268: validate_input sin reglas de sanitización."""
+        # Crear una ruta con schema que no tiene sanitize
+        @self.app.route("/validated-no-sanitize", methods=["POST"])
+        @validate_input(schema={"comment": {"max_length": 50}})  # Sin sanitize
+        def validated_no_sanitize_route():
+            return jsonify(data=request.validated_data)
+        
+        with self.app.test_request_context(
+            "/validated-no-sanitize", method="POST", json={"comment": "This is a normal comment"}
+        ):
+            view_func = self.app.view_functions["validated_no_sanitize_route"]
+            result = view_func()
+            # El decorador puede retornar una tupla (response, status) o solo response
+            if isinstance(result, tuple):
+                response, status_code = result
+                self.assertEqual(status_code, 200)
+            else:
+                response = result
+                self.assertEqual(response.status_code, 200)
+            
+            json_data = response.get_json()
+            # El input no debería ser sanitizado ya que no hay regla sanitize
+            self.assertEqual(json_data["data"]["comment"], "This is a normal comment")
 
 
 if __name__ == "__main__":

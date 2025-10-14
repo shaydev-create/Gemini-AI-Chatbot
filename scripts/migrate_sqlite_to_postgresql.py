@@ -398,8 +398,9 @@ def create_backup(sqlite_path: str) -> str:
 
 def main():
     """Función principal."""
-    import argparse
 
+def parse_args():
+    import argparse
     parser = argparse.ArgumentParser(description="Migrar datos de SQLite a PostgreSQL")
     parser.add_argument(
         "--sqlite-db",
@@ -419,134 +420,105 @@ def main():
     parser.add_argument(
         "--verify", action="store_true", help="Verificar migración después de completar"
     )
+    return parser.parse_args()
 
-    args = parser.parse_args()
+def log_databases(sqlite_path, pg_config):
+    logger.info(f"📂 SQLite: {sqlite_path}")
+    logger.info(f"🐘 PostgreSQL: {pg_config['host']}:{pg_config['port']}/{pg_config['database']}")
 
+def connect_databases(sqlite_path, pg_config, dry_run):
+    sqlite_conn = get_sqlite_connection(sqlite_path)
+    logger.info("✅ Conectado a SQLite")
+    pg_conn = None
+    if not dry_run:
+        pg_conn = get_postgresql_connection(pg_config)
+        logger.info("✅ Conectado a PostgreSQL")
+    return sqlite_conn, pg_conn
+
+def migrate_tables(sqlite_conn, pg_conn, tables):
+    migrated_tables = []
+    failed_tables = []
+    for table_name in tables:
+        logger.info(f"\n🔄 Procesando tabla: {table_name}")
+        schema = get_table_schema(sqlite_conn, table_name)
+        logger.info(f"  📊 Columnas: {len(schema)}")
+        if create_postgresql_table(pg_conn, table_name, schema):
+            if migrate_table_data(sqlite_conn, pg_conn, table_name):
+                migrated_tables.append(table_name)
+            else:
+                failed_tables.append(table_name)
+        else:
+            failed_tables.append(table_name)
+    return migrated_tables, failed_tables
+
+def verify_tables(sqlite_conn, pg_conn, migrated_tables):
+    logger.info("\n🔍 Verificando migración...")
+    verification_failed = []
+    for table_name in migrated_tables:
+        if not verify_migration(sqlite_conn, pg_conn, table_name):
+            verification_failed.append(table_name)
+    if verification_failed:
+        logger.error(f"❌ Verificación fallida para: {verification_failed}")
+    else:
+        logger.info("✅ Verificación exitosa para todas las tablas")
+
+def print_summary(migrated_tables, failed_tables):
+    logger.info("\n" + "=" * 40)
+    logger.info("📊 RESUMEN DE MIGRACIÓN:")
+    logger.info(f"✅ Tablas migradas: {len(migrated_tables)}")
+    if migrated_tables:
+        for table in migrated_tables:
+            logger.info(f"  📄 {table}")
+    if failed_tables:
+        logger.error(f"❌ Tablas fallidas: {len(failed_tables)}")
+        for table in failed_tables:
+            logger.error(f"  📄 {table}")
+    if failed_tables:
+        logger.error("\n❌ Migración completada con errores")
+        sys.exit(1)
+    else:
+        logger.info("\n🎉 Migración completada exitosamente")
+        logger.info("\n📋 Próximos pasos:")
+        logger.info("1. Actualizar DATABASE_URL en .env")
+        logger.info("2. Reiniciar la aplicación")
+        logger.info("3. Verificar funcionamiento")
+
+def main():
+    args = parse_args()
     logger.info("🚀 Migración de SQLite a PostgreSQL")
     logger.info("=" * 40)
-
     try:
-        # Verificar dependencias
         if not check_dependencies():
             sys.exit(1)
-
-        # Obtener configuración
         project_root = get_project_root()
         sqlite_path = str(project_root / args.sqlite_db)
-
-        # URL de PostgreSQL
         postgresql_url = args.postgresql_url or os.getenv("DATABASE_URL")
         if not postgresql_url or "sqlite" in postgresql_url:
             logger.error("❌ URL de PostgreSQL no configurada")
             logger.error("💡 Usar --postgresql-url o configurar DATABASE_URL")
             sys.exit(1)
-
-        # Parsear configuración de PostgreSQL
         pg_config = parse_database_url(postgresql_url)
-
-        logger.info(f"📂 SQLite: {sqlite_path}")
-        logger.info(
-            f"🐘 PostgreSQL: {
-                pg_config['host']}:{
-                pg_config['port']}/{
-                pg_config['database']}"
-        )
-
+        log_databases(sqlite_path, pg_config)
         if args.dry_run:
             logger.info("🔍 Modo dry-run activado")
-
-        # Crear backup si se solicita
         if args.backup and not args.dry_run:
             create_backup(sqlite_path)
-
-        # Conectar a bases de datos
-        logger.info("🔌 Conectando a bases de datos...")
-
-        sqlite_conn = get_sqlite_connection(sqlite_path)
-        logger.info("✅ Conectado a SQLite")
-
-        if not args.dry_run:
-            pg_conn = get_postgresql_connection(pg_config)
-            logger.info("✅ Conectado a PostgreSQL")
-
-        # Obtener tablas
+        sqlite_conn, pg_conn = connect_databases(sqlite_path, pg_config, args.dry_run)
         tables = get_sqlite_tables(sqlite_conn)
         logger.info(f"📋 Tablas encontradas: {len(tables)}")
-
         for table in tables:
             logger.info(f"  📄 {table}")
-
         if args.dry_run:
             logger.info("\n✅ Dry-run completado")
             sqlite_conn.close()
             return
-
-        # Migrar cada tabla
-        migrated_tables = []
-        failed_tables = []
-
-        for table_name in tables:
-            logger.info(f"\n🔄 Procesando tabla: {table_name}")
-
-            # Obtener esquema
-            schema = get_table_schema(sqlite_conn, table_name)
-            logger.info(f"  📊 Columnas: {len(schema)}")
-
-            # Crear tabla en PostgreSQL
-            if create_postgresql_table(pg_conn, table_name, schema):
-                # Migrar datos
-                if migrate_table_data(sqlite_conn, pg_conn, table_name):
-                    migrated_tables.append(table_name)
-                else:
-                    failed_tables.append(table_name)
-            else:
-                failed_tables.append(table_name)
-
-        # Verificar migración si se solicita
+        migrated_tables, failed_tables = migrate_tables(sqlite_conn, pg_conn, tables)
         if args.verify and migrated_tables:
-            logger.info("\n🔍 Verificando migración...")
-            verification_failed = []
-
-            for table_name in migrated_tables:
-                if not verify_migration(sqlite_conn, pg_conn, table_name):
-                    verification_failed.append(table_name)
-
-            if verification_failed:
-                logger.error(f"❌ Verificación fallida para: {verification_failed}")
-            else:
-                logger.info("✅ Verificación exitosa para todas las tablas")
-
-        # Cerrar conexiones
+            verify_tables(sqlite_conn, pg_conn, migrated_tables)
         sqlite_conn.close()
-        pg_conn.close()
-
-        # Resumen final
-        logger.info("\n" + "=" * 40)
-        logger.info("📊 RESUMEN DE MIGRACIÓN:")
-        logger.info(f"✅ Tablas migradas: {len(migrated_tables)}")
-        if migrated_tables:
-            for table in migrated_tables:
-                logger.info(f"  📄 {table}")
-
-        if failed_tables:
-            logger.error(f"❌ Tablas fallidas: {len(failed_tables)}")
-            for table in failed_tables:
-                logger.error(f"  📄 {table}")
-
-        if failed_tables:
-            logger.error("\n❌ Migración completada con errores")
-            sys.exit(1)
-        else:
-            logger.info("\n🎉 Migración completada exitosamente")
-            logger.info("\n📋 Próximos pasos:")
-            logger.info("1. Actualizar DATABASE_URL en .env")
-            logger.info("2. Reiniciar la aplicación")
-            logger.info("3. Verificar funcionamiento")
-
+        if pg_conn:
+            pg_conn.close()
+        print_summary(migrated_tables, failed_tables)
     except Exception as e:
         logger.error(f"\n❌ Error durante la migración: {e}")
         sys.exit(1)
-
-
-if __name__ == "__main__":
-    main()

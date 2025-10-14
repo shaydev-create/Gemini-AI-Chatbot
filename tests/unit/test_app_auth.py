@@ -19,7 +19,7 @@ class TestAuthManager(unittest.TestCase):
 
     def setUp(self):
         self.app = Flask(__name__)
-        self.app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///:memory:"
+        self.app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///test.db"
         self.app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
         self.app.config["TESTING"] = True
         db.init_app(self.app)

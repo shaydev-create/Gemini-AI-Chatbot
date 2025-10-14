@@ -86,15 +86,40 @@ class CacheManager:
         Elimina todas las entradas expiradas de la caché.
         """
         with self._lock:
-            current_time = time.time()
-            expired_keys = [
-                key
-                for key, (_, expiry) in self._cache.items()
-                if current_time >= expiry
-            ]
+            return self._cleanup_expired_without_lock()
 
-            for key in expired_keys:
-                del self._cache[key]
+    def get_stats(self) -> Dict[str, int]:
+        """
+        Obtiene estadísticas sobre el estado actual de la caché.
+        """
+        with self._lock:
+            total_entries = len(self._cache)
+            # Clean up expired entries first to get accurate stats
+            expired_count = self._cleanup_expired_without_lock()
+            active_entries = total_entries - expired_count
+            size_bytes = self._size_in_bytes_without_lock()
+
+            return {
+                "total_entries": total_entries,
+                "active_entries": active_entries,
+                "expired_entries": expired_count,
+                "estimated_size_bytes": size_bytes,
+            }
+
+    def _cleanup_expired_without_lock(self) -> int:
+        """
+        Versión interna de cleanup_expired que no adquiere el lock.
+        Debe ser llamada solo desde métodos que ya tienen el lock.
+        """
+        current_time = time.time()
+        expired_keys = [
+            key
+            for key, (_, expiry) in self._cache.items()
+            if current_time >= expiry
+        ]
+
+        for key in expired_keys:
+            del self._cache[key]
 
         if expired_keys:
             logger.info(
@@ -103,33 +128,25 @@ class CacheManager:
             )
         return len(expired_keys)
 
-    def get_stats(self) -> Dict[str, int]:
-        """
-        Obtiene estadísticas sobre el estado actual de la caché.
-        """
-        with self._lock:
-            total_entries = len(self._cache)
-            active_entries = total_entries - self.cleanup_expired()
-
-            return {
-                "total_entries": total_entries,
-                "active_entries": active_entries,
-                "expired_entries": total_entries - active_entries,
-                "estimated_size_bytes": self.size_in_bytes(),
-            }
-
     def size_in_bytes(self) -> int:
         """
         Estima el tamaño total de la caché en bytes.
         Es una aproximación y puede no ser exacta.
         """
         with self._lock:
-            # sys.getsizeof no es recursivo, por lo que esto es una estimación.
-            # Suma el tamaño del diccionario y una estimación del tamaño de sus contenidos.
-            size = sys.getsizeof(self._cache)
-            for key, (value, _) in self._cache.items():
-                size += sys.getsizeof(key)
-                size += sys.getsizeof(value)
+            return self._size_in_bytes_without_lock()
+
+    def _size_in_bytes_without_lock(self) -> int:
+        """
+        Versión interna de size_in_bytes que no adquiere el lock.
+        Debe ser llamada solo desde métodos que ya tienen el lock.
+        """
+        # sys.getsizeof no es recursivo, por lo que esto es una estimación.
+        # Suma el tamaño del diccionario y una estimación del tamaño de sus contenidos.
+        size = sys.getsizeof(self._cache)
+        for key, (value, _) in self._cache.items():
+            size += sys.getsizeof(key)
+            size += sys.getsizeof(value)
         return size
 
 

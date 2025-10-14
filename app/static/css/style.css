@@ -425,9 +425,107 @@ body {
     }
 }
 
+/* Stars container and animations */
+.stars-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 1;
+    overflow: hidden;
+}
+
+.star {
+    position: absolute;
+    border-radius: 50%;
+    pointer-events: none;
+    top: 50%;
+    left: 50%;
+    transform-origin: 0 0;
+    animation: orbit-blackhole 15s linear infinite;
+}
+
+/* Black hole orbit animations */
+@keyframes orbit-blackhole {
+    from { transform: rotate(0deg) translateX(var(--orbit-radius, 200px)) rotate(0deg); }
+    to { transform: rotate(360deg) translateX(var(--orbit-radius, 200px)) rotate(-360deg); }
+}
+
+@keyframes orbit-blackhole-2 {
+    from { transform: rotate(0deg) translateX(250px) rotate(0deg); }
+    to { transform: rotate(360deg) translateX(250px) rotate(-360deg); }
+}
+
+@keyframes orbit-blackhole-3 {
+    from { transform: rotate(0deg) translateX(300px) rotate(0deg); }
+    to { transform: rotate(360deg) translateX(300px) rotate(-360deg); }
+}
+
+@keyframes orbit-blackhole-4 {
+    from { transform: rotate(0deg) translateX(350px) rotate(0deg); }
+    to { transform: rotate(360deg) translateX(350px) rotate(-360deg); }
+}
+
+@keyframes orbit-blackhole-5 {
+    from { transform: rotate(0deg) translateX(400px) rotate(0deg); }
+    to { transform: rotate(360deg) translateX(400px) rotate(-360deg); }
+}
+
+@keyframes escape-velocity {
+    0% { transform: rotate(0deg) translateX(150px) rotate(0deg); opacity: 1; }
+    50% { transform: rotate(180deg) translateX(300px) rotate(-180deg); opacity: 0.8; }
+    100% { transform: rotate(360deg) translateX(800px) rotate(-360deg); opacity: 0; }
+}
+
+@keyframes slow-drift {
+    from { transform: rotate(0deg) translateX(180px) rotate(0deg); }
+    to { transform: rotate(360deg) translateX(180px) rotate(-360deg); }
+}
+
+@keyframes comet-trail {
+    0% { transform: rotate(0deg) translateX(100px) rotate(0deg); opacity: 1; }
+    50% { transform: rotate(180deg) translateX(400px) rotate(-180deg); opacity: 0.8; }
+    100% { transform: rotate(360deg) translateX(100px) rotate(-360deg); opacity: 1; }
+}
+
+@keyframes pulsar-pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.3; transform: scale(1.5); }
+}
+
+@keyframes twinkle {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+}
+
+/* Orbit classes */
+.star.orbit-2 { animation: orbit-blackhole-2 18s linear infinite; }
+.star.orbit-3 { animation: orbit-blackhole-3 22s linear infinite; }
+.star.orbit-4 { animation: orbit-blackhole-4 25s linear infinite; }
+.star.orbit-5 { animation: orbit-blackhole-5 28s linear infinite; }
+.star.escape-velocity { animation: escape-velocity 30s linear infinite; }
+.star.slow-drift { animation: slow-drift 35s linear infinite; }
+.star.comet { animation: comet-trail 25s linear infinite; }
+.star.pulsar { animation: pulsar-pulse 1.5s ease-in-out infinite, orbit-blackhole-3 20s linear infinite; }
+
+/* Particles container */
+.particles {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 2;
+    overflow: hidden;
+}
+
 /* Reduced motion support */
 @media (prefers-reduced-motion: reduce) {
     .particle,
+    .star,
     .message,
     .typing-dots span,
     .loading {

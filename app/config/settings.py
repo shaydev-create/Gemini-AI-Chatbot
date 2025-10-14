@@ -2,6 +2,7 @@ import logging
 import os
 from datetime import timedelta
 from pathlib import Path
+import tempfile
 
 # Configuración del logger
 logger = logging.getLogger(__name__)
@@ -93,6 +94,7 @@ class TestingConfig(Config):
         "TEST_SECRET_KEY", "test-secret-key-change-in-production"
     )
     SQLALCHEMY_DATABASE_URI: str = "sqlite:///:memory:"
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
     WTF_CSRF_ENABLED: bool = False
     # ID de proyecto de Vertex AI para los tests.
     VERTEXAI_PROJECT_ID: str = os.environ.get("TEST_PROJECT_ID", "test-project-id")

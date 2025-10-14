@@ -1,8 +1,7 @@
 {
-  "title": "Gemini AI Chatbot",
-  "welcome": "Welcome to Gemini AI Futuristic Chatbot",
-  "admin_panel": "Admin Panel",
-  "logout": "Logout",
-  "home": "Home",
-  "access_restricted": "Access restricted to administrators."
+  "welcome_message": "Welcome to Gemini AI Chatbot!",
+  "chat_placeholder": "Type your message here...",
+  "send_button": "Send",
+  "greeting": "Hello, {name}! How are you?",
+  "error_message": "Sorry, an error occurred: {error}"
 }
