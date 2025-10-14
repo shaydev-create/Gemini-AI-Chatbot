@@ -196,7 +196,6 @@ class AuthManager:
         Returns:
             True si tiene el permiso, False en caso contrario
         """
-
         user = User.query.get(user_id)
         if user:
             return has_permission(user.role, permission)
@@ -212,7 +211,6 @@ class AuthManager:
         Returns:
             Lista de usuarios con el rol especificado
         """
-
         return User.query.filter_by(role=role).all()
 
     def authenticate_api_key(self, api_key: str) -> Optional[User]:

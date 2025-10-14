@@ -1,5 +1,5 @@
-from dotenv import load_dotenv
 from app.core.application import create_app
+from dotenv import load_dotenv
 
 # Cargar variables de entorno desde .env ANTES de importar la app.
 load_dotenv()

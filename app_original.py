@@ -13,10 +13,11 @@ Requiere clave API de Google Gemini configurada
 import os
 import sys
 
-# CARGAR VARIABLES DE ENTORNO ANTES QUE NADA
-from dotenv import load_dotenv
 # Importar la configuración original que funcionaba
 from app.core.application import create_app
+
+# CARGAR VARIABLES DE ENTORNO ANTES QUE NADA
+from dotenv import load_dotenv
 
 load_dotenv()
 
