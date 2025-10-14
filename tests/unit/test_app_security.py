@@ -34,7 +34,7 @@ class TestSecurityManager(unittest.TestCase):
         self.assertEqual(strong["strength"], "strong")
 
         # This password meets all criteria but is less than 12 chars, so score is 3 -> strong
-        medium = self.manager.validate_password("MedPass1!")
+        medium = self.manager.validate_password("TestPass1!")
         self.assertTrue(medium["valid"])
         self.assertEqual(medium["strength"], "strong")
 
@@ -59,7 +59,7 @@ class TestSecurityManager(unittest.TestCase):
         self.assertEqual(result["strength"], "strong")
         
         # Password con 8 caracteres (score 2 -> medium)
-        result = self.manager.validate_password("MedPass1!")
+        result = self.manager.validate_password("TestPass1!")
         self.assertTrue(result["valid"])
         self.assertEqual(result["strength"], "strong")  # Score 3 -> strong
 
