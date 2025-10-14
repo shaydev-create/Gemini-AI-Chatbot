@@ -2,12 +2,9 @@
 Tests unitarios completos para el servicio multimodal.
 """
 
-import base64
-import os
 import unittest
 from unittest.mock import MagicMock, mock_open, patch
 
-from app.config.settings import Config
 from app.services.multimodal_service import MultimodalService
 
 
@@ -35,7 +32,7 @@ class TestMultimodalService(unittest.TestCase):
         """Test initialization failure when client is not initialized."""
         mock_client = MagicMock()
         mock_client.initialized = False
-        
+
         with self.assertRaises(ValueError) as context:
             MultimodalService(mock_client)
         self.assertIn("El VertexAIClient debe ser proporcionado y estar inicializado", str(context.exception))
@@ -137,7 +134,7 @@ class TestMultimodalService(unittest.TestCase):
         self.mock_client.generate_content = MagicMock(return_value=MagicMock(text="Success response."))
 
         base64_image = "data:image/gif;base64,R0lGODlhAQABAIABAP8AAP///yH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
-        response = self.service.generate_response("Test logging.", [base64_image])
+        self.service.generate_response("Test logging.", [base64_image])
 
         mock_logger.info.assert_called()
 
@@ -147,7 +144,7 @@ class TestMultimodalService(unittest.TestCase):
         self.mock_client.generate_content = MagicMock(side_effect=Exception("Test error"))
 
         base64_image = "data:image/gif;base64,R0lGODlhAQABAIABAP8AAP///yH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
-        response = self.service.generate_response("Test error logging.", [base64_image])
+        self.service.generate_response("Test error logging.", [base64_image])
 
         mock_logger.exception.assert_called()
 
