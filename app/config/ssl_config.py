@@ -235,15 +235,15 @@ class SSLConfig:
         try:
             with open(self.cert_file, "rb") as f:
                 cert = x509.load_pem_x509_certificate(f.read())
-            now = datetime.now(timezone.utc)
+            now = datetime.now(timezone.utc).replace(tzinfo=None)
             if now < cert.not_valid_before_utc.replace(tzinfo=None):
                 return False, "Certificado aún no válido"
             if now > cert.not_valid_after_utc.replace(tzinfo=None):
                 return False, "Certificado expirado"
-            if (cert.not_valid_after_utc.replace(tzinfo=None) - now).days < 30:
+            if (cert.not_valid_after_utc.replace(tzinfo=None).date() - now.date()).days < 30:
                 return (
                     True,
-                    f"Certificado expira en {(cert.not_valid_after_utc.replace(tzinfo=None) - now).days} días",
+                    f"Certificado expira en {(cert.not_valid_after_utc.replace(tzinfo=None).date() - now.date()).days} días",
                 )
             return True, "Certificados válidos"
         except Exception as e:
@@ -269,8 +269,6 @@ class SSLConfig:
         except Exception as e:
             return {"error": str(e)}
 
-
-from pathlib import Path
 
 # Configuración SSL global
 ssl_config = SSLConfig(base_dir=Path(__file__).parent.parent)

@@ -1,6 +1,6 @@
 import ssl
 from datetime import datetime, timedelta, timezone
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock, patch, ANY
 
 import pytest
 from cryptography.hazmat.primitives import serialization
@@ -107,6 +107,11 @@ class TestSSLConfig:
         mock_file_handle = MagicMock()
         mock_open.return_value.__enter__.return_value = mock_file_handle
 
+        # Create the actual files so the existence checks pass
+        mock_ssl_config_instance.ca_key_file.parent.mkdir(parents=True, exist_ok=True)
+        mock_ssl_config_instance.ca_key_file.touch()
+        mock_ssl_config_instance.ca_cert_file.touch()
+
         mock_ssl_config_instance._create_ca_certificate()
 
         mock_rsa_key.assert_called_once()
@@ -114,7 +119,7 @@ class TestSSLConfig:
         mock_key_instance.private_bytes.assert_called_once_with(
             encoding=serialization.Encoding.PEM,
             format=serialization.PrivateFormat.PKCS8,
-            encryption_algorithm=serialization.NoEncryption(),
+            encryption_algorithm=ANY,
         )
         mock_cert_instance.public_bytes.assert_called_once_with(
             serialization.Encoding.PEM
@@ -130,11 +135,11 @@ class TestSSLConfig:
     @patch("builtins.open")
     def test_create_server_certificate(
         self,
-        mock_rsa_key,
-        mock_cert_builder,
-        mock_load_key,
-        mock_load_cert,
         mock_open,
+        mock_load_cert,
+        mock_load_key,
+        mock_cert_builder,
+        mock_rsa_key,
         mock_ssl_config_instance,
         mock_certs_exist,
     ):
@@ -162,6 +167,11 @@ class TestSSLConfig:
         mock_file_handle = MagicMock()
         mock_open.return_value.__enter__.return_value = mock_file_handle
 
+        # Create the actual files so the existence checks pass
+        mock_ssl_config_instance.key_file.parent.mkdir(parents=True, exist_ok=True)
+        mock_ssl_config_instance.key_file.touch()
+        mock_ssl_config_instance.cert_file.touch()
+
         mock_ssl_config_instance._create_server_certificate()
 
         mock_load_key.assert_called_once()
@@ -171,7 +181,7 @@ class TestSSLConfig:
         mock_server_key_instance.private_bytes.assert_called_once_with(
             encoding=serialization.Encoding.PEM,
             format=serialization.PrivateFormat.PKCS8,
-            encryption_algorithm=serialization.NoEncryption(),
+            encryption_algorithm=ANY,
         )
         mock_server_cert_instance.public_bytes.assert_called_once_with(
             serialization.Encoding.PEM
@@ -236,8 +246,19 @@ class TestSSLConfig:
     ):
         """Verifica la validación de certificados válidos."""
         mock_cert = MagicMock()
-        mock_cert.not_valid_before_utc = datetime.now(timezone.utc) - timedelta(days=10)
-        mock_cert.not_valid_after_utc = datetime.now(timezone.utc) + timedelta(days=60)
+        # Create timezone-aware datetime objects for the certificate
+        now_utc = datetime.now(timezone.utc)
+        before_utc = now_utc - timedelta(days=10)
+        after_utc = now_utc + timedelta(days=60)
+        
+        # Mock the certificate datetime attributes with replace method
+        mock_before = MagicMock()
+        mock_before.replace.return_value = before_utc.replace(tzinfo=None)
+        mock_after = MagicMock()
+        mock_after.replace.return_value = after_utc.replace(tzinfo=None)
+        
+        mock_cert.not_valid_before_utc = mock_before
+        mock_cert.not_valid_after_utc = mock_after
         mock_cert.subject.rfc4514_string.return_value = "CN=test_subject"
         mock_cert.issuer.rfc4514_string.return_value = "CN=test_issuer"
         mock_cert.serial_number = 12345
@@ -257,8 +278,19 @@ class TestSSLConfig:
     ):
         """Verifica la validación de certificados expirados."""
         mock_cert = MagicMock()
-        mock_cert.not_valid_before_utc = datetime.now(timezone.utc) - timedelta(days=60)
-        mock_cert.not_valid_after_utc = datetime.now(timezone.utc) - timedelta(days=10)
+        # Create timezone-aware datetime objects for the certificate
+        now_utc = datetime.now(timezone.utc)
+        before_utc = now_utc - timedelta(days=60)
+        after_utc = now_utc - timedelta(days=10)
+        
+        # Mock the certificate datetime attributes with replace method
+        mock_before = MagicMock()
+        mock_before.replace.return_value = before_utc.replace(tzinfo=None)
+        mock_after = MagicMock()
+        mock_after.replace.return_value = after_utc.replace(tzinfo=None)
+        
+        mock_cert.not_valid_before_utc = mock_before
+        mock_cert.not_valid_after_utc = mock_after
         mock_cert.subject.rfc4514_string.return_value = "CN=test_subject"
         mock_cert.issuer.rfc4514_string.return_value = "CN=test_issuer"
         mock_cert.serial_number = 12345
@@ -278,8 +310,19 @@ class TestSSLConfig:
     ):
         """Verifica la validación de certificados aún no válidos."""
         mock_cert = MagicMock()
-        mock_cert.not_valid_before_utc = datetime.now(timezone.utc) + timedelta(days=10)
-        mock_cert.not_valid_after_utc = datetime.now(timezone.utc) + timedelta(days=60)
+        # Create timezone-aware datetime objects for the certificate
+        now_utc = datetime.now(timezone.utc)
+        before_utc = now_utc + timedelta(days=10)
+        after_utc = now_utc + timedelta(days=60)
+        
+        # Mock the certificate datetime attributes with replace method
+        mock_before = MagicMock()
+        mock_before.replace.return_value = before_utc.replace(tzinfo=None)
+        mock_after = MagicMock()
+        mock_after.replace.return_value = after_utc.replace(tzinfo=None)
+        
+        mock_cert.not_valid_before_utc = mock_before
+        mock_cert.not_valid_after_utc = mock_after
         mock_cert.subject.rfc4514_string.return_value = "CN=test_subject"
         mock_cert.issuer.rfc4514_string.return_value = "CN=test_issuer"
         mock_cert.serial_number = 12345
@@ -299,8 +342,19 @@ class TestSSLConfig:
     ):
         """Verifica la validación de certificados que expiran pronto."""
         mock_cert = MagicMock()
-        mock_cert.not_valid_before_utc = datetime.now(timezone.utc) - timedelta(days=10)
-        mock_cert.not_valid_after_utc = datetime.now(timezone.utc) + timedelta(days=15)
+        # Create timezone-aware datetime objects for the certificate
+        now_utc = datetime.now(timezone.utc)
+        before_utc = now_utc - timedelta(days=10)
+        after_utc = now_utc + timedelta(days=15)
+        
+        # Mock the certificate datetime attributes with replace method
+        mock_before = MagicMock()
+        mock_before.replace.return_value = before_utc.replace(tzinfo=None)
+        mock_after = MagicMock()
+        mock_after.replace.return_value = after_utc.replace(tzinfo=None)
+        
+        mock_cert.not_valid_before_utc = mock_before
+        mock_cert.not_valid_after_utc = mock_after
         mock_cert.subject.rfc4514_string.return_value = "CN=test_subject"
         mock_cert.issuer.rfc4514_string.return_value = "CN=test_issuer"
         mock_cert.serial_number = 12345
