@@ -129,12 +129,13 @@ def test_chat_api_unauthorized(client):
 
 def test_send_message_success(client, app):
     """Prueba el envío de un mensaje exitoso a /api/chat/send."""
-    
+
     # Configurar el mock del servicio en la configuración de la app
     from unittest.mock import MagicMock
+
     mock_service = MagicMock()
     mock_service.generate_response.return_value = "Hola, soy Gemini."
-    
+
     with app.test_request_context():
         app.config["GEMINI_SERVICE"] = mock_service
         response = client.post("/api/chat/send", json={"message": "Hola"})
@@ -173,9 +174,10 @@ def test_send_message_internal_error(client, app):
 
     # Configurar el mock del servicio para que lance una excepción
     from unittest.mock import MagicMock
+
     mock_service = MagicMock()
     mock_service.generate_response.side_effect = Exception("Internal Error")
-    
+
     with app.test_request_context():
         app.config["GEMINI_SERVICE"] = mock_service
         response = client.post("/api/chat/send", json={"message": "Hola"})
