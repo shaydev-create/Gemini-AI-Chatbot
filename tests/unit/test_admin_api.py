@@ -29,6 +29,18 @@ class TestAdminRoutes(unittest.TestCase):
         db.init_app(self.app)
         jwt.init_app(self.app)
 
+        # Configurar callback de JWT
+        @jwt.user_identity_loader
+        def user_identity_lookup(user):
+            return user
+
+        @jwt.user_lookup_loader
+        def user_lookup_callback(_jwt_header, jwt_data):
+            identity = jwt_data["sub"]
+            if isinstance(identity, dict) and "user_id" in identity:
+                return User.query.get(identity["user_id"])
+            return None
+
         # Mocks de dependencias
         self.app.metrics = MagicMock()
         self.app.gemini_service = MagicMock()

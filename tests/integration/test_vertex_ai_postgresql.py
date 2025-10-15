@@ -318,11 +318,13 @@ class TestVertexAIPostgreSQLIntegration:
     def test_full_integration_real_services(self):
         """Test integración completa con servicios reales."""
         # Configurar PostgreSQL real
-        postgres_url = f"postgresql://{os.getenv('POSTGRES_TEST_USER')}:{
-            os.getenv('POSTGRES_TEST_PASSWORD')
-        }@{os.getenv('POSTGRES_TEST_HOST')}:{os.getenv('POSTGRES_TEST_PORT', '5432')}/{
-            os.getenv('POSTGRES_TEST_DB')
-        }"
+        postgres_url = (
+            f"postgresql://{os.getenv('POSTGRES_TEST_USER')}:"
+            f"{os.getenv('POSTGRES_TEST_PASSWORD')}@"
+            f"{os.getenv('POSTGRES_TEST_HOST')}:"
+            f"{os.getenv('POSTGRES_TEST_PORT', '5432')}/"
+            f"{os.getenv('POSTGRES_TEST_DB')}"
+        )
 
         # Verificar conexión a PostgreSQL
         assert check_db_connection(postgres_url) is True
