@@ -90,10 +90,7 @@ class TestSSLConfig:
         mock_cert_instance.public_bytes.return_value = b"public cert bytes"
         # Mock certificate builder chain
         (
-            mock_cert_builder.return_value.subject_name.return_value.issuer_name.return_value
-            .public_key.return_value.serial_number.return_value.not_valid_before.return_value
-            .not_valid_after.return_value.add_extension.return_value.add_extension.return_value
-            .add_extension.return_value.sign.return_value
+            mock_cert_builder.return_value.subject_name.return_value.issuer_name.return_value.public_key.return_value.serial_number.return_value.not_valid_before.return_value.not_valid_after.return_value.add_extension.return_value.add_extension.return_value.add_extension.return_value.sign.return_value
         ) = mock_cert_instance
 
         mock_file_handle = MagicMock()
@@ -148,10 +145,7 @@ class TestSSLConfig:
         mock_server_cert_instance.public_bytes.return_value = b"server public cert bytes"
         # Mock server certificate builder chain
         (
-            mock_cert_builder.return_value.subject_name.return_value.issuer_name.return_value
-            .public_key.return_value.serial_number.return_value.not_valid_before.return_value
-            .not_valid_after.return_value.add_extension.return_value.add_extension.return_value
-            .add_extension.return_value.add_extension.return_value.sign.return_value
+            mock_cert_builder.return_value.subject_name.return_value.issuer_name.return_value.public_key.return_value.serial_number.return_value.not_valid_before.return_value.not_valid_after.return_value.add_extension.return_value.add_extension.return_value.add_extension.return_value.add_extension.return_value.sign.return_value
         ) = mock_server_cert_instance
 
         mock_file_handle = MagicMock()
