@@ -47,7 +47,7 @@ class TestAdminRoutes(unittest.TestCase):
     def test_get_security_summary_route(self, mock_get_security_summary, mock_role_required):
         # Mock role_required to bypass authentication
         mock_role_required.return_value = lambda f: f
-        
+
         expected_summary = {
             "total_events": 0,
             "events_by_type": {},
@@ -58,7 +58,7 @@ class TestAdminRoutes(unittest.TestCase):
         mock_get_security_summary.return_value = expected_summary
 
         response = self.client.get("/api/admin/security-summary")
-        
+
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.get_json(), expected_summary)
         mock_get_security_summary.assert_called_once()
@@ -68,7 +68,7 @@ class TestAdminRoutes(unittest.TestCase):
     def test_get_metrics_route(self, mock_metrics_manager, mock_role_required):
         # Mock role_required to bypass authentication
         mock_role_required.return_value = lambda f: f
-        
+
         expected_metrics = {
             "uptime_seconds": 0.0,
             "counters": {},
@@ -80,7 +80,7 @@ class TestAdminRoutes(unittest.TestCase):
         mock_metrics_manager.get_metrics.return_value = expected_metrics
 
         response = self.client.get("/api/admin/metrics")
-        
+
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.get_json(), expected_metrics)
         mock_metrics_manager.get_metrics.assert_called_once()
@@ -90,11 +90,11 @@ class TestAdminRoutes(unittest.TestCase):
     def test_get_system_status_route(self, mock_check_db_connection, mock_role_required):
         # Mock role_required to bypass authentication
         mock_role_required.return_value = lambda f: f
-        
+
         mock_check_db_connection.return_value = (True, "Database connection OK")
 
         response = self.client.get("/api/admin/status")
-        
+
         self.assertEqual(response.status_code, 200)
         response_data = response.get_json()
         self.assertIn("database", response_data)
