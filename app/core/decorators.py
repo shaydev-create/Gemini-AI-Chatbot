@@ -1,3 +1,4 @@
+from typing import Any, Optional
 """
 Decoradores para la aplicación.
 """
@@ -10,10 +11,10 @@ from flask_jwt_extended import get_jwt_identity
 
 from app.auth import get_current_user_from_jwt
 
-logger = logging.getLogger(__name__)
+logger=logging.getLogger(__name__)
 
 
-def role_required(required_role: str):
+def role_required(required_role: str) -> None:
     """
     Decorador para restringir el acceso a una ruta a usuarios con un rol específico.
     Soporta múltiples roles separados por coma y jerarquía de permisos.
@@ -31,11 +32,11 @@ def role_required(required_role: str):
         "guest": 10,
     }
 
-    def decorator(fn):
+    def decorator(fn) -> None:
         @wraps(fn)
-        def wrapper(*args, **kwargs):
+        def wrapper(*args, **kwargs) -> None:
             try:
-                current_user = get_current_user_from_jwt()
+                current_user=get_current_user_from_jwt()
 
                 if not current_user:
                     logger.warning("Acceso denegado: usuario no autenticado")
@@ -46,23 +47,23 @@ def role_required(required_role: str):
                         }
                     ), 401
 
-                jwt_identity = get_jwt_identity()
-                user_role = jwt_identity.get("role", "user")
+                jwt_identity=get_jwt_identity()
+                user_role=jwt_identity.get("role", "user")
 
                 # Verificar si el usuario tiene el rol requerido o uno superior
-                required_roles = [r.strip() for r in required_role.split(",")]
-                user_has_access = False
+                required_roles: list[Any] = [r.strip() for r in required_role.split(",")]
+                user_has_access: bool = False
 
                 # Verificar acceso por rol específico
                 if user_role in required_roles:
-                    user_has_access = True
+                    user_has_access: bool = True
                 # Verificar acceso por jerarquía (si el usuario tiene un rol superior)
                 elif user_role in ROLE_HIERARCHY and any(
                     req_role in ROLE_HIERARCHY
                     and ROLE_HIERARCHY[user_role] >= ROLE_HIERARCHY[req_role]
                     for req_role in required_roles
                 ):
-                    user_has_access = True
+                    user_has_access: bool = True
 
                 if not user_has_access:
                     logger.warning(
@@ -95,14 +96,14 @@ def role_required(required_role: str):
     return decorator
 
 
-def log_request(fn):
+def log_request(fn) -> None:
     """
     Decorador para registrar información sobre las solicitudes entrantes.
     """
 
     @wraps(fn)
-    def wrapper(*args, **kwargs):
-        user_identity = get_jwt_identity()
+    def wrapper(*args, **kwargs) -> None:
+        user_identity=get_jwt_identity()
         logger.info(
             "Solicitud a '%s' recibida de %s.",
             fn.__name__,

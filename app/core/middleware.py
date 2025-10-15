@@ -1,3 +1,4 @@
+from typing import Any, Optional
 """
 Middleware personalizado para el Gemini AI Chatbot.
 """
@@ -10,28 +11,28 @@ from flask_wtf.csrf import CSRFProtect
 
 from app.core.metrics import metrics_manager
 
-logger = logging.getLogger(__name__)
+logger=logging.getLogger(__name__)
 
 
-def setup_middleware(app):
+def setup_middleware(app) -> None:
     """Configurar middleware personalizado."""
     # ProtecciÃ³n CSRF
-    csrf = CSRFProtect(app)
+    csrf=CSRFProtect(app)
     app.logger.info("CSRF protection enabled")
 
     # Eximir rutas API especÃ­ficas de la protecciÃ³n CSRF
     @csrf.exempt
-    def csrf_exempt_api_routes():
+    def csrf_exempt_api_routes() -> None:
         pass
 
     # Eximir la ruta /api/chat/send de la protecciÃ³n CSRF
     @app.before_request
-    def exempt_api_routes():
+    def exempt_api_routes() -> None:
         if request.path == "/api/chat/send" and request.method == "POST":
             csrf.protect_csrf = False
 
     @app.before_request
-    def before_request():
+    def before_request() -> None:
         """Ejecutar antes de cada request."""
         g.start_time = time.time()
 
@@ -48,11 +49,11 @@ def setup_middleware(app):
             metrics_manager.increment_counter("api_requests")
 
     @app.after_request
-    def after_request(response):
+    def after_request(response) -> None:
         """Ejecutar despuÃ©s de cada request."""
         # Calcular tiempo de respuesta
         if hasattr(g, "start_time"):
-            response_time = time.time() - g.start_time
+            response_time=time.time() - g.start_time
             metrics_manager.record_response_time(response_time)
 
             # Log del response
@@ -73,17 +74,17 @@ def setup_middleware(app):
         return response
 
     @app.teardown_appcontext
-    def teardown_db(error):
+    def teardown_db(error) -> dict[str, Any]:
         """Limpiar contexto de aplicaciÃ³n."""
         if error:
             logger.error(f"Application context error: {error}")
 
 
-def setup_error_handlers(app):
+def setup_error_handlers(app) -> dict[str, Any]:
     """Configurar manejadores de errores personalizados."""
 
     @app.errorhandler(404)
-    def not_found(error):
+    def not_found(error) -> dict[str, Any]:
         """Manejar errores 404."""
         logger.warning(f"404 error: {request.path}")
         return {
@@ -93,14 +94,14 @@ def setup_error_handlers(app):
         }, 404
 
     @app.errorhandler(500)
-    def internal_error(error):
+    def internal_error(error) -> dict[str, Any]:
         """Manejar errores 500."""
-        original_exception = getattr(error, "original_exception", error)
+        original_exception=getattr(error, "original_exception", error)
         logger.error(f"500 error: {original_exception}")
         return {"error": "Error interno del servidor", "status_code": 500}, 500
 
     @app.errorhandler(429)
-    def rate_limit_error(error):
+    def rate_limit_error(error) -> dict[str, Any]:
         """Manejar errores de rate limiting."""
         logger.warning(f"Rate limit exceeded from {request.remote_addr}")
         return {

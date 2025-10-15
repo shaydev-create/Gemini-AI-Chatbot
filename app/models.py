@@ -16,7 +16,7 @@ from sqlalchemy.orm import Mapped
 
 from app.config.extensions import db
 
-logger = logging.getLogger(__name__)
+logger=logging.getLogger(__name__)
 
 
 def validate_password_strength(password: str) -> tuple[bool, str]:
@@ -41,7 +41,7 @@ class User(db.Model):
     Modelo de usuario para autenticación, perfiles y gestión de acceso.
     """
 
-    __tablename__ = "users"
+    __tablename__: str = "users"
 
     id: int = db.Column(db.Integer, primary_key=True)
     username: str = db.Column(db.String(64), unique=True, nullable=False, index=True)
@@ -67,7 +67,7 @@ class User(db.Model):
         if not self.api_key:
             self.api_key = self.generate_new_api_key()
 
-    def __repr__(self) -> str:
+    def __repr__(self) -> Any:
         return f"<User id={self.id} username='{self.username}' email='{self.email}' status='{self.status}'>"
 
     def set_password(self, password: str) -> None:
@@ -78,20 +78,92 @@ class User(db.Model):
         if not is_strong:
             raise ValueError(message)
 
-        password_bytes = password.encode("utf-8")
-        salt = bcrypt.gensalt()
+        password_bytes=password.encode("utf-8")
+        salt=bcrypt.gensalt()
         self.password_hash = bcrypt.hashpw(password_bytes, salt).decode("utf-8")
 
     def check_password(self, password: str) -> bool:
         """Verifica si la contraseña proporcionada coincide con el hash almacenado."""
         if not self.password_hash:
             return False
-        password_bytes = password.encode("utf-8")
-        hash_bytes = self.password_hash.encode("utf-8")
+        password_bytes=password.encode("utf-8")
+        hash_bytes=self.password_hash.encode("utf-8")
         return bcrypt.checkpw(password_bytes, hash_bytes)
 
     @staticmethod
-    def generate_new_api_key() -> str:
+    def generate_new_api_key() -> Any:
+        """Genera una nueva API key segura."""
+        return secrets.token_urlsafe(32)
+
+    def regenerate_api_key(self) -> None:
+        """Asigna una nueva API key al usuario."""
+        self.api_key = self.generate_new_api_key()
+
+    def increment_failed_login(self) -> None:
+        """Incrementa el contador de intentos de inicio de sesión fallidos."""
+        self.failed_login_attempts = (self.failed_login_attempts or 0) + 1
+
+    def reset_failed_login(self) -> None:
+        """Resetea el contador de intentos de inicio de sesión fallidos."""
+        self.failed_login_attempts = 0
+
+    def lock_account(self, minutes: int = 15) -> None:
+        """Bloquea la cuenta por un número determinado de minutos."""
+        self.account_locked_until = datetime.now(timezone.utc) + timedelta(
+            minutes=minutes
+        )
+
+    def unlock_account(self) -> None:
+        """Desbloquea la cuenta y resetea los intentos fallidos."""
+        self.account_locked_until = None
+        self.reset_failed_login()
+
+    def is_account_locked(self) -> bool:
+        """
+        Verifica si la cuenta está actualmente bloqueada.
+        Si el tiempo de bloqueo ha pasado, desbloquea la cuenta automáticamente.
+        """
+        if not self.account_locked_until:
+            return False
+
+        if datetime.now(timezone.utc) < self.account_locked_until:
+            return True
+
+        # El tiempo de bloqueo ha expirado, desbloquear la cuenta.
+        self.unlock_account()
+        try:
+            db.session.commit()
+        except SQLAlchemyError:
+            db.session.rollback()
+            logger.exception(
+                "Error al auto-desbloquear la cuenta del usuario %s", self.username
+            )
+        return False
+
+    def to_dict(self) -> dict[str, Any]:
+        """Devuelve una representación del usuario en un diccionario."""
+        return {
+            "id": self.id,
+            "username": self.username,
+            "email": self.email,
+            "first_name": self.first_name,
+            "last_name": self.last_name,
+            "created_at": self.created_at.isoformat(),
+            "last_login": self.last_login.isoformat() if self.last_login else None,
+            "status": self.status,
+            "role": self.role,
+        }
+
+    def check_password(self, password: str) -> bool:
+        """Verifica si la contraseña proporcionada coincide con el hash almacenado."""
+        if not self.password_hash:
+            return False
+        password_bytes=password.encode("utf-8")
+        hash_bytes=self.password_hash.encode("utf-8")
+        return bcrypt.checkpw(password_bytes, hash_bytes)
+
+    @staticmethod
+    def generate_new_api_key() -> Any:
         """Genera una nueva API key segura."""
         return secrets.token_urlsafe(32)
 
@@ -160,7 +232,7 @@ class ChatSession(db.Model):
     Modelo para una sesión de chat, que agrupa una serie de mensajes.
     """
 
-    __tablename__ = "chat_sessions"
+    __tablename__: str = "chat_sessions"
 
     id: int = db.Column(db.Integer, primary_key=True)
     session_id: str = db.Column(db.String(64), unique=True, nullable=False, index=True)
@@ -186,7 +258,7 @@ class ChatSession(db.Model):
         if not self.title:
             self.title = f"Conversación del {datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M')}"
 
-    def __repr__(self) -> str:
+    def __repr__(self) -> Any:
         return f"<ChatSession id={self.id} session_id='{self.session_id}' user_id={self.user_id} status='{self.status}'>"
 
     def to_dict(self) -> dict[str, Any]:
@@ -208,7 +280,7 @@ class ChatMessage(db.Model):
     Modelo para un único mensaje dentro de una sesión de chat.
     """
 
-    __tablename__ = "chat_messages"
+    __tablename__: str = "chat_messages"
 
     id: int = db.Column(db.Integer, primary_key=True)
     session_id: int = db.Column(
@@ -221,7 +293,7 @@ class ChatMessage(db.Model):
     )
     tokens: Optional[int] = db.Column(db.Integer)
 
-    def __repr__(self) -> str:
+    def __repr__(self) -> Any:
         return f"<ChatMessage id={self.id} session_id={self.session_id} role='{self.role}'>"
 
     def to_dict(self) -> dict[str, Any]:

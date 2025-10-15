@@ -9,7 +9,7 @@ from vertexai.generative_models import Part
 
 from app.config.vertex_client import VertexAIClient
 
-logger = logging.getLogger(__name__)
+logger=logging.getLogger(__name__)
 
 
 class MultimodalService:
@@ -20,7 +20,7 @@ class MultimodalService:
     con capacidad de visión.
     """
 
-    def __init__(self, client: VertexAIClient):
+    def __init__(self, client: VertexAIClient) -> None:
         """
         Inicializa el servicio multimodal.
 
@@ -41,15 +41,15 @@ class MultimodalService:
         if isinstance(image_data, Path) or (
             isinstance(image_data, str) and Path(image_data).exists()
         ):
-            path = Path(image_data)
-            mime_type = f"image/{path.suffix.lower().strip('.')}"
+            path=Path(image_data)
+            mime_type=f"image/{path.suffix.lower().strip('.')}"
             with open(path, "rb") as f:
                 return Part.from_data(f.read(), mime_type=mime_type)
 
         elif isinstance(image_data, str) and image_data.startswith("data:image"):
             header, encoded = image_data.split(",", 1)
             mime_type = header.split(":")[1].split(";")[0]
-            data = base64.b64decode(encoded)
+            data=base64.b64decode(encoded)
             return Part.from_data(data, mime_type=mime_type)
 
         raise ValueError(
@@ -74,7 +74,7 @@ class MultimodalService:
         logger.debug("Generando respuesta multimodal con el modelo %s", model_type)
 
         # Verificar si hay imágenes válidas
-        valid_images = []
+        valid_images: list[Any] = []
         for image in images:
             if isinstance(image, str) and image.startswith("data:image"):
                 valid_images.append(image)
@@ -101,7 +101,7 @@ class MultimodalService:
             response_data: dict[str, Any] = await self.client.generate_response(
                 prompt=multimodal_prompt, model_type=model_type, max_tokens=1000
             )
-            response_text = response_data["response"]
+            response_text=response_data["response"]
             logger.info("Respuesta multimodal generada con éxito.")
             return response_text
 

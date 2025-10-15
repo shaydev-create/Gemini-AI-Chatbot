@@ -1,3 +1,4 @@
+from typing import Any, Optional
 """
 Sistema de permisos granulares para la aplicación.
 Permite definir permisos específicos más allá de roles simples.
@@ -9,7 +10,7 @@ from functools import wraps
 from flask import jsonify
 from flask_jwt_extended import get_jwt_identity
 
-logger = logging.getLogger(__name__)
+logger=logging.getLogger(__name__)
 
 # Definición de permisos disponibles
 PERMISSIONS = {
@@ -85,7 +86,7 @@ ROLE_PERMISSIONS = {
 }
 
 
-def permission_required(required_permission: str):
+def permission_required(required_permission: str) -> None:
     """
     Decorador para verificar permisos específicos del usuario.
 
@@ -93,13 +94,13 @@ def permission_required(required_permission: str):
         required_permission: El permiso requerido (ej. 'admin.users.read')
     """
 
-    def decorator(fn):
+    def decorator(fn) -> None:
         @wraps(fn)
-        def wrapper(*args, **kwargs):
+        def wrapper(*args, **kwargs) -> None:
             try:
                 from .decorators import get_current_user_from_jwt
 
-                current_user = get_current_user_from_jwt()
+                current_user=get_current_user_from_jwt()
 
                 if not current_user:
                     logger.warning("Acceso denegado: usuario no autenticado")
@@ -110,11 +111,11 @@ def permission_required(required_permission: str):
                         }
                     ), 401
 
-                jwt_identity = get_jwt_identity()
-                user_role = jwt_identity.get("role", "user")
+                jwt_identity=get_jwt_identity()
+                user_role=jwt_identity.get("role", "user")
 
                 # Obtener permisos del usuario basados en su rol
-                user_permissions = ROLE_PERMISSIONS.get(user_role, [])
+                user_permissions=ROLE_PERMISSIONS.get(user_role, [])
 
                 # Verificar si el usuario tiene el permiso requerido
                 if required_permission not in user_permissions:

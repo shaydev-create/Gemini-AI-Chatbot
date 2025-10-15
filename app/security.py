@@ -19,7 +19,7 @@ from flask import g, jsonify, request
 class SecurityManager:
     """Gestor principal de seguridad."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.rate_limits = {}
         self.blocked_ips = set()
         self.security_headers = {
@@ -31,7 +31,7 @@ class SecurityManager:
             "Referrer-Policy": "strict-origin-when-cross-origin",
         }
 
-    def sanitize_input(self, text: str, max_length: int = 10000) -> str:
+    def sanitize_input(self, text: str, max_length: int = 10000) -> Any:
         """Sanitizar entrada de usuario."""
         if not isinstance(text, str):
             return ""
@@ -40,21 +40,21 @@ class SecurityManager:
         text = text[:max_length]
 
         # Limpiar con bleach (escapa caracteres peligrosos y permite tags seguros)
-        allowed_tags = ["b", "i", "u", "em", "strong", "p", "br"]
-        text = bleach.clean(text, tags=allowed_tags, strip=True)
+        allowed_tags: list[Any] = ["b", "i", "u", "em", "strong", "p", "br"]
+        text=bleach.clean(text, tags=allowed_tags, strip=True)
 
         return text.strip()
 
     def validate_email(self, email: str) -> bool:
         """Validar formato de email."""
-        pattern = r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
+        pattern=r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
         return bool(re.match(pattern, email))
 
     def _check_password_requirements(self, password: str) -> List[str]:
         """Verificar requisitos básicos de la contraseña."""
-        errors = []
+        errors: list[Any] = []
 
-        requirements = [
+        requirements=[
             (len(password) >= 8, "Mínimo 8 caracteres"),
             (bool(re.search(r"[A-Z]", password)), "Debe contener mayúsculas"),
             (bool(re.search(r"[a-z]", password)), "Debe contener minúsculas"),
@@ -73,7 +73,7 @@ class SecurityManager:
 
     def _calculate_password_strength(self, password: str) -> str:
         """Calcular la fortaleza de la contraseña."""
-        score = 0
+        score: int = 0
 
         if len(password) >= 12:
             score += 1
@@ -93,7 +93,7 @@ class SecurityManager:
 
     def validate_password(self, password: str) -> Dict[str, Any]:
         """Validar fortaleza de contraseña."""
-        errors = self._check_password_requirements(password)
+        errors=self._check_password_requirements(password)
 
         if errors:
             return {"valid": False, "errors": errors, "strength": "weak"}
@@ -108,13 +108,13 @@ class SecurityManager:
         self, identifier: str, limit: int = 100, window: int = 3600
     ) -> bool:
         """Verificar límite de tasa."""
-        now = datetime.now(timezone.utc)
+        now=datetime.now(timezone.utc)
 
         if identifier not in self.rate_limits:
             self.rate_limits[identifier] = []
 
         # Limpiar requests antiguos
-        cutoff = now - timedelta(seconds=window)
+        cutoff=now - timedelta(seconds=window)
         self.rate_limits[identifier] = [
             timestamp
             for timestamp in self.rate_limits[identifier]
@@ -132,7 +132,7 @@ class SecurityManager:
     def detect_suspicious_activity(self, request_data: Dict[str, Any]) -> bool:
         """Detectar actividad sospechosa."""
         # Verificar patrones de inyección SQL
-        sql_patterns = [
+        sql_patterns=[
             r"(\bUNION\b|\bSELECT\b|\bINSERT\b|\bDELETE\b|\bDROP\b)",
             r"(\bOR\b\s+\d+\s*=\s*\d+)",
             r"(\bAND\b\s+\d+\s*=\s*\d+)",
@@ -140,14 +140,14 @@ class SecurityManager:
         ]
 
         # Verificar patrones XSS
-        xss_patterns = [
+        xss_patterns=[
             r"<script[^>]*>.*?</script>",
             r"javascript:",
             r"on\w+\s*=",
             r"<iframe[^>]*>.*?</iframe>",
         ]
 
-        text_to_check = str(request_data).lower()
+        text_to_check=str(request_data).lower()
 
         for pattern in sql_patterns + xss_patterns:
             if re.search(pattern, text_to_check, re.IGNORECASE):
@@ -155,7 +155,7 @@ class SecurityManager:
 
         return False
 
-    def generate_csrf_token(self) -> str:
+    def generate_csrf_token(self) -> Any:
         """Generar token CSRF."""
         return secrets.token_urlsafe(32)
 
@@ -163,11 +163,11 @@ class SecurityManager:
         """Validar token CSRF."""
         return secrets.compare_digest(token, session_token)
 
-    def hash_data(self, data: str) -> str:
+    def hash_data(self, data: str) -> Any:
         """Hash seguro de datos."""
         return hashlib.sha256(data.encode("utf-8")).hexdigest()
 
-    def apply_security_headers(self, response):
+    def apply_security_headers(self, response) -> None:
         """Aplicar headers de seguridad a la respuesta."""
         for header, value in self.security_headers.items():
             response.headers[header] = value
@@ -177,18 +177,18 @@ class SecurityManager:
 class RateLimiter:
     """Decorador para rate limiting."""
 
-    def __init__(self, limit: int = 100, window: int = 3600):
+    def __init__(self, limit: int = 100, window: int = 3600) -> None:
         self.limit = limit
         self.window = window
         self.security_manager = SecurityManager()
 
-    def __call__(self, func):
+    def __call__(self, func) -> None:
         @wraps(func)
-        def wrapper(*args, **kwargs):
+        def wrapper(*args, **kwargs) -> None:
             # Obtener identificador (IP o usuario)
-            identifier = request.remote_addr
+            identifier=request.remote_addr
             if hasattr(g, "current_user") and g.current_user:
-                identifier = g.current_user.get("id", identifier)
+                identifier=g.current_user.get("id", identifier)
 
             if not self.security_manager.check_rate_limit(
                 identifier, self.limit, self.window
@@ -208,11 +208,11 @@ class RateLimiter:
         return wrapper
 
 
-def require_https(func):
+def require_https(func) -> None:
     """Decorador para requerir HTTPS."""
 
     @wraps(func)
-    def wrapper(*args, **kwargs):
+    def wrapper(*args, **kwargs) -> None:
         if (
             not request.is_secure
             and not request.headers.get("X-Forwarded-Proto") == "https"
@@ -231,19 +231,19 @@ def require_https(func):
     return wrapper
 
 
-def validate_input(schema: Dict[str, Any]):
+def validate_input(schema: Dict[str, Any]) -> None:
     """Decorador para validar entrada."""
 
-    def decorator(func):
+    def decorator(func) -> None:
         @wraps(func)
-        def wrapper(*args, **kwargs):
-            security_manager = SecurityManager()
+        def wrapper(*args, **kwargs) -> None:
+            security_manager=SecurityManager()
 
             # Obtener datos de la request
             if request.is_json:
-                data = request.get_json()
+                data=request.get_json()
             else:
-                data = request.form.to_dict()
+                data=request.form.to_dict()
 
             # Detectar actividad sospechosa
             if security_manager.detect_suspicious_activity(data):
@@ -258,19 +258,19 @@ def validate_input(schema: Dict[str, Any]):
                 )
 
             # Sanitizar y validar datos
-            validated_data = {}
+            validated_data: dict[str, Any] = {}
             for field, rules in schema.items():
-                value = data.get(field)
+                value=data.get(field)
                 if value is None:
                     validated_data[field] = None
                     continue
 
                 # Sanitizar si se especifica
                 if rules.get("sanitize"):
-                    value = security_manager.sanitize_input(str(value))
+                    value=security_manager.sanitize_input(str(value))
 
                 # Validar longitud
-                max_length = rules.get("max_length")
+                max_length=rules.get("max_length")
                 if max_length and len(value) > max_length:
                     return (
                         jsonify(
@@ -292,4 +292,4 @@ def validate_input(schema: Dict[str, Any]):
 
 
 # Instancia global
-security_manager = SecurityManager()
+security_manager=SecurityManager()

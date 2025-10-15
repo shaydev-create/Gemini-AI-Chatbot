@@ -1,3 +1,4 @@
+from typing import Any, Optional
 """
 Utilidades generales para la aplicación.
 """
@@ -10,7 +11,7 @@ import uuid
 from pathlib import Path
 from typing import Optional, Union
 
-logger = logging.getLogger(__name__)
+logger=logging.getLogger(__name__)
 
 
 def generate_secret_key(length: int = 32) -> str:
@@ -43,19 +44,19 @@ def hash_string(text: str, algorithm: str = "sha256") -> str:
         Hash en hexadecimal
     """
     try:
-        hash_obj = hashlib.new(algorithm)
+        hash_obj=hashlib.new(algorithm)
         hash_obj.update(text.encode("utf-8"))
         return hash_obj.hexdigest()
     except ValueError:
         logger.exception(
             "Algoritmo de hash no válido: %s. Usando sha256 como fallback.", algorithm
         )
-        hash_obj = hashlib.sha256()
+        hash_obj=hashlib.sha256()
         hash_obj.update(text.encode("utf-8"))
         return hash_obj.hexdigest()
 
 
-def ensure_directory_exists(path: Union[str, Path]):
+def ensure_directory_exists(path: Union[str, Path]) -> None:
     """
     Asegura que un directorio exista, creándolo si es necesario.
     Utiliza pathlib para un manejo de rutas más robusto.
@@ -100,7 +101,7 @@ def sanitize_filename(filename: str) -> str:
         Nombre sanitizado
     """
     # Caracteres no permitidos en la mayoría de los sistemas de archivos
-    sanitized = "".join(c if c.isalnum() or c in "._-" else "_" for c in filename)
+    sanitized: str = "".join(c if c.isalnum() or c in "._-" else "_" for c in filename)
 
     # Limitar la longitud total del nombre del archivo
     if len(sanitized) > 255:
@@ -123,8 +124,8 @@ def format_bytes(size_in_bytes: int) -> str:
     if size_in_bytes is None or size_in_bytes < 0:
         return "0 B"
 
-    power = 1024
-    n = 0
+    power: int = 1024
+    n: int = 0
     power_labels = {0: "B", 1: "KB", 2: "MB", 3: "GB", 4: "TB"}
 
     while size_in_bytes >= power and n < len(power_labels) - 1:
@@ -134,7 +135,7 @@ def format_bytes(size_in_bytes: int) -> str:
     return f"{size_in_bytes:.1f} {power_labels[n]}"
 
 
-def truncate_text(text: str, max_length: int, suffix: str = "...") -> str:
+def truncate_text(text: str, max_length: int, suffix: str = "...") -> Any:
     """
     Trunca un texto a una longitud máxima si es necesario, añadiendo un sufijo.
 

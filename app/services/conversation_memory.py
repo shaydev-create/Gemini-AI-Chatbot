@@ -6,7 +6,7 @@ from typing import Any, Dict, List, Optional
 from app.config.extensions import db
 from app.models import ChatMessage, ChatSession
 
-logger = logging.getLogger(__name__)
+logger=logging.getLogger(__name__)
 
 
 class ConversationMemory:
@@ -15,7 +15,7 @@ class ConversationMemory:
     utilizando la base de datos.
     """
 
-    def __init__(self, session_id: str, user_id: int, max_history: int = 20):
+    def __init__(self, session_id: str, user_id: int, max_history: int = 20) -> None:
         """
         Inicializa la memoria de conversación, cargando o creando una sesión.
 
@@ -29,7 +29,7 @@ class ConversationMemory:
 
     def _load_or_create_session(self, session_id: str, user_id: int) -> ChatSession:
         """Carga una sesión existente o crea una nueva si no se encuentra."""
-        session = ChatSession.query.filter_by(
+        session=ChatSession.query.filter_by(
             session_id=session_id, user_id=user_id
         ).first()
         if session:
@@ -41,7 +41,7 @@ class ConversationMemory:
             logger.info(
                 "Creando nueva sesión de chat en la base de datos: %s", session_id
             )
-            new_session = ChatSession(session_id=session_id, user_id=user_id)
+            new_session=ChatSession(session_id=session_id, user_id=user_id)
             db.session.add(new_session)
             db.session.commit()
             return new_session
@@ -60,7 +60,7 @@ class ConversationMemory:
         if role not in ["user", "model"]:
             raise ValueError("El rol debe ser 'user' o 'model'")
 
-        message = ChatMessage(
+        message=ChatMessage(
             session_id=self.session.id, role=role, content=content, tokens=tokens
         )
         db.session.add(message)
@@ -77,11 +77,11 @@ class ConversationMemory:
             Una lista de objetos ChatMessage, ordenados del más antiguo al más reciente.
         """
         # Get total count of messages
-        total_messages = ChatMessage.query.filter_by(session_id=self.session.id).count()
+        total_messages=ChatMessage.query.filter_by(session_id=self.session.id).count()
 
         # If we have more messages than the max_history limit, we need to skip the oldest ones
         if total_messages > self.max_history:
-            offset = total_messages - self.max_history
+            offset=total_messages - self.max_history
             return (
                 ChatMessage.query.filter_by(session_id=self.session.id)
                 .order_by(ChatMessage.created_at.asc())
@@ -101,7 +101,7 @@ class ConversationMemory:
         Elimina todos los mensajes asociados a la sesión de chat actual.
         """
         try:
-            num_deleted = ChatMessage.query.filter_by(
+            num_deleted=ChatMessage.query.filter_by(
                 session_id=self.session.id
             ).delete()
             db.session.commit()
@@ -117,7 +117,7 @@ class ConversationMemory:
             )
 
     @property
-    def session_id(self) -> str:
+    def session_id(self) -> Any:
         """Devuelve el ID de la sesión actual."""
         return self.session.session_id
 
@@ -128,8 +128,8 @@ class ConversationMemory:
         Returns:
             Una lista de mensajes en el formato que espera la API de Gemini.
         """
-        history = self.get_history()
-        formatted_history = []
+        history=self.get_history()
+        formatted_history: list[Any] = []
         for msg in history:
             formatted_history.append(
                 {

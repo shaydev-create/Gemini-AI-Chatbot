@@ -1,3 +1,4 @@
+from typing import Any, Optional
 """
 Utilidad para cargar traducciones y seleccionar idioma en Gemini AI Chatbot.
 """
@@ -9,7 +10,7 @@ from typing import Dict
 
 from flask import request, session
 
-logger = logging.getLogger(__name__)
+logger=logging.getLogger(__name__)
 
 # Constantes
 I18N_DIR = Path(__file__).parent.parent / "i18n"
@@ -20,7 +21,7 @@ SUPPORTED_LANGS = ["es", "en"]
 _translations_cache: Dict[str, Dict[str, str]] = {}
 
 
-def get_locale() -> str:
+def get_locale() -> Any:
     """
     Determina el idioma a utilizar para la solicitud actual.
     El orden de precedencia es:
@@ -29,7 +30,7 @@ def get_locale() -> str:
     3. Idioma por defecto ('es').
     """
     # Intenta obtener el idioma desde los argumentos de la solicitud o la sesión
-    lang = request.args.get("lang") or session.get("lang")
+    lang=request.args.get("lang") or session.get("lang")
 
     if lang and lang in SUPPORTED_LANGS:
         # Si el idioma está soportado, lo usamos y lo guardamos en la sesión
@@ -49,7 +50,7 @@ def _load_translations(lang: str) -> Dict[str, str]:
     Carga el archivo de traducción para un idioma específico en la caché.
     """
     if lang not in _translations_cache:
-        lang_file = I18N_DIR / f"{lang}.json"
+        lang_file=I18N_DIR / f"{lang}.json"
         try:
             with open(lang_file, "r", encoding="utf-8") as f:
                 _translations_cache[lang] = json.load(f)
@@ -65,15 +66,15 @@ def _load_translations(lang: str) -> Dict[str, str]:
     return _translations_cache[lang]
 
 
-def translate(key: str, **kwargs) -> str:
+def translate(key: str, **kwargs) -> Any:
     """
     Traduce una clave al idioma actual y formatea la cadena con los argumentos proporcionados.
     Si la clave no se encuentra, devuelve la propia clave.
     """
-    lang = get_locale()
-    translations = _load_translations(lang)
+    lang=get_locale()
+    translations=_load_translations(lang)
 
-    translated_string = translations.get(key, key)
+    translated_string=translations.get(key, key)
 
     # Si se proporcionan argumentos, intenta formatear la cadena
     if kwargs:

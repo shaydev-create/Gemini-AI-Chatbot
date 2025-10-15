@@ -22,7 +22,7 @@ from app.config.extensions import db
 from app.core.permissions import get_user_permissions, has_permission
 from app.models import User
 
-logger = logging.getLogger(__name__)
+logger=logging.getLogger(__name__)
 
 
 class AuthManager:
@@ -31,7 +31,7 @@ class AuthManager:
     Interactúa con la base de datos a través del modelo User.
     """
 
-    def __init__(self, max_attempts: int = 5, lockout_duration: int = 300):
+    def __init__(self, max_attempts: int = 5, lockout_duration: int = 300) -> None:
         """
         Inicializa el gestor de autenticación.
 
@@ -66,7 +66,7 @@ class AuthManager:
                 )
                 return None, "El nombre de usuario o el email ya están en uso."
 
-            new_user = User(username=username, email=email, status="pending")
+            new_user=User(username=username, email=email, status="pending")
             new_user.set_password(password)
 
             db.session.add(new_user)
@@ -93,7 +93,7 @@ class AuthManager:
         Autentica a un usuario con su nombre de usuario y contraseña.
         Maneja el bloqueo de cuentas por intentos fallidos.
         """
-        user = User.query.filter_by(username=username).first()
+        user=User.query.filter_by(username=username).first()
 
         if not user:
             logger.warning(
@@ -156,12 +156,12 @@ class AuthManager:
             El usuario actualizado o None si no se encuentra
         """
         # Validar que el rol sea válido
-        valid_roles = ["superadmin", "admin", "moderator", "premium", "user", "guest"]
+        valid_roles: list[Any] = ["superadmin", "admin", "moderator", "premium", "user", "guest"]
         if new_role not in valid_roles:
             logger.warning("Intento de asignar rol inválido: %s", new_role)
             return None
 
-        user = User.query.get(user_id)
+        user=User.query.get(user_id)
         if user:
             user.role = new_role
             db.session.commit()
@@ -181,14 +181,14 @@ class AuthManager:
         Returns:
             El objeto User actualizado si la asignación fue exitosa, None en caso contrario.
         """
-        valid_roles = ["superadmin", "admin", "moderator", "premium", "user", "guest"]
+        valid_roles: list[Any] = ["superadmin", "admin", "moderator", "premium", "user", "guest"]
         if role not in valid_roles:
             logger.warning(
                 "Intento de asignar un rol inválido: %s a user_id: %d", role, user_id
             )
             return None
 
-        user = User.query.get(user_id)
+        user=User.query.get(user_id)
         if user:
             user.role = role
             db.session.commit()
@@ -212,7 +212,7 @@ class AuthManager:
         Returns:
             El objeto User actualizado si la eliminación fue exitosa, None en caso contrario.
         """
-        user = User.query.get(user_id)
+        user=User.query.get(user_id)
         if user:
             # Solo eliminar el rol si el usuario realmente lo tiene
             if user.role == role:
@@ -248,7 +248,7 @@ class AuthManager:
         Returns:
             Lista de permisos del usuario
         """
-        user = User.query.get(user_id)
+        user=User.query.get(user_id)
         if user:
             return get_user_permissions(user.role)
         return []
@@ -264,7 +264,7 @@ class AuthManager:
         Returns:
             True si tiene el permiso, False en caso contrario
         """
-        user = User.query.get(user_id)
+        user=User.query.get(user_id)
         if user:
             return has_permission(user.role, permission)
         return False
@@ -286,7 +286,7 @@ class AuthManager:
         if not api_key:
             return None
 
-        user = User.query.filter_by(api_key=api_key).first()
+        user=User.query.filter_by(api_key=api_key).first()
 
         if user and user.status == "active":
             return user
@@ -297,16 +297,16 @@ class AuthManager:
         """
         Crea tokens JWT (acceso y refresco) para un usuario.
         """
-        identity = {
+        identity={
             "user_id": user.id,
             "username": user.username,
             "role": user.role,  # Usar el rol real del usuario
         }
 
-        access_token = create_access_token(
+        access_token=create_access_token(
             identity=identity, expires_delta=timedelta(hours=1)
         )
-        refresh_token = create_refresh_token(
+        refresh_token=create_refresh_token(
             identity=identity, expires_delta=timedelta(days=30)
         )
 
@@ -338,8 +338,8 @@ class AuthManager:
 
 
 # Instancia global
-auth_manager = AuthManager()
-auth = Blueprint("auth", __name__)
+auth_manager=AuthManager()
+auth=Blueprint("auth", __name__)
 
 
 def get_current_user_from_jwt() -> Optional[User]:
@@ -352,11 +352,11 @@ def get_current_user_from_jwt() -> Optional[User]:
         # Verificar si hay un JWT en la request antes de intentar obtener la identidad
         verify_jwt_in_request(optional=True)
 
-        jwt_identity = get_jwt_identity()
+        jwt_identity=get_jwt_identity()
         if not jwt_identity or "user_id" not in jwt_identity:
             return None
 
-        user = User.query.get(jwt_identity["user_id"])
+        user=User.query.get(jwt_identity["user_id"])
 
         if user and user.status == "active":
             return user

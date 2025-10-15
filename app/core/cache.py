@@ -8,7 +8,7 @@ import threading
 import time
 from typing import Any, Dict, Optional
 
-logger = logging.getLogger(__name__)
+logger=logging.getLogger(__name__)
 
 
 class CacheManager:
@@ -16,7 +16,7 @@ class CacheManager:
     Gestor de caché simple, en memoria y seguro para hilos (thread-safe).
     """
 
-    def __init__(self, default_ttl: int = 300):
+    def __init__(self, default_ttl: int = 300) -> None:
         """
         Inicializa el gestor de caché.
 
@@ -36,7 +36,7 @@ class CacheManager:
         Obtiene un valor de la caché. Devuelve None si la clave no existe o ha expirado.
         """
         with self._lock:
-            item = self._cache.get(key)
+            item=self._cache.get(key)
             if item:
                 value, expiry = item
                 if time.time() < expiry:
@@ -49,12 +49,12 @@ class CacheManager:
                 logger.debug("Cache MISS para la clave: %s", key)
             return None
 
-    def set(self, key: str, value: Any, ttl: Optional[int] = None):
+    def set(self, key: str, value: Any, ttl: Optional[int] = None) -> None:
         """
         Almacena un valor en la caché con un TTL específico o el por defecto.
         """
-        ttl_to_use = ttl or self.default_ttl
-        expiry = time.time() + ttl_to_use
+        ttl_to_use=ttl or self.default_ttl
+        expiry=time.time() + ttl_to_use
 
         with self._lock:
             self._cache[key] = (value, expiry)
@@ -73,7 +73,7 @@ class CacheManager:
                 return True
             return False
 
-    def clear(self):
+    def clear(self) -> None:
         """
         Limpia toda la caché.
         """
@@ -93,11 +93,58 @@ class CacheManager:
         Obtiene estadísticas sobre el estado actual de la caché.
         """
         with self._lock:
-            total_entries = len(self._cache)
+            total_entries=len(self._cache)
             # Clean up expired entries first to get accurate stats
-            expired_count = self._cleanup_expired_without_lock()
-            active_entries = total_entries - expired_count
-            size_bytes = self._size_in_bytes_without_lock()
+            expired_count=self._cleanup_expired_without_lock()
+            active_entries=total_entries - expired_count
+            size_bytes=self._size_in_bytes_without_lock()
+
+            return {
+                "total_entries": total_entries,
+                "active_entries": active_entries,
+                "expired_entries": expired_count,
+                "estimated_size_bytes": size_bytes,
+            }
+        logger.debug(
+            "Cache SET para la clave: %s con un TTL de %d segundos.", key, ttl_to_use
+        )
+
+    def delete(self, key: str) -> bool:
+        """
+        Elimina una clave de la caché.
+        """
+        with self._lock:
+            if key in self._cache:
+                del self._cache[key]
+                logger.debug("Cache DELETE para la clave: %s", key)
+                return True
+            return False
+
+    def clear(self) -> None:
+        """
+        Limpia toda la caché.
+        """
+        with self._lock:
+            self._cache.clear()
+        logger.info("Caché limpiada completamente.")
+
+    def cleanup_expired(self) -> int:
+        """
+        Elimina todas las entradas expiradas de la caché.
+        """
+        with self._lock:
+            return self._cleanup_expired_without_lock()
+
+    def get_stats(self) -> Dict[str, int]:
+        """
+        Obtiene estadísticas sobre el estado actual de la caché.
+        """
+        with self._lock:
+            total_entries=len(self._cache)
+            # Clean up expired entries first to get accurate stats
+            expired_count=self._cleanup_expired_without_lock()
+            active_entries=total_entries - expired_count
+            size_bytes=self._size_in_bytes_without_lock()
 
             return {
                 "total_entries": total_entries,
@@ -111,8 +158,8 @@ class CacheManager:
         Versión interna de cleanup_expired que no adquiere el lock.
         Debe ser llamada solo desde métodos que ya tienen el lock.
         """
-        current_time = time.time()
-        expired_keys = [
+        current_time=time.time()
+        expired_keys=[
             key for key, (_, expiry) in self._cache.items() if current_time >= expiry
         ]
 
@@ -141,7 +188,7 @@ class CacheManager:
         """
         # sys.getsizeof no es recursivo, por lo que esto es una estimación.
         # Suma el tamaño del diccionario y una estimación del tamaño de sus contenidos.
-        size = sys.getsizeof(self._cache)
+        size=sys.getsizeof(self._cache)
         for key, (value, _) in self._cache.items():
             size += sys.getsizeof(key)
             size += sys.getsizeof(value)
@@ -149,4 +196,4 @@ class CacheManager:
 
 
 # Instancia global del gestor de caché para ser usada en la aplicación.
-cache_manager = CacheManager()
+cache_manager=CacheManager()

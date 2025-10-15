@@ -29,7 +29,7 @@ except ImportError:
 
 from .vertex_ai import vertex_config
 
-logger = logging.getLogger(__name__)
+logger=logging.getLogger(__name__)
 
 
 class VertexAIClient:
@@ -40,7 +40,7 @@ class VertexAIClient:
     la conmutación automática entre Vertex AI y la API de Gemini si es necesario.
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Inicializa el cliente y sus atributos de estado."""
         self.config = vertex_config
         self.initialized: bool = False
@@ -141,7 +141,7 @@ class VertexAIClient:
     def _initialize_gemini_api(self) -> bool:
         """Inicializa el cliente de la API de Gemini."""
         try:
-            api_key = os.getenv("GOOGLE_API_KEY") or os.getenv("GEMINI_API_KEY")
+            api_key=os.getenv("GOOGLE_API_KEY") or os.getenv("GEMINI_API_KEY")
             if not api_key:
                 logger.warning(
                     "⚠️ No se encontró la API key para Gemini (GEMINI_API_KEY o GOOGLE_API_KEY)."
@@ -185,7 +185,7 @@ class VertexAIClient:
         self._reset_daily_limits()
 
         # Verificar límite de costo diario
-        estimated_cost = self.config.estimate_cost(estimated_tokens, 0, model_type)
+        estimated_cost=self.config.estimate_cost(estimated_tokens, 0, model_type)
         if self.daily_cost + estimated_cost > self.config.limits["max_daily_cost"]:
             return (
                 False,
@@ -213,7 +213,7 @@ class VertexAIClient:
             int: Número estimado de tokens
         """
         # Estimación simple: ~1.3 tokens por palabra
-        words = len(text.split())
+        words=len(text.split())
         return int(words * 1.3)
 
     def _update_metrics(
@@ -223,7 +223,7 @@ class VertexAIClient:
         cost: float,
         response_time: float,
         success: bool,
-    ) -> None:
+    ) -> dict[str, Any]:
         """Actualizar métricas de uso.
 
         Args:
@@ -279,14 +279,14 @@ class VertexAIClient:
         if not self.initialized or model_type not in self.models:
             raise Exception(f"Modelo {model_type} no disponible")
 
-        model = self.models[model_type]
-        model_info = self.config.get_model_info(model_type)
+        model=self.models[model_type]
+        model_info=self.config.get_model_info(model_type)
 
         if model_info is None:
             raise Exception(f"Información del modelo {model_type} no disponible")
 
         # Configurar generación
-        generation_config = GenerationConfig(
+        generation_config=GenerationConfig(
             max_output_tokens=min(max_tokens, model_info["max_tokens"]),
             temperature=temperature,
             top_p=kwargs.get("top_p", 0.8),
@@ -294,19 +294,19 @@ class VertexAIClient:
         )
 
         # Generar respuesta
-        start_time = time.time()
-        response = await model.generate_content_async(
+        start_time=time.time()
+        response=await model.generate_content_async(
             prompt, generation_config=generation_config
         )
-        response_time = time.time() - start_time
+        response_time=time.time() - start_time
 
         # Procesar respuesta
-        response_text = response.text if response.text else ""
+        response_text=response.text if response.text else ""
 
         # Calcular métricas
-        input_tokens = self._estimate_tokens(prompt)
-        output_tokens = self._estimate_tokens(response_text)
-        cost = self.config.estimate_cost(input_tokens, output_tokens, model_type)
+        input_tokens=self._estimate_tokens(prompt)
+        output_tokens=self._estimate_tokens(response_text)
+        cost=self.config.estimate_cost(input_tokens, output_tokens, model_type)
 
         return {
             "response": response_text,
@@ -339,25 +339,25 @@ class VertexAIClient:
             raise Exception("Gemini API no disponible")
 
         # Configurar generación
-        generation_config = {
+        generation_config={
             "max_output_tokens": max_tokens,
             "temperature": temperature,
         }
 
         # Generar respuesta
-        start_time = time.time()
-        response = await self.gemini_client.generate_content_async(
+        start_time=time.time()
+        response=await self.gemini_client.generate_content_async(
             prompt, generation_config=generation_config
         )
-        response_time = time.time() - start_time
+        response_time=time.time() - start_time
 
         # Procesar respuesta
-        response_text = response.text if response.text else ""
+        response_text=response.text if response.text else ""
 
         # Calcular métricas (estimación para Gemini API)
-        input_tokens = self._estimate_tokens(prompt)
-        output_tokens = self._estimate_tokens(response_text)
-        cost = 0.0  # Gemini API gratuita
+        input_tokens=self._estimate_tokens(prompt)
+        output_tokens=self._estimate_tokens(response_text)
+        cost=0.0  # Gemini API gratuita
 
         return {
             "response": response_text,
@@ -399,7 +399,7 @@ class VertexAIClient:
             raise Exception("No hay clientes de IA disponibles")
 
         # Estimar tokens y verificar límites
-        estimated_tokens = self._estimate_tokens(prompt) + max_tokens
+        estimated_tokens=self._estimate_tokens(prompt) + max_tokens
         can_proceed, reason = self._check_limits(estimated_tokens, model_type)
 
         if not can_proceed:
@@ -416,7 +416,7 @@ class VertexAIClient:
         # Intentar con Vertex AI primero
         if self.initialized and not self.fallback_active:
             try:
-                result = await self._generate_with_vertex_ai(
+                result=await self._generate_with_vertex_ai(
                     prompt, model_type, max_tokens, temperature, **kwargs
                 )
                 self._update_metrics(
@@ -436,7 +436,7 @@ class VertexAIClient:
         # Usar Gemini API como fallback
         if self.gemini_client:
             try:
-                result = await self._generate_with_gemini_api(
+                result=await self._generate_with_gemini_api(
                     prompt, max_tokens, temperature, **kwargs
                 )
                 self._update_metrics(
@@ -471,7 +471,7 @@ class VertexAIClient:
 
         def run_async():
             # Crear un nuevo loop de eventos en un hilo separado
-            new_loop = asyncio.new_event_loop()
+            new_loop=asyncio.new_event_loop()
             asyncio.set_event_loop(new_loop)
             try:
                 return new_loop.run_until_complete(
@@ -486,7 +486,7 @@ class VertexAIClient:
 
         # Ejecutar siempre en un hilo separado para evitar conflictos
         with concurrent.futures.ThreadPoolExecutor() as executor:
-            future = executor.submit(run_async)
+            future=executor.submit(run_async)
             try:
                 return future.result(timeout=120)  # 2 minutos de timeout
             except Exception as e:
@@ -539,14 +539,14 @@ class VertexAIClient:
         Returns:
             Dict con estado de salud
         """
-        current_time = time.time()
+        current_time=time.time()
 
         # Solo hacer health check cada cierto intervalo
         if current_time - self.last_health_check < self.health_check_interval:
             return {"status": "cached", "healthy": self.is_healthy}
 
         self.last_health_check = current_time
-        health_status = {
+        health_status={
             "timestamp": datetime.now().isoformat(),
             "vertex_ai": {"available": False, "error": None},
             "gemini_api": {"available": False, "error": None},
@@ -583,4 +583,4 @@ class VertexAIClient:
 
 
 # Instancia global del cliente
-vertex_client = VertexAIClient()
+vertex_client=VertexAIClient()

@@ -1,4 +1,5 @@
 import os
+from typing import Any, Optional
 
 from flask import Flask
 from flask_babel import Babel
@@ -12,11 +13,11 @@ from app.main import main as main_blueprint
 from app.utils.translation_utils import register_translation_functions
 
 
-def create_app(config_class=DevelopmentConfig):
+def create_app(config_class=DevelopmentConfig) -> None:
     """
     Fábrica de aplicaciones para crear y configurar la instancia de la aplicación Flask.
     """
-    app = Flask(
+    app=Flask(
         __name__,
         template_folder=os.path.join(
             os.path.dirname(os.path.abspath(__file__)), "..", "templates"
@@ -40,12 +41,12 @@ def create_app(config_class=DevelopmentConfig):
     migrate.init_app(app, db)
     socketio.init_app(app, cors_allowed_origins="*", async_mode="threading")
 
-    def get_locale():
+    def get_locale() -> None:
         # Aquí puedes añadir lógica para seleccionar el idioma, por ejemplo, desde la sesión del usuario
         # o una cabecera HTTP. Por ahora, se fija a 'es'.
         return "es"
 
-    _ = Babel(app, locale_selector=get_locale)
+    _=Babel(app, locale_selector=get_locale)
 
     # Registrar blueprints
     app.register_blueprint(main_blueprint)
@@ -77,7 +78,7 @@ def create_app(config_class=DevelopmentConfig):
     return app, socketio
 
 
-def get_flask_app(config_class=DevelopmentConfig):
+def get_flask_app(config_class=DevelopmentConfig) -> None:
     """
     Devuelve solo la instancia Flask para pruebas (pytest, Flask test client).
     Acepta tanto clases de configuración como nombres de configuración (string).
@@ -86,7 +87,7 @@ def get_flask_app(config_class=DevelopmentConfig):
     if isinstance(config_class, str):
         from app.config.settings import config
 
-        config_class = config.get(config_class, DevelopmentConfig)
+        config_class=config.get(config_class, DevelopmentConfig)
 
     app, _ = create_app(config_class)
     return app

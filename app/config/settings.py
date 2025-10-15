@@ -2,9 +2,10 @@ import logging
 import os
 from datetime import timedelta
 from pathlib import Path
+from typing import Any, Optional
 
 # Configuración del logger
-logger = logging.getLogger(__name__)
+logger=logging.getLogger(__name__)
 
 # Directorio base del proyecto
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -60,7 +61,7 @@ class Config:
     JWT_ACCESS_TOKEN_EXPIRES: timedelta = timedelta(hours=1)
 
     @staticmethod
-    def init_app(app):
+    def init_app(app) -> None:
         """Método para inicializaciones específicas de la app."""
         pass
 
@@ -111,7 +112,7 @@ class ProductionConfig(Config):
     SESSION_COOKIE_SECURE: bool = True
     SESSION_COOKIE_SAMESITE: str = "Strict"
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Asegura que las variables críticas de entorno estén definidas en producción."""
         super().__init__()
         if not self.SECRET_KEY:

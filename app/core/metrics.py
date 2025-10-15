@@ -10,7 +10,7 @@ from typing import Any, Deque, Dict, List
 
 from flask import Blueprint, Response, current_app
 
-logger = logging.getLogger(__name__)
+logger=logging.getLogger(__name__)
 
 
 class MetricsManager:
@@ -18,7 +18,7 @@ class MetricsManager:
     Gestor de métricas de rendimiento, thread-safe, para monitoreo de la aplicación.
     """
 
-    def __init__(self, max_history: int = 1000):
+    def __init__(self, max_history: int = 1000) -> dict[str, Any]:
         """
         Inicializa el gestor de métricas.
 
@@ -38,22 +38,22 @@ class MetricsManager:
             max_history,
         )
 
-    def increment_counter(self, name: str, value: int = 1):
+    def increment_counter(self, name: str, value: int = 1) -> dict[str, Any]:
         """Incrementa un contador específico."""
         with self._lock:
             self.counters[name] += value
 
-    def record_response_time(self, duration: float):
+    def record_response_time(self, duration: float) -> dict[str, Any]:
         """Registra la duración de una respuesta."""
         with self._lock:
             self.response_times.append(duration)
 
-    def record_request(self, endpoint: str, method: str, status_code: int):
+    def record_request(self, endpoint: str, method: str, status_code: int) -> dict[str, Any]:
         """
         Registra una solicitud entrante y actualiza los contadores relacionados.
         """
         with self._lock:
-            timestamp = time.time()
+            timestamp=time.time()
             self.request_history.append(
                 {
                     "timestamp": timestamp,
@@ -72,20 +72,20 @@ class MetricsManager:
         Obtiene un diccionario con todas las métricas actuales.
         """
         with self._lock:
-            current_time = time.time()
-            uptime = current_time - self.start_time
+            current_time=time.time()
+            uptime=current_time - self.start_time
 
-            response_stats = {}
+            response_stats: dict[str, Any] = {}
             if self.response_times:
-                times = list(self.response_times)
-                response_stats = {
+                times=list(self.response_times)
+                response_stats={
                     "avg_seconds": sum(times) / len(times),
                     "min_seconds": min(times),
                     "max_seconds": max(times),
                     "count": len(times),
                 }
 
-            recent_requests = [
+            recent_requests=[
                 req
                 for req in self.request_history
                 if current_time - req["timestamp"] <= 60
@@ -100,7 +100,7 @@ class MetricsManager:
                 "timestamp": current_time,
             }
 
-    def reset_metrics(self):
+    def reset_metrics(self) -> None:
         """Reinicia todas las métricas a su estado inicial."""
         with self._lock:
             self.counters.clear()
@@ -111,10 +111,10 @@ class MetricsManager:
 
 
 # Instancia global del gestor de métricas
-metrics_manager = MetricsManager()
+metrics_manager=MetricsManager()
 
 # Blueprint para el endpoint de métricas
-metrics_bp = Blueprint("metrics", __name__)
+metrics_bp=Blueprint("metrics", __name__)
 
 
 def _format_prometheus_metric(
@@ -125,15 +125,15 @@ def _format_prometheus_metric(
     labels: Dict[str, str] = None,
 ) -> str:
     """Formatea una métrica individual para la salida de Prometheus."""
-    label_str = ""
+    label_str: str = ""
     if labels:
-        label_str = "{" + ",".join([f'{k}="{v}"' for k, v in labels.items()]) + "}"
+        label_str: str = "{" + ",".join([f'{k}="{v}"' for k, v in labels.items()]) + "}"
 
     return f"# HELP {name} {help_text}\n# TYPE {name} {metric_type}\n{name}{label_str} {value}\n"
 
 
 @metrics_bp.route("/metrics")
-def prometheus_metrics():
+def prometheus_metrics() -> None:
     """
     Endpoint que expone las métricas en un formato compatible con Prometheus.
     """
@@ -143,7 +143,7 @@ def prometheus_metrics():
             "Métricas deshabilitadas en modo de prueba.", mimetype="text/plain"
         )
 
-    metrics = metrics_manager.get_metrics()
+    metrics=metrics_manager.get_metrics()
     output: List[str] = []
 
     # Uptime
@@ -166,7 +166,7 @@ def prometheus_metrics():
 
     # Estadísticas de tiempo de respuesta
     if "response_time_stats" in metrics and metrics["response_time_stats"]:
-        stats = metrics["response_time_stats"]
+        stats=metrics["response_time_stats"]
         output.append(
             _format_prometheus_metric(
                 "gemini_response_time_avg_seconds",

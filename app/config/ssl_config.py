@@ -1,3 +1,4 @@
+from typing import Any, Optional
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
@@ -22,13 +23,13 @@ from cryptography.hazmat.primitives.asymmetric import rsa
 from cryptography.x509.oid import NameOID
 
 # Configuración del logger
-logger = logging.getLogger(__name__)
+logger=logging.getLogger(__name__)
 
 
 class SSLConfig:
     """Configuración SSL/TLS empresarial."""
 
-    def __init__(self, base_dir: Path):
+    def __init__(self, base_dir: Path) -> None:
         """
         Inicializa la configuración SSL.
 
@@ -72,10 +73,10 @@ class SSLConfig:
             logger.exception("❌ Error crítico al generar los certificados SSL.")
             return None, None
 
-    def _create_ca_certificate(self):
+    def _create_ca_certificate(self) -> None:
         """Crear certificado de autoridad certificadora (CA)."""
-        ca_key = rsa.generate_private_key(public_exponent=65537, key_size=4096)
-        ca_name = x509.Name(
+        ca_key=rsa.generate_private_key(public_exponent=65537, key_size=4096)
+        ca_name=x509.Name(
             [
                 x509.NameAttribute(NameOID.COUNTRY_NAME, "ES"),
                 x509.NameAttribute(NameOID.STATE_OR_PROVINCE_NAME, "Madrid"),
@@ -87,7 +88,7 @@ class SSLConfig:
                 x509.NameAttribute(NameOID.COMMON_NAME, "Gemini AI Chatbot Root CA"),
             ]
         )
-        ca_cert = (
+        ca_cert=(
             x509.CertificateBuilder()
             .subject_name(ca_name)
             .issuer_name(ca_name)
@@ -136,15 +137,15 @@ class SSLConfig:
         with open(self.ca_cert_file, "wb") as f:
             f.write(ca_cert.public_bytes(serialization.Encoding.PEM))
 
-    def _create_server_certificate(self):
+    def _create_server_certificate(self) -> None:
         """Crear certificado del servidor firmado por CA."""
         with open(self.ca_key_file, "rb") as f:
-            ca_key = serialization.load_pem_private_key(f.read(), password=None)
+            ca_key=serialization.load_pem_private_key(f.read(), password=None)
         with open(self.ca_cert_file, "rb") as f:
-            ca_cert = x509.load_pem_x509_certificate(f.read())
+            ca_cert=x509.load_pem_x509_certificate(f.read())
 
-        server_key = rsa.generate_private_key(public_exponent=65537, key_size=4096)
-        server_name = x509.Name(
+        server_key=rsa.generate_private_key(public_exponent=65537, key_size=4096)
+        server_name=x509.Name(
             [
                 x509.NameAttribute(NameOID.COUNTRY_NAME, "ES"),
                 x509.NameAttribute(NameOID.STATE_OR_PROVINCE_NAME, "Madrid"),
@@ -154,7 +155,7 @@ class SSLConfig:
                 x509.NameAttribute(NameOID.COMMON_NAME, "localhost"),
             ]
         )
-        server_cert = (
+        server_cert=(
             x509.CertificateBuilder()
             .subject_name(server_name)
             .issuer_name(ca_cert.subject)
@@ -213,11 +214,11 @@ class SSLConfig:
         with open(self.cert_file, "wb") as f:
             f.write(server_cert.public_bytes(serialization.Encoding.PEM))
 
-    def get_ssl_context(self):
+    def get_ssl_context(self) -> None:
         """Obtener contexto SSL configurado para Flask."""
         if not self.cert_file.exists() or not self.key_file.exists():
             self.create_ssl_certificates()
-        context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
+        context=ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
         context.load_cert_chain(str(self.cert_file), str(self.key_file))
         context.set_ciphers(
             "ECDHE+AESGCM:ECDHE+CHACHA20:DHE+AESGCM:DHE+CHACHA20:!aNULL:!MD5:!DSS"
@@ -228,14 +229,14 @@ class SSLConfig:
         context.options |= ssl.OP_SINGLE_DH_USE | ssl.OP_SINGLE_ECDH_USE
         return context
 
-    def validate_certificates(self):
+    def validate_certificates(self) -> None:
         """Validar certificados SSL existentes."""
         if not self.cert_file.exists() or not self.key_file.exists():
             return False, "Certificados no encontrados"
         try:
             with open(self.cert_file, "rb") as f:
-                cert = x509.load_pem_x509_certificate(f.read())
-            now = datetime.now(timezone.utc).replace(tzinfo=None)
+                cert=x509.load_pem_x509_certificate(f.read())
+            now=datetime.now(timezone.utc).replace(tzinfo=None)
             if now < cert.not_valid_before_utc.replace(tzinfo=None):
                 return False, "Certificado aún no válido"
             if now > cert.not_valid_after_utc.replace(tzinfo=None):
@@ -249,13 +250,13 @@ class SSLConfig:
         except Exception as e:
             return False, f"Error validando certificados: {e}"
 
-    def get_certificate_info(self):
+    def get_certificate_info(self) -> Any:
         """Obtener información de los certificados."""
         if not self.cert_file.exists():
             return None
         try:
             with open(self.cert_file, "rb") as f:
-                cert = x509.load_pem_x509_certificate(f.read())
+                cert=x509.load_pem_x509_certificate(f.read())
             return {
                 "subject": cert.subject.rfc4514_string(),
                 "issuer": cert.issuer.rfc4514_string(),
@@ -271,20 +272,20 @@ class SSLConfig:
 
 
 # Configuración SSL global
-ssl_config = SSLConfig(base_dir=Path(__file__).parent.parent)
+ssl_config=SSLConfig(base_dir=Path(__file__).parent.parent)
 
 
-def create_ssl_certificates(force_recreate=False):
+def create_ssl_certificates(force_recreate=False) -> None:
     """Función de conveniencia para crear certificados SSL."""
     return ssl_config.create_ssl_certificates(force_recreate)
 
 
-def get_ssl_context():
+def get_ssl_context() -> None:
     """Función de conveniencia para obtener contexto SSL."""
     return ssl_config.get_ssl_context()
 
 
-def validate_ssl_certificates():
+def validate_ssl_certificates() -> None:
     """Función de conveniencia para validar certificados."""
     return ssl_config.validate_certificates()
 
@@ -324,7 +325,7 @@ if __name__ == "__main__":
         print(f"Clave privada: {key_file}")
 
         # Mostrar información de certificados
-        info = ssl_config.get_certificate_info()
+        info=ssl_config.get_certificate_info()
         if info:
             print("\n📋 Información del certificado:")
             for key, value in info.items():
