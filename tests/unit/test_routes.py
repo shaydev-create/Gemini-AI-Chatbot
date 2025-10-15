@@ -129,15 +129,18 @@ def test_chat_api_unauthorized(client):
 
 def test_send_message_success(client, app):
     """Prueba el envío de un mensaje exitoso a /api/chat/send."""
-
-    # Configure the mock that was set up in the app fixture
-    mock_gemini_service = app.config.get("GEMINI_SERVICE")
-    mock_gemini_service.generate_response.return_value = "Hola, soy Gemini."
-
-    response = client.post("/api/chat/send", json={"message": "Hola"})
-    assert response.status_code == 200
-    assert response.json["response"] == "Hola, soy Gemini."
-    assert "session_id" in response.json
+    
+    # Configurar el mock del servicio en la configuración de la app
+    from unittest.mock import MagicMock
+    mock_service = MagicMock()
+    mock_service.generate_response.return_value = "Hola, soy Gemini."
+    
+    with app.test_request_context():
+        app.config["GEMINI_SERVICE"] = mock_service
+        response = client.post("/api/chat/send", json={"message": "Hola"})
+        assert response.status_code == 200
+        assert response.json["response"] == "Hola, soy Gemini."
+        assert "session_id" in response.json
 
 
 def test_send_message_missing_data(client):
@@ -168,16 +171,17 @@ def test_send_message_too_long(client):
 def test_send_message_internal_error(client, app):
     """Prueba el manejo de un error interno en /api/chat/send."""
 
-    # Configure the mock to raise an exception
-    async def mock_generate_response_error(*args, **kwargs):
-        raise Exception("Internal Error")
-
-    app.gemini_service.generate_response = mock_generate_response_error
-
-    response = client.post("/api/chat/send", json={"message": "Hola"})
-    assert response.status_code == 500
-    assert "message" in response.json
-    assert "Error interno al procesar la solicitud." in response.json["message"]
+    # Configurar el mock del servicio para que lance una excepción
+    from unittest.mock import MagicMock
+    mock_service = MagicMock()
+    mock_service.generate_response.side_effect = Exception("Internal Error")
+    
+    with app.test_request_context():
+        app.config["GEMINI_SERVICE"] = mock_service
+        response = client.post("/api/chat/send", json={"message": "Hola"})
+        assert response.status_code == 500
+        assert "message" in response.json
+        assert "Error interno al procesar la solicitud." in response.json["message"]
 
 
 def test_upload_authorized(client):

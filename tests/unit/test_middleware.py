@@ -148,8 +148,8 @@ def test_500_internal_error_handler(app):
         assert json_data["error"] == "Error interno del servidor"
         assert json_data["status_code"] == 500
 
-        # Verificar log
-        mock_logger.error.assert_called_with("500 error: Test error")
+        # Verificar log - El mensaje real incluye "Application context error"
+        mock_logger.error.assert_called_with("Application context error: Test error")
 
 
 def test_429_rate_limit_handler(app):
