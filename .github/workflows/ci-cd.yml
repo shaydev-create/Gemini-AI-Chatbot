@@ -1,540 +1,175 @@
-name: CI/CD Pipeline# 🚀 CI/CD Pipeline Optimizado# 🚀 CI/CD Pipeline Optimizado
-
-
+name: 🚀 CI/CD Pipeline Optimizado
 
 on:
-
   push:
-
-    branches: [ main, develop ]name: 🚀 CI/CD Pipelinename: 🚀 CI/CD Pipeline
-
+    branches: [ main, develop ]
   pull_request:
-
     branches: [ main ]
-
   release:
+    types: [ published ]
 
-    types: [ published ]on:on:
-
-
-
-env:  push:  push:
-
+env:
   PYTHON_DEV_VERSION: '3.11'
-
-  PYTHON_PROD_VERSION: '3.12'    branches: [ main, develop ]    branches: [ main, develop ]
-
+  PYTHON_PROD_VERSION: '3.12'
   NODE_VERSION: '18'
-
-  pull_request:  pull_request:
+  SSL_CERT_FILE: "/etc/ssl/certs/ca-certificates.crt"
 
 jobs:
-
-  test:    branches: [ main ]    branches: [ main ]
-
-    name: Test Python ${{ matrix.python-version }}
-
-    runs-on: ubuntu-latest  release:  release:
-
+  test-matrix:
+    name: 🧪 Test Python ${{ matrix.python-version }}
+    runs-on: ubuntu-latest
     timeout-minutes: 15
-
-    strategy:    types: [ published ]    types: [ published ]
-
+    strategy:
       fail-fast: false
-
       matrix:
-
         python-version: ['3.11', '3.12', '3.13']
-
-        include:env:env:
-
+        include:
           - python-version: '3.11'
-
-            test-type: 'development'  PYTHON_DEV_VERSION: '3.11'  PYTHON_DEV_VERSION: '3.11'
-
+            test-type: 'development'
             coverage: false
-
-          - python-version: '3.12'  PYTHON_PROD_VERSION: '3.12'  PYTHON_PROD_VERSION: '3.12'
-
+          - python-version: '3.12'
             test-type: 'production'
-
-            coverage: true  NODE_VERSION: '18'  NODE_VERSION: '18'
-
+            coverage: true
           - python-version: '3.13'
-
-            test-type: 'latest'  SSL_CERT_FILE: "/etc/ssl/certs/ca-certificates.crt"
-
+            test-type: 'latest'
             coverage: false
-
-    jobs:
-
     steps:
-
-      - name: Checkout code  test:jobs:
-
+      - name: 📥 Checkout code
         uses: actions/checkout@v4
 
-    name: 🧪 Test Python ${{ matrix.python-version }}  test:
-
-      - name: Set up Python ${{ matrix.python-version }}
-
-        uses: actions/setup-python@v4    runs-on: ubuntu-latest    name: 🧪 Test Python ${{ matrix.python-version }}
-
+      - name: 🔧 Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
         with:
+          python-version: ${{ matrix.python-version }}
 
-          python-version: ${{ matrix.python-version }}    timeout-minutes: 15    runs-on: ubuntu-latest
-
-      
-
-      - name: Cache Poetry dependencies    strategy:    timeout-minutes: 15
-
+      - name: 📦 Cache Poetry dependencies
         uses: actions/cache@v3
-
-        with:      fail-fast: false    strategy:
-
+        with:
           path: |
-
-            ~/.cache/pypoetry      matrix:      fail-fast: false
-
+            ~/.cache/pypoetry
             .venv
-
-          key: ${{ runner.os }}-poetry-${{ matrix.python-version }}-${{ hashFiles('**/poetry.lock') }}        python-version: ['3.11', '3.12', '3.13']      matrix:
-
+          key: ${{ runner.os }}-poetry-${{ matrix.python-version }}-${{ hashFiles('**/poetry.lock') }}
           restore-keys: |
-
-            ${{ runner.os }}-poetry-${{ matrix.python-version }}-        include:        python-version: ['3.11', '3.12', '3.13']
-
+            ${{ runner.os }}-poetry-${{ matrix.python-version }}-
             ${{ runner.os }}-poetry-
 
-                - python-version: '3.11'        include:
-
-      - name: Install Poetry
-
-        uses: snok/install-poetry@v1            test-type: 'development'          - python-version: '3.11'
-
+      - name: 🎨 Install Poetry
+        uses: snok/install-poetry@v1
         with:
-
-          version: latest            coverage: false            test-type: 'development'
-
+          version: latest
           virtualenvs-create: true
+          virtualenvs-in-project: true
 
-          virtualenvs-in-project: true          - python-version: '3.12'            coverage: false
-
-      
-
-      - name: Install dependencies            test-type: 'production'          - python-version: '3.12'
-
+      - name: 📋 Install dependencies
         run: poetry install --with dev --no-interaction --no-ansi
 
-                  coverage: true            test-type: 'production'
+      - name: 🔧 Format check
+        run: poetry run ruff format --check app/ tests/ --quiet
 
-      - name: Format check
-
-        run: poetry run ruff format --check app/ tests/ --quiet          - python-version: '3.13'            coverage: true
-
-      
-
-      - name: Lint check            test-type: 'latest'          - python-version: '3.13'
-
+      - name: 🔍 Lint check
         run: poetry run ruff check app/ tests/ --select=E,W,F --quiet
 
-                  coverage: false            test-type: 'latest'
+      - name: 🧪 Run tests
+        run: poetry run pytest tests/ -v --tb=short --maxfail=3
 
-      - name: Run tests
-
-        run: poetry run pytest tests/ -v --tb=short --maxfail=3                coverage: false
-
-      
-
-      - name: Run tests with coverage    steps:    
-
+      - name: 📊 Run tests with coverage (Production only)
         if: matrix.coverage == true
+        run: poetry run pytest tests/ -v --cov=app --cov-report=xml --cov-report=term
 
-        run: poetry run pytest tests/ -v --cov=app --cov-report=xml --cov-report=term      - name: 📥 Checkout code    steps:
-
-      
-
-      - name: Upload coverage to Codecov        uses: actions/checkout@v4      - name: 📥 Checkout code
-
+      - name: 📤 Upload coverage to Codecov (Production only)
         if: matrix.coverage == true
-
-        uses: codecov/codecov-action@v4        uses: actions/checkout@v4
-
+        uses: codecov/codecov-action@v4
         with:
-
-          file: ./coverage.xml      - name: 🔧 Set up Python ${{ matrix.python-version }}
-
+          file: ./coverage.xml
           flags: unittests
-
-          name: codecov-umbrella        uses: actions/setup-python@v4      - name: 🔧 Set up Python ${{ matrix.python-version }}
-
+          name: codecov-umbrella
         continue-on-error: true
 
-        with:        uses: actions/setup-python@v4
-
   security:
-
-    name: Security Scan          python-version: ${{ matrix.python-version }}        with:
-
+    name: 🔒 Security Scan
     runs-on: ubuntu-latest
-
-    needs: [test]                python-version: ${{ matrix.python-version }}
-
+    needs: [test-matrix]
     if: github.ref == 'refs/heads/main'
-
-          - name: 📦 Cache Poetry dependencies      
-
     steps:
-
-      - name: Checkout code        uses: actions/cache@v3      - name: 🔒 Update CA certificates
-
+      - name: 📥 Checkout code
         uses: actions/checkout@v4
 
-              with:        run: |
-
-      - name: Set up Python
-
-        uses: actions/setup-python@v4          path: |          sudo apt-get update
-
-        with:
-
-          python-version: '3.12'            ~/.cache/pypoetry          sudo apt-get install -y ca-certificates
-
-      
-
-      - name: Install Poetry            .venv          sudo update-ca-certificates
-
-        uses: snok/install-poetry@v1
-
-                key: ${{ runner.os }}-poetry-${{ matrix.python-version }}-${{ hashFiles('**/poetry.lock') }}      
-
-      - name: Install dependencies
-
-        run: poetry install --with dev --no-interaction --no-ansi          restore-keys: |      - name: 📦 Upgrade pip and install certifi
-
-      
-
-      - name: Run Bandit security scan            ${{ runner.os }}-poetry-${{ matrix.python-version }}-        run: |
-
-        run: poetry run bandit -r app/ -f json -o bandit-report.json || true
-
-        continue-on-error: true            ${{ runner.os }}-poetry-          python -m pip install --upgrade pip setuptools wheel
-
-      
-
-      - name: Run Safety check                python -m pip install --upgrade certifi
-
-        run: poetry run safety check --json --output safety-report.json || true
-
-        continue-on-error: true      - name: 🎨 Install Poetry      
-
-
-
-  docker:        uses: snok/install-poetry@v1      - name: 📦 Cache Poetry dependencies
-
-    name: Docker Build
-
-    runs-on: ubuntu-latest        with:        uses: actions/cache@v3
-
-    needs: [test]
-
-    if: github.ref == 'refs/heads/main' || github.event_name == 'release'          version: latest        with:
-
-    
-
-    steps:          virtualenvs-create: true          path: ~/.cache/pypoetry
-
-      - name: Checkout code
-
-        uses: actions/checkout@v4          virtualenvs-in-project: true          key: ${{ runner.os }}-poetry-${{ hashFiles('**/poetry.lock') }}
-
-      
-
-      - name: Set up Docker Buildx                restore-keys: |
-
-        uses: docker/setup-buildx-action@v3
-
-            - name: 📥 Install dependencies            ${{ runner.os }}-poetry-
-
-      - name: Extract metadata
-
-        id: meta        run: poetry install --with dev --no-interaction --no-ansi      
-
-        uses: docker/metadata-action@v5
-
-        with:            - name: 🎨 Install Poetry
-
-          images: gemini-ai-chatbot
-
-          tags: |      - name: 🔧 Format check        uses: snok/install-poetry@v1
-
-            type=ref,event=branch
-
-            type=semver,pattern={{version}}        run: poetry run ruff format --check app/ tests/ --quiet        with:
-
-            type=raw,value=latest,enable={{is_default_branch}}
-
-                      version: latest
-
-      - name: Build Docker image
-
-        uses: docker/build-push-action@v5      - name: 🔍 Lint check          virtualenvs-create: true
-
-        with:
-
-          context: .        run: poetry run ruff check app/ tests/ --select=E,W,F --quiet          virtualenvs-in-project: true
-
-          file: ./Dockerfile
-
-          push: false            
-
-          tags: ${{ steps.meta.outputs.tags }}
-
-          labels: ${{ steps.meta.outputs.labels }}      - name: 🧪 Run tests      - name: 📥 Install dependencies
-
-          cache-from: type=gha
-
-          cache-to: type=gha,mode=max        run: poetry run pytest tests/ -v --tb=short --maxfail=3        run: poetry install --no-interaction
-
-
-
-  deploy-readiness:            
-
-    name: Deploy Readiness Check
-
-    runs-on: ubuntu-latest      - name: 📊 Run tests with coverage (Production only)      - name: 🧹 Run linting
-
-    needs: [test, security, docker]
-
-    if: github.ref == 'refs/heads/main'        if: matrix.coverage == true        run: poetry run ruff check app/ tests/ --select=E,W,F --quiet
-
-    
-
-    steps:        run: poetry run pytest tests/ -v --cov=app --cov-report=xml --cov-report=term      
-
-      - name: Deployment readiness verification
-
-        run: |            - name: 🧪 Run tests
-
-          echo "All tests passed"
-
-          echo "Security checks completed"      - name: 📤 Upload coverage to Codecov (Production only)        run: poetry run pytest -v tests/
-
-          echo "Docker image built successfully"
-
-          echo "Project ready for deployment"        if: matrix.coverage == true        with:
-
-
-        uses: codecov/codecov-action@v4          path: |
-
-        with:            ~/.cache/pypoetry
-
-          file: ./coverage.xml            .venv
-
-          flags: unittests          key: ${{ runner.os }}-poetry-${{ matrix.python-version }}-${{ hashFiles('**/poetry.lock') }}
-
-          name: codecov-umbrella          restore-keys: |
-
-        continue-on-error: true            ${{ runner.os }}-poetry-${{ matrix.python-version }}-
-
-            ${{ runner.os }}-poetry-
-
-  security:            
-
-    name: 🔒 Security Scan      - name: 📋 Install dependencies
-
-    runs-on: ubuntu-latest        run: |
-
-    needs: [test]          poetry install --with dev --no-interaction --no-ansi --no-root
-
-    if: github.ref == 'refs/heads/main'
-
-          - name: 🔧 Format check
-
-    steps:        run: poetry run ruff format --check app/ tests/ --quiet
-
-      - name: 📥 Checkout code
-
-        uses: actions/checkout@v4      - name: 🔍 Lint check
-
-              run: poetry run ruff check app/ tests/ --select=E,W,F --quiet
-
       - name: 🐍 Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.12'
 
-        uses: actions/setup-python@v4      - name: 🧪 Run basic tests (Python ${{ matrix.python-version }})
+      - name: 🎨 Install Poetry
+        uses: snok/install-poetry@v1
+        with:
+          version: latest
+          virtualenvs-create: true
+          virtualenvs-in-project: true
 
-        with:        run: |
+      - name: 📦 Cache Poetry dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/pypoetry
+          key: ${{ runner.os }}-poetry-security-${{ hashFiles('**/poetry.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-poetry-security-
 
-          python-version: '3.12'          APP_ENV=testing poetry run pytest tests/test_basic.py tests/test_main.py -v --tb=short --maxfail=3
+      - name: 📋 Install dependencies
+        run: poetry install --with dev --no-interaction --no-ansi
 
-                
-
-      - name: 📦 Install Poetry      - name: 🧪 Run full test suite (Python ${{ matrix.python-version }})
-
-        uses: snok/install-poetry@v1        if: matrix.coverage == true
-
-              run: |
-
-      - name: 📥 Install dependencies      - name: � Upload coverage to Codecov (Production only)
-
-        run: poetry install --with dev --no-interaction --no-ansi        if: matrix.coverage == true
-
-              uses: codecov/codecov-action@v4
-
-      - name: 🔍 Run Bandit security scan        with:
-
-        run: poetry run bandit -r app/ -f json -o bandit-report.json || true          file: ./coverage.xml
-
-        continue-on-error: true          flags: unittests
-
-                name: codecov-umbrella
+      - name: 🔍 Run Bandit security scan
+        run: poetry run bandit -r app/ -f json -o bandit-report.json || true
+        continue-on-error: true
 
       - name: 🔍 Run Safety check
+        run: poetry run safety check --json --output safety-report.json || true
+        continue-on-error: true
 
-        run: poetry run safety check --json --output safety-report.json || true  # 🔒 Security Scan (Solo en main)
+  docker:
+    name: 🐳 Docker Build
+    runs-on: ubuntu-latest
+    needs: [test-matrix]
+    if: github.ref == 'refs/heads/main' || github.event_name == 'release'
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
 
-        continue-on-error: true  security:
+      - name: 🐳 Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
 
-    name: 🔒 Security Scan
+      - name: 🏷️ Extract metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: gemini-ai-chatbot
+          tags: |
+            type=ref,event=branch
+            type=semver,pattern={{version}}
+            type=raw,value=latest,enable={{is_default_branch}}
 
-  docker:    runs-on: ubuntu-latest
+      - name: 🔨 Build Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./Dockerfile
+          push: false
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
 
-    name: 🐳 Docker Build    needs: [test-matrix]
-
-    runs-on: ubuntu-latest    if: github.ref == 'refs/heads/main'
-
-    needs: [test]    
-
-    if: github.ref == 'refs/heads/main' || github.event_name == 'release'    steps:
-
-        - name: 📥 Checkout code
-
-    steps:      uses: actions/checkout@v4
-
-      - name: 📥 Checkout code      
-
-        uses: actions/checkout@v4    - name: 🐍 Set up Python
-
-            uses: actions/setup-python@v5
-
-      - name: 🐳 Set up Docker Buildx      with:
-
-        uses: docker/setup-buildx-action@v3        python-version: '3.12'
-
-              
-
-      - name: 🏷️ Extract metadata    - name: 📦 Install Poetry
-
-        id: meta      uses: snok/install-poetry@v1
-
-        uses: docker/metadata-action@v5      
-
-        with:    - name: 📦 Cache Poetry dependencies
-
-          images: gemini-ai-chatbot      uses: actions/cache@v4
-
-          tags: |      with:
-
-            type=ref,event=branch        path: ~/.cache/pypoetry
-
-            type=semver,pattern={{version}}        key: ${{ runner.os }}-poetry-security-${{ hashFiles('**/poetry.lock') }}
-
-            type=raw,value=latest,enable={{is_default_branch}}        restore-keys: |
-
-                ${{ runner.os }}-poetry-security-
-
-      - name: 🔨 Build Docker image          
-
-        uses: docker/build-push-action@v5    - name: 📋 Install dependencies
-
-        with:      run: |
-
-          context: .        poetry install --with dev --no-interaction --no-ansi
-
-          file: ./Dockerfile        
-
-          push: false    - name: 🔍 Run Bandit security scan
-
-          tags: ${{ steps.meta.outputs.tags }}      run: poetry run bandit -r app/ -f json -o bandit-report.json || true
-
-          labels: ${{ steps.meta.outputs.labels }}        
-
-          cache-from: type=gha    - name: 🔍 Run Safety check
-
-          cache-to: type=gha,mode=max      run: poetry run safety check --json --output safety-report.json || true
-
-
-
-  deploy-readiness:  # 🐳 Docker Build (Solo en main y releases)
-
-    name: 🌟 Deploy Readiness Check  docker:
-
-    runs-on: ubuntu-latest    name: 🐳 Docker Build
-
-    needs: [test, security, docker]    runs-on: ubuntu-latest
-
-    if: github.ref == 'refs/heads/main'    needs: [test-matrix]
-
-        if: github.ref == 'refs/heads/main' || github.event_name == 'release'
-
-    steps:    
-
-      - name: 🌟 Deployment readiness verification    steps:
-
-        run: |    - name: 📥 Checkout code
-
-          echo "✅ All tests passed"      uses: actions/checkout@v4
-
-          echo "✅ Security checks completed"      
-
-          echo "✅ Docker image built successfully"    - name: 🐳 Set up Docker Buildx
-
-          echo "🚀 Project ready for deployment!"      uses: docker/setup-buildx-action@v3
-
-      
-    # Login to Docker Hub is optional and requires secrets to be configured
-    # - name: 🔑 Login to Docker Hub (optional)
-    #   if: ${{ secrets.DOCKER_USERNAME != '' && secrets.DOCKER_PASSWORD != '' }}
-    #   uses: docker/login-action@v3
-    #   with:
-    #     username: ${{ secrets.DOCKER_USERNAME }}
-    #     password: ${{ secrets.DOCKER_PASSWORD }}
-        
-    - name: 🏷️ Extract metadata
-      id: meta
-      uses: docker/metadata-action@v5
-      with:
-        images: gemini-ai-chatbot
-        tags: |
-          type=ref,event=branch
-          type=semver,pattern={{version}}
-          type=raw,value=latest,enable={{is_default_branch}}
-          
-    - name: 🔨 Build Docker image
-      uses: docker/build-push-action@v5
-      with:
-        context: .
-        file: ./Dockerfile
-        push: false
-        tags: ${{ steps.meta.outputs.tags }}
-        labels: ${{ steps.meta.outputs.labels }}
-        cache-from: type=gha
-        cache-to: type=gha,mode=max
-
-  # 🚀 Deploy Readiness Check
   deploy-readiness:
     name: 🌟 Deploy Readiness Check
     runs-on: ubuntu-latest
     needs: [test-matrix, security, docker]
     if: github.ref == 'refs/heads/main'
-    
     steps:
-    - name: 📥 Checkout code
-      uses: actions/checkout@v4
-      
-    - name: 🌟 Deployment readiness verification
-      run: |
-        echo "✅ All tests passed for Python 3.11 and 3.12"
-        echo "✅ Security checks completed"
-        echo "✅ Docker image built successfully"
-        echo "� Project ready for deployment!"
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 🌟 Deployment readiness verification
+        run: |
+          echo "✅ All tests passed for Python 3.11 and 3.12"
+          echo "✅ Security checks completed"
+          echo "✅ Docker image built successfully"
+          echo "🚀 Project ready for deployment!"
