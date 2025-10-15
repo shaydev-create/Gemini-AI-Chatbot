@@ -12,3 +12,13 @@ __author__: str = "Gemini AI Chatbot Team"
 db = SQLAlchemy()
 migrate = Migrate()
 socketio = SocketIO()
+
+# Entry point para Vercel
+from app.core.application import create_app
+
+# Crear la aplicación para Vercel
+app, socketio = create_app()
+
+# Para compatibilidad con Vercel
+if __name__ == "__main__":
+    app.run(debug=False)
