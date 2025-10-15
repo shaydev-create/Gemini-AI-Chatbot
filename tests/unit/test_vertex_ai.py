@@ -4,12 +4,12 @@ import os
 from unittest.mock import patch
 
 import pytest
-
-pytestmark = pytest.mark.asyncio
 from google.auth.exceptions import DefaultCredentialsError
 
 from app.config.vertex_ai import VertexAIConfig
 from app.config.vertex_client import VertexAIClient
+
+pytestmark = pytest.mark.asyncio
 
 
 class TestVertexAIConfig:

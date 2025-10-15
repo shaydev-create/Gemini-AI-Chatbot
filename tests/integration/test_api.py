@@ -232,12 +232,12 @@ class TestAPIIntegration:
             # Hacemos 60 peticiones que deberían ser exitosas.
             for i in range(60):
                 response = client.get(endpoint)
-                assert response.status_code == 200, (
-                    f"Request {i + 1} failed with status {response.status_code}, expected 200"
-                )
+                assert (
+                    response.status_code == 200
+                ), f"Request {i + 1} failed with status {response.status_code}, expected 200"
 
             # La petición 61 debería fallar con 429 Too Many Requests
             response = client.get(endpoint)
-            assert response.status_code == 429, (
-                f"Expected 429 Too Many Requests, got {response.status_code}"
-            )
+            assert (
+                response.status_code == 429
+            ), f"Expected 429 Too Many Requests, got {response.status_code}"

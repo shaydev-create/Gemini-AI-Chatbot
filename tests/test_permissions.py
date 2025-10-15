@@ -69,9 +69,9 @@ def test_role_permissions_structure():
     # Verificar que los permisos asignados existen en PERMISSIONS
     for role, permissions in ROLE_PERMISSIONS.items():
         for permission in permissions:
-            assert permission in PERMISSIONS, (
-                f"Permiso '{permission}' no existe en PERMISSIONS para rol '{role}'"
-            )
+            assert (
+                permission in PERMISSIONS
+            ), f"Permiso '{permission}' no existe en PERMISSIONS para rol '{role}'"
 
 
 def test_permissions_hierarchy():
