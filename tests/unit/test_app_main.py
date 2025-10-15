@@ -4,8 +4,8 @@ from unittest.mock import patch
 
 
 class TestAppMain(unittest.TestCase):
-    @patch("app.core.application.create_app")
-    def test_main_script_execution(self, mock_create_app):
+    @patch("app.core.application.get_flask_app")
+    def test_main_script_execution(self, mock_get_flask_app):
         """
         Prueba que el script principal `run.py` existe y tiene la estructura correcta.
         """
@@ -18,8 +18,9 @@ class TestAppMain(unittest.TestCase):
         assert "def main()" in content, "El archivo debe contener una función main()"
         assert 'if __name__ == "__main__"' in content, "El archivo debe ser ejecutable"
 
-        # Verificar que importa subprocess para ejecutar launch_app.py
-        assert "subprocess" in content, "El archivo debe usar subprocess para ejecutar launcher"
+        # Verificar que usa get_flask_app para importación directa
+        assert "from app.core.application import get_flask_app" in content, "El archivo debe importar get_flask_app"
+        assert "app.run(" in content, "El archivo debe ejecutar el servidor Flask directamente"
 
 
 if __name__ == "__main__":
