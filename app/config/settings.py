@@ -69,7 +69,8 @@ class DevelopmentConfig(Config):
     import secrets
 
     DEBUG: bool = True
-    SQLALCHEMY_DATABASE_URI: str = os.environ.get("DEV_DATABASE_URL") or "sqlite:///./fresh_gemini_dev.db"
+    # Usar base de datos en memoria para desarrollo para evitar problemas de corrupción
+    SQLALCHEMY_DATABASE_URI: str = os.environ.get("DEV_DATABASE_URL") or "sqlite:///:memory:"
 
     # En desarrollo, si no se define una SECRET_KEY, se genera una temporal.
     # Esto es conveniente para desarrollo local pero invalida las sesiones al reiniciar.
