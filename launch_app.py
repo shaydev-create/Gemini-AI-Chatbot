@@ -8,10 +8,10 @@ Script de lanzamiento mejorado que maneja dependencias problemáticas
 y proporciona un inicio más estable de la aplicación.
 """
 
-import os
-import sys
-import signal
 import atexit
+import os
+import signal
+import sys
 from pathlib import Path
 
 # Configurar la codificación para Windows
@@ -31,7 +31,7 @@ def setup_environment():
     project_root = Path(__file__).parent
     if str(project_root) not in sys.path:
         sys.path.insert(0, str(project_root))
-    
+
     # Configurar variables de entorno
     os.environ.setdefault("PYTHONPATH", str(project_root))
 
@@ -111,10 +111,10 @@ def main():
         port = 5000
         debug = True
 
-        safe_print(f"\n🚀 INICIANDO SERVIDOR")
+        safe_print("\n🚀 INICIANDO SERVIDOR")
         safe_print(f"   📍 URL: http://{host}:{port}")
         safe_print(f"   🔧 Debug: {debug}")
-        safe_print(f"   ⚡ SocketIO: Habilitado")
+        safe_print("   ⚡ SocketIO: Habilitado")
         safe_print("\n💡 Para detener la aplicación, presiona Ctrl+C")
         safe_print("=" * 50)
 

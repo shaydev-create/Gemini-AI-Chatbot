@@ -8,11 +8,10 @@ Script para limpiar, organizar y actualizar la documentación del proyecto.
 Elimina archivos obsoletos y mantiene solo lo esencial y actualizado.
 """
 
-import os
 import shutil
-from pathlib import Path
 from datetime import datetime
-from typing import Dict, List, Tuple
+from pathlib import Path
+from typing import Dict, List
 
 
 class DocumentationOrganizer:
@@ -263,7 +262,7 @@ python scripts/clean_project.py
             if file.is_file():
                 print(f"   📄 {file.name}")
 
-        print(f"\n📦 Archivo creado en: archive/")
+        print("\n📦 Archivo creado en: archive/")
         print("✅ Organización completada exitosamente!")
 
         return len(current_files), len(archived_files)
@@ -284,7 +283,7 @@ def main():
     organizer = DocumentationOrganizer(docs_path)
     current_count, archived_count = organizer.organize_all()
 
-    print(f"\n🎉 ¡Documentación organizada exitosamente!")
+    print("\n🎉 ¡Documentación organizada exitosamente!")
     print(f"📚 {current_count} documentos esenciales mantenidos")
     print(f"📦 {archived_count} documentos archivados")
 

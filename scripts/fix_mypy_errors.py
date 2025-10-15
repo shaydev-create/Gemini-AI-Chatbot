@@ -45,12 +45,12 @@ class MyPyErrorFixer:
             for imp in imports_needed:
                 if imp not in existing_imports:
                     new_imports += f", {imp}"
-            return re.sub(import_pattern, f"from typing import {, Optionalnew_imports}", content)
+            return re.sub(import_pattern, f"from typing import Optional{new_imports}", content)
         return content
 
     def _create_new_import(self, content: str, imports_needed: list[str]) -> str:
         """Crea una nueva línea de import de typing."""
-        import_line = f"from typing import {', '.joi, Optionaln(imports_needed)}\n"
+        import_line = f"from typing import {', '.join(imports_needed)}\n"
         lines = content.split("\n")
         insert_pos = self._find_import_position(lines)
         lines.insert(insert_pos, import_line)

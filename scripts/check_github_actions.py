@@ -8,7 +8,6 @@ Script para verificar el estado de las GitHub Actions y CI/CD.
 """
 
 import webbrowser
-import sys
 from datetime import datetime
 
 

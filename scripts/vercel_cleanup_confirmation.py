@@ -67,7 +67,7 @@ def verify_vercel_removal():
 
 def show_clean_project_status():
     """Muestra el estado del proyecto limpio."""
-    print(f"\n🎯 ESTADO DEL PROYECTO SIN VERCEL:")
+    print("\n🎯 ESTADO DEL PROYECTO SIN VERCEL:")
     print("=" * 40)
     print()
 

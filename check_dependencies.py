@@ -8,9 +8,9 @@ Script para diagnosticar problemas con las dependencias
 y verificar que todo esté correctamente instalado.
 """
 
-import sys
 import importlib
-from typing import Dict, List, Tuple
+import sys
+from typing import Tuple
 
 
 def check_import(module_name: str, description: str = "") -> Tuple[bool, str]:

@@ -8,9 +8,8 @@ Script para confirmar que el problema de Poetry ha sido
 solucionado definitivamente.
 """
 
-import subprocess
-import sys
 import os
+import subprocess
 from datetime import datetime
 
 
@@ -58,7 +57,7 @@ def check_poetry_configuration():
 
 def test_poetry_install():
     """Prueba la instalación con Poetry."""
-    print(f"\n🧪 PROBANDO INSTALACIÓN DE POETRY")
+    print("\n🧪 PROBANDO INSTALACIÓN DE POETRY")
     print("=" * 40)
     print()
 
@@ -96,7 +95,7 @@ def test_poetry_install():
 
 def check_github_ci_configuration():
     """Verifica la configuración de GitHub CI."""
-    print(f"\n🤖 VERIFICANDO CONFIGURACIÓN CI/CD")
+    print("\n🤖 VERIFICANDO CONFIGURACIÓN CI/CD")
     print("=" * 40)
     print()
 
@@ -136,7 +135,7 @@ def check_github_ci_configuration():
 
 def predict_ci_outcome():
     """Predice el resultado del CI basado en las verificaciones."""
-    print(f"\n🔮 PREDICCIÓN DE RESULTADO CI/CD")
+    print("\n🔮 PREDICCIÓN DE RESULTADO CI/CD")
     print("=" * 40)
     print()
 
@@ -242,8 +241,8 @@ def main():
         print("⚠️  Algunas verificaciones fallaron")
         print("🔧 Revisar los detalles arriba")
 
-    print(f"\n🌐 Ve a GitHub Actions para confirmar el éxito:")
-    print(f"   https://github.com/shaydev-create/Gemini-AI-Chatbot/actions")
+    print("\n🌐 Ve a GitHub Actions para confirmar el éxito:")
+    print("   https://github.com/shaydev-create/Gemini-AI-Chatbot/actions")
 
 
 if __name__ == "__main__":
