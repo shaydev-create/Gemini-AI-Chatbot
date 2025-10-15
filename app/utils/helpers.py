@@ -1,4 +1,3 @@
-from typing import Any, Optional
 """
 Utilidades generales para la aplicación.
 """
@@ -9,7 +8,7 @@ import os
 import secrets
 import uuid
 from pathlib import Path
-from typing import Optional, Union
+from typing import Any, Optional, Union
 
 logger=logging.getLogger(__name__)
 

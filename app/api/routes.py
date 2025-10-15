@@ -1,10 +1,9 @@
-from typing import Any, Optional
 """
 Rutas API del Gemini AI Chatbot.
 """
 
 import time
-from typing import Tuple
+from typing import Any, Tuple
 
 from flask import Blueprint, current_app, jsonify, request
 

@@ -1,10 +1,10 @@
-from typing import Any, Optional
 """
 Middleware personalizado para el Gemini AI Chatbot.
 """
 
 import logging
 import time
+from typing import Any
 
 from flask import g, request
 from flask_wtf.csrf import CSRFProtect

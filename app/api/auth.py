@@ -1,6 +1,6 @@
+
 from flask import Blueprint, jsonify, request
 from flask_jwt_extended import jwt_required
-from typing import Any, Optional
 
 from app.auth import auth_manager, get_current_user_from_jwt
 

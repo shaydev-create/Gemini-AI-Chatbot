@@ -1,4 +1,3 @@
-from typing import Any, Optional
 """
 Utilidad para cargar traducciones y seleccionar idioma en Gemini AI Chatbot.
 """
@@ -6,7 +5,7 @@ Utilidad para cargar traducciones y seleccionar idioma en Gemini AI Chatbot.
 import json
 import logging
 from pathlib import Path
-from typing import Dict
+from typing import Any, Dict
 
 from flask import request, session
 

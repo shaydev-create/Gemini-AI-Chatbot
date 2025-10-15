@@ -1,10 +1,10 @@
-from typing import Any, Optional
 """
 Decoradores para la aplicación.
 """
 
 import logging
 from functools import wraps
+from typing import Any
 
 from flask import jsonify
 from flask_jwt_extended import get_jwt_identity

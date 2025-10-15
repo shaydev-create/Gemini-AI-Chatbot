@@ -1,6 +1,6 @@
 import json
 import os
-from typing import Any, Optional
+from typing import Any
 
 from flask import current_app
 
@@ -36,10 +36,6 @@ def register_translation_functions(app) -> None:
     """
     Registra la función de traducción en el contexto de la plantilla Jinja2.
     """
-
-    @app.context_processor
-    def inject_translate() -> dict[str, Any]:
-        return {"translate": translate}
 
     @app.context_processor
     def inject_translate() -> dict[str, Any]:

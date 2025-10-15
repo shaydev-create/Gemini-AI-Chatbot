@@ -1,8 +1,9 @@
-from typing import Any, Optional
 """
 Blueprint de administración para Gemini AI Chatbot.
 Solo accesible para usuarios autenticados con rol de administrador.
 """
+
+from typing import Any
 
 from flask import Blueprint, current_app, jsonify, request
 from flask_jwt_extended import jwt_required

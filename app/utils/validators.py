@@ -1,4 +1,3 @@
-from typing import Any, Optional
 """
 Validadores para la aplicación.
 """

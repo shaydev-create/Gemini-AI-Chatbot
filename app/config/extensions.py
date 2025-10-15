@@ -1,4 +1,3 @@
-from typing import Any, Optional
 """
 Inicialización de las extensiones de Flask para evitar importaciones circulares.
 """

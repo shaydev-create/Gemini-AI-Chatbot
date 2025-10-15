@@ -1,4 +1,3 @@
-from typing import Any, Optional
 """Configuración de base de datos con soporte para PostgreSQL y SQLite."""
 
 import logging

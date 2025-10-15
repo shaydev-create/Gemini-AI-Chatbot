@@ -105,37 +105,8 @@ class CacheManager:
                 "expired_entries": expired_count,
                 "estimated_size_bytes": size_bytes,
             }
-        logger.debug(
-            "Cache SET para la clave: %s con un TTL de %d segundos.", key, ttl_to_use
-        )
 
-    def delete(self, key: str) -> bool:
-        """
-        Elimina una clave de la caché.
-        """
-        with self._lock:
-            if key in self._cache:
-                del self._cache[key]
-                logger.debug("Cache DELETE para la clave: %s", key)
-                return True
-            return False
-
-    def clear(self) -> None:
-        """
-        Limpia toda la caché.
-        """
-        with self._lock:
-            self._cache.clear()
-        logger.info("Caché limpiada completamente.")
-
-    def cleanup_expired(self) -> int:
-        """
-        Elimina todas las entradas expiradas de la caché.
-        """
-        with self._lock:
-            return self._cleanup_expired_without_lock()
-
-    def get_stats(self) -> Dict[str, int]:
+    def _cleanup_expired_without_lock(self) -> int:
         """
         Obtiene estadísticas sobre el estado actual de la caché.
         """

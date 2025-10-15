@@ -43,6 +43,11 @@ class TestVertexAIClient:
         self.patcher_aiplatform_init = patch("app.config.vertex_ai.aiplatform.init")
         self.mock_aiplatform_init = self.patcher_aiplatform_init.start()
 
+        self.patcher_default_credentials = patch("app.config.vertex_ai.default")
+        self.mock_default_credentials = self.patcher_default_credentials.start()
+        # Configure the mock to return valid credentials and project
+        self.mock_default_credentials.return_value = (None, "test-project")
+
         self.patcher_generative_model = patch(
             "app.config.vertex_client.GenerativeModel"
         )
@@ -68,6 +73,7 @@ class TestVertexAIClient:
         self.patcher_vertex_ai.stop()
         self.patcher_gemini_api.stop()
         self.patcher_aiplatform_init.stop()
+        self.patcher_default_credentials.stop()
         self.patcher_generative_model.stop()
         self.patcher_genai_configure.stop()
         self.patcher_genai_model.stop()
@@ -81,9 +87,19 @@ class TestVertexAIClient:
 
     async def test_initialize_vertex_ai_success(self):
         """Test successful initialization of Vertex AI."""
-        self.mock_vertex_config.enabled = True
-        self.mock_vertex_config.initialize.return_value = True
-        self.mock_vertex_config.models = {"fast": {"name": "gemini-1.0-pro"}}
+        # Import the real VertexAIConfig to use its initialize method
+        from app.config.vertex_ai import VertexAIConfig
+        
+        # Create a real config instance but patch its dependencies
+        real_config = VertexAIConfig()
+        real_config.enabled = True
+        real_config.project_id = "test-project"
+        real_config.location = "test-location"
+        real_config.credentials_path = None
+        real_config.models = {"fast": {"name": "gemini-1.0-pro"}}
+        
+        # Replace the mock with the real config
+        self.client.config = real_config
 
         result = await self.client.initialize()
 

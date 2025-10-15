@@ -79,13 +79,13 @@ class VertexAIClient:
         logger.info("🚀 Iniciando cliente de IA...")
 
         # 1. Intentar inicializar Vertex AI
-        # if VERTEX_AI_AVAILABLE and self.config.enabled:
-        #     if self._initialize_vertex_ai():
-        #         self.initialized = True
-        #         self.is_healthy = True
-        #         self.fallback_active = False
-        #         logger.info("✅ Cliente de IA inicializado en modo Vertex AI.")
-        #         return True
+        if VERTEX_AI_AVAILABLE and self.config.enabled:
+            if self._initialize_vertex_ai():
+                self.initialized = True
+                self.is_healthy = True
+                self.fallback_active = False
+                logger.info("✅ Cliente de IA inicializado en modo Vertex AI.")
+                return True
 
         # 2. Si Vertex AI falla o está deshabilitado, intentar inicializar Gemini API como fallback
         if (

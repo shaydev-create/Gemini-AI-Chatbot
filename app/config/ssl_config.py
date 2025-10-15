@@ -1,4 +1,3 @@
-from typing import Any, Optional
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
@@ -16,6 +15,7 @@ import logging
 import ssl
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
+from typing import Any
 
 from cryptography import x509
 from cryptography.hazmat.primitives import hashes, serialization

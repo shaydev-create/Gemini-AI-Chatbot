@@ -1,4 +1,3 @@
-from typing import Any, Optional
 """
 Servicio para integración con Google Gemini AI.
 VERSIÓN RESTAURADA - Esta era la que funcionaba antes de la limpieza.
@@ -8,6 +7,7 @@ ACTUALIZADA CON SOPORTE MULTIMODAL PARA ANÁLISIS DE IMÁGENES.
 import logging
 import os
 import time
+from typing import Any, Optional
 
 import google.generativeai as genai
 

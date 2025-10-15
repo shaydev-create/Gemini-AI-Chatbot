@@ -1,5 +1,6 @@
+from typing import Any
+
 from flask import Blueprint
-from typing import Any, Optional
 
 __all__: list[Any] = ['main', 'routes']
 

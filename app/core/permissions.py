@@ -1,4 +1,3 @@
-from typing import Any, Optional
 """
 Sistema de permisos granulares para la aplicación.
 Permite definir permisos específicos más allá de roles simples.
