@@ -19,6 +19,7 @@ def app():
         mock_gemini_service = MagicMock()
         mock_gemini_service.generate_response.return_value = "Mocked Gemini response"
         app_instance.gemini_service = mock_gemini_service
+        app_instance.config["GEMINI_SERVICE"] = mock_gemini_service
 
         # Crear tablas de la base de datos
         with app_instance.app_context():

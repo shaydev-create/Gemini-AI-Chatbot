@@ -11,13 +11,13 @@ from flask_wtf.csrf import CSRFProtect
 
 from app.core.metrics import metrics_manager
 
-logger=logging.getLogger(__name__)
+logger = logging.getLogger(__name__)
 
 
 def setup_middleware(app) -> None:
     """Configurar middleware personalizado."""
     # ProtecciÃ³n CSRF
-    csrf=CSRFProtect(app)
+    csrf = CSRFProtect(app)
     app.logger.info("CSRF protection enabled")
 
     # Eximir rutas API especÃ­ficas de la protecciÃ³n CSRF
@@ -53,7 +53,7 @@ def setup_middleware(app) -> None:
         """Ejecutar despuÃ©s de cada request."""
         # Calcular tiempo de respuesta
         if hasattr(g, "start_time"):
-            response_time=time.time() - g.start_time
+            response_time = time.time() - g.start_time
             metrics_manager.record_response_time(response_time)
 
             # Log del response
@@ -96,7 +96,7 @@ def setup_error_handlers(app) -> dict[str, Any]:
     @app.errorhandler(500)
     def internal_error(error) -> dict[str, Any]:
         """Manejar errores 500."""
-        original_exception=getattr(error, "original_exception", error)
+        original_exception = getattr(error, "original_exception", error)
         logger.error(f"500 error: {original_exception}")
         return {"error": "Error interno del servidor", "status_code": 500}, 500
 

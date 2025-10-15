@@ -4,7 +4,7 @@ from datetime import timedelta
 from pathlib import Path
 
 # Configuración del logger
-logger=logging.getLogger(__name__)
+logger = logging.getLogger(__name__)
 
 # Directorio base del proyecto
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -71,9 +71,9 @@ class DevelopmentConfig(Config):
     import secrets
 
     DEBUG: bool = True
-    SQLALCHEMY_DATABASE_URI: str = os.environ.get(
-        "DEV_DATABASE_URL"
-    ) or "sqlite:///./fresh_gemini_dev.db"
+    SQLALCHEMY_DATABASE_URI: str = (
+        os.environ.get("DEV_DATABASE_URL") or "sqlite:///./fresh_gemini_dev.db"
+    )
 
     # En desarrollo, si no se define una SECRET_KEY, se genera una temporal.
     # Esto es conveniente para desarrollo local pero invalida las sesiones al reiniciar.

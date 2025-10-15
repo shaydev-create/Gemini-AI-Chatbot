@@ -10,7 +10,7 @@ from typing import Any, Deque, Dict, List
 
 from flask import Blueprint, Response, current_app
 
-logger=logging.getLogger(__name__)
+logger = logging.getLogger(__name__)
 
 
 class MetricsManager:
@@ -48,12 +48,14 @@ class MetricsManager:
         with self._lock:
             self.response_times.append(duration)
 
-    def record_request(self, endpoint: str, method: str, status_code: int) -> dict[str, Any]:
+    def record_request(
+        self, endpoint: str, method: str, status_code: int
+    ) -> dict[str, Any]:
         """
         Registra una solicitud entrante y actualiza los contadores relacionados.
         """
         with self._lock:
-            timestamp=time.time()
+            timestamp = time.time()
             self.request_history.append(
                 {
                     "timestamp": timestamp,
@@ -72,20 +74,20 @@ class MetricsManager:
         Obtiene un diccionario con todas las métricas actuales.
         """
         with self._lock:
-            current_time=time.time()
-            uptime=current_time - self.start_time
+            current_time = time.time()
+            uptime = current_time - self.start_time
 
             response_stats: dict[str, Any] = {}
             if self.response_times:
-                times=list(self.response_times)
-                response_stats={
+                times = list(self.response_times)
+                response_stats = {
                     "avg_seconds": sum(times) / len(times),
                     "min_seconds": min(times),
                     "max_seconds": max(times),
                     "count": len(times),
                 }
 
-            recent_requests=[
+            recent_requests = [
                 req
                 for req in self.request_history
                 if current_time - req["timestamp"] <= 60
@@ -111,10 +113,10 @@ class MetricsManager:
 
 
 # Instancia global del gestor de métricas
-metrics_manager=MetricsManager()
+metrics_manager = MetricsManager()
 
 # Blueprint para el endpoint de métricas
-metrics_bp=Blueprint("metrics", __name__)
+metrics_bp = Blueprint("metrics", __name__)
 
 
 def _format_prometheus_metric(
@@ -143,7 +145,7 @@ def prometheus_metrics() -> None:
             "Métricas deshabilitadas en modo de prueba.", mimetype="text/plain"
         )
 
-    metrics=metrics_manager.get_metrics()
+    metrics = metrics_manager.get_metrics()
     output: List[str] = []
 
     # Uptime
@@ -166,7 +168,7 @@ def prometheus_metrics() -> None:
 
     # Estadísticas de tiempo de respuesta
     if "response_time_stats" in metrics and metrics["response_time_stats"]:
-        stats=metrics["response_time_stats"]
+        stats = metrics["response_time_stats"]
         output.append(
             _format_prometheus_metric(
                 "gemini_response_time_avg_seconds",

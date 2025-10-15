@@ -5,12 +5,13 @@ Un chatbot de IA avanzado y seguro, potenciado por Google Gemini, con una interf
 [![Python Version](https://img.shields.io/badge/Python-3.13%2B-blue.svg)](https://python.org)
 [![Flask](https://img.shields.io/badge/Flask-3.0%2B-green.svg)](https://flask.palletsprojects.com/)
 [![Build Status](https://img.shields.io/badge/Build-Passing-brightgreen.svg)](https://github.com/shaydev-create/Gemini-AI-Chatbot/actions)
-[![Tests](https://img.shields.io/badge/Tests-100%25%20Passing-brightgreen.svg)](tests/)
-[![Coverage](https://img.shields.io/badge/Coverage-82%25-green.svg)](reports/pytest_report.html)
+[![Tests](https://img.shields.io/badge/Tests-254%20Passing-brightgreen.svg)](tests/)
+[![Coverage](https://img.shields.io/badge/Coverage-71%25-green.svg)](reports/pytest_report.html)
 [![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Docker](https://img.shields.io/badge/Docker-Ready-blue.svg)](Dockerfile)
 [![Security](https://img.shields.io/badge/Security-Hardened-red.svg)](SECURITY.md)
 [![Vertex AI](https://img.shields.io/badge/Vertex%20AI-Ready-orange.svg)](docs/VERTEX_AI_MIGRATION_STEPS.md)
+[![Chrome AI](https://img.shields.io/badge/Chrome%20AI-Integrated-purple.svg)](chrome_extension/)
 
 ## 📋 Tabla de Contenidos
 
@@ -30,13 +31,15 @@ Un chatbot de IA avanzado y seguro, potenciado por Google Gemini, con una interf
 ## ✨ Características Principales
 
 - **🤖 Inteligencia Artificial Avanzada**: Integración nativa con **Google Gemini** y preparado para **Vertex AI** con sistema de fallback automático.
+- **🧠 Chrome AI Ready**: Totalmente compatible con Chrome AI APIs para experiencias de IA más rápidas y offline.
 - **🌐 Interfaz Moderna y Accesible**: UI futurista y responsiva, con soporte PWA para instalación en escritorio/móvil y funcionamiento offline básico.
 - **🔒 Seguridad Robusta**: Autenticación JWT, protección CSRF/XSS, cabeceras de seguridad, y rate limiting.
 - **🐳 Dockerizado**: Entornos consistentes para desarrollo y producción con Docker Compose.
-- **✅ Cobertura de Pruebas Sólida**: Más del 80% de cobertura de código para garantizar la estabilidad.
-- **🌐 Extensión de Chrome**: Acceso rápido al chatbot directamente desde el navegador.
+- **✅ Cobertura de Pruebas Sólida**: 71% de cobertura de código con 254 tests pasando para garantizar la estabilidad.
+- **🌐 Extensión de Chrome**: Acceso rápido al chatbot directamente desde el navegador con funciones Chrome AI integradas.
 - **📊 Panel de Administración**: Métricas y estado del sistema en tiempo real (protegido por rol).
 - **🌍 Multi-idioma**: Soporte para inglés y español, fácilmente extensible.
+- **🏆 Hackathon Ready**: Preparado para competencias y presentaciones con todas las funciones Chrome AI implementadas.
 
 ---
 

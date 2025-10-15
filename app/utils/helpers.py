@@ -10,7 +10,7 @@ import uuid
 from pathlib import Path
 from typing import Any, Optional, Union
 
-logger=logging.getLogger(__name__)
+logger = logging.getLogger(__name__)
 
 
 def generate_secret_key(length: int = 32) -> str:
@@ -43,14 +43,14 @@ def hash_string(text: str, algorithm: str = "sha256") -> str:
         Hash en hexadecimal
     """
     try:
-        hash_obj=hashlib.new(algorithm)
+        hash_obj = hashlib.new(algorithm)
         hash_obj.update(text.encode("utf-8"))
         return hash_obj.hexdigest()
     except ValueError:
         logger.exception(
             "Algoritmo de hash no válido: %s. Usando sha256 como fallback.", algorithm
         )
-        hash_obj=hashlib.sha256()
+        hash_obj = hashlib.sha256()
         hash_obj.update(text.encode("utf-8"))
         return hash_obj.hexdigest()
 

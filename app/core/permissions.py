@@ -9,7 +9,7 @@ from functools import wraps
 from flask import jsonify
 from flask_jwt_extended import get_jwt_identity
 
-logger=logging.getLogger(__name__)
+logger = logging.getLogger(__name__)
 
 # Definición de permisos disponibles
 PERMISSIONS = {
@@ -99,7 +99,7 @@ def permission_required(required_permission: str) -> None:
             try:
                 from .decorators import get_current_user_from_jwt
 
-                current_user=get_current_user_from_jwt()
+                current_user = get_current_user_from_jwt()
 
                 if not current_user:
                     logger.warning("Acceso denegado: usuario no autenticado")
@@ -110,11 +110,11 @@ def permission_required(required_permission: str) -> None:
                         }
                     ), 401
 
-                jwt_identity=get_jwt_identity()
-                user_role=jwt_identity.get("role", "user")
+                jwt_identity = get_jwt_identity()
+                user_role = jwt_identity.get("role", "user")
 
                 # Obtener permisos del usuario basados en su rol
-                user_permissions=ROLE_PERMISSIONS.get(user_role, [])
+                user_permissions = ROLE_PERMISSIONS.get(user_role, [])
 
                 # Verificar si el usuario tiene el permiso requerido
                 if required_permission not in user_permissions:

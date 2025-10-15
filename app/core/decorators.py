@@ -11,7 +11,7 @@ from flask_jwt_extended import get_jwt_identity
 
 from app.auth import get_current_user_from_jwt
 
-logger=logging.getLogger(__name__)
+logger = logging.getLogger(__name__)
 
 
 def role_required(required_role: str) -> None:
@@ -36,7 +36,7 @@ def role_required(required_role: str) -> None:
         @wraps(fn)
         def wrapper(*args, **kwargs) -> None:
             try:
-                current_user=get_current_user_from_jwt()
+                current_user = get_current_user_from_jwt()
 
                 if not current_user:
                     logger.warning("Acceso denegado: usuario no autenticado")
@@ -47,11 +47,13 @@ def role_required(required_role: str) -> None:
                         }
                     ), 401
 
-                jwt_identity=get_jwt_identity()
-                user_role=jwt_identity.get("role", "user")
+                jwt_identity = get_jwt_identity()
+                user_role = jwt_identity.get("role", "user")
 
                 # Verificar si el usuario tiene el rol requerido o uno superior
-                required_roles: list[Any] = [r.strip() for r in required_role.split(",")]
+                required_roles: list[Any] = [
+                    r.strip() for r in required_role.split(",")
+                ]
                 user_has_access: bool = False
 
                 # Verificar acceso por rol específico
@@ -103,7 +105,7 @@ def log_request(fn) -> None:
 
     @wraps(fn)
     def wrapper(*args, **kwargs) -> None:
-        user_identity=get_jwt_identity()
+        user_identity = get_jwt_identity()
         logger.info(
             "Solicitud a '%s' recibida de %s.",
             fn.__name__,

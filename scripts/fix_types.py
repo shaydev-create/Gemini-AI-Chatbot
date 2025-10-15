@@ -23,6 +23,7 @@ APP_DIR = BASE_DIR / "app"
 FUNC_DEF_PATTERN = re.compile(r"^(\s*)def\s+(\w+)\((.*?)\)(\s*):(\s*)$")
 VAR_ASSIGN_PATTERN = re.compile(r"^(\s*)(\w+)\s*=\s*(.+)$")
 
+
 def ensure_typing_import(content: str) -> str:
     """Agrega importación de typing si no existe."""
     if "from typing import Any" not in content and "import Any" not in content:
@@ -35,6 +36,7 @@ def ensure_typing_import(content: str) -> str:
             break
         return "\n".join(lines)
     return content
+
 
 def infer_type_from_value(value: str) -> str:
     """Detecta tipo adecuado a partir del valor asignado."""
@@ -57,6 +59,7 @@ def infer_type_from_value(value: str) -> str:
         return "bool"
     return "Any"
 
+
 def fix_file(path: Path):
     """Corrige tipos básicos en un archivo Python."""
     with open(path, "r", encoding="utf-8") as f:
@@ -71,7 +74,13 @@ def fix_file(path: Path):
         stripped = line.strip()
 
         # Ignorar comentarios, imports o decoradores
-        if not stripped or stripped.startswith("#") or stripped.startswith("@") or stripped.startswith("import") or stripped.startswith("from"):
+        if (
+            not stripped
+            or stripped.startswith("#")
+            or stripped.startswith("@")
+            or stripped.startswith("import")
+            or stripped.startswith("from")
+        ):
             new_lines.append(line)
             continue
 
@@ -105,6 +114,7 @@ def fix_file(path: Path):
     else:
         print(f"✔️  Sin cambios: {path}")
 
+
 def process_directory(directory: Path):
     """Procesa todos los archivos .py dentro del directorio."""
     for root, _, files in os.walk(directory):
@@ -112,10 +122,12 @@ def process_directory(directory: Path):
             if filename.endswith(".py"):
                 fix_file(Path(root) / filename)
 
+
 def main():
     print(f"🔧 Iniciando corrección inteligente de tipos en: {APP_DIR}")
     process_directory(APP_DIR)
     print("\n✨ Corrección automática avanzada completada.")
+
 
 if __name__ == "__main__":
     main()

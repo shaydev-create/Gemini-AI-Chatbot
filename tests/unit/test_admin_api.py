@@ -54,10 +54,32 @@ class TestAdminRoutes(unittest.TestCase):
         }
         mock_get_security_summary.return_value = expected_summary
 
-        response = self.client.get(
-            "/api/admin/security-summary",
-            headers={"Authorization": f"Bearer {self.valid_token}"},
-        )
+        with self.app.app_context():
+            db.drop_all()
+            db.create_all()
+            # Create a test user with admin role
+            test_user = User(
+                username="admin_user",
+                email="admin@test.com",
+                role="admin",
+                status="active",
+            )
+            test_user.set_password("Password123!")
+            db.session.add(test_user)
+            db.session.commit()
+
+            # Create JWT token with proper identity format
+            identity = {
+                "user_id": test_user.id,
+                "username": test_user.username,
+                "role": test_user.role,
+            }
+            token = create_access_token(identity=identity)
+
+            response = self.client.get(
+                "/api/admin/security-summary",
+                headers={"Authorization": f"Bearer {token}"},
+            )
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.get_json(), expected_summary)
@@ -84,23 +106,22 @@ class TestAdminRoutes(unittest.TestCase):
                 username="admin_user",
                 email="admin@test.com",
                 role="admin",
-                status="active"
+                status="active",
             )
             test_user.set_password("Password123!")
             db.session.add(test_user)
             db.session.commit()
-            
+
             # Create JWT token with proper identity format
             identity = {
                 "user_id": test_user.id,
                 "username": test_user.username,
-                "role": test_user.role
+                "role": test_user.role,
             }
             token = create_access_token(identity=identity)
-            
+
             response = self.client.get(
-                "/api/admin/metrics",
-                headers={"Authorization": f"Bearer {token}"}
+                "/api/admin/metrics", headers={"Authorization": f"Bearer {token}"}
             )
 
         self.assertEqual(response.status_code, 200)
@@ -108,15 +129,39 @@ class TestAdminRoutes(unittest.TestCase):
         mock_metrics_manager.get_metrics.assert_called_once()
 
     def test_get_system_status_route(self):
-        response = self.client.get(
-            "/api/admin/status",
-            headers={"Authorization": f"Bearer {self.valid_token}"},
-        )
+        with self.app.app_context():
+            db.drop_all()
+            db.create_all()
+            # Create a test user with admin role
+            test_user = User(
+                username="admin_user",
+                email="admin@test.com",
+                role="admin",
+                status="active",
+            )
+            test_user.set_password("Password123!")
+            db.session.add(test_user)
+            db.session.commit()
+
+            # Create JWT token with proper identity format
+            identity = {
+                "user_id": test_user.id,
+                "username": test_user.username,
+                "role": test_user.role,
+            }
+            token = create_access_token(identity=identity)
+
+            response = self.client.get(
+                "/api/admin/status",
+                headers={"Authorization": f"Bearer {token}"},
+            )
+
         self.assertEqual(response.status_code, 200)
         data = response.get_json()
-        self.assertIn("status", data)
-        self.assertIn("uptime", data)
-        self.assertIn("memory_usage", data)
+        self.assertIn("database", data)
+        self.assertIn("ai_services", data)
+        self.assertIn("status", data["database"])
+        self.assertIn("status", data["ai_services"])
 
 
 if __name__ == "__main__":

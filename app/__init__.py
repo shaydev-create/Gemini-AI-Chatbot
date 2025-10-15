@@ -9,6 +9,6 @@ from flask_sqlalchemy import SQLAlchemy
 __version__: str = "1.0.0"
 __author__: str = "Gemini AI Chatbot Team"
 
-db=SQLAlchemy()
-migrate=Migrate()
-socketio=SocketIO()
+db = SQLAlchemy()
+migrate = Migrate()
+socketio = SocketIO()

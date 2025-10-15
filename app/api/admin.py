@@ -16,7 +16,7 @@ from app.core.permissions import PERMISSIONS, ROLE_PERMISSIONS
 from app.core.security import get_security_summary
 from app.models import User
 
-admin_bp=Blueprint("admin_api", __name__)
+admin_bp = Blueprint("admin_api", __name__)
 
 
 @admin_bp.route("/security-summary", methods=["GET"])
@@ -37,16 +37,16 @@ def system_status() -> None:
     Endpoint para verificar el estado del sistema (base de datos, servicios de IA, etc.).
     """
     # Verificar estado de la base de datos
-    db_url=current_app.config.get("SQLALCHEMY_DATABASE_URI")
+    db_url = current_app.config.get("SQLALCHEMY_DATABASE_URI")
     db_ok, db_msg = check_db_connection(db_url)
 
     # Verificar estado de los servicios de IA
-    ai_service_ok=(
+    ai_service_ok = (
         hasattr(current_app, "gemini_service")
         and current_app.gemini_service is not None
     )
 
-    status={
+    status = {
         "database": {"status": "ok" if db_ok else "error", "message": db_msg},
         "ai_services": {
             "status": "ok" if ai_service_ok else "error",
@@ -56,7 +56,7 @@ def system_status() -> None:
         },
     }
 
-    http_status=200 if db_ok and ai_service_ok else 503  # Service Unavailable
+    http_status = 200 if db_ok and ai_service_ok else 503  # Service Unavailable
     return jsonify(status), http_status
 
 
@@ -77,10 +77,10 @@ def list_users() -> None:
     """
     Obtiene una lista paginada de todos los usuarios.
     """
-    page=request.args.get("page", 1, type=int)
-    per_page=request.args.get("per_page", 10, type=int)
+    page = request.args.get("page", 1, type=int)
+    per_page = request.args.get("per_page", 10, type=int)
 
-    users_pagination=User.query.paginate(
+    users_pagination = User.query.paginate(
         page=page, per_page=per_page, error_out=False
     )
     users_list: list[Any] = [user.to_dict() for user in users_pagination.items]
@@ -102,7 +102,7 @@ def get_user(user_id: int) -> None:
     """
     Obtiene los detalles de un usuario específico.
     """
-    user=User.query.get_or_404(user_id)
+    user = User.query.get_or_404(user_id)
     return jsonify(user.to_dict()), 200
 
 
@@ -113,8 +113,8 @@ def update_user(user_id: int) -> None:
     """
     Actualiza la información de un usuario (ej. rol, estado).
     """
-    user=User.query.get_or_404(user_id)
-    data=request.get_json()
+    user = User.query.get_or_404(user_id)
+    data = request.get_json()
 
     if not data:
         return jsonify({"message": "Se requiere un cuerpo de solicitud JSON."}), 400
@@ -124,8 +124,15 @@ def update_user(user_id: int) -> None:
 
     # Actualizar rol si se proporciona y es válido
     if "role" in data:
-        new_role=data["role"]
-        valid_roles: list[Any] = ["superadmin", "admin", "moderator", "premium", "user", "guest"]
+        new_role = data["role"]
+        valid_roles: list[Any] = [
+            "superadmin",
+            "admin",
+            "moderator",
+            "premium",
+            "user",
+            "guest",
+        ]
         if new_role in valid_roles:
             user.role = new_role
         else:
@@ -151,7 +158,7 @@ def update_user_role(user_id: int) -> None:
     Requiere rol de administrador.
     """
     try:
-        data=request.get_json()
+        data = request.get_json()
         if not data or "role" not in data:
             return jsonify(
                 {
@@ -160,8 +167,8 @@ def update_user_role(user_id: int) -> None:
                 }
             ), 400
 
-        new_role=data["role"]
-        updated_user=auth_manager.update_user_role(user_id, new_role)
+        new_role = data["role"]
+        updated_user = auth_manager.update_user_role(user_id, new_role)
 
         if not updated_user:
             return jsonify(
@@ -192,7 +199,7 @@ def get_users_by_role(role: str) -> None:
     Requiere rol de administrador.
     """
     try:
-        users=auth_manager.get_users_by_role(role)
+        users = auth_manager.get_users_by_role(role)
         return jsonify(
             {
                 "users": [user.to_dict() for user in users],
@@ -215,8 +222,8 @@ def get_user_permissions(user_id: int) -> None:
     Requiere rol de administrador.
     """
     try:
-        permissions=auth_manager.get_user_permissions(user_id)
-        user=User.query.get(user_id)
+        permissions = auth_manager.get_user_permissions(user_id)
+        user = User.query.get(user_id)
 
         if not user:
             return jsonify(
@@ -260,13 +267,20 @@ def get_users_stats() -> None:
     try:
         # Contar usuarios por rol
         roles_stats: dict[str, Any] = {}
-        valid_roles: list[Any] = ["superadmin", "admin", "moderator", "premium", "user", "guest"]
+        valid_roles: list[Any] = [
+            "superadmin",
+            "admin",
+            "moderator",
+            "premium",
+            "user",
+            "guest",
+        ]
 
         for role in valid_roles:
-            count=User.query.filter_by(role=role).count()
+            count = User.query.filter_by(role=role).count()
             roles_stats[role] = count
 
-        total_users=User.query.count()
+        total_users = User.query.count()
 
         return jsonify(
             {

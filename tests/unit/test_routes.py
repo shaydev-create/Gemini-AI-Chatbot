@@ -133,17 +133,13 @@ def test_send_message_success(client, app):
     """Prueba el envío de un mensaje exitoso a /api/chat/send."""
 
     # Configure the mock that was set up in the app fixture
-    async def mock_generate_response_success(*args, **kwargs):
-        return "Hola, soy Gemini."
-
-    app.gemini_service.generate_response = mock_generate_response_success
+    mock_gemini_service = app.config.get("GEMINI_SERVICE")
+    mock_gemini_service.generate_response.return_value = "Hola, soy Gemini."
 
     response = client.post("/api/chat/send", json={"message": "Hola"})
     assert response.status_code == 200
     assert response.json["response"] == "Hola, soy Gemini."
     assert "session_id" in response.json
-    # The API calls generate_response with multiple parameters including session_id, user_id, prompt, etc.
-    # Nota: No podemos usar assert_called() directamente con funciones async mock
 
 
 def test_send_message_missing_data(client):

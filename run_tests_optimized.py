@@ -18,11 +18,7 @@ def run_command(cmd, description=""):
 
     try:
         result = subprocess.run(
-            cmd,
-            check=True,
-            capture_output=True,
-            text=True,
-            cwd=Path(__file__).parent
+            cmd, check=True, capture_output=True, text=True, cwd=Path(__file__).parent
         )
         print(f"✅ {description} - Completado")
         return result
@@ -33,14 +29,27 @@ def run_command(cmd, description=""):
         print(f"STDERR: {e.stderr}")
         return None
 
+
 def main():
     parser = argparse.ArgumentParser(description="Ejecutar tests optimizados")
-    parser.add_argument("--fast", action="store_true", help="Ejecutar solo tests rápidos")
-    parser.add_argument("--unit", action="store_true", help="Ejecutar solo tests unitarios")
-    parser.add_argument("--integration", action="store_true", help="Ejecutar solo tests de integración")
-    parser.add_argument("--coverage", action="store_true", help="Generar reporte de cobertura")
-    parser.add_argument("--parallel", action="store_true", help="Ejecutar tests en paralelo")
-    parser.add_argument("--maxfail", type=int, default=3, help="Máximo número de fallos antes de parar")
+    parser.add_argument(
+        "--fast", action="store_true", help="Ejecutar solo tests rápidos"
+    )
+    parser.add_argument(
+        "--unit", action="store_true", help="Ejecutar solo tests unitarios"
+    )
+    parser.add_argument(
+        "--integration", action="store_true", help="Ejecutar solo tests de integración"
+    )
+    parser.add_argument(
+        "--coverage", action="store_true", help="Generar reporte de cobertura"
+    )
+    parser.add_argument(
+        "--parallel", action="store_true", help="Ejecutar tests en paralelo"
+    )
+    parser.add_argument(
+        "--maxfail", type=int, default=3, help="Máximo número de fallos antes de parar"
+    )
 
     args = parser.parse_args()
 
@@ -64,23 +73,27 @@ def main():
         cmd.extend(["-m", " and ".join(markers)])
 
     # Configurar opciones
-    cmd.extend([
-        f"--maxfail={args.maxfail}",
-        "-x",  # Parar en el primer fallo
-        "--tb=short",  # Traceback corto
-        "--disable-warnings",  # Deshabilitar warnings
-        "-q",  # Modo silencioso
-    ])
+    cmd.extend(
+        [
+            f"--maxfail={args.maxfail}",
+            "-x",  # Parar en el primer fallo
+            "--tb=short",  # Traceback corto
+            "--disable-warnings",  # Deshabilitar warnings
+            "-q",  # Modo silencioso
+        ]
+    )
 
     if args.parallel:
         cmd.extend(["-n", "auto"])  # Requiere pytest-xdist
 
     if args.coverage:
-        cmd.extend([
-            "--cov=app",
-            "--cov-report=term-missing:skip-covered",
-            "--cov-report=xml",
-        ])
+        cmd.extend(
+            [
+                "--cov=app",
+                "--cov-report=term-missing:skip-covered",
+                "--cov-report=xml",
+            ]
+        )
 
     # Ejecutar tests
     result = run_command(cmd, "Ejecutando tests")
@@ -91,6 +104,7 @@ def main():
     else:
         print("✅ Todos los tests pasaron")
         sys.exit(0)
+
 
 if __name__ == "__main__":
     main()

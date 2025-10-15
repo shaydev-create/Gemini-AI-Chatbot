@@ -9,6 +9,8 @@ from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 
+pytestmark = pytest.mark.asyncio
+
 # Set environment variables for testing
 os.environ["GOOGLE_API_KEY"] = "test-api-key"
 os.environ["VERTEX_AI_PROJECT_ID"] = "test-project"
@@ -89,7 +91,7 @@ class TestVertexAIClient:
         """Test successful initialization of Vertex AI."""
         # Import the real VertexAIConfig to use its initialize method
         from app.config.vertex_ai import VertexAIConfig
-        
+
         # Create a real config instance but patch its dependencies
         real_config = VertexAIConfig()
         real_config.enabled = True
@@ -97,7 +99,7 @@ class TestVertexAIClient:
         real_config.location = "test-location"
         real_config.credentials_path = None
         real_config.models = {"fast": {"name": "gemini-1.0-pro"}}
-        
+
         # Replace the mock with the real config
         self.client.config = real_config
 

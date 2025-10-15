@@ -6,8 +6,8 @@ from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import create_engine
 from sqlalchemy.exc import OperationalError, SQLAlchemyError
 
-db=SQLAlchemy()
-logger=logging.getLogger(__name__)
+db = SQLAlchemy()
+logger = logging.getLogger(__name__)
 
 
 def init_db(app) -> None:
@@ -61,7 +61,7 @@ def check_db_connection(db_url: str) -> tuple[bool, str]:
     Returns:
         tuple: (success: bool, message: str)
     """
-    engine=create_engine(db_url)
+    engine = create_engine(db_url)
     try:
         with engine.connect() as _:
             logger.info(f"✅ Conexión exitosa a la base de datos: {db_url}")

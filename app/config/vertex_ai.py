@@ -8,7 +8,7 @@ from google.auth import credentials, default
 from google.auth.exceptions import DefaultCredentialsError
 from google.cloud import aiplatform
 
-logger=logging.getLogger(__name__)
+logger = logging.getLogger(__name__)
 
 
 class VertexAIConfig:
@@ -174,8 +174,8 @@ class VertexAIConfig:
         Returns:
             El nombre del endpoint del modelo.
         """
-        model_info=self.get_model_info(model_type) or self.models["fast"]
-        model_name=model_info["name"]
+        model_info = self.get_model_info(model_type) or self.models["fast"]
+        model_name = model_info["name"]
         return f"projects/{self.project_id}/locations/{self.location}/publishers/google/models/{model_name}"
 
     def estimate_cost(
@@ -192,17 +192,17 @@ class VertexAIConfig:
         Returns:
             El costo estimado en USD.
         """
-        model_info=self.get_model_info(model_type)
+        model_info = self.get_model_info(model_type)
         if not model_info:
             logger.warning(
                 "No se pudo estimar el costo: modelo '%s' no encontrado.", model_type
             )
             return 0.0
 
-        total_tokens=input_tokens + output_tokens
-        cost_per_million=model_info["cost_per_1m_tokens"]
+        total_tokens = input_tokens + output_tokens
+        cost_per_million = model_info["cost_per_1m_tokens"]
         return (total_tokens / 1_000_000) * cost_per_million
 
 
 # Instancia global para ser importada y utilizada en toda la aplicación.
-vertex_config=VertexAIConfig()
+vertex_config = VertexAIConfig()

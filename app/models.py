@@ -16,7 +16,7 @@ from sqlalchemy.orm import Mapped
 
 from app.config.extensions import db
 
-logger=logging.getLogger(__name__)
+logger = logging.getLogger(__name__)
 
 
 def validate_password_strength(password: str) -> tuple[bool, str]:
@@ -78,16 +78,16 @@ class User(db.Model):
         if not is_strong:
             raise ValueError(message)
 
-        password_bytes=password.encode("utf-8")
-        salt=bcrypt.gensalt()
+        password_bytes = password.encode("utf-8")
+        salt = bcrypt.gensalt()
         self.password_hash = bcrypt.hashpw(password_bytes, salt).decode("utf-8")
 
     def check_password(self, password: str) -> bool:
         """Verifica si la contraseña proporcionada coincide con el hash almacenado."""
         if not self.password_hash:
             return False
-        password_bytes=password.encode("utf-8")
-        hash_bytes=self.password_hash.encode("utf-8")
+        password_bytes = password.encode("utf-8")
+        hash_bytes = self.password_hash.encode("utf-8")
         return bcrypt.checkpw(password_bytes, hash_bytes)
 
     @staticmethod

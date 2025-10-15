@@ -7,7 +7,7 @@ import re
 from typing import List, Optional, Tuple
 
 # Configuración del logger
-logger=logging.getLogger(__name__)
+logger = logging.getLogger(__name__)
 
 # Expresiones regulares precompiladas para un mejor rendimiento
 EMAIL_PATTERN = re.compile(r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$")
@@ -100,10 +100,10 @@ def sanitize_input(text: Optional[str]) -> str:
         return ""
 
     # Remover caracteres de control que no son visibles
-    sanitized_text=CONTROL_CHARS_PATTERN.sub("", text)
+    sanitized_text = CONTROL_CHARS_PATTERN.sub("", text)
 
     # Normalizar espacios en blanco (reemplaza múltiples espacios/saltos de línea por uno solo)
-    sanitized_text=WHITESPACE_PATTERN.sub(" ", sanitized_text)
+    sanitized_text = WHITESPACE_PATTERN.sub(" ", sanitized_text)
 
     if text != sanitized_text:
         logger.debug(f"Texto sanitizado de '{text[:100]}' a '{sanitized_text[:100]}'")
@@ -130,7 +130,7 @@ def validate_file_upload(
     if "." not in filename:
         return False, "El archivo no tiene una extensión."
 
-    extension=filename.rsplit(".", 1)[1].lower()
+    extension = filename.rsplit(".", 1)[1].lower()
     if extension not in [ext.lower() for ext in allowed_extensions]:
         allowed_str: str = ", ".join(allowed_extensions)
         logger.warning(

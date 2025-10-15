@@ -16,7 +16,7 @@ def create_app(config_class=DevelopmentConfig) -> None:
     """
     Fábrica de aplicaciones para crear y configurar la instancia de la aplicación Flask.
     """
-    app=Flask(
+    app = Flask(
         __name__,
         template_folder=os.path.join(
             os.path.dirname(os.path.abspath(__file__)), "..", "templates"
@@ -45,7 +45,7 @@ def create_app(config_class=DevelopmentConfig) -> None:
         # o una cabecera HTTP. Por ahora, se fija a 'es'.
         return "es"
 
-    _=Babel(app, locale_selector=get_locale)
+    _ = Babel(app, locale_selector=get_locale)
 
     # Registrar blueprints
     app.register_blueprint(main_blueprint)
@@ -86,7 +86,7 @@ def get_flask_app(config_class=DevelopmentConfig) -> None:
     if isinstance(config_class, str):
         from app.config.settings import config
 
-        config_class=config.get(config_class, DevelopmentConfig)
+        config_class = config.get(config_class, DevelopmentConfig)
 
     app, _ = create_app(config_class)
     return app

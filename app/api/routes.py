@@ -9,7 +9,7 @@ from flask import Blueprint, current_app, jsonify, request
 
 from app.auth import get_current_user_from_jwt
 
-api_bp=Blueprint("api_bp", __name__)
+api_bp = Blueprint("api_bp", __name__)
 
 
 @api_bp.route("/chat/send", methods=["POST"])
@@ -18,16 +18,16 @@ def send_message() -> Tuple:
     Endpoint para enviar un mensaje al chatbot y recibir una respuesta.
     Ahora soporta contexto de imagen para análisis multimodal.
     """
-    data=request.get_json()
+    data = request.get_json()
     if not data or not data.get("message"):
         return jsonify({"message": "El campo 'message' es requerido."}), 400
 
-    user_message=data["message"].strip()
-    session_id=data.get(
+    user_message = data["message"].strip()
+    session_id = data.get(
         "session_id", "anonymous"
     )  # Usar sesión anónima si no se proporciona
     image_context = data.get("image_context", None)  # Nuevo: contexto de imagen
-    language=data.get("language", "es")  # Obtener idioma, por defecto español
+    language = data.get("language", "es")  # Obtener idioma, por defecto español
 
     if not user_message:
         return jsonify({"message": "El mensaje no puede estar vacío."}), 400
@@ -38,12 +38,12 @@ def send_message() -> Tuple:
 
     # Intentar obtener usuario autenticado, pero no requerirlo
     try:
-        current_user=get_current_user_from_jwt()
-        user_id=current_user.id if current_user else None
+        current_user = get_current_user_from_jwt()
+        user_id = current_user.id if current_user else None
     except Exception:
-        user_id=None  # Usuario anónimo
+        user_id = None  # Usuario anónimo
 
-    gemini_service=current_app.config.get("GEMINI_SERVICE"),
+    gemini_service = current_app.config.get("GEMINI_SERVICE")
     if not gemini_service:
         return jsonify(
             {"message": "El servicio de IA no está disponible en este momento."}
@@ -51,14 +51,14 @@ def send_message() -> Tuple:
 
     try:
         # Prepare the prompt with image context if available
-        final_prompt=user_message
+        final_prompt = user_message
 
         if image_context and image_context.get("has_image"):
-            image_name=image_context.get("image_name", "imagen")
-            context_message=image_context.get("context_message", "")
+            image_name = image_context.get("image_name", "imagen")
+            context_message = image_context.get("context_message", "")
 
             if language == "en":
-                final_prompt=f"""
+                final_prompt = f"""
 {context_message}
 
 Image context:
@@ -68,7 +68,7 @@ Image context:
 Please analyze the provided image and respond to the user's question in detail and helpfully.
 """
             else:
-                final_prompt=f"""
+                final_prompt = f"""
 {context_message}
 
 Contexto de imagen:
@@ -81,7 +81,7 @@ Por favor, analiza la imagen proporcionada y responde a la pregunta del usuario 
                 f"Processing message with image context: {image_name}"
             )
 
-        response_text=gemini_service.generate_response(
+        response_text = gemini_service.generate_response(
             session_id=session_id,
             user_id=user_id,
             prompt=final_prompt,
@@ -110,7 +110,7 @@ def health_check() -> Tuple:
     Endpoint de health check para verificar que la API está activa.
     """
     metrics: dict[str, Any] = {}
-    uptime_seconds=int(time.time() - getattr(current_app, "start_time", time.time()))
+    uptime_seconds = int(time.time() - getattr(current_app, "start_time", time.time()))
     metrics["uptime_seconds"] = uptime_seconds
     return jsonify(
         {"status": "healthy", "timestamp": int(time.time()), "metrics": metrics}
