@@ -24,7 +24,7 @@ jobs:
     strategy:
       fail-fast: false  # Continuar con otras versiones si una falla
       matrix:
-        python-version: ['3.11', '3.12']
+        python-version: ['3.11', '3.12', '3.13']
         include:
           - python-version: '3.11'
             test-type: 'development'
@@ -32,6 +32,9 @@ jobs:
           - python-version: '3.12'
             test-type: 'production'
             coverage: true
+          - python-version: '3.13'
+            test-type: 'latest'
+            coverage: false
     
     steps:
       - name: 📥 Checkout code
