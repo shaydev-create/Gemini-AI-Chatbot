@@ -20,53 +20,9 @@ jobs:
   test:
     name: 🧪 Test Python ${{ matrix.python-version }}
     runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        python-version: ['3.11', '3.12', '3.13']
-    
-    steps:
-      - uses: actions/checkout@v4
-      
-      - name: 🔧 Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v4
-        with:
-          python-version: ${{ matrix.python-version }}
-      
-      - name: 🔒 Update CA certificates
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y ca-certificates
-          sudo update-ca-certificates
-      
-      - name: 📦 Upgrade pip and install certifi
-        run: |
-          python -m pip install --upgrade pip setuptools wheel
-          python -m pip install --upgrade certifi
-      
-      - name: 🎨 Install Poetry
-        uses: snok/install-poetry@v1
-        with:
-          virtualenvs-in-project: true
-      
-      - name: 📥 Install dependencies
-        run: poetry install --no-interaction
-      
-      - name: 🧹 Run linting
-        run: |
-          poetry run ruff check app/ tests/ --select=E,W,F --quiet
-      
-      - name: 🧪 Run tests
-        run: |
-          poetry run pytest -v tests/
-        run: |
-          curl -sSL https://install.python-poetry.org | POETRY_HOME=/opt/poetry python - --yes
-          echo "/opt/poetry/bin" >> $GITHUB_PATH
-    name: 🧪 Tests - Python ${{ matrix.python-version }}
-    runs-on: ubuntu-latest
     timeout-minutes: 15
     strategy:
-      fail-fast: false  # Continuar con otras versiones si una falla
+      fail-fast: false
       matrix:
         python-version: ['3.11', '3.12', '3.13']
         include:
@@ -84,20 +40,45 @@ jobs:
       - name: 📥 Checkout code
         uses: actions/checkout@v4
 
-      - name: 🐍 Set up Python ${{ matrix.python-version }}
-        uses: actions/setup-python@v5
+      - name: 🔧 Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
-
-      - name: 📦 Install Poetry
+      
+      - name: 🔒 Update CA certificates
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ca-certificates
+          sudo update-ca-certificates
+      
+      - name: 📦 Upgrade pip and install certifi
+        run: |
+          python -m pip install --upgrade pip setuptools wheel
+          python -m pip install --upgrade certifi
+      
+      - name: 📦 Cache Poetry dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/pypoetry
+          key: ${{ runner.os }}-poetry-${{ hashFiles('**/poetry.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-poetry-
+      
+      - name: 🎨 Install Poetry
         uses: snok/install-poetry@v1
         with:
           version: latest
           virtualenvs-create: true
           virtualenvs-in-project: true
-
-      - name: 📦 Cache Poetry dependencies
-        uses: actions/cache@v4
+      
+      - name: 📥 Install dependencies
+        run: poetry install --no-interaction
+      
+      - name: 🧹 Run linting
+        run: poetry run ruff check app/ tests/ --select=E,W,F --quiet
+      
+      - name: 🧪 Run tests
+        run: poetry run pytest -v tests/
         with:
           path: |
             ~/.cache/pypoetry
