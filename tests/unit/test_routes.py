@@ -10,7 +10,6 @@ def app():
     """Crea una instancia de una aplicación Flask para pruebas de rutas."""
     import os
     from unittest.mock import MagicMock, patch
-    import asyncio
 
     # Set test environment variables to avoid GeminiService initialization errors
     with patch.dict(os.environ, {"GEMINI_API_KEY": "test-key"}):
@@ -18,9 +17,11 @@ def app():
 
         # Mock the GeminiService instance that was created during app initialization
         mock_service = MagicMock()
+
         # Crear una corutina mock para el método asíncrono
         async def mock_generate_response(*args, **kwargs):
             return "Mocked response"
+
         mock_service.generate_response = mock_generate_response
         app.gemini_service = mock_service
 
@@ -130,9 +131,11 @@ def test_chat_api_unauthorized(client):
 
 def test_send_message_success(client, app):
     """Prueba el envío de un mensaje exitoso a /api/chat/send."""
+
     # Configure the mock that was set up in the app fixture
     async def mock_generate_response_success(*args, **kwargs):
         return "Hola, soy Gemini."
+
     app.gemini_service.generate_response = mock_generate_response_success
 
     response = client.post("/api/chat/send", json={"message": "Hola"})
@@ -170,9 +173,11 @@ def test_send_message_too_long(client):
 
 def test_send_message_internal_error(client, app):
     """Prueba el manejo de un error interno en /api/chat/send."""
+
     # Configure the mock to raise an exception
     async def mock_generate_response_error(*args, **kwargs):
         raise Exception("Internal Error")
+
     app.gemini_service.generate_response = mock_generate_response_error
 
     response = client.post("/api/chat/send", json={"message": "Hola"})

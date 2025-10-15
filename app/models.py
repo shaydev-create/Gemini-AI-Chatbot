@@ -9,10 +9,10 @@ import logging
 import secrets
 from datetime import datetime, timedelta, timezone
 from typing import Any, Optional
-from sqlalchemy.orm import Mapped
 
 import bcrypt
 from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy.orm import Mapped
 
 from app.config.extensions import db
 
@@ -49,9 +49,7 @@ class User(db.Model):
     password_hash: str = db.Column(db.String(128), nullable=False)
     first_name: Optional[str] = db.Column(db.String(64))
     last_name: Optional[str] = db.Column(db.String(64))
-    created_at: datetime = db.Column(
-        db.DateTime, default=lambda: datetime.now(timezone.utc)
-    )
+    created_at: datetime = db.Column(db.DateTime, default=db.func.now())
     last_login: Optional[datetime] = db.Column(db.DateTime)
     status: str = db.Column(db.String(20), default="pending", nullable=False)
     role: str = db.Column(db.String(20), default="user", nullable=False, index=True)
@@ -60,9 +58,11 @@ class User(db.Model):
     failed_login_attempts: int = db.Column(db.Integer, default=0, nullable=False)
     account_locked_until: Optional[datetime] = db.Column(db.DateTime, nullable=True)
 
-    chat_sessions: Mapped[list["ChatSession"]] = db.relationship("ChatSession", backref="user", lazy="select")
+    chat_sessions: Mapped[list["ChatSession"]] = db.relationship(
+        "ChatSession", backref="user", lazy="select"
+    )
 
-    def __init__(self, **kwargs):
+    def __init__(self, **kwargs) -> None:
         super().__init__(**kwargs)
         if not self.api_key:
             self.api_key = self.generate_new_api_key()
@@ -166,13 +166,11 @@ class ChatSession(db.Model):
     session_id: str = db.Column(db.String(64), unique=True, nullable=False, index=True)
     user_id: int = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=True)
     title: str = db.Column(db.String(255), nullable=False)
-    created_at: datetime = db.Column(
-        db.DateTime, default=lambda: datetime.now(timezone.utc)
-    )
+    created_at: datetime = db.Column(db.DateTime, default=db.func.now())
     updated_at: datetime = db.Column(
         db.DateTime,
-        default=lambda: datetime.now(timezone.utc),
-        onupdate=lambda: datetime.now(timezone.utc),
+        default=db.func.now(),
+        onupdate=db.func.now(),
     )
     status: str = db.Column(db.String(20), default="active", nullable=False)
     model: str = db.Column(db.String(50), default="gemini-flash-latest", nullable=False)
@@ -181,7 +179,7 @@ class ChatSession(db.Model):
         "ChatMessage", backref="session", lazy="select", cascade="all, delete-orphan"
     )
 
-    def __init__(self, **kwargs):
+    def __init__(self, **kwargs) -> None:
         super().__init__(**kwargs)
         if not self.session_id:
             self.session_id = secrets.token_urlsafe(16)

@@ -29,51 +29,12 @@ class TestVertexAIPostgreSQLIntegration:
         return VertexAIConfig()
 
     @pytest.fixture
-    def setup_test_database(self, test_database_url):
+    def setup_test_database(self, app):
         """Fixture para configurar base de datos de prueba."""
-        engine = create_engine(test_database_url)
+        with app.app_context():
+            from app.extensions import db
 
-        with engine.connect() as conn:
-            # Crear tablas para logs de AI
-            conn.execute(
-                text("""
-                CREATE TABLE ai_usage_logs (
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
-                    model_used TEXT NOT NULL,
-                    prompt_text TEXT NOT NULL,
-                    response_text TEXT,
-                    input_tokens INTEGER,
-                    output_tokens INTEGER,
-                    cost REAL,
-                    source TEXT,
-                    success BOOLEAN,
-                    error_message TEXT,
-                    response_time REAL
-                )
-            """)
-            )
-
-            # Crear tabla para métricas diarias
-            conn.execute(
-                text("""
-                CREATE TABLE daily_metrics (
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    date DATE UNIQUE,
-                    total_requests INTEGER DEFAULT 0,
-                    total_cost REAL DEFAULT 0.0,
-                    total_input_tokens INTEGER DEFAULT 0,
-                    total_output_tokens INTEGER DEFAULT 0,
-                    vertex_ai_requests INTEGER DEFAULT 0,
-                    gemini_fallback_requests INTEGER DEFAULT 0,
-                    error_count INTEGER DEFAULT 0
-                )
-            """)
-            )
-
-            conn.commit()
-
-        return engine
+            return db.engine
 
     def test_log_ai_usage_to_database(self, setup_test_database, vertex_config):
         """Test logging de uso de AI en la base de datos."""

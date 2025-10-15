@@ -92,7 +92,7 @@ class TestingConfig(Config):
     SECRET_KEY: str = os.environ.get(
         "TEST_SECRET_KEY", "test-secret-key-change-in-production"
     )
-    SQLALCHEMY_DATABASE_URI: str = "sqlite:///:memory:"
+    SQLALCHEMY_DATABASE_URI: str = "sqlite:///test.db"
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     WTF_CSRF_ENABLED: bool = False
     # ID de proyecto de Vertex AI para los tests.

@@ -43,7 +43,7 @@ def send_message() -> Tuple:
     except Exception:
         user_id = None  # Usuario anónimo
 
-    gemini_service = current_app.config.get('GEMINI_SERVICE')
+    gemini_service = current_app.config.get("GEMINI_SERVICE")
     if not gemini_service:
         return jsonify(
             {"message": "El servicio de IA no está disponible en este momento."}

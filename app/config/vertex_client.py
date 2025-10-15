@@ -281,7 +281,7 @@ class VertexAIClient:
 
         model = self.models[model_type]
         model_info = self.config.get_model_info(model_type)
-        
+
         if model_info is None:
             raise Exception(f"Información del modelo {model_type} no disponible")
 

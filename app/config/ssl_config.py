@@ -270,8 +270,10 @@ class SSLConfig:
             return {"error": str(e)}
 
 
+from pathlib import Path
+
 # Configuración SSL global
-ssl_config = SSLConfig()
+ssl_config = SSLConfig(base_dir=Path(__file__).parent.parent)
 
 
 def create_ssl_certificates(force_recreate=False):

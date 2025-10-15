@@ -170,6 +170,74 @@ class AuthManager:
 
         return None
 
+    def assign_role_to_user(self, user_id: int, role: str) -> Optional[User]:
+        """
+        Asigna un rol a un usuario existente.
+
+        Args:
+            user_id: ID del usuario al que se le asignará el rol.
+            role: El rol a asignar (ej. 'admin', 'user').
+
+        Returns:
+            El objeto User actualizado si la asignación fue exitosa, None en caso contrario.
+        """
+        valid_roles = ["superadmin", "admin", "moderator", "premium", "user", "guest"]
+        if role not in valid_roles:
+            logger.warning(
+                "Intento de asignar un rol inválido: %s a user_id: %d", role, user_id
+            )
+            return None
+
+        user = User.query.get(user_id)
+        if user:
+            user.role = role
+            db.session.commit()
+            logger.info(
+                "Rol '%s' asignado al usuario %s (ID: %d)", role, user.username, user_id
+            )
+            return user
+        logger.warning(
+            "No se encontró el usuario con ID: %d para asignar el rol.", user_id
+        )
+        return None
+
+    def remove_role_from_user(self, user_id: int, role: str) -> Optional[User]:
+        """
+        Elimina un rol específico de un usuario.
+
+        Args:
+            user_id: ID del usuario al que se le eliminará el rol.
+            role: El rol a eliminar.
+
+        Returns:
+            El objeto User actualizado si la eliminación fue exitosa, None en caso contrario.
+        """
+        user = User.query.get(user_id)
+        if user:
+            # Solo eliminar el rol si el usuario realmente lo tiene
+            if user.role == role:
+                user.role = "user"  # O algún rol predeterminado
+                db.session.commit()
+                logger.info(
+                    "Rol '%s' eliminado del usuario %s (ID: %d). Rol actual: %s",
+                    role,
+                    user.username,
+                    user_id,
+                    user.role,
+                )
+                return user
+            logger.warning(
+                "El usuario %s (ID: %d) no tiene el rol '%s' para eliminar.",
+                user.username,
+                user_id,
+                role,
+            )
+            return None  # Retornar None si el usuario no tiene el rol para eliminar
+        logger.warning(
+            "No se encontró el usuario con ID: %d para eliminar el rol.", user_id
+        )
+        return None
+
     def get_user_permissions(self, user_id: int) -> List[str]:
         """
         Obtiene la lista de permisos de un usuario basado en su rol.

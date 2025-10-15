@@ -5,7 +5,7 @@ import logging
 from pathlib import Path
 from typing import Any, List, Union
 
-from vertexai.generative_models import GenerationResponse, Part
+from vertexai.generative_models import Part
 
 from app.config.vertex_client import VertexAIClient
 

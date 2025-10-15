@@ -7,7 +7,7 @@ from app.api.admin import admin_bp as admin_blueprint
 from app.api.auth import auth_bp as auth_blueprint
 from app.api.routes import api_bp as api_blueprint
 from app.config.extensions import db, jwt, migrate, socketio
-from app.config.settings import DevelopmentConfig, ProductionConfig
+from app.config.settings import DevelopmentConfig, ProductionConfig, TestingConfig
 from app.main import main as main_blueprint
 from app.utils.translation_utils import register_translation_functions
 
@@ -29,6 +29,8 @@ def create_app(config_class=DevelopmentConfig):
     # Cargar configuración
     if os.environ.get("FLASK_ENV") == "production":
         app.config.from_object(ProductionConfig)
+    elif os.environ.get("FLASK_ENV") == "testing":
+        app.config.from_object(TestingConfig)
     else:
         app.config.from_object(DevelopmentConfig)
 
@@ -60,11 +62,11 @@ def create_app(config_class=DevelopmentConfig):
 
         # Usar la versión simple que funcionaba antes
         # Usar app.config en lugar de atributo directo para mejor compatibilidad
-        app.config['GEMINI_SERVICE'] = GeminiService()
+        app.config["GEMINI_SERVICE"] = GeminiService()
         app.logger.info("Servicio de Gemini inicializado exitosamente.")
     except Exception as e:
         app.logger.warning(f"No se pudo inicializar el servicio de Gemini: {e}")
-        app.config['GEMINI_SERVICE'] = None
+        app.config["GEMINI_SERVICE"] = None
 
     with app.app_context():
         # Crea las tablas de la base de datos si no existen

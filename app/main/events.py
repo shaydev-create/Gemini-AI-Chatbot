@@ -8,7 +8,7 @@ from app import socketio
 
 
 @socketio.on("connect")
-def handle_connect():
+def handle_connect() -> None:
     """
     Maneja la conexión de un nuevo cliente.
     """
@@ -17,7 +17,7 @@ def handle_connect():
 
 
 @socketio.on("disconnect")
-def handle_disconnect():
+def handle_disconnect() -> None:
     """
     Maneja la desconexión de un cliente.
     """
@@ -25,7 +25,7 @@ def handle_disconnect():
 
 
 @socketio.on("message")
-def handle_message(data):
+def handle_message(data: dict[str, Any]) -> None:
     """
     Maneja los mensajes entrantes de los clientes.
     """

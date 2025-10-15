@@ -5,7 +5,7 @@ from app.core.application import get_flask_app
 from app.models import User, db
 
 
-@pytest.fixture(scope="module")
+@pytest.fixture(scope="function")
 def app():
     """Crea y configura una nueva instancia de la aplicacion Flask para cada modulo de prueba."""
     import os
@@ -22,9 +22,12 @@ def app():
 
         # Crear tablas de la base de datos
         with app_instance.app_context():
+            db.drop_all()
             db.create_all()
             yield app_instance
+            db.session.remove()
             db.drop_all()
+            db.engine.dispose()
 
 
 @pytest.fixture(scope="module")

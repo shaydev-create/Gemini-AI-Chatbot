@@ -33,7 +33,7 @@ class TestAuthManager(unittest.TestCase):
             )
             user.status = "active"
             db.session.commit()
-    
+
     def tearDown(self):
         with self.app.app_context():
             db.session.remove()

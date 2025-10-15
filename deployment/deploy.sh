@@ -88,7 +88,8 @@ function deploy_code() {
     log "Instalando dependencias de Python..."
     # Activar venv y instalar dependencias
     sudo -u "${APP_USER}" "${VENV_DIR}/bin/pip" install --upgrade pip
-    sudo -u "${APP_USER}" "${VENV_DIR}/bin/pip" install -r "${APP_DIR}/requirements.txt"
+    sudo -u "${APP_USER}" "${VENV_DIR}/bin/pip" install poetry
+sudo -u "${APP_USER}" bash -c "cd ${APP_DIR} && ${VENV_DIR}/bin/poetry install --only=main"
 
     log "Aplicando migraciones de la base de datos..."
     # Las variables de entorno para la DB deben estar disponibles
