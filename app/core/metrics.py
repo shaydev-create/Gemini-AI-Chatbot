@@ -48,9 +48,7 @@ class MetricsManager:
         with self._lock:
             self.response_times.append(duration)
 
-    def record_request(
-        self, endpoint: str, method: str, status_code: int
-    ) -> dict[str, Any]:
+    def record_request(self, endpoint: str, method: str, status_code: int) -> dict[str, Any]:
         """
         Registra una solicitud entrante y actualiza los contadores relacionados.
         """
@@ -87,11 +85,7 @@ class MetricsManager:
                     "count": len(times),
                 }
 
-            recent_requests = [
-                req
-                for req in self.request_history
-                if current_time - req["timestamp"] <= 60
-            ]
+            recent_requests = [req for req in self.request_history if current_time - req["timestamp"] <= 60]
 
             return {
                 "uptime_seconds": uptime,
@@ -141,9 +135,7 @@ def prometheus_metrics() -> None:
     """
     if current_app.config.get("TESTING", False):
         # Deshabilitar en modo de prueba para no interferir con los tests
-        return Response(
-            "Métricas deshabilitadas en modo de prueba.", mimetype="text/plain"
-        )
+        return Response("Métricas deshabilitadas en modo de prueba.", mimetype="text/plain")
 
     metrics = metrics_manager.get_metrics()
     output: List[str] = []
@@ -160,11 +152,7 @@ def prometheus_metrics() -> None:
 
     # Contadores generales
     for key, value in metrics["counters"].items():
-        output.append(
-            _format_prometheus_metric(
-                f"gemini_{key}", value, "counter", f"Contador para {key}."
-            )
-        )
+        output.append(_format_prometheus_metric(f"gemini_{key}", value, "counter", f"Contador para {key}."))
 
     # Estadísticas de tiempo de respuesta
     if "response_time_stats" in metrics and metrics["response_time_stats"]:

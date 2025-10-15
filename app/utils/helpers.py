@@ -47,9 +47,7 @@ def hash_string(text: str, algorithm: str = "sha256") -> str:
         hash_obj.update(text.encode("utf-8"))
         return hash_obj.hexdigest()
     except ValueError:
-        logger.exception(
-            "Algoritmo de hash no válido: %s. Usando sha256 como fallback.", algorithm
-        )
+        logger.exception("Algoritmo de hash no válido: %s. Usando sha256 como fallback.", algorithm)
         hash_obj = hashlib.sha256()
         hash_obj.update(text.encode("utf-8"))
         return hash_obj.hexdigest()

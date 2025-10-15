@@ -71,9 +71,7 @@ except ImportError:
         class SecurityConfig:
             """Configuración de seguridad simulada."""
 
-            jwt_secret_key = os.getenv(
-                "JWT_SECRET_KEY", "fallback-dev-key-change-in-production"
-            )
+            jwt_secret_key = os.getenv("JWT_SECRET_KEY", "fallback-dev-key-change-in-production")
             jwt_expiration_hours: int = 24
             rate_limit_per_minute: int = 60
             max_login_attempts: int = 5
@@ -125,9 +123,7 @@ class TokenManager:
         self.blacklisted_tokens = set()
         self.logger = get_logger(__name__)
 
-    def generate_token(
-        self, user_id: str, additional_claims: Optional[Dict[str, Any]] = None
-    ) -> str:
+    def generate_token(self, user_id: str, additional_claims: Optional[Dict[str, Any]] = None) -> str:
         """Generar token JWT."""
         now = datetime.now(timezone.utc)
         payload = {
@@ -206,10 +202,7 @@ class RateLimiter:
             now = time.time()
 
             # Limpiar requests antiguos
-            while (
-                self.requests[identifier]
-                and now - self.requests[identifier][0] > self.window_seconds
-            ):
+            while self.requests[identifier] and now - self.requests[identifier][0] > self.window_seconds:
                 self.requests[identifier].popleft()
 
             # Verificar límite
@@ -227,10 +220,7 @@ class RateLimiter:
             now = time.time()
 
             # Limpiar requests antiguos
-            while (
-                self.requests[identifier]
-                and now - self.requests[identifier][0] > self.window_seconds
-            ):
+            while self.requests[identifier] and now - self.requests[identifier][0] > self.window_seconds:
                 self.requests[identifier].popleft()
 
             return max(0, self.max_requests - len(self.requests[identifier]))
@@ -260,9 +250,7 @@ class LoginAttemptTracker:
 
             # Limpiar intentos antiguos
             cutoff = now - self.lockout_seconds
-            self.attempts[identifier] = [
-                attempt for attempt in self.attempts[identifier] if attempt > cutoff
-            ]
+            self.attempts[identifier] = [attempt for attempt in self.attempts[identifier] if attempt > cutoff]
 
             # Agregar intento actual
             self.attempts[identifier].append(now)
@@ -270,9 +258,7 @@ class LoginAttemptTracker:
             # Verificar si se debe bloquear
             if len(self.attempts[identifier]) >= self.max_attempts:
                 self.lockouts[identifier] = now + self.lockout_seconds
-                self.logger.warning(
-                    f"Account locked due to failed attempts: {identifier}"
-                )
+                self.logger.warning(f"Account locked due to failed attempts: {identifier}")
 
     def record_successful_attempt(self, identifier: str) -> None:
         """Registrar intento exitoso."""
@@ -407,9 +393,7 @@ class SecurityAuditor:
         """Obtener resumen de seguridad."""
         with self.lock:
             cutoff = datetime.now(timezone.utc) - timedelta(hours=hours)
-            recent_events: list[Any] = [
-                event for event in self.events if event.timestamp > cutoff
-            ]
+            recent_events: list[Any] = [event for event in self.events if event.timestamp > cutoff]
 
             summary = {
                 "total_events": len(recent_events),
@@ -443,13 +427,9 @@ class SecurityManager:
 
     def __init__(self, config=None) -> None:
         self.config = config or get_current_config().security
-        self.token_manager = TokenManager(
-            self.config.jwt_secret_key, self.config.jwt_expiration_hours
-        )
+        self.token_manager = TokenManager(self.config.jwt_secret_key, self.config.jwt_expiration_hours)
         self.rate_limiter = RateLimiter(self.config.rate_limit_per_minute)
-        self.login_tracker = LoginAttemptTracker(
-            self.config.max_login_attempts, self.config.lockout_duration_minutes
-        )
+        self.login_tracker = LoginAttemptTracker(self.config.max_login_attempts, self.config.lockout_duration_minutes)
         self.auditor = SecurityAuditor()
         self.logger = get_logger(__name__)
 
@@ -477,9 +457,7 @@ class SecurityManager:
                     details={"lockout_remaining_seconds": remaining},
                 )
             )
-            raise AuthenticationError(
-                f"Account locked. Try again in {remaining} seconds."
-            )
+            raise AuthenticationError(f"Account locked. Try again in {remaining} seconds.")
 
         # Aquí iría la verificación real del usuario/password
         # Por ahora, simulamos la verificación
@@ -590,12 +568,8 @@ def require_auth(func: Callable) -> Callable:
 
         if not auth_header or not auth_header.startswith("Bearer "):
             if error_handler:
-                context = error_handler.handle_error(
-                    AuthenticationError("Missing or invalid authorization header")
-                )
-                response_data, status_code = error_handler.create_error_response(
-                    context
-                )
+                context = error_handler.handle_error(AuthenticationError("Missing or invalid authorization header"))
+                response_data, status_code = error_handler.create_error_response(context)
                 return jsonify(response_data), status_code
             else:
                 return jsonify({"error": "Authentication required"}), 401
@@ -605,12 +579,8 @@ def require_auth(func: Callable) -> Callable:
 
         if not payload:
             if error_handler:
-                context = error_handler.handle_error(
-                    AuthenticationError("Invalid or expired token")
-                )
-                response_data, status_code = error_handler.create_error_response(
-                    context
-                )
+                context = error_handler.handle_error(AuthenticationError("Invalid or expired token"))
+                response_data, status_code = error_handler.create_error_response(context)
                 return jsonify(response_data), status_code
             else:
                 return jsonify({"error": "Invalid token"}), 401
@@ -632,12 +602,8 @@ def require_role(required_role: str) -> None:
         def wrapper(*args, **kwargs) -> None:
             if not hasattr(g, "current_user") or not g.current_user:
                 if error_handler:
-                    context = error_handler.handle_error(
-                        AuthenticationError("Authentication required")
-                    )
-                    response_data, status_code = error_handler.create_error_response(
-                        context
-                    )
+                    context = error_handler.handle_error(AuthenticationError("Authentication required"))
+                    response_data, status_code = error_handler.create_error_response(context)
                     return jsonify(response_data), status_code
                 else:
                     return jsonify({"error": "Authentication required"}), 401
@@ -646,12 +612,8 @@ def require_role(required_role: str) -> None:
 
             if required_role not in user_roles:
                 if error_handler:
-                    context = error_handler.handle_error(
-                        AuthorizationError(f"Role '{required_role}' required")
-                    )
-                    response_data, status_code = error_handler.create_error_response(
-                        context
-                    )
+                    context = error_handler.handle_error(AuthorizationError(f"Role '{required_role}' required"))
+                    response_data, status_code = error_handler.create_error_response(context)
                     return jsonify(response_data), status_code
                 else:
                     return jsonify({"error": "Insufficient permissions"}), 403
@@ -697,9 +659,7 @@ def security_headers(func: Callable) -> Callable:
             response.headers["X-Content-Type-Options"] = "nosniff"
             response.headers["X-Frame-Options"] = "DENY"
             response.headers["X-XSS-Protection"] = "1; mode=block"
-            response.headers["Strict-Transport-Security"] = (
-                "max-age=31536000; includeSubDomains"
-            )
+            response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"
             response.headers["Content-Security-Policy"] = "default-src 'self'"
 
         return response

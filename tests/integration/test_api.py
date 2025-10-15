@@ -135,9 +135,7 @@ class TestAPIIntegration:
     def test_upload_authorized(self, client):
         """Test upload endpoint with authorization."""
         # Este endpoint no existe actualmente, debería devolver 404
-        response = client.post(
-            "/api/upload", headers={"Authorization": "Bearer test-token"}
-        )
+        response = client.post("/api/upload", headers={"Authorization": "Bearer test-token"})
         assert response.status_code == 404
 
     def test_chat_api_unauthorized(self, client):
@@ -160,9 +158,7 @@ class TestAPIIntegration:
 
     def test_send_message_missing_data(self, client):
         """Test envío de mensaje sin datos."""
-        response = client.post(
-            "/api/chat/send", data=json.dumps({}), content_type="application/json"
-        )
+        response = client.post("/api/chat/send", data=json.dumps({}), content_type="application/json")
         assert response.status_code == 400
 
         data = json.loads(response.data)
@@ -196,11 +192,7 @@ class TestAPIIntegration:
         data = json.loads(response.data)
         assert "message" in data
         # El mensaje actual menciona "4000 caracteres"
-        assert (
-            "4000" in data["message"]
-            or "excede" in data["message"]
-            or "limit" in data["message"]
-        )
+        assert "4000" in data["message"] or "excede" in data["message"] or "limit" in data["message"]
 
     def test_send_message_valid_format(self, client):
         """Test formato de respuesta válida."""
@@ -232,12 +224,8 @@ class TestAPIIntegration:
             # Hacemos 60 peticiones que deberían ser exitosas.
             for i in range(60):
                 response = client.get(endpoint)
-                assert response.status_code == 200, (
-                    f"Request {i + 1} failed with status {response.status_code}, expected 200"
-                )
+                assert response.status_code == 200, f"Request {i + 1} failed with status {response.status_code}, expected 200"
 
             # La petición 61 debería fallar con 429 Too Many Requests
             response = client.get(endpoint)
-            assert response.status_code == 429, (
-                f"Expected 429 Too Many Requests, got {response.status_code}"
-            )
+            assert response.status_code == 429, f"Expected 429 Too Many Requests, got {response.status_code}"

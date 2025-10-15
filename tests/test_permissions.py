@@ -28,9 +28,7 @@ def test_get_user_permissions():
     user_perms = get_user_permissions("user")
     assert "user.chat.create" in user_perms
     assert "user.profile.read" in user_perms
-    assert (
-        "admin.users.read" not in user_perms
-    )  # User no debería tener permisos de admin
+    assert "admin.users.read" not in user_perms  # User no debería tener permisos de admin
 
     # Test para rol inexistente
     unknown_perms = get_user_permissions("unknown")
@@ -69,9 +67,7 @@ def test_role_permissions_structure():
     # Verificar que los permisos asignados existen en PERMISSIONS
     for role, permissions in ROLE_PERMISSIONS.items():
         for permission in permissions:
-            assert permission in PERMISSIONS, (
-                f"Permiso '{permission}' no existe en PERMISSIONS para rol '{role}'"
-            )
+            assert permission in PERMISSIONS, f"Permiso '{permission}' no existe en PERMISSIONS para rol '{role}'"
 
 
 def test_permissions_hierarchy():

@@ -127,9 +127,7 @@ class TestVertexAIConfig:
 
         config = VertexAIConfig()
         config.initialize()
-        mock_init.assert_called_once_with(
-            project=config.project_id, location=config.location
-        )
+        mock_init.assert_called_once_with(project=config.project_id, location=config.location)
 
     @patch.dict(
         os.environ,
@@ -148,9 +146,7 @@ class TestVertexAIConfig:
         os.environ,
         {"GOOGLE_CLOUD_PROJECT_ID": "test-project", "VERTEX_AI_ENABLED": "true"},
     )
-    @patch(
-        "app.config.vertex_ai.aiplatform.init", side_effect=Exception("Error genérico")
-    )
+    @patch("app.config.vertex_ai.aiplatform.init", side_effect=Exception("Error genérico"))
     def test_initialize_generic_error(self, mock_init):
         """Test error genérico en inicialización."""
         config = VertexAIConfig()
@@ -273,8 +269,7 @@ class TestVertexAIIntegration:
             pytest.skip("No se pudo inicializar el cliente")
 
     @pytest.mark.skipif(
-        not os.getenv("GOOGLE_API_KEY")
-        or os.getenv("GOOGLE_API_KEY") == "test-api-key",
+        not os.getenv("GOOGLE_API_KEY") or os.getenv("GOOGLE_API_KEY") == "test-api-key",
         reason="Google API Key no configurada o es de prueba",
     )
     @pytest.mark.asyncio

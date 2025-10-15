@@ -68,11 +68,7 @@ class TestUserModel:
     def test_account_locking(self, app, init_database):
         """Test bloqueo de cuenta."""
         with app.app_context():
-            user = (
-                init_database.session.query(User)
-                .filter_by(email="test@example.com")
-                .one()
-            )
+            user = init_database.session.query(User).filter_by(email="test@example.com").one()
 
             # Incrementar intentos fallidos
             for _ in range(5):
@@ -107,10 +103,7 @@ class TestAuthentication:
             json={"username": "testuser", "password": "WrongPassword123!"},
         )
         assert response.status_code == 401
-        assert (
-            response.json["message"]
-            == "Credenciales inválidas o cuenta inactiva/bloqueada."
-        )
+        assert response.json["message"] == "Credenciales inválidas o cuenta inactiva/bloqueada."
 
     def test_register_user(self, client, init_database):
         """Test registro de nuevo usuario."""

@@ -57,7 +57,8 @@ class TestVertexAIPostgreSQLIntegration:
         with engine.connect() as conn:
             # Insertar log de uso
             conn.execute(
-                text("""
+                text(
+                    """
                 INSERT INTO ai_usage_logs (
                     model_used, prompt_text, response_text, input_tokens,
                     output_tokens, cost, source, success, response_time
@@ -65,7 +66,8 @@ class TestVertexAIPostgreSQLIntegration:
                     :model_used, :prompt_text, :response_text, :input_tokens,
                     :output_tokens, :cost, :source, :success, :response_time
                 )
-            """),
+            """
+                ),
                 usage_data,
             )
 
@@ -73,11 +75,13 @@ class TestVertexAIPostgreSQLIntegration:
 
             # Verificar que se guardó correctamente
             result = conn.execute(
-                text("""
+                text(
+                    """
                 SELECT model_used, cost, source, success
                 FROM ai_usage_logs
                 WHERE prompt_text = 'Test prompt'
-            """)
+            """
+                )
             )
 
             row = result.fetchone()
@@ -127,7 +131,8 @@ class TestVertexAIPostgreSQLIntegration:
 
             for i, log in enumerate(logs):
                 conn.execute(
-                    text("""
+                    text(
+                        """
                     INSERT INTO ai_usage_logs (
                         model_used, prompt_text, response_text, input_tokens,
                         output_tokens, cost, source, success
@@ -135,7 +140,8 @@ class TestVertexAIPostgreSQLIntegration:
                         'gemini-1.5-flash', :prompt, 'response', :input_tokens,
                         :output_tokens, :cost, :source, :success
                     )
-                """),
+                """
+                    ),
                     {
                         "prompt": f"Test prompt {i}",
                         "input_tokens": log["input_tokens"],
@@ -149,7 +155,8 @@ class TestVertexAIPostgreSQLIntegration:
 
             # Agregar métricas diarias
             conn.execute(
-                text("""
+                text(
+                    """
                 INSERT OR REPLACE INTO daily_metrics (
                     date, total_requests, total_cost, total_input_tokens,
                     total_output_tokens, vertex_ai_requests, gemini_fallback_requests,
@@ -166,19 +173,22 @@ class TestVertexAIPostgreSQLIntegration:
                     SUM(CASE WHEN success = 0 THEN 1 ELSE 0 END) as error_count
                 FROM ai_usage_logs
                 WHERE DATE(timestamp) = DATE('now')
-            """)
+            """
+                )
             )
 
             conn.commit()
 
             # Verificar métricas
             result = conn.execute(
-                text("""
+                text(
+                    """
                 SELECT total_requests, total_cost, vertex_ai_requests,
                        gemini_fallback_requests, error_count
                 FROM daily_metrics
                 WHERE date = DATE('now')
-            """)
+            """
+                )
             )
 
             row = result.fetchone()
@@ -209,7 +219,8 @@ class TestVertexAIPostgreSQLIntegration:
         # Simular logging en base de datos
         with engine.connect() as conn:
             conn.execute(
-                text("""
+                text(
+                    """
                 INSERT INTO ai_usage_logs (
                     model_used, prompt_text, response_text, input_tokens,
                     output_tokens, cost, source, success, response_time
@@ -217,7 +228,8 @@ class TestVertexAIPostgreSQLIntegration:
                     :model, :prompt, :response, :input_tokens,
                     :output_tokens, :cost, :source, :success, :response_time
                 )
-            """),
+            """
+                ),
                 {
                     "model": mock_result["model_type"],
                     "prompt": "Prompt de prueba",
@@ -235,11 +247,13 @@ class TestVertexAIPostgreSQLIntegration:
 
             # Verificar que se guardó
             log_result = conn.execute(
-                text("""
+                text(
+                    """
                 SELECT prompt_text, response_text, source, success
                 FROM ai_usage_logs
                 WHERE prompt_text = 'Prompt de prueba'
-            """)
+            """
+                )
             )
 
             row = log_result.fetchone()
@@ -259,13 +273,15 @@ class TestVertexAIPostgreSQLIntegration:
 
             for i, cost in enumerate(costs):
                 conn.execute(
-                    text("""
+                    text(
+                        """
                     INSERT INTO ai_usage_logs (
                         model_used, prompt_text, response_text, cost, source, success
                     ) VALUES (
                         'gemini-1.5-flash', :prompt, 'response', :cost, 'vertex_ai', 1
                     )
-                """),
+                """
+                    ),
                     {"prompt": f"Prompt {i}", "cost": cost},
                 )
 
@@ -273,12 +289,14 @@ class TestVertexAIPostgreSQLIntegration:
 
             # Calcular costo total del día
             result = conn.execute(
-                text("""
+                text(
+                    """
                 SELECT SUM(cost) as daily_cost
                 FROM ai_usage_logs
                 WHERE DATE(timestamp) = DATE('now')
                 AND success = 1
-            """)
+            """
+                )
             )
 
             row = result.fetchone()
@@ -325,7 +343,8 @@ class TestVertexAIPostgreSQLIntegration:
         with engine.connect() as conn:
             # Crear tabla si no existe
             conn.execute(
-                text("""
+                text(
+                    """
                 CREATE TABLE IF NOT EXISTS integration_test_logs (
                     id SERIAL PRIMARY KEY,
                     timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -333,15 +352,18 @@ class TestVertexAIPostgreSQLIntegration:
                     result_data JSONB,
                     success BOOLEAN
                 )
-            """)
+            """
+                )
             )
 
             # Insertar resultado del test
             conn.execute(
-                text("""
+                text(
+                    """
                 INSERT INTO integration_test_logs (test_type, result_data, success)
                 VALUES ('vertex_ai_integration', :data, :success)
-            """),
+            """
+                ),
                 {
                     "data": json.dumps(
                         {
@@ -359,13 +381,15 @@ class TestVertexAIPostgreSQLIntegration:
 
             # Verificar que se guardó
             verify_result = conn.execute(
-                text("""
+                text(
+                    """
                 SELECT success, result_data
                 FROM integration_test_logs
                 WHERE test_type = 'vertex_ai_integration'
                 ORDER BY timestamp DESC
                 LIMIT 1
-            """)
+            """
+                )
             )
 
             row = verify_result.fetchone()
@@ -374,10 +398,12 @@ class TestVertexAIPostgreSQLIntegration:
 
             # Limpiar datos de test
             conn.execute(
-                text("""
+                text(
+                    """
                 DELETE FROM integration_test_logs
                 WHERE test_type = 'vertex_ai_integration'
-            """)
+            """
+                )
             )
 
             conn.commit()
@@ -392,9 +418,7 @@ class TestErrorHandlingIntegration:
         """Test que simula un fallo de conexión a la base de datos."""
         # Crear un mock engine que lance error al conectar
         mock_engine = mock_create_engine.return_value
-        mock_engine.connect.side_effect = OperationalError(
-            "Simulated connection error", None, None
-        )
+        mock_engine.connect.side_effect = OperationalError("Simulated connection error", None, None)
 
         # Llamar a la función que verifica la conexión, pasando una URL dummy
         success, message = check_db_connection("postgresql://dummy")
@@ -407,9 +431,7 @@ class TestErrorHandlingIntegration:
         "app.config.vertex_client.VertexAIClient._initialize_gemini_api",
         side_effect=ImportError("Gemini API not available"),
     )
-    def test_vertex_ai_unavailable_with_database_logging(
-        self, mock_initialize_gemini_api
-    ):
+    def test_vertex_ai_unavailable_with_database_logging(self, mock_initialize_gemini_api):
         """Test logging cuando Vertex AI no está disponible."""
 
         client = VertexAIClient()
@@ -438,9 +460,7 @@ class TestErrorHandlingIntegration:
         client.daily_cost = 49.95
 
         # Verificar que no permite más requests con un costo estimado alto
-        can_proceed, reason = client._check_limits(
-            100000, "pro"
-        )  # Muchos tokens para generar costo alto
+        can_proceed, reason = client._check_limits(100000, "pro")  # Muchos tokens para generar costo alto
         assert can_proceed is False
         assert "costo" in reason.lower()
 

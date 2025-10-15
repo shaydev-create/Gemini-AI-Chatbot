@@ -52,9 +52,7 @@ class TestMultimodalService(unittest.TestCase):
 
         # Configurar un mock que debería NO ser llamado
         async def mock_generate_response(*args, **kwargs):
-            self.fail(
-                "El cliente no debería ser llamado cuando no hay imágenes válidas"
-            )
+            self.fail("El cliente no debería ser llamado cuando no hay imágenes válidas")
 
         self.mock_client.generate_response = mock_generate_response
 
@@ -75,9 +73,7 @@ class TestMultimodalService(unittest.TestCase):
 
         # A simple 1x1 red pixel gif
         base64_image = "data:image/gif;base64,R0lGODlhAQABAIABAP8AAP///yH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
-        response = self.run_async(
-            self.service.generate_response("What is this?", [base64_image])
-        )
+        response = self.run_async(self.service.generate_response("What is this?", [base64_image]))
 
         self.assertEqual(response, "Image received.")
 
@@ -91,9 +87,7 @@ class TestMultimodalService(unittest.TestCase):
         self.mock_client.generate_response = mock_generate_response
 
         image_path = "test_image.png"
-        response = self.run_async(
-            self.service.generate_response("Analyze this image.", [image_path])
-        )
+        response = self.run_async(self.service.generate_response("Analyze this image.", [image_path]))
 
         self.assertEqual(response, "Image from path received.")
         mock_exists.assert_called_once()
@@ -102,9 +96,7 @@ class TestMultimodalService(unittest.TestCase):
     def test_generate_response_with_nonexistent_image_path(self, mock_exists):
         """Test generating a response with a non-existent image path."""
         image_path = "nonexistent.jpg"
-        response = self.run_async(
-            self.service.generate_response("Analyze this.", [image_path])
-        )
+        response = self.run_async(self.service.generate_response("Analyze this.", [image_path]))
 
         self.assertEqual(
             response,
@@ -124,9 +116,7 @@ class TestMultimodalService(unittest.TestCase):
         response = self.run_async(
             self.service.generate_response(
                 "What is this?",
-                [
-                    "data:image/gif;base64,R0lGODlhAQABAIABAP8AAP///yH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
-                ],
+                ["data:image/gif;base64,R0lGODlhAQABAIABAP8AAP///yH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="],
             )
         )
 
@@ -137,9 +127,7 @@ class TestMultimodalService(unittest.TestCase):
 
     def test_generate_response_no_valid_images(self):
         """Test handling when no valid images are provided."""
-        response = self.run_async(
-            self.service.generate_response("Analyze this.", ["invalid_path.jpg"])
-        )
+        response = self.run_async(self.service.generate_response("Analyze this.", ["invalid_path.jpg"]))
 
         self.assertEqual(
             response,
@@ -156,12 +144,11 @@ class TestMultimodalService(unittest.TestCase):
         self.mock_client.generate_response = mock_generate_response
 
         base64_image1 = "data:image/gif;base64,R0lGODlhAQABAIABAP8AAP///yH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
-        base64_image2 = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg=="
-        response = self.run_async(
-            self.service.generate_response(
-                "Analyze these images.", [base64_image1, base64_image2]
-            )
+        base64_image2 = (
+            "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAD"
+            "UlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg=="
         )
+        response = self.run_async(self.service.generate_response("Analyze these images.", [base64_image1, base64_image2]))
 
         self.assertEqual(response, "Multiple images received.")
 
@@ -174,11 +161,7 @@ class TestMultimodalService(unittest.TestCase):
         self.mock_client.generate_response = mock_generate_response
 
         base64_image = "data:image/gif;base64,R0lGODlhAQABAIABAP8AAP///yH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
-        response = self.run_async(
-            self.service.generate_response(
-                "Analyze this.", [base64_image], model_type="vision"
-            )
-        )
+        response = self.run_async(self.service.generate_response("Analyze this.", [base64_image], model_type="vision"))
 
         self.assertEqual(response, "Vision model response.")
 
@@ -192,9 +175,7 @@ class TestMultimodalService(unittest.TestCase):
 
         base64_image = "data:image/gif;base64,R0lGODlhAQABAIABAP8AAP///yH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
         response = self.run_async(
-            self.service.generate_response(
-                "Analyze these.", ["invalid.jpg", base64_image, "another_invalid.png"]
-            )
+            self.service.generate_response("Analyze these.", ["invalid.jpg", base64_image, "another_invalid.png"])
         )
 
         self.assertEqual(response, "Mixed images response.")
@@ -223,9 +204,7 @@ class TestMultimodalService(unittest.TestCase):
         self.mock_client.generate_response = mock_generate_response
 
         base64_image = "data:image/gif;base64,R0lGODlhAQABAIABAP8AAP///yH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
-        self.run_async(
-            self.service.generate_response("Test error logging.", [base64_image])
-        )
+        self.run_async(self.service.generate_response("Test error logging.", [base64_image]))
 
         mock_logger.exception.assert_called()
 

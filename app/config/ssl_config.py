@@ -44,9 +44,7 @@ class SSLConfig:
         self.ca_cert_file = self.ssl_dir / "ca-cert.pem"
         self.ca_key_file = self.ssl_dir / "ca-key.pem"
 
-    def create_ssl_certificates(
-        self, force_recreate: bool = False
-    ) -> tuple[Optional[str], Optional[str]]:
+    def create_ssl_certificates(self, force_recreate: bool = False) -> tuple[Optional[str], Optional[str]]:
         """
         Crea certificados SSL autofirmados para desarrollo local.
 
@@ -82,9 +80,7 @@ class SSLConfig:
                 x509.NameAttribute(NameOID.STATE_OR_PROVINCE_NAME, "Madrid"),
                 x509.NameAttribute(NameOID.LOCALITY_NAME, "Madrid"),
                 x509.NameAttribute(NameOID.ORGANIZATION_NAME, "Gemini AI Chatbot CA"),
-                x509.NameAttribute(
-                    NameOID.ORGANIZATIONAL_UNIT_NAME, "Security Department"
-                ),
+                x509.NameAttribute(NameOID.ORGANIZATIONAL_UNIT_NAME, "Security Department"),
                 x509.NameAttribute(NameOID.COMMON_NAME, "Gemini AI Chatbot Root CA"),
             ]
         )
@@ -106,9 +102,7 @@ class SSLConfig:
                 ),
                 critical=False,
             )
-            .add_extension(
-                x509.BasicConstraints(ca=True, path_length=None), critical=True
-            )
+            .add_extension(x509.BasicConstraints(ca=True, path_length=None), critical=True)
             .add_extension(
                 x509.KeyUsage(
                     key_cert_sign=True,
@@ -174,9 +168,7 @@ class SSLConfig:
                 ),
                 critical=False,
             )
-            .add_extension(
-                x509.BasicConstraints(ca=False, path_length=None), critical=True
-            )
+            .add_extension(x509.BasicConstraints(ca=False, path_length=None), critical=True)
             .add_extension(
                 x509.KeyUsage(
                     key_cert_sign=False,
@@ -220,12 +212,8 @@ class SSLConfig:
             self.create_ssl_certificates()
         context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
         context.load_cert_chain(str(self.cert_file), str(self.key_file))
-        context.set_ciphers(
-            "ECDHE+AESGCM:ECDHE+CHACHA20:DHE+AESGCM:DHE+CHACHA20:!aNULL:!MD5:!DSS"
-        )
-        context.options |= (
-            ssl.OP_NO_SSLv2 | ssl.OP_NO_SSLv3 | ssl.OP_NO_TLSv1 | ssl.OP_NO_TLSv1_1
-        )
+        context.set_ciphers("ECDHE+AESGCM:ECDHE+CHACHA20:DHE+AESGCM:DHE+CHACHA20:!aNULL:!MD5:!DSS")
+        context.options |= ssl.OP_NO_SSLv2 | ssl.OP_NO_SSLv3 | ssl.OP_NO_TLSv1 | ssl.OP_NO_TLSv1_1
         context.options |= ssl.OP_SINGLE_DH_USE | ssl.OP_SINGLE_ECDH_USE
         return context
 
@@ -241,9 +229,7 @@ class SSLConfig:
                 return False, "Certificado aún no válido"
             if now > cert.not_valid_after_utc.replace(tzinfo=None):
                 return False, "Certificado expirado"
-            if (
-                cert.not_valid_after_utc.replace(tzinfo=None).date() - now.date()
-            ).days < 30:
+            if (cert.not_valid_after_utc.replace(tzinfo=None).date() - now.date()).days < 30:
                 return (
                     True,
                     f"Certificado expira en {(cert.not_valid_after_utc.replace(tzinfo=None).date() - now.date()).days} días",
@@ -314,8 +300,7 @@ SECURITY_HEADERS = {
         "upgrade-insecure-requests"
     ),
     "Permissions-Policy": (
-        "geolocation=(), microphone=(), camera=(), payment=(), usb=(), "
-        "magnetometer=(), gyroscope=(), accelerometer=()"
+        "geolocation=(), microphone=(), camera=(), payment=(), usb=(), " "magnetometer=(), gyroscope=(), accelerometer=()"
     ),
 }
 

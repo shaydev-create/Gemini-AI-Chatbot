@@ -57,9 +57,7 @@ class TestGeminiService:
             del os.environ["GOOGLE_API_KEY"]
 
         # Debería lanzar ValueError
-        with pytest.raises(
-            ValueError, match="GEMINI_API_KEY no encontrada en las variables de entorno"
-        ):
+        with pytest.raises(ValueError, match="GEMINI_API_KEY no encontrada en las variables de entorno"):
             GeminiService()
 
     @patch("app.services.gemini_service.genai")

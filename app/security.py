@@ -104,9 +104,7 @@ class SecurityManager:
                 "strength": self._calculate_password_strength(password),
             }
 
-    def check_rate_limit(
-        self, identifier: str, limit: int = 100, window: int = 3600
-    ) -> bool:
+    def check_rate_limit(self, identifier: str, limit: int = 100, window: int = 3600) -> bool:
         """Verificar límite de tasa."""
         now = datetime.now(timezone.utc)
 
@@ -115,11 +113,7 @@ class SecurityManager:
 
         # Limpiar requests antiguos
         cutoff = now - timedelta(seconds=window)
-        self.rate_limits[identifier] = [
-            timestamp
-            for timestamp in self.rate_limits[identifier]
-            if timestamp > cutoff
-        ]
+        self.rate_limits[identifier] = [timestamp for timestamp in self.rate_limits[identifier] if timestamp > cutoff]
 
         # Verificar límite
         if len(self.rate_limits[identifier]) >= limit:
@@ -190,9 +184,7 @@ class RateLimiter:
             if hasattr(g, "current_user") and g.current_user:
                 identifier = g.current_user.get("id", identifier)
 
-            if not self.security_manager.check_rate_limit(
-                identifier, self.limit, self.window
-            ):
+            if not self.security_manager.check_rate_limit(identifier, self.limit, self.window):
                 return (
                     jsonify(
                         {
@@ -213,10 +205,7 @@ def require_https(func) -> None:
 
     @wraps(func)
     def wrapper(*args, **kwargs) -> None:
-        if (
-            not request.is_secure
-            and not request.headers.get("X-Forwarded-Proto") == "https"
-        ):
+        if not request.is_secure and not request.headers.get("X-Forwarded-Proto") == "https":
             return (
                 jsonify(
                     {

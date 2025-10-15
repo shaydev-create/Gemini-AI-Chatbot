@@ -89,9 +89,7 @@ def test_sitemap_xml_route(client):
 def test_favicon_route(mock_send, app):
     """Prueba que la ruta '/favicon.ico' intenta servir el archivo."""
     # El mock debe devolver un objeto Response para que se puedan añadir cabeceras
-    mock_send.return_value = app.response_class(
-        "favicon content", mimetype="image/x-icon"
-    )
+    mock_send.return_value = app.response_class("favicon content", mimetype="image/x-icon")
     client = app.test_client()
     response = client.get("/favicon.ico")
     assert response.status_code == 200
@@ -184,9 +182,7 @@ def test_send_message_internal_error(client, app):
 
 def test_upload_authorized(client):
     """Prueba el endpoint /api/upload con autorización (no implementado)."""
-    response = client.post(
-        "/api/upload", headers={"Authorization": "Bearer test-token"}
-    )
+    response = client.post("/api/upload", headers={"Authorization": "Bearer test-token"})
     assert response.status_code == 404
 
 

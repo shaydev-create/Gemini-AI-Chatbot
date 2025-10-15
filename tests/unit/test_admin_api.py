@@ -120,9 +120,7 @@ class TestAdminRoutes(unittest.TestCase):
             }
             token = create_access_token(identity=identity)
 
-            response = self.client.get(
-                "/api/admin/metrics", headers={"Authorization": f"Bearer {token}"}
-            )
+            response = self.client.get("/api/admin/metrics", headers={"Authorization": f"Bearer {token}"})
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.get_json(), expected_metrics)

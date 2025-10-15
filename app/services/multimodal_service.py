@@ -28,9 +28,7 @@ class MultimodalService:
             client: Una instancia del VertexAIClient ya inicializado.
         """
         if not client or not client.initialized:
-            raise ValueError(
-                "El VertexAIClient debe ser proporcionado y estar inicializado."
-            )
+            raise ValueError("El VertexAIClient debe ser proporcionado y estar inicializado.")
         self.client = client
         logger.info("✅ Servicio Multimodal inicializado.")
 
@@ -38,9 +36,7 @@ class MultimodalService:
         """
         Crea un objeto `Part` de imagen a partir de una ruta de archivo o datos en base64.
         """
-        if isinstance(image_data, Path) or (
-            isinstance(image_data, str) and Path(image_data).exists()
-        ):
+        if isinstance(image_data, Path) or (isinstance(image_data, str) and Path(image_data).exists()):
             path = Path(image_data)
             mime_type = f"image/{path.suffix.lower().strip('.')}"
             with open(path, "rb") as f:
@@ -52,13 +48,9 @@ class MultimodalService:
             data = base64.b64decode(encoded)
             return Part.from_data(data, mime_type=mime_type)
 
-        raise ValueError(
-            f"Formato de imagen no válido o ruta no encontrada: {image_data}"
-        )
+        raise ValueError(f"Formato de imagen no válido o ruta no encontrada: {image_data}")
 
-    async def generate_response(
-        self, prompt: str, images: List[Union[str, Path]], model_type: str = "pro"
-    ) -> str:
+    async def generate_response(self, prompt: str, images: List[Union[str, Path]], model_type: str = "pro") -> str:
         """
         Genera una respuesta a partir de un prompt de texto y una lista de imágenes.
 
@@ -107,9 +99,7 @@ class MultimodalService:
 
         except Exception:
             logger.exception("❌ Error al generar la respuesta multimodal.")
-            return (
-                "Lo siento, ha ocurrido un error al procesar tu solicitud de imágenes."
-            )
+            return "Lo siento, ha ocurrido un error al procesar tu solicitud de imágenes."
 
 
 # La instanciación de este servicio, al igual que GeminiService,

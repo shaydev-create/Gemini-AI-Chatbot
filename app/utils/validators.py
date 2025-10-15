@@ -12,9 +12,7 @@ logger = logging.getLogger(__name__)
 # Expresiones regulares precompiladas para un mejor rendimiento
 EMAIL_PATTERN = re.compile(r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$")
 API_KEY_PATTERN = re.compile(r"^[a-zA-Z0-9_]{10,}$")
-DANGEROUS_SCRIPT_PATTERNS = re.compile(
-    r"<script[^>]*>.*?</script>|javascript:|on\w+\s*=", re.IGNORECASE
-)
+DANGEROUS_SCRIPT_PATTERNS = re.compile(r"<script[^>]*>.*?</script>|javascript:|on\w+\s*=", re.IGNORECASE)
 CONTROL_CHARS_PATTERN = re.compile(r"[\x00-\x1f\x7f]")
 WHITESPACE_PATTERN = re.compile(r"\s+")
 DANGEROUS_FILENAME_CHARS = re.compile(r'[<>:"|?*\\/]')
@@ -59,9 +57,7 @@ def validate_message_content(message: str) -> Tuple[bool, Optional[str]]:
         return False, "El mensaje es demasiado corto (mínimo 2 caracteres)."
 
     if DANGEROUS_SCRIPT_PATTERNS.search(message):
-        logger.warning(
-            f"Detectado contenido potencialmente peligroso en el mensaje: '{message[:100]}...'"
-        )
+        logger.warning(f"Detectado contenido potencialmente peligroso en el mensaje: '{message[:100]}...'")
         return (
             False,
             "El mensaje contiene contenido no permitido que podría ser inseguro.",
@@ -111,9 +107,7 @@ def sanitize_input(text: Optional[str]) -> str:
     return sanitized_text.strip()
 
 
-def validate_file_upload(
-    filename: str, allowed_extensions: List[str]
-) -> Tuple[bool, Optional[str]]:
+def validate_file_upload(filename: str, allowed_extensions: List[str]) -> Tuple[bool, Optional[str]]:
     """
     Valida el nombre de un archivo subido, su extensión y caracteres.
 
@@ -133,18 +127,14 @@ def validate_file_upload(
     extension = filename.rsplit(".", 1)[1].lower()
     if extension not in [ext.lower() for ext in allowed_extensions]:
         allowed_str: str = ", ".join(allowed_extensions)
-        logger.warning(
-            f"Intento de subir archivo con extensión no permitida: '{extension}'. Permitidas: {allowed_str}"
-        )
+        logger.warning(f"Intento de subir archivo con extensión no permitida: '{extension}'. Permitidas: {allowed_str}")
         return (
             False,
             f"Extensión de archivo no permitida. Solo se aceptan: {allowed_str}",
         )
 
     if DANGEROUS_FILENAME_CHARS.search(filename):
-        logger.warning(
-            f"Nombre de archivo '{filename}' contiene caracteres no permitidos."
-        )
+        logger.warning(f"Nombre de archivo '{filename}' contiene caracteres no permitidos.")
         return False, "El nombre del archivo contiene caracteres no válidos."
 
     return True, None

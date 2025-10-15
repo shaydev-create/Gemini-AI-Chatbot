@@ -23,13 +23,9 @@ class VertexAIConfig:
         """Inicializa la configuración cargando valores desde el entorno."""
         self.project_id: Optional[str] = os.getenv("GOOGLE_CLOUD_PROJECT_ID")
         self.location: Optional[str] = os.getenv("GOOGLE_CLOUD_LOCATION", "us-central1")
-        self.credentials_path: Optional[str] = os.getenv(
-            "GOOGLE_APPLICATION_CREDENTIALS"
-        )
+        self.credentials_path: Optional[str] = os.getenv("GOOGLE_APPLICATION_CREDENTIALS")
         self.enabled: bool = os.getenv("VERTEX_AI_ENABLED", "False").lower() == "true"
-        self.max_daily_cost: float = float(
-            os.getenv("VERTEX_AI_MAX_DAILY_COST", "50.0")
-        )
+        self.max_daily_cost: float = float(os.getenv("VERTEX_AI_MAX_DAILY_COST", "50.0"))
 
         # Catálogo de modelos disponibles con sus características y costos.
         self.models: Dict[str, Dict[str, Any]] = {
@@ -178,9 +174,7 @@ class VertexAIConfig:
         model_name = model_info["name"]
         return f"projects/{self.project_id}/locations/{self.location}/publishers/google/models/{model_name}"
 
-    def estimate_cost(
-        self, input_tokens: int, output_tokens: int, model_type: str = "fast"
-    ) -> float:
+    def estimate_cost(self, input_tokens: int, output_tokens: int, model_type: str = "fast") -> float:
         """
         Estima el costo de una solicitud a un modelo basado en el número de tokens.
 
@@ -194,9 +188,7 @@ class VertexAIConfig:
         """
         model_info = self.get_model_info(model_type)
         if not model_info:
-            logger.warning(
-                "No se pudo estimar el costo: modelo '%s' no encontrado.", model_type
-            )
+            logger.warning("No se pudo estimar el costo: modelo '%s' no encontrado.", model_type)
             return 0.0
 
         total_tokens = input_tokens + output_tokens

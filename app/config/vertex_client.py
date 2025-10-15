@@ -13,9 +13,7 @@ try:
     VERTEX_AI_AVAILABLE = True
 except ImportError:
     VERTEX_AI_AVAILABLE = False
-    logging.warning(
-        "⚠️ Vertex AI SDK no está instalado. Para usarlo, ejecute: pip install google-cloud-aiplatform vertexai"
-    )
+    logging.warning("⚠️ Vertex AI SDK no está instalado. Para usarlo, ejecute: pip install google-cloud-aiplatform vertexai")
 
 try:
     import google.generativeai as genai
@@ -88,23 +86,16 @@ class VertexAIClient:
                 return True
 
         # 2. Si Vertex AI falla o está deshabilitado, intentar inicializar Gemini API como fallback
-        if (
-            self.config.fallback_config.get("use_gemini_api", True)
-            and GEMINI_API_AVAILABLE
-        ):
+        if self.config.fallback_config.get("use_gemini_api", True) and GEMINI_API_AVAILABLE:
             if self._initialize_gemini_api():
                 self.initialized = True
                 self.is_healthy = True
                 self.fallback_active = True
-                logger.info(
-                    "🔄 Cliente de IA inicializado en modo Fallback (Gemini API)."
-                )
+                logger.info("🔄 Cliente de IA inicializado en modo Fallback (Gemini API).")
                 return True
 
         self.is_healthy = False
-        logger.error(
-            "❌ No se pudo inicializar ningún cliente de IA. Todas las funciones estarán desactivadas."
-        )
+        logger.error("❌ No se pudo inicializar ningún cliente de IA. Todas las funciones estarán desactivadas.")
         return False
 
     def _initialize_vertex_ai(self) -> bool:
@@ -123,14 +114,10 @@ class VertexAIClient:
                         model_info["name"],
                     )
                 except Exception:
-                    logger.exception(
-                        "⚠️ No se pudo cargar el modelo de Vertex AI: %s", model_type
-                    )
+                    logger.exception("⚠️ No se pudo cargar el modelo de Vertex AI: %s", model_type)
 
             if not self.models:
-                logger.error(
-                    "❌ No se pudo cargar ningún modelo de Vertex AI, la inicialización falló."
-                )
+                logger.error("❌ No se pudo cargar ningún modelo de Vertex AI, la inicialización falló.")
                 return False
 
             return True
@@ -143,9 +130,7 @@ class VertexAIClient:
         try:
             api_key = os.getenv("GOOGLE_API_KEY") or os.getenv("GEMINI_API_KEY")
             if not api_key:
-                logger.warning(
-                    "⚠️ No se encontró la API key para Gemini (GEMINI_API_KEY o GOOGLE_API_KEY)."
-                )
+                logger.warning("⚠️ No se encontró la API key para Gemini (GEMINI_API_KEY o GOOGLE_API_KEY).")
                 return False
 
             genai.configure(api_key=api_key)
@@ -169,9 +154,7 @@ class VertexAIClient:
             self.last_reset = time.time()
             logger.info("🔄 Límites de uso diarios reseteados.")
 
-    def _check_limits(
-        self, estimated_tokens: int, model_type: str = "fast"
-    ) -> Tuple[bool, str]:
+    def _check_limits(self, estimated_tokens: int, model_type: str = "fast") -> Tuple[bool, str]:
         """
         Verifica si la solicitud actual excede alguno de los límites de uso definidos.
 
@@ -189,16 +172,14 @@ class VertexAIClient:
         if self.daily_cost + estimated_cost > self.config.limits["max_daily_cost"]:
             return (
                 False,
-                f"Límite de costo diario alcanzado (${self.daily_cost:.2f}/"
-                f"${self.config.limits['max_daily_cost']:.2f})",
+                f"Límite de costo diario alcanzado (${self.daily_cost:.2f}/" f"${self.config.limits['max_daily_cost']:.2f})",
             )
 
         # Verificar límite de tokens por solicitud
         if estimated_tokens > self.config.limits["max_tokens_per_request"]:
             return (
                 False,
-                f"Solicitud excede límite de tokens ({estimated_tokens}/"
-                f"{self.config.limits['max_tokens_per_request']})",
+                f"Solicitud excede límite de tokens ({estimated_tokens}/" f"{self.config.limits['max_tokens_per_request']})",
             )
 
         return True, "OK"
@@ -295,9 +276,7 @@ class VertexAIClient:
 
         # Generar respuesta
         start_time = time.time()
-        response = await model.generate_content_async(
-            prompt, generation_config=generation_config
-        )
+        response = await model.generate_content_async(prompt, generation_config=generation_config)
         response_time = time.time() - start_time
 
         # Procesar respuesta
@@ -346,9 +325,7 @@ class VertexAIClient:
 
         # Generar respuesta
         start_time = time.time()
-        response = await self.gemini_client.generate_content_async(
-            prompt, generation_config=generation_config
-        )
+        response = await self.gemini_client.generate_content_async(prompt, generation_config=generation_config)
         response_time = time.time() - start_time
 
         # Procesar respuesta
@@ -407,18 +384,14 @@ class VertexAIClient:
             # Si es por límites de costo, intentar con fallback
             if "costo" in reason.lower() and not self.fallback_active:
                 logger.info("🔄 Intentando con Gemini API por límites de costo")
-                return await self._generate_with_gemini_api(
-                    prompt, max_tokens, temperature, **kwargs
-                )
+                return await self._generate_with_gemini_api(prompt, max_tokens, temperature, **kwargs)
             else:
                 raise ValueError(f"Solicitud rechazada: {reason}")
 
         # Intentar con Vertex AI primero
         if self.initialized and not self.fallback_active:
             try:
-                result = await self._generate_with_vertex_ai(
-                    prompt, model_type, max_tokens, temperature, **kwargs
-                )
+                result = await self._generate_with_vertex_ai(prompt, model_type, max_tokens, temperature, **kwargs)
                 self._update_metrics(
                     result["input_tokens"],
                     result["output_tokens"],
@@ -436,9 +409,7 @@ class VertexAIClient:
         # Usar Gemini API como fallback
         if self.gemini_client:
             try:
-                result = await self._generate_with_gemini_api(
-                    prompt, max_tokens, temperature, **kwargs
-                )
+                result = await self._generate_with_gemini_api(prompt, max_tokens, temperature, **kwargs)
                 self._update_metrics(
                     result["input_tokens"],
                     result["output_tokens"],
@@ -451,9 +422,7 @@ class VertexAIClient:
             except Exception as e:
                 logger.error(f"❌ Error en Gemini API: {e}")
                 self._update_metrics(0, 0, 0, 0, False)
-                raise RuntimeError(
-                    f"Todos los clientes fallaron. Último error: {e}"
-                ) from e
+                raise RuntimeError(f"Todos los clientes fallaron. Último error: {e}") from e
 
         raise Exception("No hay clientes disponibles")
 
@@ -474,11 +443,7 @@ class VertexAIClient:
             new_loop = asyncio.new_event_loop()
             asyncio.set_event_loop(new_loop)
             try:
-                return new_loop.run_until_complete(
-                    self.generate_response(
-                        prompt, model_type, max_tokens, temperature, **kwargs
-                    )
-                )
+                return new_loop.run_until_complete(self.generate_response(prompt, model_type, max_tokens, temperature, **kwargs))
             except Exception as e:
                 raise e
             finally:
@@ -508,9 +473,7 @@ class VertexAIClient:
                 "cost": round(self.daily_cost, 4),
                 "errors": self.error_count,
                 "success_rate": round(
-                    (self.request_count - self.error_count)
-                    / max(self.request_count, 1)
-                    * 100,
+                    (self.request_count - self.error_count) / max(self.request_count, 1) * 100,
                     2,
                 ),
             },
@@ -524,8 +487,7 @@ class VertexAIClient:
             "recent_requests": len(recent_history),
             "avg_response_time": (
                 round(
-                    sum(r["response_time"] for r in recent_history)
-                    / max(len(recent_history), 1),
+                    sum(r["response_time"] for r in recent_history) / max(len(recent_history), 1),
                     3,
                 )
                 if recent_history
@@ -573,10 +535,7 @@ class VertexAIClient:
                 logger.warning(f"⚠️ Gemini API health check falló: {e}")
 
         # Determinar estado general
-        health_status["overall_healthy"] = (
-            health_status["vertex_ai"]["available"]
-            or health_status["gemini_api"]["available"]
-        )
+        health_status["overall_healthy"] = health_status["vertex_ai"]["available"] or health_status["gemini_api"]["available"]
 
         self.is_healthy = health_status["overall_healthy"]
         return health_status

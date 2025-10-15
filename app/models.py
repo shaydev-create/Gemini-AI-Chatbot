@@ -58,9 +58,7 @@ class User(db.Model):
     failed_login_attempts: int = db.Column(db.Integer, default=0, nullable=False)
     account_locked_until: Optional[datetime] = db.Column(db.DateTime, nullable=True)
 
-    chat_sessions: Mapped[list["ChatSession"]] = db.relationship(
-        "ChatSession", backref="user", lazy="select"
-    )
+    chat_sessions: Mapped[list["ChatSession"]] = db.relationship("ChatSession", backref="user", lazy="select")
 
     def __init__(self, **kwargs) -> None:
         super().__init__(**kwargs)
@@ -109,9 +107,7 @@ class User(db.Model):
 
     def lock_account(self, minutes: int = 15) -> None:
         """Bloquea la cuenta por un número determinado de minutos."""
-        self.account_locked_until = datetime.now(timezone.utc) + timedelta(
-            minutes=minutes
-        )
+        self.account_locked_until = datetime.now(timezone.utc) + timedelta(minutes=minutes)
 
     def unlock_account(self) -> None:
         """Desbloquea la cuenta y resetea los intentos fallidos."""
@@ -135,9 +131,7 @@ class User(db.Model):
             db.session.commit()
         except SQLAlchemyError:
             db.session.rollback()
-            logger.exception(
-                "Error al auto-desbloquear la cuenta del usuario %s", self.username
-            )
+            logger.exception("Error al auto-desbloquear la cuenta del usuario %s", self.username)
         return False
 
     def to_dict(self) -> dict[str, Any]:
@@ -211,14 +205,10 @@ class ChatMessage(db.Model):
     __tablename__: str = "chat_messages"
 
     id: int = db.Column(db.Integer, primary_key=True)
-    session_id: int = db.Column(
-        db.Integer, db.ForeignKey("chat_sessions.id"), nullable=False, index=True
-    )
+    session_id: int = db.Column(db.Integer, db.ForeignKey("chat_sessions.id"), nullable=False, index=True)
     role: str = db.Column(db.String(20), nullable=False)  # 'user' o 'assistant'
     content: str = db.Column(db.Text, nullable=False)
-    created_at: datetime = db.Column(
-        db.DateTime, default=lambda: datetime.now(timezone.utc)
-    )
+    created_at: datetime = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
     tokens: Optional[int] = db.Column(db.Integer)
 
     def __repr__(self) -> Any:

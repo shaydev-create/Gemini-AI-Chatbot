@@ -42,9 +42,7 @@ class AuthManager:
         self.max_attempts = max_attempts
         self.lockout_duration = lockout_duration
 
-    def create_user(
-        self, username: str, password: str, email: str
-    ) -> tuple[Optional[User], str]:
+    def create_user(self, username: str, password: str, email: str) -> tuple[Optional[User], str]:
         """
         Crea un nuevo usuario en la base de datos.
 
@@ -56,9 +54,7 @@ class AuthManager:
 
         try:
             # Verificar si el usuario o el email ya existen
-            if User.query.filter(
-                (User.username == username) | (User.email == email)
-            ).first():
+            if User.query.filter((User.username == username) | (User.email == email)).first():
                 logger.warning(
                     "Intento de crear un usuario que ya existe: %s o %s",
                     username,
@@ -83,9 +79,7 @@ class AuthManager:
             return None, "El nombre de usuario o el email ya están en uso."
         except SQLAlchemyError:
             db.session.rollback()
-            logger.exception(
-                "❌ Error de base de datos al crear el usuario: %s", username
-            )
+            logger.exception("❌ Error de base de datos al crear el usuario: %s", username)
             return None, "Error en la base de datos al crear el usuario."
 
     def authenticate_user(self, username: str, password: str) -> Optional[User]:
@@ -96,15 +90,11 @@ class AuthManager:
         user = User.query.filter_by(username=username).first()
 
         if not user:
-            logger.warning(
-                "Intento de inicio de sesión para usuario no existente: %s", username
-            )
+            logger.warning("Intento de inicio de sesión para usuario no existente: %s", username)
             return None
 
         if user.is_account_locked():
-            logger.warning(
-                "Intento de inicio de sesión para cuenta bloqueada: %s", username
-            )
+            logger.warning("Intento de inicio de sesión para cuenta bloqueada: %s", username)
             return None
 
         if user.check_password(password):
@@ -197,22 +187,16 @@ class AuthManager:
             "guest",
         ]
         if role not in valid_roles:
-            logger.warning(
-                "Intento de asignar un rol inválido: %s a user_id: %d", role, user_id
-            )
+            logger.warning("Intento de asignar un rol inválido: %s a user_id: %d", role, user_id)
             return None
 
         user = User.query.get(user_id)
         if user:
             user.role = role
             db.session.commit()
-            logger.info(
-                "Rol '%s' asignado al usuario %s (ID: %d)", role, user.username, user_id
-            )
+            logger.info("Rol '%s' asignado al usuario %s (ID: %d)", role, user.username, user_id)
             return user
-        logger.warning(
-            "No se encontró el usuario con ID: %d para asignar el rol.", user_id
-        )
+        logger.warning("No se encontró el usuario con ID: %d para asignar el rol.", user_id)
         return None
 
     def remove_role_from_user(self, user_id: int, role: str) -> Optional[User]:
@@ -247,9 +231,7 @@ class AuthManager:
                 role,
             )
             return None  # Retornar None si el usuario no tiene el rol para eliminar
-        logger.warning(
-            "No se encontró el usuario con ID: %d para eliminar el rol.", user_id
-        )
+        logger.warning("No se encontró el usuario con ID: %d para eliminar el rol.", user_id)
         return None
 
     def get_user_permissions(self, user_id: int) -> List[str]:
@@ -317,12 +299,8 @@ class AuthManager:
             "role": user.role,  # Usar el rol real del usuario
         }
 
-        access_token = create_access_token(
-            identity=identity, expires_delta=timedelta(hours=1)
-        )
-        refresh_token = create_refresh_token(
-            identity=identity, expires_delta=timedelta(days=30)
-        )
+        access_token = create_access_token(identity=identity, expires_delta=timedelta(hours=1))
+        refresh_token = create_refresh_token(identity=identity, expires_delta=timedelta(days=30))
 
         return {
             "access_token": access_token,

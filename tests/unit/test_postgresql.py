@@ -37,9 +37,7 @@ class TestDatabaseConnection:
         """Test fallo de conexión a la base de datos."""
         mock_engine = Mock()
         mock_create_engine.return_value = mock_engine
-        mock_engine.connect.side_effect = OperationalError(
-            "Connection failed", None, None
-        )
+        mock_engine.connect.side_effect = OperationalError("Connection failed", None, None)
 
         result, msg = check_db_connection("sqlite:///:memory:")
 
@@ -148,27 +146,33 @@ class TestPostgreSQLIntegration:
 
                 # Test creación de tabla temporal
                 conn.execute(
-                    text("""
+                    text(
+                        """
                     CREATE TEMPORARY TABLE test_table (
                         id SERIAL PRIMARY KEY,
                         name VARCHAR(100),
                         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
                     )
-                """)
+                """
+                    )
                 )
 
                 # Test inserción
                 conn.execute(
-                    text("""
+                    text(
+                        """
                     INSERT INTO test_table (name) VALUES ('test_record')
-                """)
+                """
+                    )
                 )
 
                 # Test consulta
                 result = conn.execute(
-                    text("""
+                    text(
+                        """
                     SELECT name FROM test_table WHERE name = 'test_record'
-                """)
+                """
+                    )
                 )
                 row = result.fetchone()
                 assert row[0] == "test_record"
@@ -193,27 +197,33 @@ class TestPostgreSQLIntegration:
 
                 # Test creación de tabla
                 conn.execute(
-                    text("""
+                    text(
+                        """
                     CREATE TABLE test_table (
                         id INTEGER PRIMARY KEY AUTOINCREMENT,
                         name TEXT,
                         created_at DATETIME DEFAULT CURRENT_TIMESTAMP
                     )
-                """)
+                """
+                    )
                 )
 
                 # Test inserción
                 conn.execute(
-                    text("""
+                    text(
+                        """
                     INSERT INTO test_table (name) VALUES ('test_record')
-                """)
+                """
+                    )
                 )
 
                 # Test consulta
                 result = conn.execute(
-                    text("""
+                    text(
+                        """
                     SELECT name FROM test_table WHERE name = 'test_record'
-                """)
+                """
+                    )
                 )
                 row = result.fetchone()
                 assert row[0] == "test_record"
@@ -231,9 +241,7 @@ class TestDatabasePerformance:
     def test_connection_pool_performance(self):
         """Test rendimiento del pool de conexiones."""
         sqlite_url = "sqlite:///:memory:"
-        engine = create_engine(
-            sqlite_url, pool_size=5
-        )  # Eliminar max_overflow para SQLite
+        engine = create_engine(sqlite_url, pool_size=5)  # Eliminar max_overflow para SQLite
 
         import time
 
@@ -264,13 +272,15 @@ class TestDatabasePerformance:
         with engine.connect() as conn:
             # Crear tabla de prueba
             conn.execute(
-                text("""
+                text(
+                    """
                 CREATE TABLE performance_test (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     data TEXT,
                     number INTEGER
                 )
-            """)
+            """
+                )
             )
 
             import time
@@ -280,10 +290,12 @@ class TestDatabasePerformance:
             # Insertar 1000 registros
             for i in range(1000):
                 conn.execute(
-                    text("""
+                    text(
+                        """
                     INSERT INTO performance_test (data, number)
                     VALUES (:data, :number)
-                """),
+                """
+                    ),
                     {"data": f"test_data_{i}", "number": i},
                 )
 

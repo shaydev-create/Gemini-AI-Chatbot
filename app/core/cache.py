@@ -58,9 +58,7 @@ class CacheManager:
 
         with self._lock:
             self._cache[key] = (value, expiry)
-        logger.debug(
-            "Cache SET para la clave: %s con un TTL de %d segundos.", key, ttl_to_use
-        )
+        logger.debug("Cache SET para la clave: %s con un TTL de %d segundos.", key, ttl_to_use)
 
     def delete(self, key: str) -> bool:
         """
@@ -130,9 +128,7 @@ class CacheManager:
         Debe ser llamada solo desde métodos que ya tienen el lock.
         """
         current_time = time.time()
-        expired_keys = [
-            key for key, (_, expiry) in self._cache.items() if current_time >= expiry
-        ]
+        expired_keys = [key for key, (_, expiry) in self._cache.items() if current_time >= expiry]
 
         for key in expired_keys:
             del self._cache[key]

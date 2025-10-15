@@ -42,13 +42,9 @@ class TestSSLConfig:
 
     @patch("app.config.ssl_config.SSLConfig._create_ca_certificate")
     @patch("app.config.ssl_config.SSLConfig._create_server_certificate")
-    def test_create_ssl_certificates_recreate(
-        self, mock_create_server, mock_create_ca, mock_ssl_config_instance
-    ):
+    def test_create_ssl_certificates_recreate(self, mock_create_server, mock_create_ca, mock_ssl_config_instance):
         """Verifica la creación forzada de certificados."""
-        cert, key = mock_ssl_config_instance.create_ssl_certificates(
-            force_recreate=True
-        )
+        cert, key = mock_ssl_config_instance.create_ssl_certificates(force_recreate=True)
         mock_create_ca.assert_called_once()
         mock_create_server.assert_called_once()
         assert cert == str(mock_ssl_config_instance.cert_file)
@@ -64,9 +60,7 @@ class TestSSLConfig:
         mock_certs_exist,
     ):
         """Verifica que no se recrean certificados si ya existen y no se fuerza la recreación."""
-        cert, key = mock_ssl_config_instance.create_ssl_certificates(
-            force_recreate=False
-        )
+        cert, key = mock_ssl_config_instance.create_ssl_certificates(force_recreate=False)
         mock_create_ca.assert_not_called()
         mock_create_server.assert_not_called()
         assert cert == str(mock_ssl_config_instance.cert_file)
@@ -77,32 +71,30 @@ class TestSSLConfig:
         "app.config.ssl_config.SSLConfig._create_ca_certificate",
         side_effect=Exception("Test Error"),
     )
-    def test_create_ssl_certificates_error(
-        self, mock_create_ca, mock_logger, mock_ssl_config_instance
-    ):
+    def test_create_ssl_certificates_error(self, mock_create_ca, mock_logger, mock_ssl_config_instance):
         """Verifica el manejo de errores durante la creación de certificados."""
-        cert, key = mock_ssl_config_instance.create_ssl_certificates(
-            force_recreate=True
-        )
-        mock_logger.exception.assert_called_once_with(
-            "❌ Error crítico al generar los certificados SSL."
-        )
+        cert, key = mock_ssl_config_instance.create_ssl_certificates(force_recreate=True)
+        mock_logger.exception.assert_called_once_with("❌ Error crítico al generar los certificados SSL.")
         assert cert is None
         assert key is None
 
     @patch("app.config.ssl_config.rsa.generate_private_key")
     @patch("app.config.ssl_config.x509.CertificateBuilder")
     @patch("builtins.open")
-    def test_create_ca_certificate(
-        self, mock_open, mock_cert_builder, mock_rsa_key, mock_ssl_config_instance
-    ):
+    def test_create_ca_certificate(self, mock_open, mock_cert_builder, mock_rsa_key, mock_ssl_config_instance):
         """Verifica la creación del certificado CA."""
         mock_key_instance = MagicMock()
         mock_key_instance.private_bytes.return_value = b"private key bytes"
         mock_rsa_key.return_value = mock_key_instance
         mock_cert_instance = MagicMock()
         mock_cert_instance.public_bytes.return_value = b"public cert bytes"
-        mock_cert_builder.return_value.subject_name.return_value.issuer_name.return_value.public_key.return_value.serial_number.return_value.not_valid_before.return_value.not_valid_after.return_value.add_extension.return_value.add_extension.return_value.add_extension.return_value.sign.return_value = mock_cert_instance
+        # Mock certificate builder chain
+        (
+            mock_cert_builder.return_value.subject_name.return_value.issuer_name.return_value
+            .public_key.return_value.serial_number.return_value.not_valid_before.return_value
+            .not_valid_after.return_value.add_extension.return_value.add_extension.return_value
+            .add_extension.return_value.sign.return_value
+        ) = mock_cert_instance
 
         mock_file_handle = MagicMock()
         mock_open.return_value.__enter__.return_value = mock_file_handle
@@ -121,9 +113,7 @@ class TestSSLConfig:
             format=serialization.PrivateFormat.PKCS8,
             encryption_algorithm=ANY,
         )
-        mock_cert_instance.public_bytes.assert_called_once_with(
-            serialization.Encoding.PEM
-        )
+        mock_cert_instance.public_bytes.assert_called_once_with(serialization.Encoding.PEM)
         assert mock_file_handle.write.call_count == 2
         assert mock_ssl_config_instance.ca_key_file.exists()
         assert mock_ssl_config_instance.ca_cert_file.exists()
@@ -148,21 +138,21 @@ class TestSSLConfig:
         mock_load_key.return_value = mock_ca_key_instance
 
         mock_ca_cert_instance = MagicMock()
-        mock_ca_cert_instance.subject.rfc4514_string.return_value = (
-            "CN=Gemini AI Chatbot Root CA"
-        )
+        mock_ca_cert_instance.subject.rfc4514_string.return_value = "CN=Gemini AI Chatbot Root CA"
         mock_load_cert.return_value = mock_ca_cert_instance
 
         mock_server_key_instance = MagicMock()
-        mock_server_key_instance.private_bytes.return_value = (
-            b"server private key bytes"
-        )
+        mock_server_key_instance.private_bytes.return_value = b"server private key bytes"
         mock_rsa_key.return_value = mock_server_key_instance
         mock_server_cert_instance = MagicMock()
-        mock_server_cert_instance.public_bytes.return_value = (
-            b"server public cert bytes"
-        )
-        mock_cert_builder.return_value.subject_name.return_value.issuer_name.return_value.public_key.return_value.serial_number.return_value.not_valid_before.return_value.not_valid_after.return_value.add_extension.return_value.add_extension.return_value.add_extension.return_value.add_extension.return_value.sign.return_value = mock_server_cert_instance
+        mock_server_cert_instance.public_bytes.return_value = b"server public cert bytes"
+        # Mock server certificate builder chain
+        (
+            mock_cert_builder.return_value.subject_name.return_value.issuer_name.return_value
+            .public_key.return_value.serial_number.return_value.not_valid_before.return_value
+            .not_valid_after.return_value.add_extension.return_value.add_extension.return_value
+            .add_extension.return_value.add_extension.return_value.sign.return_value
+        ) = mock_server_cert_instance
 
         mock_file_handle = MagicMock()
         mock_open.return_value.__enter__.return_value = mock_file_handle
@@ -183,9 +173,7 @@ class TestSSLConfig:
             format=serialization.PrivateFormat.PKCS8,
             encryption_algorithm=ANY,
         )
-        mock_server_cert_instance.public_bytes.assert_called_once_with(
-            serialization.Encoding.PEM
-        )
+        mock_server_cert_instance.public_bytes.assert_called_once_with(serialization.Encoding.PEM)
         # open es llamado 4 veces: 2 para lectura (CA key/cert) y 2 para escritura (server key/cert)
         assert mock_open.call_count == 4
         # write es llamado 2 veces: una para la clave del servidor y otra para el certificado
@@ -218,9 +206,7 @@ class TestSSLConfig:
 
     @patch("app.config.ssl_config.ssl.SSLContext")
     @patch("app.config.ssl_config.SSLConfig.create_ssl_certificates")
-    def test_get_ssl_context_certs_not_exist(
-        self, mock_create_certs, mock_ssl_context, mock_ssl_config_instance
-    ):
+    def test_get_ssl_context_certs_not_exist(self, mock_create_certs, mock_ssl_context, mock_ssl_config_instance):
         """Verifica que se crean certificados si no existen al obtener el contexto SSL."""
         # Simulate certs not existing
         mock_ssl_config_instance.cert_file.unlink(missing_ok=True)
@@ -241,9 +227,7 @@ class TestSSLConfig:
 
     @patch("app.config.ssl_config.x509.load_pem_x509_certificate")
     @patch("builtins.open")
-    def test_validate_certificates_valid(
-        self, mock_open, mock_load_cert, mock_ssl_config_instance, mock_certs_exist
-    ):
+    def test_validate_certificates_valid(self, mock_open, mock_load_cert, mock_ssl_config_instance, mock_certs_exist):
         """Verifica la validación de certificados válidos."""
         mock_cert = MagicMock()
         # Create timezone-aware datetime objects for the certificate
@@ -273,9 +257,7 @@ class TestSSLConfig:
 
     @patch("app.config.ssl_config.x509.load_pem_x509_certificate")
     @patch("builtins.open")
-    def test_validate_certificates_expired(
-        self, mock_open, mock_load_cert, mock_ssl_config_instance, mock_certs_exist
-    ):
+    def test_validate_certificates_expired(self, mock_open, mock_load_cert, mock_ssl_config_instance, mock_certs_exist):
         """Verifica la validación de certificados expirados."""
         mock_cert = MagicMock()
         # Create timezone-aware datetime objects for the certificate
@@ -305,9 +287,7 @@ class TestSSLConfig:
 
     @patch("app.config.ssl_config.x509.load_pem_x509_certificate")
     @patch("builtins.open")
-    def test_validate_certificates_not_yet_valid(
-        self, mock_open, mock_load_cert, mock_ssl_config_instance, mock_certs_exist
-    ):
+    def test_validate_certificates_not_yet_valid(self, mock_open, mock_load_cert, mock_ssl_config_instance, mock_certs_exist):
         """Verifica la validación de certificados aún no válidos."""
         mock_cert = MagicMock()
         # Create timezone-aware datetime objects for the certificate
@@ -337,9 +317,7 @@ class TestSSLConfig:
 
     @patch("app.config.ssl_config.x509.load_pem_x509_certificate")
     @patch("builtins.open")
-    def test_validate_certificates_expiring_soon(
-        self, mock_open, mock_load_cert, mock_ssl_config_instance, mock_certs_exist
-    ):
+    def test_validate_certificates_expiring_soon(self, mock_open, mock_load_cert, mock_ssl_config_instance, mock_certs_exist):
         """Verifica la validación de certificados que expiran pronto."""
         mock_cert = MagicMock()
         # Create timezone-aware datetime objects for the certificate
@@ -394,9 +372,7 @@ class TestSSLConfig:
 
     @patch("app.config.ssl_config.x509.load_pem_x509_certificate")
     @patch("builtins.open")
-    def test_get_certificate_info(
-        self, mock_open, mock_load_cert, mock_ssl_config_instance, mock_certs_exist
-    ):
+    def test_get_certificate_info(self, mock_open, mock_load_cert, mock_ssl_config_instance, mock_certs_exist):
         """Verifica la obtención de información del certificado."""
         mock_cert = MagicMock()
         mock_cert.subject.rfc4514_string.return_value = "subject_test"

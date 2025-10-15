@@ -67,9 +67,7 @@ def test_register_existing_email(app, client, new_user_data):
     """Prueba el registro con un email que ya existe."""
     with app.app_context():
         client.post("/auth/register", json=new_user_data)  # Registrar primero
-        response = client.post(
-            "/auth/register", json=new_user_data
-        )  # Intentar de nuevo
+        response = client.post("/auth/register", json=new_user_data)  # Intentar de nuevo
         assert response.status_code == 409
         assert "message" in response.json
 

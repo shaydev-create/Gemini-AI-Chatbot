@@ -40,20 +40,21 @@ def role_required(required_role: str) -> None:
 
                 if not current_user:
                     logger.warning("Acceso denegado: usuario no autenticado")
-                    return jsonify(
-                        {
-                            "message": "Se requiere autenticación para acceder a este recurso.",
-                            "error": "authentication_required",
-                        }
-                    ), 401
+                    return (
+                        jsonify(
+                            {
+                                "message": "Se requiere autenticación para acceder a este recurso.",
+                                "error": "authentication_required",
+                            }
+                        ),
+                        401,
+                    )
 
                 jwt_identity = get_jwt_identity()
                 user_role = jwt_identity.get("role", "user")
 
                 # Verificar si el usuario tiene el rol requerido o uno superior
-                required_roles: list[Any] = [
-                    r.strip() for r in required_role.split(",")
-                ]
+                required_roles: list[Any] = [r.strip() for r in required_role.split(",")]
                 user_has_access: bool = False
 
                 # Verificar acceso por rol específico
@@ -61,8 +62,7 @@ def role_required(required_role: str) -> None:
                     user_has_access: bool = True
                 # Verificar acceso por jerarquía (si el usuario tiene un rol superior)
                 elif user_role in ROLE_HIERARCHY and any(
-                    req_role in ROLE_HIERARCHY
-                    and ROLE_HIERARCHY[user_role] >= ROLE_HIERARCHY[req_role]
+                    req_role in ROLE_HIERARCHY and ROLE_HIERARCHY[user_role] >= ROLE_HIERARCHY[req_role]
                     for req_role in required_roles
                 ):
                     user_has_access: bool = True
@@ -74,24 +74,30 @@ def role_required(required_role: str) -> None:
                         user_role,
                         required_role,
                     )
-                    return jsonify(
-                        {
-                            "message": "No tienes permiso para realizar esta acción.",
-                            "error": "insufficient_permissions",
-                            "required_role": required_role,
-                            "user_role": user_role,
-                        }
-                    ), 403
+                    return (
+                        jsonify(
+                            {
+                                "message": "No tienes permiso para realizar esta acción.",
+                                "error": "insufficient_permissions",
+                                "required_role": required_role,
+                                "user_role": user_role,
+                            }
+                        ),
+                        403,
+                    )
 
                 return fn(*args, **kwargs)
             except Exception:
                 logger.exception("Error en el decorador role_required.")
-                return jsonify(
-                    {
-                        "message": "Error interno al verificar los permisos.",
-                        "error": "internal_server_error",
-                    }
-                ), 500
+                return (
+                    jsonify(
+                        {
+                            "message": "Error interno al verificar los permisos.",
+                            "error": "internal_server_error",
+                        }
+                    ),
+                    500,
+                )
 
         return wrapper
 

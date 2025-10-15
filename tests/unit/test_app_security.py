@@ -12,15 +12,9 @@ class TestSecurityManager(unittest.TestCase):
         self.manager = SecurityManager()
 
     def test_sanitize_input(self):
-        self.assertEqual(
-            self.manager.sanitize_input("<script>alert('xss')</script>"), "alert('xss')"
-        )
-        self.assertEqual(
-            self.manager.sanitize_input("<b>Hello</b> World"), "<b>Hello</b> World"
-        )
-        self.assertEqual(
-            self.manager.sanitize_input(" an evil input "), "an evil input"
-        )
+        self.assertEqual(self.manager.sanitize_input("<script>alert('xss')</script>"), "alert('xss')")
+        self.assertEqual(self.manager.sanitize_input("<b>Hello</b> World"), "<b>Hello</b> World")
+        self.assertEqual(self.manager.sanitize_input(" an evil input "), "an evil input")
         self.assertEqual(self.manager.sanitize_input("a" * 10001), "a" * 10000)
         self.assertEqual(self.manager.sanitize_input(123), "")
 
@@ -71,33 +65,19 @@ class TestSecurityManager(unittest.TestCase):
     def test_check_rate_limit(self):
         identifier = "127.0.0.1"
         for _ in range(5):
-            self.assertTrue(
-                self.manager.check_rate_limit(identifier, limit=5, window=60)
-            )
+            self.assertTrue(self.manager.check_rate_limit(identifier, limit=5, window=60))
         self.assertFalse(self.manager.check_rate_limit(identifier, limit=5, window=60))
 
     def test_check_rate_limit_new_identifier(self):
         """Test para cubrir líneas 95-96: rate limit con identificador nuevo."""
         # Identificador que no existe en rate_limits
         new_identifier = "192.168.1.100"
-        self.assertTrue(
-            self.manager.check_rate_limit(new_identifier, limit=5, window=60)
-        )
+        self.assertTrue(self.manager.check_rate_limit(new_identifier, limit=5, window=60))
 
     def test_detect_suspicious_activity(self):
-        self.assertTrue(
-            self.manager.detect_suspicious_activity({"comment": "SELECT * FROM users"})
-        )
-        self.assertTrue(
-            self.manager.detect_suspicious_activity(
-                {"post": "<script>alert(1)</script>"}
-            )
-        )
-        self.assertFalse(
-            self.manager.detect_suspicious_activity(
-                {"comment": "This is a safe comment."}
-            )
-        )
+        self.assertTrue(self.manager.detect_suspicious_activity({"comment": "SELECT * FROM users"}))
+        self.assertTrue(self.manager.detect_suspicious_activity({"post": "<script>alert(1)</script>"}))
+        self.assertFalse(self.manager.detect_suspicious_activity({"comment": "This is a safe comment."}))
 
     def test_csrf_token_generation_and_validation(self):
         token1 = self.manager.generate_csrf_token()
@@ -173,28 +153,20 @@ class TestDecorators(unittest.TestCase):
             self.assertEqual(response3.status_code, 429)
 
     def test_require_https_decorator(self):
-        with self.app.test_request_context(
-            "/secure", method="POST", base_url="http://localhost"
-        ):
+        with self.app.test_request_context("/secure", method="POST", base_url="http://localhost"):
             response = self.client.post("/secure")
             self.assertEqual(response.status_code, 400)
             self.assertIn("HTTPS required", response.get_data(as_text=True))
 
-        with self.app.test_request_context(
-            "/secure", method="POST", base_url="https://localhost"
-        ):
+        with self.app.test_request_context("/secure", method="POST", base_url="https://localhost"):
             # In a test environment, request.is_secure might still be false.
             # We can simulate the X-Forwarded-Proto header.
-            response = self.client.post(
-                "/secure", headers={"X-Forwarded-Proto": "https"}
-            )
+            response = self.client.post("/secure", headers={"X-Forwarded-Proto": "https"})
             self.assertEqual(response.status_code, 200)
 
     def test_validate_input_decorator_sanitization(self):
         # Test sanitization of non-suspicious HTML
-        with self.app.test_request_context(
-            "/validated", method="POST", json={"comment": "<b>innocent</b>"}
-        ):
+        with self.app.test_request_context("/validated", method="POST", json={"comment": "<b>innocent</b>"}):
             view_func = self.app.view_functions["validated_route"]
             response = view_func()
             # On success, the decorator passes through, and the view returns a Response object
@@ -203,22 +175,16 @@ class TestDecorators(unittest.TestCase):
             self.assertEqual(json_data["data"]["comment"], "<b>innocent</b>")
 
     def test_validate_input_decorator_suspicious_activity(self):
-        with self.app.test_request_context(
-            "/validated", method="POST", json={"comment": "SELECT * FROM users"}
-        ):
+        with self.app.test_request_context("/validated", method="POST", json={"comment": "SELECT * FROM users"}):
             view_func = self.app.view_functions["validated_route"]
             # On suspicious activity, the decorator returns a tuple (response, status_code)
             response, status_code = view_func()
             self.assertEqual(status_code, 400)
-            self.assertIn(
-                "Suspicious activity detected", response.get_data(as_text=True)
-            )
+            self.assertIn("Suspicious activity detected", response.get_data(as_text=True))
 
     def test_validate_input_decorator_form_data(self):
         """Test para cubrir línea 239: validate_input con datos de formulario (no JSON)."""
-        with self.app.test_request_context(
-            "/validated", method="POST", data={"comment": "safe input"}
-        ):
+        with self.app.test_request_context("/validated", method="POST", data={"comment": "safe input"}):
             view_func = self.app.view_functions["validated_route"]
             response = view_func()
             self.assertEqual(response.status_code, 200)

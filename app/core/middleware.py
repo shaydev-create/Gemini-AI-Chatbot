@@ -37,9 +37,7 @@ def setup_middleware(app) -> None:
         g.start_time = time.time()
 
         # Log del request
-        logger.info(
-            f"Request: {request.method} {request.path} from {request.remote_addr}"
-        )
+        logger.info(f"Request: {request.method} {request.path} from {request.remote_addr}")
 
         # Incrementar contador de requests
         metrics_manager.increment_counter("total_requests")
@@ -60,9 +58,7 @@ def setup_middleware(app) -> None:
             logger.info(f"Response: {response.status_code} in {response_time:.3f}s")
 
         # Headers de seguridad adicionales
-        response.headers["X-Request-ID"] = request.headers.get(
-            "X-Request-ID", "unknown"
-        )
+        response.headers["X-Request-ID"] = request.headers.get("X-Request-ID", "unknown")
         # Cabeceras de seguridad para XSS
         response.headers["X-Content-Type-Options"] = "nosniff"
         response.headers["X-Frame-Options"] = "DENY"

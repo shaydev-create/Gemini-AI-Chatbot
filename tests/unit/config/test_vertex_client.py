@@ -32,14 +32,10 @@ class TestVertexAIClient:
         }
         self.mock_vertex_config.estimate_cost.return_value = 0.01
 
-        self.patcher_vertex_ai = patch(
-            "app.config.vertex_client.VERTEX_AI_AVAILABLE", True
-        )
+        self.patcher_vertex_ai = patch("app.config.vertex_client.VERTEX_AI_AVAILABLE", True)
         self.mock_vertex_ai_available = self.patcher_vertex_ai.start()
 
-        self.patcher_gemini_api = patch(
-            "app.config.vertex_client.GEMINI_API_AVAILABLE", True
-        )
+        self.patcher_gemini_api = patch("app.config.vertex_client.GEMINI_API_AVAILABLE", True)
         self.mock_gemini_api_available = self.patcher_gemini_api.start()
 
         self.patcher_aiplatform_init = patch("app.config.vertex_ai.aiplatform.init")
@@ -50,17 +46,13 @@ class TestVertexAIClient:
         # Configure the mock to return valid credentials and project
         self.mock_default_credentials.return_value = (None, "test-project")
 
-        self.patcher_generative_model = patch(
-            "app.config.vertex_client.GenerativeModel"
-        )
+        self.patcher_generative_model = patch("app.config.vertex_client.GenerativeModel")
         self.mock_generative_model = self.patcher_generative_model.start()
 
         self.patcher_genai_configure = patch("app.config.vertex_client.genai.configure")
         self.mock_genai_configure = self.patcher_genai_configure.start()
 
-        self.patcher_genai_model = patch(
-            "app.config.vertex_client.genai.GenerativeModel"
-        )
+        self.patcher_genai_model = patch("app.config.vertex_client.genai.GenerativeModel")
         self.mock_genai_model = self.patcher_genai_model.start()
 
         # Import the client after patching
@@ -259,9 +251,7 @@ class TestVertexAIClient:
         self.client.is_healthy = True
         self.client.fallback_active = False
 
-        self.client._generate_with_vertex_ai = AsyncMock(
-            side_effect=Exception("Vertex failed")
-        )
+        self.client._generate_with_vertex_ai = AsyncMock(side_effect=Exception("Vertex failed"))
 
         self.client.gemini_client = MagicMock()
         self.client._generate_with_gemini_api = AsyncMock(
@@ -291,9 +281,7 @@ class TestVertexAIClient:
         self.mock_vertex_config.limits["max_tokens_per_request"] = 50
 
         with pytest.raises(ValueError, match="Solicitud rechazada:"):
-            await self.client.generate_response(
-                "test a long prompt that exceeds the token limit"
-            )
+            await self.client.generate_response("test a long prompt that exceeds the token limit")
 
     @pytest.mark.asyncio
     async def test_generate_response_cost_limit_triggers_fallback(self):
@@ -304,9 +292,7 @@ class TestVertexAIClient:
 
         # Mock the gemini_client and its async method
         self.client.gemini_client = AsyncMock()
-        self.client.gemini_client.generate_content_async = AsyncMock(
-            return_value=MagicMock(text="fallback response")
-        )
+        self.client.gemini_client.generate_content_async = AsyncMock(return_value=MagicMock(text="fallback response"))
 
         self.mock_vertex_config.estimate_cost.return_value = 10
         self.client.daily_cost = 95
@@ -325,9 +311,7 @@ class TestVertexAIClient:
 
         # Mock the gemini_client and its async method
         self.client.gemini_client = AsyncMock()
-        self.client.gemini_client.generate_content_async = AsyncMock(
-            return_value=MagicMock(text="fallback response")
-        )
+        self.client.gemini_client.generate_content_async = AsyncMock(return_value=MagicMock(text="fallback response"))
 
         with patch.object(
             self.client,
@@ -346,9 +330,7 @@ class TestVertexAIClient:
         self.client.is_healthy = True
         self.client.initialized = False
         self.client.gemini_client = AsyncMock()
-        self.client.gemini_client.generate_content_async.side_effect = Exception(
-            "Gemini Error"
-        )
+        self.client.gemini_client.generate_content_async.side_effect = Exception("Gemini Error")
 
         with pytest.raises(RuntimeError, match="Todos los clientes fallaron"):
             await self.client.generate_response("test")
@@ -379,12 +361,8 @@ class TestVertexAIClient:
         self.mock_vertex_config.models = {"basic": {"name": "test-model"}}
 
         with (
-            patch.object(
-                self.client, "_generate_with_vertex_ai", new_callable=AsyncMock
-            ),
-            patch.object(
-                self.client, "_generate_with_gemini_api", new_callable=AsyncMock
-            ),
+            patch.object(self.client, "_generate_with_vertex_ai", new_callable=AsyncMock),
+            patch.object(self.client, "_generate_with_gemini_api", new_callable=AsyncMock),
         ):
             result = await self.client.health_check()
 
@@ -409,9 +387,7 @@ class TestVertexAIClient:
                 "_generate_with_vertex_ai",
                 side_effect=Exception("Vertex Down"),
             ),
-            patch.object(
-                self.client, "_generate_with_gemini_api", new_callable=AsyncMock
-            ),
+            patch.object(self.client, "_generate_with_gemini_api", new_callable=AsyncMock),
         ):
             result = await self.client.health_check()
 

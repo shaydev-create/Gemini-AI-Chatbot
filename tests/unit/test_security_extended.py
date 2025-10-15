@@ -104,11 +104,7 @@ def test_auditor_event_pruning():
     # Forzar el límite de eventos a un número bajo para la prueba
     with patch.object(auditor, "events", []):
         for i in range(1010):
-            auditor.log_event(
-                SecurityEvent(
-                    event_type=f"event_{i}", timestamp=datetime.now(timezone.utc)
-                )
-            )
+            auditor.log_event(SecurityEvent(event_type=f"event_{i}", timestamp=datetime.now(timezone.utc)))
 
         assert len(auditor.events) == 1000
         assert auditor.events[0].event_type == "event_10"
@@ -143,9 +139,7 @@ def test_rate_limit_decorator(app_for_decorators):
     client = app_for_decorators.test_client()
 
     # Simular que el límite se excede
-    with patch(
-        "app.core.security.security_manager.check_rate_limit", return_value=False
-    ):
+    with patch("app.core.security.security_manager.check_rate_limit", return_value=False):
         response = client.get("/limited")
         assert response.status_code == 429
         assert "Rate limit exceeded" in response.json["error"]
@@ -200,9 +194,7 @@ def test_generate_csrf_token():
 
 def test_get_security_summary_wrapper():
     """Prueba la función de conveniencia get_security_summary."""
-    with patch(
-        "app.core.security.security_manager.auditor.get_security_summary"
-    ) as mock_summary:
+    with patch("app.core.security.security_manager.auditor.get_security_summary") as mock_summary:
         mock_summary.return_value = {"total_events": 5}
         summary = get_security_summary()
 

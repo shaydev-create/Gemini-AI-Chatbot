@@ -23,18 +23,17 @@ def send_message() -> Tuple:
         return jsonify({"message": "El campo 'message' es requerido."}), 400
 
     user_message = data["message"].strip()
-    session_id = data.get(
-        "session_id", "anonymous"
-    )  # Usar sesión anónima si no se proporciona
+    session_id = data.get("session_id", "anonymous")  # Usar sesión anónima si no se proporciona
     image_context = data.get("image_context", None)  # Nuevo: contexto de imagen
     language = data.get("language", "es")  # Obtener idioma, por defecto español
 
     if not user_message:
         return jsonify({"message": "El mensaje no puede estar vacío."}), 400
     if len(user_message) > 4000:
-        return jsonify(
-            {"message": "El mensaje excede el límite de 4000 caracteres."}
-        ), 400
+        return (
+            jsonify({"message": "El mensaje excede el límite de 4000 caracteres."}),
+            400,
+        )
 
     # Intentar obtener usuario autenticado, pero no requerirlo
     try:
@@ -45,9 +44,10 @@ def send_message() -> Tuple:
 
     gemini_service = current_app.config.get("GEMINI_SERVICE")
     if not gemini_service:
-        return jsonify(
-            {"message": "El servicio de IA no está disponible en este momento."}
-        ), 503
+        return (
+            jsonify({"message": "El servicio de IA no está disponible en este momento."}),
+            503,
+        )
 
     try:
         # Prepare the prompt with image context if available
@@ -77,9 +77,7 @@ Contexto de imagen:
 
 Por favor, analiza la imagen proporcionada y responde a la pregunta del usuario de manera detallada y útil.
 """
-            current_app.logger.info(
-                f"Processing message with image context: {image_name}"
-            )
+            current_app.logger.info(f"Processing message with image context: {image_name}")
 
         response_text = gemini_service.generate_response(
             session_id=session_id,
@@ -112,9 +110,10 @@ def health_check() -> Tuple:
     metrics: dict[str, Any] = {}
     uptime_seconds = int(time.time() - getattr(current_app, "start_time", time.time()))
     metrics["uptime_seconds"] = uptime_seconds
-    return jsonify(
-        {"status": "healthy", "timestamp": int(time.time()), "metrics": metrics}
-    ), 200
+    return (
+        jsonify({"status": "healthy", "timestamp": int(time.time()), "metrics": metrics}),
+        200,
+    )
 
 
 # Export Blueprint for import in app and tests

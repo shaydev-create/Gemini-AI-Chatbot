@@ -18,12 +18,8 @@ def create_app(config_class=DevelopmentConfig) -> None:
     """
     app = Flask(
         __name__,
-        template_folder=os.path.join(
-            os.path.dirname(os.path.abspath(__file__)), "..", "templates"
-        ),
-        static_folder=os.path.join(
-            os.path.dirname(os.path.abspath(__file__)), "..", "static"
-        ),
+        template_folder=os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "templates"),
+        static_folder=os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "static"),
     )
 
     # Cargar configuración

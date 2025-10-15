@@ -140,9 +140,7 @@ class TestI18n:
         """Test que translate devuelve la traducción correcta para una clave existente."""
         with self.app.test_request_context("/?lang=en"):
             with patch("app.utils.i18n._load_translations") as mock_load:
-                mock_load.return_value = {
-                    "welcome_message": "Welcome to Gemini AI Chatbot!"
-                }
+                mock_load.return_value = {"welcome_message": "Welcome to Gemini AI Chatbot!"}
                 result = translate("welcome_message")
                 assert result == "Welcome to Gemini AI Chatbot!"
 
@@ -177,18 +175,14 @@ class TestI18n:
         # Test español
         with self.app.test_request_context("/?lang=es"):
             with patch("app.utils.i18n._load_translations") as mock_load:
-                mock_load.return_value = {
-                    "welcome_message": "¡Bienvenido a Gemini AI Chatbot!"
-                }
+                mock_load.return_value = {"welcome_message": "¡Bienvenido a Gemini AI Chatbot!"}
                 result_es = translate("welcome_message")
                 assert result_es == "¡Bienvenido a Gemini AI Chatbot!"
 
         # Test inglés
         with self.app.test_request_context("/?lang=en"):
             with patch("app.utils.i18n._load_translations") as mock_load:
-                mock_load.return_value = {
-                    "welcome_message": "Welcome to Gemini AI Chatbot!"
-                }
+                mock_load.return_value = {"welcome_message": "Welcome to Gemini AI Chatbot!"}
                 result_en = translate("welcome_message")
                 assert result_en == "Welcome to Gemini AI Chatbot!"
 
@@ -216,9 +210,7 @@ class TestI18n:
 
                     _translations_cache.clear()
 
-                    mock_load.return_value = {
-                        "welcome_message": "Welcome to Gemini AI Chatbot!"
-                    }
+                    mock_load.return_value = {"welcome_message": "Welcome to Gemini AI Chatbot!"}
 
                     # Primera llamada debería cargar el archivo
                     result1 = translate("welcome_message")

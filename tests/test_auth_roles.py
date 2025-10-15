@@ -96,9 +96,7 @@ def test_assign_role_to_user(app, auth_manager: AuthManager, test_user: User):
         assert user_from_db.role == "admin"
 
         # Intentar asignar un rol inexistente
-        assigned_user_invalid = auth_manager.assign_role_to_user(
-            test_user.id, "nonexistent_role"
-        )
+        assigned_user_invalid = auth_manager.assign_role_to_user(test_user.id, "nonexistent_role")
         assert assigned_user_invalid is None
 
 

@@ -60,9 +60,7 @@ class GeminiService:
         if language == "en":
             language_instruction = "IMPORTANT: Please respond only in English. "
         elif language == "es":
-            language_instruction = (
-                "IMPORTANTE: Por favor responde únicamente en español. "
-            )
+            language_instruction = "IMPORTANTE: Por favor responde únicamente en español. "
 
         # Agregar instrucciones de idioma al prompt
         text_to_process = language_instruction + text_to_process
@@ -90,20 +88,14 @@ class GeminiService:
 
                 # Create multimodal content
                 content: list[Any] = [text_to_process, image]
-                logger.info(
-                    f"🖼️ Processing multimodal request with image and text: {text_to_process[:100]}..."
-                )
+                logger.info(f"🖼️ Processing multimodal request with image and text: {text_to_process[:100]}...")
             else:
                 content = text_to_process
-                logger.info(
-                    f"💬 Processing text-only request: {text_to_process[:100]}..."
-                )
+                logger.info(f"💬 Processing text-only request: {text_to_process[:100]}...")
 
             response = self.model.generate_content(
                 content,
-                generation_config=genai.types.GenerationConfig(
-                    temperature=0.7, max_output_tokens=2048, top_p=0.8, top_k=40
-                ),
+                generation_config=genai.types.GenerationConfig(temperature=0.7, max_output_tokens=2048, top_p=0.8, top_k=40),
             )
 
             response_text = response.text

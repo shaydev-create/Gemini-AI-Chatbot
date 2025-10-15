@@ -103,12 +103,15 @@ def permission_required(required_permission: str) -> None:
 
                 if not current_user:
                     logger.warning("Acceso denegado: usuario no autenticado")
-                    return jsonify(
-                        {
-                            "message": "Se requiere autenticación para acceder a este recurso.",
-                            "error": "authentication_required",
-                        }
-                    ), 401
+                    return (
+                        jsonify(
+                            {
+                                "message": "Se requiere autenticación para acceder a este recurso.",
+                                "error": "authentication_required",
+                            }
+                        ),
+                        401,
+                    )
 
                 jwt_identity = get_jwt_identity()
                 user_role = jwt_identity.get("role", "user")
@@ -124,24 +127,30 @@ def permission_required(required_permission: str) -> None:
                         user_role,
                         required_permission,
                     )
-                    return jsonify(
-                        {
-                            "message": "No tienes permiso para realizar esta acción.",
-                            "error": "insufficient_permissions",
-                            "required_permission": required_permission,
-                            "user_role": user_role,
-                        }
-                    ), 403
+                    return (
+                        jsonify(
+                            {
+                                "message": "No tienes permiso para realizar esta acción.",
+                                "error": "insufficient_permissions",
+                                "required_permission": required_permission,
+                                "user_role": user_role,
+                            }
+                        ),
+                        403,
+                    )
 
                 return fn(*args, **kwargs)
             except Exception:
                 logger.exception("Error en el decorador permission_required.")
-                return jsonify(
-                    {
-                        "message": "Error interno al verificar los permisos.",
-                        "error": "internal_server_error",
-                    }
-                ), 500
+                return (
+                    jsonify(
+                        {
+                            "message": "Error interno al verificar los permisos.",
+                            "error": "internal_server_error",
+                        }
+                    ),
+                    500,
+                )
 
         return wrapper
 
