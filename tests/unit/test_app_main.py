@@ -13,12 +13,12 @@ class TestAppMain(unittest.TestCase):
         # Verificar que el archivo run.py existe
         run_file = Path("run.py")
         assert run_file.exists(), "El archivo run.py debe existir"
-        
+
         # Verificar que el archivo contiene las funciones necesarias
-        content = run_file.read_text(encoding='utf-8')
+        content = run_file.read_text(encoding="utf-8")
         assert "def main()" in content, "El archivo debe contener una función main()"
         assert 'if __name__ == "__main__"' in content, "El archivo debe ser ejecutable"
-        
+
         # Verificar que importa subprocess para ejecutar launch_app.py
         assert "subprocess" in content, "El archivo debe usar subprocess para ejecutar launcher"
 
