@@ -2,6 +2,8 @@
 Manejo de eventos de Socket.IO para la comunicación en tiempo real.
 """
 
+from typing import Any
+
 from flask_socketio import emit
 
 from app import socketio

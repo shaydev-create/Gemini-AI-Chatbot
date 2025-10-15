@@ -1,6 +1,8 @@
 from flask import Blueprint
 
+__all__ = ['main', 'routes']
+
 main = Blueprint("main", __name__)
 
-# Importar las rutas DESPUÉS de crear el blueprint para que se registren correctamente
-from . import routes
+# Import routes after blueprint definition to avoid circular import
+from . import routes  # noqa: E402, F401

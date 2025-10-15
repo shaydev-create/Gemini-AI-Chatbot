@@ -73,7 +73,7 @@ class DevelopmentConfig(Config):
     DEBUG: bool = True
     SQLALCHEMY_DATABASE_URI: str = os.environ.get(
         "DEV_DATABASE_URL"
-    ) or "sqlite:///" + str(BASE_DIR / "gemini_chatbot_dev.db")
+    ) or "sqlite:///./fresh_gemini_dev.db"
 
     # En desarrollo, si no se define una SECRET_KEY, se genera una temporal.
     # Esto es conveniente para desarrollo local pero invalida las sesiones al reiniciar.
@@ -92,7 +92,7 @@ class TestingConfig(Config):
     SECRET_KEY: str = os.environ.get(
         "TEST_SECRET_KEY", "test-secret-key-change-in-production"
     )
-    SQLALCHEMY_DATABASE_URI: str = "sqlite:///test.db"
+    SQLALCHEMY_DATABASE_URI: str = "sqlite:///:memory:"
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     WTF_CSRF_ENABLED: bool = False
     # ID de proyecto de Vertex AI para los tests.

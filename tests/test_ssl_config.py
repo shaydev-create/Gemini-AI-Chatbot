@@ -1,6 +1,6 @@
 import ssl
 from datetime import datetime, timedelta, timezone
-from unittest.mock import MagicMock, patch, ANY
+from unittest.mock import ANY, MagicMock, patch
 
 import pytest
 from cryptography.hazmat.primitives import serialization
@@ -250,13 +250,13 @@ class TestSSLConfig:
         now_utc = datetime.now(timezone.utc)
         before_utc = now_utc - timedelta(days=10)
         after_utc = now_utc + timedelta(days=60)
-        
+
         # Mock the certificate datetime attributes with replace method
         mock_before = MagicMock()
         mock_before.replace.return_value = before_utc.replace(tzinfo=None)
         mock_after = MagicMock()
         mock_after.replace.return_value = after_utc.replace(tzinfo=None)
-        
+
         mock_cert.not_valid_before_utc = mock_before
         mock_cert.not_valid_after_utc = mock_after
         mock_cert.subject.rfc4514_string.return_value = "CN=test_subject"
@@ -282,13 +282,13 @@ class TestSSLConfig:
         now_utc = datetime.now(timezone.utc)
         before_utc = now_utc - timedelta(days=60)
         after_utc = now_utc - timedelta(days=10)
-        
+
         # Mock the certificate datetime attributes with replace method
         mock_before = MagicMock()
         mock_before.replace.return_value = before_utc.replace(tzinfo=None)
         mock_after = MagicMock()
         mock_after.replace.return_value = after_utc.replace(tzinfo=None)
-        
+
         mock_cert.not_valid_before_utc = mock_before
         mock_cert.not_valid_after_utc = mock_after
         mock_cert.subject.rfc4514_string.return_value = "CN=test_subject"
@@ -314,13 +314,13 @@ class TestSSLConfig:
         now_utc = datetime.now(timezone.utc)
         before_utc = now_utc + timedelta(days=10)
         after_utc = now_utc + timedelta(days=60)
-        
+
         # Mock the certificate datetime attributes with replace method
         mock_before = MagicMock()
         mock_before.replace.return_value = before_utc.replace(tzinfo=None)
         mock_after = MagicMock()
         mock_after.replace.return_value = after_utc.replace(tzinfo=None)
-        
+
         mock_cert.not_valid_before_utc = mock_before
         mock_cert.not_valid_after_utc = mock_after
         mock_cert.subject.rfc4514_string.return_value = "CN=test_subject"
@@ -346,13 +346,13 @@ class TestSSLConfig:
         now_utc = datetime.now(timezone.utc)
         before_utc = now_utc - timedelta(days=10)
         after_utc = now_utc + timedelta(days=15)
-        
+
         # Mock the certificate datetime attributes with replace method
         mock_before = MagicMock()
         mock_before.replace.return_value = before_utc.replace(tzinfo=None)
         mock_after = MagicMock()
         mock_after.replace.return_value = after_utc.replace(tzinfo=None)
-        
+
         mock_cert.not_valid_before_utc = mock_before
         mock_cert.not_valid_after_utc = mock_after
         mock_cert.subject.rfc4514_string.return_value = "CN=test_subject"

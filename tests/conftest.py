@@ -30,7 +30,7 @@ def app():
             db.engine.dispose()
 
 
-@pytest.fixture(scope="module")
+@pytest.fixture(scope="function")
 def client(app):
     """Fixture que proporciona un cliente de prueba para la aplicacion Flask."""
     return app.test_client()
