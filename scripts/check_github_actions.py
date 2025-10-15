@@ -16,13 +16,13 @@ def open_github_actions():
     """Abre la página de GitHub Actions en el navegador."""
     repo_url = "https://github.com/shaydev-create/Gemini-AI-Chatbot"
     actions_url = f"{repo_url}/actions"
-    
+
     print("🔍 VERIFICADOR DE GITHUB ACTIONS")
     print("=" * 50)
     print(f"📍 Repositorio: {repo_url}")
     print(f"🚀 Actions: {actions_url}")
     print()
-    
+
     try:
         print("🌐 Abriendo GitHub Actions en el navegador...")
         webbrowser.open(actions_url)
@@ -30,13 +30,13 @@ def open_github_actions():
     except Exception as e:
         print(f"❌ Error abriendo navegador: {e}")
         print(f"🔗 URL manual: {actions_url}")
-    
+
     print()
     print("🔍 QUÉ VERIFICAR EN GITHUB ACTIONS:")
     print("-" * 40)
     print("1. ✅ Workflow 'CI/CD' ejecutándose")
     print("2. 🧪 Matrix Python 3.11 - Estado")
-    print("3. 🧪 Matrix Python 3.12 - Estado") 
+    print("3. 🧪 Matrix Python 3.12 - Estado")
     print("4. 🔧 Build status - Verde/Rojo")
     print("5. 📊 Test results - Cantidad pasados")
     print("6. ⏱️  Tiempo de ejecución")
@@ -73,13 +73,15 @@ def check_recent_commit():
 def main():
     """Función principal."""
     check_recent_commit()
-    
+
     response = input("\n¿Deseas abrir GitHub Actions en el navegador? (s/N): ")
-    if response.lower() in ['s', 'si', 'sí', 'y', 'yes']:
+    if response.lower() in ["s", "si", "sí", "y", "yes"]:
         open_github_actions()
     else:
-        print("🔗 URL manual: https://github.com/shaydev-create/Gemini-AI-Chatbot/actions")
-    
+        print(
+            "🔗 URL manual: https://github.com/shaydev-create/Gemini-AI-Chatbot/actions"
+        )
+
     print("\n" + "=" * 50)
     print("🎉 RESUMEN:")
     print("   📤 Commit exitoso subido a GitHub")

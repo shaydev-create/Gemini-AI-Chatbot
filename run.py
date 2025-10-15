@@ -21,10 +21,10 @@ def main():
     print("🚀 GEMINI AI CHATBOT")
     print("Iniciando con launcher mejorado...")
     print()
-    
+
     # Ejecutar el launcher mejorado
     launcher_path = Path(__file__).parent / "launch_app.py"
-    
+
     try:
         # Ejecutar el launcher mejorado directamente
         subprocess.run([sys.executable, str(launcher_path)], check=True)
