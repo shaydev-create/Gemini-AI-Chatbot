@@ -14,6 +14,16 @@ import signal
 import atexit
 from pathlib import Path
 
+# Configurar la codificación para Windows
+if sys.platform == "win32":
+    import codecs
+    try:
+        sys.stdout = codecs.getwriter("utf-8")(sys.stdout.buffer)
+        sys.stderr = codecs.getwriter("utf-8")(sys.stderr.buffer)
+    except AttributeError:
+        # Para versiones más antiguas de Python
+        pass
+
 
 def setup_environment():
     """Configura el entorno antes de importar dependencias problemáticas."""
@@ -21,8 +31,24 @@ def setup_environment():
     project_root = Path(__file__).parent
     if str(project_root) not in sys.path:
         sys.path.insert(0, str(project_root))
+    
+    # Configurar variables de entorno
+    os.environ.setdefault("PYTHONPATH", str(project_root))
 
-    # Configurar variables de entorno para evitar conflictos
+
+def safe_print(message):
+    """Imprime mensajes de forma segura, manejando problemas de codificación."""
+    try:
+        print(message)
+    except UnicodeEncodeError:
+        # Fallback sin emojis para sistemas que no los soportan
+        message_clean = message.encode('ascii', 'ignore').decode('ascii')
+        print(message_clean)
+
+
+def configure_environment():
+    """Configura variables de entorno para evitar conflictos."""
+    project_root = Path(__file__).parent
     os.environ.setdefault("PYTHONPATH", str(project_root))
 
     # Configurar encoding para evitar problemas en Windows
@@ -31,20 +57,19 @@ def setup_environment():
 
     # Suprimir warnings de deprecación que pueden causar problemas
     import warnings
-
     warnings.filterwarnings("ignore", category=DeprecationWarning)
     warnings.filterwarnings("ignore", category=UserWarning)
 
 
 def handle_exit():
     """Maneja la salida limpia de la aplicación."""
-    print("\n🛑 Cerrando Gemini AI Chatbot...")
-    print("✅ Aplicación cerrada correctamente.")
+    safe_print("\n🛑 Cerrando Gemini AI Chatbot...")
+    safe_print("✅ Aplicación cerrada correctamente.")
 
 
 def signal_handler(signum, frame):
     """Maneja las señales del sistema para cerrar limpiamente."""
-    print(f"\n📡 Señal recibida: {signum}")
+    safe_print(f"\n📡 Señal recibida: {signum}")
     handle_exit()
     sys.exit(0)
 
@@ -53,6 +78,7 @@ def main():
     """Función principal mejorada."""
     # Configurar el entorno antes de cualquier import
     setup_environment()
+    configure_environment()
 
     # Registrar manejadores de salida
     atexit.register(handle_exit)
@@ -60,24 +86,24 @@ def main():
     if hasattr(signal, "SIGTERM"):
         signal.signal(signal.SIGTERM, signal_handler)
 
-    print("🔧 GEMINI AI CHATBOT - LAUNCHER MEJORADO")
-    print("=" * 50)
-    print(f"🐍 Python: {sys.version.split()[0]}")
-    print(f"📁 Directorio: {Path(__file__).parent}")
+    safe_print("🔧 GEMINI AI CHATBOT - LAUNCHER MEJORADO")
+    safe_print("=" * 50)
+    safe_print(f"🐍 Python: {sys.version.split()[0]}")
+    safe_print(f"📁 Directorio: {Path(__file__).parent}")
 
     try:
         # Cargar variables de entorno
-        print("📋 Cargando configuración...")
+        safe_print("📋 Cargando configuración...")
         from dotenv import load_dotenv
 
         load_dotenv()
 
         # Importar la aplicación de manera controlada
-        print("🏗️  Inicializando aplicación...")
+        safe_print("🏗️  Inicializando aplicación...")
         from app.core.application import create_app
 
         # Crear la aplicación
-        print("⚙️  Creando instancia de la aplicación...")
+        safe_print("⚙️  Creando instancia de la aplicación...")
         app, socketio = create_app()
 
         # Configuración del servidor
@@ -85,12 +111,12 @@ def main():
         port = 5000
         debug = True
 
-        print(f"\n🚀 INICIANDO SERVIDOR")
-        print(f"   📍 URL: http://{host}:{port}")
-        print(f"   🔧 Debug: {debug}")
-        print(f"   ⚡ SocketIO: Habilitado")
-        print("\n💡 Para detener la aplicación, presiona Ctrl+C")
-        print("=" * 50)
+        safe_print(f"\n🚀 INICIANDO SERVIDOR")
+        safe_print(f"   📍 URL: http://{host}:{port}")
+        safe_print(f"   🔧 Debug: {debug}")
+        safe_print(f"   ⚡ SocketIO: Habilitado")
+        safe_print("\n💡 Para detener la aplicación, presiona Ctrl+C")
+        safe_print("=" * 50)
 
         # Ejecutar el servidor
         socketio.run(
@@ -103,29 +129,29 @@ def main():
         )
 
     except KeyboardInterrupt:
-        print("\n🛑 Interrupción por teclado detectada")
+        safe_print("\n🛑 Interrupción por teclado detectada")
         handle_exit()
         sys.exit(0)
 
     except ImportError as e:
-        print(f"\n❌ Error de importación: {e}")
-        print("💡 Posibles soluciones:")
-        print("   1. Instalar dependencias: pip install -r requirements.txt")
-        print("   2. Verificar el entorno virtual")
-        print("   3. Verificar GOOGLE_API_KEY en .env")
+        safe_print(f"\n❌ Error de importación: {e}")
+        safe_print("💡 Posibles soluciones:")
+        safe_print("   1. Instalar dependencias: pip install -r requirements.txt")
+        safe_print("   2. Verificar el entorno virtual")
+        safe_print("   3. Verificar GOOGLE_API_KEY en .env")
         sys.exit(1)
 
     except Exception as e:
-        print(f"\n💥 Error inesperado: {e}")
-        print(f"🔍 Tipo de error: {type(e).__name__}")
+        safe_print(f"\n💥 Error inesperado: {e}")
+        safe_print(f"🔍 Tipo de error: {type(e).__name__}")
         import traceback
 
-        print("📋 Traceback completo:")
+        safe_print("📋 Traceback completo:")
         traceback.print_exc()
         sys.exit(1)
 
     finally:
-        print("\n🔄 Proceso de cierre completado")
+        safe_print("\n🔄 Proceso de cierre completado")
 
 
 if __name__ == "__main__":

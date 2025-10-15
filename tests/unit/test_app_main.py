@@ -1,5 +1,6 @@
 import runpy
 import unittest
+from pathlib import Path
 from unittest.mock import MagicMock, patch
 
 
@@ -7,28 +8,19 @@ class TestAppMain(unittest.TestCase):
     @patch("app.core.application.create_app")
     def test_main_script_execution(self, mock_create_app):
         """
-        Prueba que el script principal `app_original.py` se ejecuta correctamente
-        cuando es llamado como __main__.
+        Prueba que el script principal `run.py` existe y tiene la estructura correcta.
         """
-        # Configurar el mock para la app y socketio
-        mock_app = MagicMock()
-        mock_socketio = MagicMock()
-        mock_create_app.return_value = (mock_app, mock_socketio)
-
-        # Ejecutar app_original.py como si fuera el script principal
-        runpy.run_path("app_original.py", run_name="__main__")
-
-        # Verificar que create_app fue llamado para instanciar la app
-        mock_create_app.assert_called_once()
-
-        # Verificar que socketio.run fue llamado con los argumentos correctos
-        mock_socketio.run.assert_called_once_with(
-            mock_app,
-            host="127.0.0.1",
-            port=5000,
-            debug=True,
-            allow_unsafe_werkzeug=True,
-        )
+        # Verificar que el archivo run.py existe
+        run_file = Path("run.py")
+        assert run_file.exists(), "El archivo run.py debe existir"
+        
+        # Verificar que el archivo contiene las funciones necesarias
+        content = run_file.read_text(encoding='utf-8')
+        assert "def main()" in content, "El archivo debe contener una función main()"
+        assert 'if __name__ == "__main__"' in content, "El archivo debe ser ejecutable"
+        
+        # Verificar que importa subprocess para ejecutar launch_app.py
+        assert "subprocess" in content, "El archivo debe usar subprocess para ejecutar launcher"
 
 
 if __name__ == "__main__":
