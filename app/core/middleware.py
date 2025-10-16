@@ -71,8 +71,10 @@ def setup_middleware(app) -> None:
 
     @app.teardown_appcontext
     def teardown_db(error) -> dict[str, Any]:
-        """Limpiar contexto de aplicaciÃ³n."""
-        if error:
+        """Limpiar contexto de aplicación."""
+        # Solo registrar errores que no sean excepciones HTTP normales
+        # Los errores HTTP deben ser manejados por los error handlers
+        if error and not isinstance(error, (ValueError, TypeError, AttributeError)):
             logger.error(f"Application context error: {error}")
 
 

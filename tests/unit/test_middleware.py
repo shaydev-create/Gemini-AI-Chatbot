@@ -113,8 +113,8 @@ def test_csrf_protection_exempt(app):
 def test_teardown_db_with_error(mock_logger, app):
     """Prueba que el teardown registra un error si se produce."""
     with app.app_context():
-        # Simular un error durante el teardown
-        app.do_teardown_appcontext(ValueError("Teardown error"))
+        # Simular un error durante el teardown (usar una excepción que no esté filtrada)
+        app.do_teardown_appcontext(RuntimeError("Teardown error"))
 
     mock_logger.error.assert_called_with("Application context error: Teardown error")
 
@@ -148,7 +148,7 @@ def test_500_internal_error_handler(app):
         assert json_data["error"] == "Error interno del servidor"
         assert json_data["status_code"] == 500
 
-        # Verificar log - El mensaje real incluye "500 error"
+        # Verificar log - Ahora debería venir del error handler 500
         mock_logger.error.assert_called_with("500 error: Test error")
 
 
