@@ -1,4 +1,5 @@
 {
+  "title": "Chat - Gemini AI",
   "welcome_message": "Welcome to Gemini AI Chatbot!",
   "chat_placeholder": "Type your message here...",
   "send_button": "Send",
