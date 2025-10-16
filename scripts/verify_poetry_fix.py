@@ -21,9 +21,7 @@ def check_poetry_configuration():
 
     # Verificar versión de Poetry
     try:
-        result = subprocess.run(
-            ["poetry", "--version"], capture_output=True, text=True, check=True
-        )
+        result = subprocess.run(["poetry", "--version"], capture_output=True, text=True, check=True)
         print(f"✅ Poetry versión: {result.stdout.strip()}")
     except Exception as e:
         print(f"❌ Error con Poetry: {e}")
@@ -42,9 +40,7 @@ def check_poetry_configuration():
         if os.path.exists("poetry.lock"):
             stat = os.stat("poetry.lock")
             mod_time = datetime.fromtimestamp(stat.st_mtime)
-            print(
-                f"✅ poetry.lock regenerado: {mod_time.strftime('%Y-%m-%d %H:%M:%S')}"
-            )
+            print(f"✅ poetry.lock regenerado: {mod_time.strftime('%Y-%m-%d %H:%M:%S')}")
         else:
             print("❌ poetry.lock NO existe")
 
@@ -116,15 +112,10 @@ def check_github_ci_configuration():
                 print("❌ Poetry NO configurado en CI/CD")
 
             # Verificar comando problemático
-            if (
-                "poetry install --with dev --no-interaction --no-ansi --no-root"
-                in content
-            ):
+            if "poetry install --with dev --no-interaction --no-ansi --no-root" in content:
                 print("✅ Comando de instalación presente en CI/CD")
             else:
-                print(
-                    "⚠️  Comando de instalación no encontrado (puede estar en diferente formato)"
-                )
+                print("⚠️  Comando de instalación no encontrado (puede estar en diferente formato)")
 
         return True
 

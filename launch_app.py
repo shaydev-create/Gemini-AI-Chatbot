@@ -17,6 +17,7 @@ from pathlib import Path
 # Configurar la codificación para Windows
 if sys.platform == "win32":
     import codecs
+
     try:
         sys.stdout = codecs.getwriter("utf-8")(sys.stdout.buffer)
         sys.stderr = codecs.getwriter("utf-8")(sys.stderr.buffer)
@@ -42,7 +43,7 @@ def safe_print(message):
         print(message)
     except UnicodeEncodeError:
         # Fallback sin emojis para sistemas que no los soportan
-        message_clean = message.encode('ascii', 'ignore').decode('ascii')
+        message_clean = message.encode("ascii", "ignore").decode("ascii")
         print(message_clean)
 
 
@@ -57,6 +58,7 @@ def configure_environment():
 
     # Suprimir warnings de deprecación que pueden causar problemas
     import warnings
+
     warnings.filterwarnings("ignore", category=DeprecationWarning)
     warnings.filterwarnings("ignore", category=UserWarning)
 

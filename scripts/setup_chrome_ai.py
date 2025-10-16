@@ -18,16 +18,12 @@ class ChromeAISetup:
         """Obtiene las rutas típicas de Chrome Canary según el OS"""
         if self.system == "Windows":
             return [
-                os.path.expanduser(
-                    r"~\AppData\Local\Google\Chrome SxS\Application\chrome.exe"
-                ),
+                os.path.expanduser(r"~\AppData\Local\Google\Chrome SxS\Application\chrome.exe"),
                 r"C:\Program Files\Google\Chrome SxS\Application\chrome.exe",
                 r"C:\Program Files (x86)\Google\Chrome SxS\Application\chrome.exe",
             ]
         elif self.system == "Darwin":  # macOS
-            return [
-                "/Applications/Google Chrome Canary.app/Contents/MacOS/Google Chrome Canary"
-            ]
+            return ["/Applications/Google Chrome Canary.app/Contents/MacOS/Google Chrome Canary"]
         else:  # Linux
             return [
                 "/usr/bin/google-chrome-unstable",
@@ -59,8 +55,7 @@ class ChromeAISetup:
             "--enable-features=AIAssistantAPI,PromptAPIForGeminiNano,SummarizationAPIForGeminiNano,RewriterAPIForGeminiNano,ComposerAPIForGeminiNano,TranslationAPI",
             "--disable-features=OptimizationGuidePushNotifications",
             "--enable-ai-assistant-api",
-            "--user-data-dir="
-            + os.path.join(os.path.expanduser("~"), ".chrome-ai-profile"),
+            "--user-data-dir=" + os.path.join(os.path.expanduser("~"), ".chrome-ai-profile"),
             "--no-first-run",
             "--disable-default-apps",
         ]

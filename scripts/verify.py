@@ -26,15 +26,11 @@ def check_python_version():
 def check_poetry():
     """Verifica Poetry y dependencias."""
     try:
-        result = subprocess.run(
-            ["poetry", "--version"], capture_output=True, text=True, check=True
-        )
+        result = subprocess.run(["poetry", "--version"], capture_output=True, text=True, check=True)
         print(f"📦 Poetry: {result.stdout.strip()}")
 
         # Verificar dependencias
-        result = subprocess.run(
-            ["poetry", "check"], capture_output=True, text=True, check=True
-        )
+        result = subprocess.run(["poetry", "check"], capture_output=True, text=True, check=True)
         print("   ✅ Dependencias verificadas")
         return True
     except (subprocess.CalledProcessError, FileNotFoundError) as e:
@@ -119,9 +115,7 @@ def check_project_structure():
 def check_git_status():
     """Verifica el estado de Git."""
     try:
-        result = subprocess.run(
-            ["git", "status", "--porcelain"], capture_output=True, text=True, check=True
-        )
+        result = subprocess.run(["git", "status", "--porcelain"], capture_output=True, text=True, check=True)
         print("📝 Git:")
 
         if result.stdout.strip():

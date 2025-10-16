@@ -12,6 +12,7 @@ Este módulo proporciona:
 - Encriptación de datos
 """
 
+import logging
 import re
 import secrets
 import threading
@@ -39,27 +40,59 @@ except ImportError:
     CRYPTOGRAPHY_AVAILABLE = False
     Fernet: Optional[Any] = None
 
+
+# Definir excepciones de autenticación localmente
+class AuthenticationError(Exception):
+    """Error de autenticación."""
+
+    pass
+
+
+class AuthorizationError(Exception):
+    """Error de autorización."""
+
+    pass
+
+
+# Configurar logging
+
+
+def get_logger(name: str):
+    """Obtener logger configurado."""
+    return logging.getLogger(name)
+
+
+# Configuración de fallback
 try:
-    from ..error_handler import AuthenticationError, AuthorizationError, error_handler
-except ImportError:
+    from app.config.settings import DevelopmentConfig, ProductionConfig, TestingConfig
 
-    class AuthenticationError(Exception):
-        pass
+    def get_current_config():
+        """Obtener configuración actual."""
+        import os
 
-    class AuthorizationError(Exception):
-        pass
+        env = os.getenv("FLASK_ENV", "development")
 
-    error_handler: Optional[Any] = None
+        if env == "production":
+            config = ProductionConfig()
+        elif env == "testing":
+            config = TestingConfig()
+        else:
+            config = DevelopmentConfig()
 
-try:
-    from ..logging_system import get_logger
-except ImportError:
-    import logging
+        # Crear un objeto de seguridad compatible
+        class SecurityConfig:
+            def __init__(self, base_config):
+                self.jwt_secret_key = getattr(base_config, "JWT_SECRET_KEY", "fallback-jwt-key")
+                self.jwt_expiration_hours = 24
+                self.rate_limit_per_minute = 60
+                self.max_login_attempts = 5
+                self.lockout_duration_minutes = 15
+                self.password_min_length = 8
+                self.session_timeout_minutes = 30
 
-    get_logger = logging.getLogger
+        config.security = SecurityConfig(config)
+        return config
 
-try:
-    from ...config.settings import get_current_config
 except ImportError:
 
     def get_current_config():
@@ -97,7 +130,7 @@ class SecurityEvent:
     ip_address: Optional[str] = None
     user_agent: Optional[str] = None
     endpoint: Optional[str] = None
-    severity = "info"  # info, warning, error, critical
+    severity: str = "info"  # info, warning, error, critical
     details: Dict[str, Any] = field(default_factory=dict)
 
     def to_dict(self) -> Dict[str, Any]:
@@ -567,23 +600,13 @@ def require_auth(func: Callable) -> Callable:
         auth_header = request.headers.get("Authorization")
 
         if not auth_header or not auth_header.startswith("Bearer "):
-            if error_handler:
-                context = error_handler.handle_error(AuthenticationError("Missing or invalid authorization header"))
-                response_data, status_code = error_handler.create_error_response(context)
-                return jsonify(response_data), status_code
-            else:
-                return jsonify({"error": "Authentication required"}), 401
+            return jsonify({"error": "Authentication required"}), 401
 
         token = auth_header.split(" ")[1]
         payload = security_manager.verify_token(token)
 
         if not payload:
-            if error_handler:
-                context = error_handler.handle_error(AuthenticationError("Invalid or expired token"))
-                response_data, status_code = error_handler.create_error_response(context)
-                return jsonify(response_data), status_code
-            else:
-                return jsonify({"error": "Invalid token"}), 401
+            return jsonify({"error": "Invalid token"}), 401
 
         # Agregar información del usuario al contexto
         g.current_user = payload
@@ -601,22 +624,12 @@ def require_role(required_role: str) -> None:
         @wraps(func)
         def wrapper(*args, **kwargs) -> None:
             if not hasattr(g, "current_user") or not g.current_user:
-                if error_handler:
-                    context = error_handler.handle_error(AuthenticationError("Authentication required"))
-                    response_data, status_code = error_handler.create_error_response(context)
-                    return jsonify(response_data), status_code
-                else:
-                    return jsonify({"error": "Authentication required"}), 401
+                return jsonify({"error": "Authentication required"}), 401
 
             user_roles = g.current_user.get("roles", [])
 
             if required_role not in user_roles:
-                if error_handler:
-                    context = error_handler.handle_error(AuthorizationError(f"Role '{required_role}' required"))
-                    response_data, status_code = error_handler.create_error_response(context)
-                    return jsonify(response_data), status_code
-                else:
-                    return jsonify({"error": "Insufficient permissions"}), 403
+                return jsonify({"error": "Insufficient permissions"}), 403
 
             return func(*args, **kwargs)
 

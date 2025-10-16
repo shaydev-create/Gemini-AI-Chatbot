@@ -33,9 +33,7 @@ def create_chrome_icons():
         # Dibujar círculo de fondo
         margin = size // 8
         circle_bbox = [margin, margin, size - margin, size - margin]
-        draw.ellipse(
-            circle_bbox, fill=accent_color, outline=text_color, width=max(1, size // 64)
-        )
+        draw.ellipse(circle_bbox, fill=accent_color, outline=text_color, width=max(1, size // 64))
 
         # Dibujar letra "G" en el centro
         try:
@@ -100,9 +98,7 @@ def create_chrome_manifest():
             "https://localhost:5000/*",
             "https://*.gemini-ai.com/*",
         ],
-        "content_security_policy": {
-            "extension_pages": "script-src 'self'; object-src 'self'; style-src 'self' 'unsafe-inline'"
-        },
+        "content_security_policy": {"extension_pages": "script-src 'self'; object-src 'self'; style-src 'self' 'unsafe-inline'"},
         "web_accessible_resources": [
             {
                 "resources": ["static/*", "templates/*", "*.html", "*.css", "*.js"],

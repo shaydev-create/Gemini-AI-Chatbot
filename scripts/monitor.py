@@ -29,9 +29,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 
 # Configurar logging
-logging.basicConfig(
-    level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
-)
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
 
 
@@ -284,12 +282,8 @@ class SystemMonitor:
         if metrics:
             print("📈 MÉTRICAS DE LA APLICACIÓN:")
             print(f"   👥 Usuarios totales: {metrics.get('users', {}).get('total', 0)}")
-            print(
-                f"   ✅ Usuarios activos: {metrics.get('users', {}).get('active', 0)}"
-            )
-            print(
-                f"   💬 Sesiones totales: {metrics.get('sessions', {}).get('total', 0)}"
-            )
+            print(f"   ✅ Usuarios activos: {metrics.get('users', {}).get('active', 0)}")
+            print(f"   💬 Sesiones totales: {metrics.get('sessions', {}).get('total', 0)}")
             print(
                 f"   🔄 Sesiones activas: {
                     metrics.get('sessions', {}).get('active', 0)
@@ -329,12 +323,8 @@ def main():
     """Función principal."""
     import argparse
 
-    parser = argparse.ArgumentParser(
-        description="Sistema de monitoreo Gemini AI Chatbot"
-    )
-    parser.add_argument(
-        "--url", default="http://localhost:5000", help="URL base de la aplicación"
-    )
+    parser = argparse.ArgumentParser(description="Sistema de monitoreo Gemini AI Chatbot")
+    parser.add_argument("--url", default="http://localhost:5000", help="URL base de la aplicación")
     parser.add_argument("--continuous", action="store_true", help="Monitoreo continuo")
     parser.add_argument(
         "--interval",

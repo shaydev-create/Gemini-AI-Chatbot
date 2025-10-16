@@ -80,9 +80,7 @@ def setup_env_file():
             break
 
     if not sample_path:
-        print(
-            f"❌ No se encontró ningún archivo de ejemplo ({', '.join(sample_files)})"
-        )
+        print(f"❌ No se encontró ningún archivo de ejemplo ({', '.join(sample_files)})")
         print(f"❌ Crea un archivo {ENV_FILE} manualmente")
         return False
 
@@ -137,21 +135,11 @@ def test_gemini_api(api_key):
     params = {"key": api_key}
 
     data = {
-        "contents": [
-            {
-                "parts": [
-                    {
-                        "text": "Hola, ¿puedes responder con una frase corta para verificar que la API funciona?"
-                    }
-                ]
-            }
-        ]
+        "contents": [{"parts": [{"text": "Hola, ¿puedes responder con una frase corta para verificar que la API funciona?"}]}]
     }
 
     try:
-        response = requests.post(
-            url, headers=headers, params=params, json=data, timeout=10
-        )
+        response = requests.post(url, headers=headers, params=params, json=data, timeout=10)
 
         if response.status_code == 200:
             return True, "API key válida"
@@ -228,9 +216,7 @@ def setup_api_keys():
     if not new_key:
         return False
     print("💾 Guardando API key en archivo .env...")
-    if update_env_file("GEMINI_API_KEY", new_key) and update_env_file(
-        "GOOGLE_API_KEY", new_key
-    ):
+    if update_env_file("GEMINI_API_KEY", new_key) and update_env_file("GOOGLE_API_KEY", new_key):
         print("✅ API key guardada correctamente")
         return True
     else:

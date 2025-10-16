@@ -11,9 +11,7 @@ import sys
 from pathlib import Path
 
 # Configurar logging
-logging.basicConfig(
-    level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
-)
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
 
 
@@ -27,9 +25,7 @@ def get_project_root() -> Path:
 
     # Buscar hacia arriba hasta encontrar requirements.txt o .git
     while current_path.parent != current_path:
-        if (current_path / "requirements.txt").exists() or (
-            current_path / ".git"
-        ).exists():
+        if (current_path / "requirements.txt").exists() or (current_path / ".git").exists():
             return current_path
         current_path = current_path.parent
 
@@ -580,12 +576,8 @@ def main():
     import argparse
 
     parser = argparse.ArgumentParser(description="Migración a Google Cloud Vertex AI")
-    parser.add_argument(
-        "--check", action="store_true", help="Solo verificar requisitos y configuración"
-    )
-    parser.add_argument(
-        "--test", action="store_true", help="Probar integración con Vertex AI"
-    )
+    parser.add_argument("--check", action="store_true", help="Solo verificar requisitos y configuración")
+    parser.add_argument("--test", action="store_true", help="Probar integración con Vertex AI")
     parser.add_argument(
         "--setup",
         action="store_true",

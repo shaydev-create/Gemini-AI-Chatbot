@@ -99,26 +99,18 @@ class MyPyErrorFixer:
         )
 
         # Patrón 3: parámetros con None por defecto
-        content = re.sub(
-            r"(\w+):\s*str\s*=\s*None", r"\1: Optional[str] = None", content
-        )
+        content = re.sub(r"(\w+):\s*str\s*=\s*None", r"\1: Optional[str] = None", content)
 
-        content = re.sub(
-            r"(\w+):\s*int\s*=\s*None", r"\1: Optional[int] = None", content
-        )
+        content = re.sub(r"(\w+):\s*int\s*=\s*None", r"\1: Optional[int] = None", content)
 
-        content = re.sub(
-            r"(\w+):\s*dict\s*=\s*None", r"\1: Optional[dict] = None", content
-        )
+        content = re.sub(r"(\w+):\s*dict\s*=\s*None", r"\1: Optional[dict] = None", content)
 
         return content
 
     def fix_function_parameters(self, content: str) -> str:
         """Agrega anotaciones de tipo faltantes a parámetros de función."""
         # Patrón: def function_name(param): -> def function_name(param: Any):
-        content = re.sub(
-            r"def\s+(\w+)\s*\(\s*(\w+)\s*\):", r"def \1(\2: Any):", content
-        )
+        content = re.sub(r"def\s+(\w+)\s*\(\s*(\w+)\s*\):", r"def \1(\2: Any):", content)
 
         # Patrón: def function_name(param1, param2): -> def function_name(param1: Any, param2: Any):
         content = re.sub(
@@ -185,9 +177,7 @@ class MyPyErrorFixer:
         )
 
         # list() sin tipo
-        content = re.sub(
-            r"^(\w+)\s*=\s*\[\]$", r"\1: list[Any] = []", content, flags=re.MULTILINE
-        )
+        content = re.sub(r"^(\w+)\s*=\s*\[\]$", r"\1: list[Any] = []", content, flags=re.MULTILINE)
 
         return content
 
@@ -269,9 +259,7 @@ class MyPyErrorFixer:
                     file_path = Path(root) / file
                     self.fix_file(file_path)
 
-        print(
-            f"\n✨ Corrección completada. {len(self.fixed_files)} archivos corregidos."
-        )
+        print(f"\n✨ Corrección completada. {len(self.fixed_files)} archivos corregidos.")
         if self.fixed_files:
             print("Archivos modificados:")
             for file in self.fixed_files:

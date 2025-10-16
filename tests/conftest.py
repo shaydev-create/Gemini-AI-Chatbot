@@ -1,3 +1,5 @@
+import os
+
 import pytest
 
 from app.auth import AuthManager
@@ -5,62 +7,57 @@ from app.core.application import get_flask_app
 from app.models import User, db
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture
 def app():
-    """Crea y configura una nueva instancia de la aplicacion Flask para cada modulo de prueba."""
-    import os
-    from unittest.mock import MagicMock, patch
+    os.environ["GEMINI_API_KEY"] = "test-api-key-for-testing"
+    app_instance = get_flask_app("testing")
 
-    # Configurar variable de entorno para testing
-    with patch.dict(os.environ, {"GEMINI_API_KEY": "test-api-key-for-testing"}):
-        app_instance = get_flask_app("testing")
+    from unittest.mock import MagicMock
 
-        # Mockear el servicio Gemini para evitar errores de inicialización
-        mock_gemini_service = MagicMock()
-        mock_gemini_service.generate_response.return_value = "Mocked Gemini response"
-        app_instance.gemini_service = mock_gemini_service
-        app_instance.config["GEMINI_SERVICE"] = mock_gemini_service
+    mock_gemini_service = MagicMock()
+    mock_gemini_service.generate_response.return_value = "Mocked Gemini response"
+    app_instance.gemini_service = mock_gemini_service
+    app_instance.config["GEMINI_SERVICE"] = mock_gemini_service
 
-        # Crear tablas de la base de datos
-        with app_instance.app_context():
-            db.drop_all()
-            db.create_all()
-            yield app_instance
-            db.session.remove()
-            db.drop_all()
-            db.engine.dispose()
+    # Crear tablas para los tests
+    with app_instance.app_context():
+        db.create_all()
+        yield app_instance
+        db.session.rollback()
+        db.drop_all()
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture
 def client(app):
-    """Fixture que proporciona un cliente de prueba para la aplicacion Flask."""
     return app.test_client()
 
 
-@pytest.fixture(scope="module")
-def auth_manager():
-    """Fixture que proporciona una instancia de AuthManager."""
-    return AuthManager()
+@pytest.fixture
+def runner(app):
+    return app.test_cli_runner()
 
 
-@pytest.fixture(scope="function")
-def test_user(app):
-    """Fixture que crea un usuario de prueba para los tests."""
+@pytest.fixture
+def auth_manager(app):
+    """Fixture para AuthManager."""
     with app.app_context():
-        # Eliminar usuario de prueba si existe
-        existing_user = User.query.filter_by(username="testuser").first()
-        if existing_user:
-            db.session.delete(existing_user)
-            db.session.commit()
+        return AuthManager()
 
-        # Crear nuevo usuario de prueba
+
+@pytest.fixture
+def test_user(app):
+    """Fixture para crear un usuario de prueba."""
+    with app.app_context():
         user = User(username="testuser", email="test@example.com", role="user")
-        user.set_password("TestPassword123!")
+        user.set_password("TestPassword123!")  # Contraseña que cumple los requisitos
         db.session.add(user)
         db.session.commit()
-
+        # Refrescar para mantener conectado a la sesión
+        db.session.refresh(user)
         yield user
-
-        # Limpiar después del test
-        db.session.delete(user)
-        db.session.commit()
+        # Cleanup al final
+        try:
+            db.session.delete(user)
+            db.session.commit()
+        except Exception:
+            db.session.rollback()

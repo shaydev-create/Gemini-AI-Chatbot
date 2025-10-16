@@ -37,9 +37,7 @@ class Python311312Compatibility:
         if "Optional[" in content and "from typing import" in content:
             # Verificar si Optional ya está importado
             if not re.search(r"from typing import.*Optional", content):
-                content = re.sub(
-                    r"(from typing import [^n]*)", r"\1, Optional", content
-                )
+                content = re.sub(r"(from typing import [^n]*)", r"\1, Optional", content)
         elif "Optional[" in content and "from typing import" not in content:
             # Añadir import de typing si no existe
             lines = content.split("\n")
@@ -72,9 +70,7 @@ class Python311312Compatibility:
         if "pytest" in content and "asyncio" in content:
             # Asegurar configuración correcta de asyncio_mode
             if "asyncio_mode" not in content:
-                content = content.replace(
-                    "import pytest", "import pytest\npytestmark = pytest.mark.asyncio"
-                )
+                content = content.replace("import pytest", "import pytest\npytestmark = pytest.mark.asyncio")
 
         if content != original_content:
             self.fixes_applied.append("Asyncio compatibility")
@@ -102,13 +98,9 @@ class Python311312Compatibility:
         if content != original_content and "datetime.now(timezone.utc)" in content:
             # Asegurar import de timezone
             if "from datetime import" in content and "timezone" not in content:
-                content = re.sub(
-                    r"(from datetime import [^n]*)", r"\1, timezone", content
-                )
+                content = re.sub(r"(from datetime import [^n]*)", r"\1, timezone", content)
             elif "import datetime" in content and "timezone" not in content:
-                content = content.replace(
-                    "import datetime", "import datetime\nfrom datetime import timezone"
-                )
+                content = content.replace("import datetime", "import datetime\nfrom datetime import timezone")
 
         return content
 
@@ -127,10 +119,7 @@ class Python311312Compatibility:
                 self.fixes_applied.append("Pytest asyncio configuration")
 
         # Configuración para pyproject.toml
-        elif (
-            file_path.name == "pyproject.toml"
-            and "[tool.pytest.ini_options]" in content
-        ):
+        elif file_path.name == "pyproject.toml" and "[tool.pytest.ini_options]" in content:
             if "asyncio_default_fixture_loop_scope" not in content:
                 content = content.replace(
                     'asyncio_mode = "auto"',
@@ -223,15 +212,11 @@ def main():
 
     print("🔧 Iniciando corrección de compatibilidad Python 3.11/3.12...")
     print(f"📍 Proyecto: {project_root}")
-    print(
-        f"🐍 Python actual: {'.'.join(map(str, compatibility_fixer.detect_python_version()))}"
-    )
+    print(f"🐍 Python actual: {'.'.join(map(str, compatibility_fixer.detect_python_version()))}")
 
     compatibility_fixer.process_all_files()
 
-    print(
-        "\n✅ Proceso completado. Ahora el proyecto debería ser compatible con Python 3.11 y 3.12."
-    )
+    print("\n✅ Proceso completado. Ahora el proyecto debería ser compatible con Python 3.11 y 3.12.")
 
 
 if __name__ == "__main__":

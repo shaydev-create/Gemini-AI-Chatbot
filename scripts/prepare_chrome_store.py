@@ -105,9 +105,7 @@ def convert_svg_to_png():
 
             # Instalar cairosvg
             try:
-                subprocess.check_call(
-                    [sys.executable, "-m", "pip", "install", "cairosvg"]
-                )
+                subprocess.check_call([sys.executable, "-m", "pip", "install", "cairosvg"])
                 print("✅ cairosvg instalado. Reintentando conversión...")
                 return convert_svg_to_png()  # Reintentar
             except subprocess.CalledProcessError:
@@ -142,12 +140,8 @@ def create_chrome_manifest():
         "background": {"service_worker": "static/sw.js"},
         "permissions": ["storage", "activeTab"],
         "host_permissions": ["https://127.0.0.1:5000/*", "https://localhost:5000/*"],
-        "content_security_policy": {
-            "extension_pages": "script-src 'self'; object-src 'self'"
-        },
-        "web_accessible_resources": [
-            {"resources": ["static/*", "templates/*"], "matches": ["<all_urls>"]}
-        ],
+        "content_security_policy": {"extension_pages": "script-src 'self'; object-src 'self'"},
+        "web_accessible_resources": [{"resources": ["static/*", "templates/*"], "matches": ["<all_urls>"]}],
     }
 
     # Guardar manifest para Chrome Web Store

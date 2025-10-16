@@ -131,16 +131,12 @@ logconfig_dict = {
     "handlers": {
         "error_console": {
             "class": "logging.StreamHandler",
-            "formatter": "json"
-            if os.getenv("FLASK_ENV") == "production"
-            else "generic",
+            "formatter": "json" if os.getenv("FLASK_ENV") == "production" else "generic",
             "stream": "ext://sys.stderr",
         },
         "access_console": {
             "class": "logging.StreamHandler",
-            "formatter": "json"
-            if os.getenv("FLASK_ENV") == "production"
-            else "generic",
+            "formatter": "json" if os.getenv("FLASK_ENV") == "production" else "generic",
             "stream": "ext://sys.stdout",
         },
     },

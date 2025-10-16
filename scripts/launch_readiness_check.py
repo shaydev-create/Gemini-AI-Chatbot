@@ -155,9 +155,7 @@ class LaunchReadinessChecker:
                     "permissions",
                     "action",
                 ]
-                missing_fields = [
-                    field for field in required_manifest_fields if field not in manifest
-                ]
+                missing_fields = [field for field in required_manifest_fields if field not in manifest]
 
                 if not missing_fields:
                     self.log_result(
@@ -247,13 +245,9 @@ class LaunchReadinessChecker:
                     )
 
             except Exception as e:
-                self.log_result(
-                    "Configuración Servidor", False, f"Error leyendo app.py: {str(e)}"
-                )
+                self.log_result("Configuración Servidor", False, f"Error leyendo app.py: {str(e)}")
         else:
-            self.log_result(
-                "Configuración Servidor", False, "Archivo app.py no encontrado"
-            )
+            self.log_result("Configuración Servidor", False, "Archivo app.py no encontrado")
 
     def check_static_assets(self):
         """Verificar assets estáticos"""
@@ -284,9 +278,7 @@ class LaunchReadinessChecker:
             else:
                 missing_assets.append(asset)
 
-        if (
-            len(existing_assets) >= len(important_assets) * 0.75
-        ):  # Al menos 75% de assets
+        if len(existing_assets) >= len(important_assets) * 0.75:  # Al menos 75% de assets
             self.log_result(
                 "Assets Estáticos",
                 True,
@@ -395,11 +387,7 @@ class LaunchReadinessChecker:
         print("🚀 REPORTE DE PREPARACIÓN PARA LANZAMIENTO")
         print("=" * 80)
 
-        success_rate = (
-            (self.passed_checks / self.total_checks) * 100
-            if self.total_checks > 0
-            else 0
-        )
+        success_rate = (self.passed_checks / self.total_checks) * 100 if self.total_checks > 0 else 0
 
         print("\n📊 RESUMEN GENERAL:")
         print(f"   ✅ Pruebas exitosas: {self.passed_checks}")
@@ -409,17 +397,13 @@ class LaunchReadinessChecker:
         # Determinar estado de preparación
         if success_rate >= 90:
             status = "🟢 LISTO PARA LANZAMIENTO"
-            recommendation = (
-                "El sistema está listo para ser lanzado en Chrome Web Store."
-            )
+            recommendation = "El sistema está listo para ser lanzado en Chrome Web Store."
         elif success_rate >= 75:
             status = "🟡 CASI LISTO"
             recommendation = "Corrige los problemas menores antes del lanzamiento."
         else:
             status = "🔴 NO LISTO"
-            recommendation = (
-                "Se requieren correcciones importantes antes del lanzamiento."
-            )
+            recommendation = "Se requieren correcciones importantes antes del lanzamiento."
 
         print(f"\n🎯 ESTADO: {status}")
         print(f"💡 RECOMENDACIÓN: {recommendation}")
@@ -482,9 +466,7 @@ def main():
             print("\n🎉 ¡FELICITACIONES! El sistema está listo para el lanzamiento.")
             print("\n📋 PRÓXIMOS PASOS:")
             print("   1. Sube la extensión a Chrome Web Store Developer Dashboard")
-            print(
-                "   2. Completa la información de la tienda (descripción, capturas, etc.)"
-            )
+            print("   2. Completa la información de la tienda (descripción, capturas, etc.)")
             print("   3. Configura el servidor de producción")
             print("   4. Realiza pruebas finales en el entorno de producción")
             print("   5. Publica la extensión")
@@ -492,9 +474,7 @@ def main():
             return True
         else:
             print("\n⚠️  Se requieren correcciones antes del lanzamiento.")
-            print(
-                "   Revisa el reporte detallado y corrige los problemas identificados."
-            )
+            print("   Revisa el reporte detallado y corrige los problemas identificados.")
 
             return False
 

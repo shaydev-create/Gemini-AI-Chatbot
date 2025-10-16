@@ -163,9 +163,7 @@ python scripts/clean_project.py
 
         readme_path = self.docs_path / "README.md"
         with open(readme_path, "w", encoding="utf-8") as f:
-            f.write(
-                readme_content.format(current_date=datetime.now().strftime("%Y-%m-%d"))
-            )
+            f.write(readme_content.format(current_date=datetime.now().strftime("%Y-%m-%d")))
 
         print("   ✅ README.md actualizado")
 
@@ -194,28 +192,18 @@ python scripts/clean_project.py
         print("\n📦 Archivando documentos obsoletos...")
 
         # Documentos de migración
-        migration_docs = [
-            doc
-            for doc in categories["obsolete"]
-            if "migration" in doc.lower() or "vertex" in doc.lower()
-        ]
+        migration_docs = [doc for doc in categories["obsolete"] if "migration" in doc.lower() or "vertex" in doc.lower()]
         self.move_to_archive(migration_docs, "migration")
 
         # Documentos de hackathon
-        hackathon_docs = [
-            doc
-            for doc in categories["obsolete"]
-            if "hackathon" in doc.lower() or "chrome" in doc.lower()
-        ]
+        hackathon_docs = [doc for doc in categories["obsolete"] if "hackathon" in doc.lower() or "chrome" in doc.lower()]
         self.move_to_archive(hackathon_docs, "hackathon")
 
         # Documentos de análisis
         analysis_docs = [
             doc
             for doc in categories["obsolete"]
-            if "analysis" in doc.lower()
-            or "system" in doc.lower()
-            or "comprehensive" in doc.lower()
+            if "analysis" in doc.lower() or "system" in doc.lower() or "comprehensive" in doc.lower()
         ]
         self.move_to_archive(analysis_docs, "analysis")
 
@@ -223,17 +211,13 @@ python scripts/clean_project.py
         compat_docs = [
             doc
             for doc in categories["obsolete"]
-            if "python" in doc.lower()
-            or "compatibility" in doc.lower()
-            or "dependencias" in doc.lower()
+            if "python" in doc.lower() or "compatibility" in doc.lower() or "dependencias" in doc.lower()
         ]
         self.move_to_archive(compat_docs, "compatibility")
 
         # Otros documentos obsoletos
         remaining_obsolete = [
-            doc
-            for doc in categories["obsolete"]
-            if doc not in migration_docs + hackathon_docs + analysis_docs + compat_docs
+            doc for doc in categories["obsolete"] if doc not in migration_docs + hackathon_docs + analysis_docs + compat_docs
         ]
         if remaining_obsolete:
             self.move_to_archive(remaining_obsolete, "misc")
@@ -247,9 +231,7 @@ python scripts/clean_project.py
         print("📊 RESUMEN DE ORGANIZACIÓN:")
 
         # Contar archivos actuales
-        current_files = list(self.docs_path.glob("*.md")) + list(
-            self.docs_path.glob("*.yml")
-        )
+        current_files = list(self.docs_path.glob("*.md")) + list(self.docs_path.glob("*.yml"))
         archived_files = list(self.backup_path.rglob("*.*"))
 
         print(f"   📚 Documentos actuales: {len(current_files)}")

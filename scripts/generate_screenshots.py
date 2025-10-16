@@ -23,9 +23,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 class ScreenshotGenerator:
     """Automated screenshot generator for Chrome extension."""
 
-    def __init__(
-        self, extension_path: str, output_dir: str = "chrome_extension/screenshots"
-    ):
+    def __init__(self, extension_path: str, output_dir: str = "chrome_extension/screenshots"):
         self.extension_path = Path(extension_path)
         self.output_dir = Path(output_dir)
         self.output_dir.mkdir(exist_ok=True)
@@ -37,9 +35,7 @@ class ScreenshotGenerator:
 
         # Load the extension
         chrome_options.add_argument(f"--load-extension={self.extension_path}")
-        chrome_options.add_argument(
-            "--disable-extensions-except=" + str(self.extension_path)
-        )
+        chrome_options.add_argument("--disable-extensions-except=" + str(self.extension_path))
         chrome_options.add_argument("--disable-web-security")
         chrome_options.add_argument("--allow-running-insecure-content")
 
@@ -123,14 +119,10 @@ class ScreenshotGenerator:
         self.driver.get("http://localhost:5000")
 
         # Wait for the page to load
-        WebDriverWait(self.driver, 10).until(
-            EC.presence_of_element_located((By.TAG_NAME, "body"))
-        )
+        WebDriverWait(self.driver, 10).until(EC.presence_of_element_located((By.TAG_NAME, "body")))
 
         # Take screenshot
-        self.take_screenshot(
-            "01_main_interface", "Main chat interface with futuristic neural background"
-        )
+        self.take_screenshot("01_main_interface", "Main chat interface with futuristic neural background")
 
     def capture_chat_functionality(self):
         """Capture chat in action."""
@@ -140,9 +132,7 @@ class ScreenshotGenerator:
         self.driver.get("http://localhost:5000/chat")
 
         # Wait for chat to load
-        WebDriverWait(self.driver, 10).until(
-            EC.presence_of_element_located((By.ID, "messageInput"))
-        )
+        WebDriverWait(self.driver, 10).until(EC.presence_of_element_located((By.ID, "messageInput")))
 
         # Simulate typing a message
         try:
@@ -151,9 +141,7 @@ class ScreenshotGenerator:
             message_input.send_keys("Hello! Can you help me with document analysis?")
             time.sleep(1)
 
-            self.take_screenshot(
-                "02_chat_interaction", "User typing a message in the chat interface"
-            )
+            self.take_screenshot("02_chat_interaction", "User typing a message in the chat interface")
 
             # Simulate sending the message (if send button exists)
             try:
@@ -182,9 +170,7 @@ class ScreenshotGenerator:
 
         try:
             # Look for voice control button
-            voice_buttons = self.driver.find_elements(
-                By.CSS_SELECTOR, "[title*='voice'], [title*='Voice'], .action-btn"
-            )
+            voice_buttons = self.driver.find_elements(By.CSS_SELECTOR, "[title*='voice'], [title*='Voice'], .action-btn")
 
             if voice_buttons:
                 # Highlight voice controls (add temporary styling)
@@ -226,9 +212,7 @@ class ScreenshotGenerator:
 
             time.sleep(1)
 
-            self.take_screenshot(
-                "05_file_upload", "Document upload interface for AI analysis"
-            )
+            self.take_screenshot("05_file_upload", "Document upload interface for AI analysis")
 
         except Exception as e:
             print(f"⚠️ Could not capture file upload: {e}")
@@ -241,9 +225,7 @@ class ScreenshotGenerator:
         self.driver.set_window_size(375, 667)  # iPhone size
         time.sleep(2)
 
-        self.take_screenshot(
-            "06_mobile_responsive", "Mobile responsive design on smartphone"
-        )
+        self.take_screenshot("06_mobile_responsive", "Mobile responsive design on smartphone")
 
         # Tablet view
         self.driver.set_window_size(768, 1024)  # iPad size
@@ -265,9 +247,7 @@ class ScreenshotGenerator:
             self.driver.get("chrome://extensions/")
             time.sleep(2)
 
-            self.take_screenshot(
-                "08_extension_popup", "Chrome extension popup interface"
-            )
+            self.take_screenshot("08_extension_popup", "Chrome extension popup interface")
 
         except Exception as e:
             print(f"⚠️ Could not capture extension popup: {e}")

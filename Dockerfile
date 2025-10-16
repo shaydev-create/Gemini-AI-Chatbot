@@ -1,6 +1,6 @@
 # --- Build Stage ---
 # Use a specific, slim version of Python for a smaller base image.
-FROM python:3.11-slim as builder
+FROM python:3.12-slim as builder
 
 # Set environment variables for a clean and efficient build.
 ENV PYTHONUNBUFFERED=1 \
@@ -37,7 +37,7 @@ RUN poetry install --no-root --only main
 
 # --- Final Stage ---
 # Use a clean, minimal base image for the final application.
-FROM python:3.11-slim as final
+FROM python:3.12-slim as final
 
 # Set environment variables for the runtime.
 ENV PYTHONUNBUFFERED=1 \

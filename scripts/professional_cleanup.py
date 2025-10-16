@@ -34,9 +34,7 @@ class ProfessionalCleanup:
 
     def log_finding(self, category: str, message: str, severity: str = "INFO"):
         """Registrar hallazgo del análisis."""
-        self.findings.append(
-            {"category": category, "message": message, "severity": severity}
-        )
+        self.findings.append({"category": category, "message": message, "severity": severity})
         print(f"[{severity}] {category}: {message}")
 
     def detect_duplicate_css_rules(self, file_path: Path) -> List[str]:
@@ -56,9 +54,7 @@ class ProfessionalCleanup:
                     seen_rules.add(rule_hash)
 
             except Exception as e:
-                self.log_finding(
-                    "CSS_ERROR", f"Error leyendo {file_path}: {e}", "ERROR"
-                )
+                self.log_finding("CSS_ERROR", f"Error leyendo {file_path}: {e}", "ERROR")
 
         return duplicates
 
@@ -75,9 +71,7 @@ class ProfessionalCleanup:
                 for func in js_functions:
                     function_counts[func] = function_counts.get(func, 0) + 1
 
-                duplicates = [
-                    func for func, count in function_counts.items() if count > 1
-                ]
+                duplicates = [func for func, count in function_counts.items() if count > 1]
 
             except Exception as e:
                 self.log_finding("JS_ERROR", f"Error leyendo {file_path}: {e}", "ERROR")
@@ -104,24 +98,18 @@ class ProfessionalCleanup:
             if new_size < original_size:
                 file_path.write_text(content, encoding="utf-8")
                 reduction = original_size - new_size
-                self.log_finding(
-                    "OPTIMIZATION", f"Optimizado {file_path.name}: -{reduction} bytes"
-                )
+                self.log_finding("OPTIMIZATION", f"Optimizado {file_path.name}: -{reduction} bytes")
                 self.files_cleaned += 1
 
         except Exception as e:
-            self.log_finding(
-                "OPTIMIZATION_ERROR", f"Error optimizando {file_path}: {e}", "ERROR"
-            )
+            self.log_finding("OPTIMIZATION_ERROR", f"Error optimizando {file_path}: {e}", "ERROR")
 
     def check_chrome_extension_compliance(self):
         """Verificar cumplimiento con políticas de Chrome Web Store."""
         manifest_path = self.project_root / "chrome_extension" / "manifest.json"
 
         if not manifest_path.exists():
-            self.log_finding(
-                "CHROME_COMPLIANCE", "manifest.json no encontrado", "ERROR"
-            )
+            self.log_finding("CHROME_COMPLIANCE", "manifest.json no encontrado", "ERROR")
             return False
 
         try:
@@ -137,9 +125,7 @@ class ProfessionalCleanup:
                 "permissions",
                 "manifest_version",
             ]
-            missing_fields = [
-                field for field in required_fields if field not in manifest
-            ]
+            missing_fields = [field for field in required_fields if field not in manifest]
 
             if missing_fields:
                 self.log_finding(
@@ -151,21 +137,15 @@ class ProfessionalCleanup:
 
             # Verificar Manifest V3
             if manifest.get("manifest_version") != 3:
-                self.log_finding(
-                    "CHROME_COMPLIANCE", "Debe usar Manifest V3", "WARNING"
-                )
+                self.log_finding("CHROME_COMPLIANCE", "Debe usar Manifest V3", "WARNING")
 
             # Verificar descrición no excede 132 caracteres
             if len(manifest.get("description", "")) > 132:
-                self.log_finding(
-                    "CHROME_COMPLIANCE", "Descripción excede 132 caracteres", "WARNING"
-                )
+                self.log_finding("CHROME_COMPLIANCE", "Descripción excede 132 caracteres", "WARNING")
 
             # Verificar iconos
             if "icons" not in manifest:
-                self.log_finding(
-                    "CHROME_COMPLIANCE", "Falta especificar iconos", "WARNING"
-                )
+                self.log_finding("CHROME_COMPLIANCE", "Falta especificar iconos", "WARNING")
 
             self.log_finding(
                 "CHROME_COMPLIANCE",
@@ -175,9 +155,7 @@ class ProfessionalCleanup:
             return True
 
         except Exception as e:
-            self.log_finding(
-                "CHROME_COMPLIANCE", f"Error validando manifest.json: {e}", "ERROR"
-            )
+            self.log_finding("CHROME_COMPLIANCE", f"Error validando manifest.json: {e}", "ERROR")
             return False
 
     def clean_unused_files(self):
@@ -202,14 +180,10 @@ class ProfessionalCleanup:
                         shutil.rmtree(file_path)
                         removed_count += 1
                 except Exception as e:
-                    self.log_finding(
-                        "CLEANUP_ERROR", f"Error eliminando {file_path}: {e}", "ERROR"
-                    )
+                    self.log_finding("CLEANUP_ERROR", f"Error eliminando {file_path}: {e}", "ERROR")
 
         if removed_count > 0:
-            self.log_finding(
-                "CLEANUP", f"Eliminados {removed_count} archivos temporales", "SUCCESS"
-            )
+            self.log_finding("CLEANUP", f"Eliminados {removed_count} archivos temporales", "SUCCESS")
 
     def validate_project_structure(self):
         """Validar estructura del proyecto."""
@@ -219,18 +193,14 @@ class ProfessionalCleanup:
         for dir_name in required_dirs:
             dir_path = self.project_root / dir_name
             if not dir_path.exists():
-                self.log_finding(
-                    "STRUCTURE", f"Directorio faltante: {dir_name}", "WARNING"
-                )
+                self.log_finding("STRUCTURE", f"Directorio faltante: {dir_name}", "WARNING")
             else:
                 self.log_finding("STRUCTURE", f"Directorio OK: {dir_name}", "SUCCESS")
 
         for file_name in required_files:
             file_path = self.project_root / file_name
             if not file_path.exists():
-                self.log_finding(
-                    "STRUCTURE", f"Archivo faltante: {file_name}", "WARNING"
-                )
+                self.log_finding("STRUCTURE", f"Archivo faltante: {file_name}", "WARNING")
             else:
                 self.log_finding("STRUCTURE", f"Archivo OK: {file_name}", "SUCCESS")
 

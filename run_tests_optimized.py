@@ -17,9 +17,7 @@ def run_command(cmd, description=""):
     print(f"Ejecutando: {' '.join(cmd)}")
 
     try:
-        result = subprocess.run(
-            cmd, check=True, capture_output=True, text=True, cwd=Path(__file__).parent
-        )
+        result = subprocess.run(cmd, check=True, capture_output=True, text=True, cwd=Path(__file__).parent)
         print(f"✅ {description} - Completado")
         return result
     except subprocess.CalledProcessError as e:
@@ -32,24 +30,12 @@ def run_command(cmd, description=""):
 
 def main():
     parser = argparse.ArgumentParser(description="Ejecutar tests optimizados")
-    parser.add_argument(
-        "--fast", action="store_true", help="Ejecutar solo tests rápidos"
-    )
-    parser.add_argument(
-        "--unit", action="store_true", help="Ejecutar solo tests unitarios"
-    )
-    parser.add_argument(
-        "--integration", action="store_true", help="Ejecutar solo tests de integración"
-    )
-    parser.add_argument(
-        "--coverage", action="store_true", help="Generar reporte de cobertura"
-    )
-    parser.add_argument(
-        "--parallel", action="store_true", help="Ejecutar tests en paralelo"
-    )
-    parser.add_argument(
-        "--maxfail", type=int, default=3, help="Máximo número de fallos antes de parar"
-    )
+    parser.add_argument("--fast", action="store_true", help="Ejecutar solo tests rápidos")
+    parser.add_argument("--unit", action="store_true", help="Ejecutar solo tests unitarios")
+    parser.add_argument("--integration", action="store_true", help="Ejecutar solo tests de integración")
+    parser.add_argument("--coverage", action="store_true", help="Generar reporte de cobertura")
+    parser.add_argument("--parallel", action="store_true", help="Ejecutar tests en paralelo")
+    parser.add_argument("--maxfail", type=int, default=3, help="Máximo número de fallos antes de parar")
 
     args = parser.parse_args()
 

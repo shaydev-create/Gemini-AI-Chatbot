@@ -76,9 +76,7 @@ def _get_commits_list() -> List[str]:
 
 def _get_commit_metadata(commit_hash: str) -> Optional[Dict[str, str]]:
     """Obtener metadatos de un commit específico."""
-    commit_info = run_command(
-        f"git show --name-only --format='%h|%an|%ad|%s' {commit_hash} --date=short"
-    )
+    commit_info = run_command(f"git show --name-only --format='%h|%an|%ad|%s' {commit_hash} --date=short")
 
     if not commit_info:
         return None
@@ -99,9 +97,7 @@ def _get_commit_metadata(commit_hash: str) -> Optional[Dict[str, str]]:
         return None
 
 
-def _analyze_commit_for_credentials(
-    commit_hash: str, metadata: Dict[str, str]
-) -> List[str]:
+def _analyze_commit_for_credentials(commit_hash: str, metadata: Dict[str, str]) -> List[str]:
     """Analizar un commit específico en busca de credenciales."""
     commit_content = run_command(f"git show {commit_hash}")
     report_lines = []
@@ -141,9 +137,7 @@ def _display_results(found_credentials: bool, report_lines: List[str]):
         print("\n".join(report_lines))
         print("")
         print("🛡️  RECOMENDACIONES:")
-        print(
-            "1. Ejecuta 'python scripts/secure_env.py' para limpiar credenciales actuales"
-        )
+        print("1. Ejecuta 'python scripts/secure_env.py' para limpiar credenciales actuales")
         print("2. Lee la guía de seguridad en 'docs/SEGURIDAD_CREDENCIALES.md'")
         print("3. Considera usar BFG Repo-Cleaner para limpiar el historial de Git")
         print("   https://rtyley.github.io/bfg-repo-cleaner/")
@@ -201,27 +195,17 @@ def generate_report(found_credentials):
     with open(report_file, "w", encoding="utf-8") as f:
         f.write("🔍 REPORTE DE ANÁLISIS DE CREDENCIALES - GEMINI AI CHATBOT\n")
         f.write("=" * 70 + "\n\n")
-        f.write(
-            f"Fecha de análisis: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n\n"
-        )
+        f.write(f"Fecha de análisis: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n\n")
 
         if found_credentials:
-            f.write(
-                "⚠️  SE ENCONTRARON CREDENCIALES EXPUESTAS EN EL HISTORIAL DE GIT\n\n"
-            )
+            f.write("⚠️  SE ENCONTRARON CREDENCIALES EXPUESTAS EN EL HISTORIAL DE GIT\n\n")
             f.write("🛡️  RECOMENDACIONES:\n")
-            f.write(
-                "1. Ejecuta 'python scripts/secure_env.py' para limpiar credenciales actuales\n"
-            )
+            f.write("1. Ejecuta 'python scripts/secure_env.py' para limpiar credenciales actuales\n")
             f.write("2. Lee la guía de seguridad en 'docs/SEGURIDAD_CREDENCIALES.md'\n")
-            f.write(
-                "3. Considera usar BFG Repo-Cleaner para limpiar el historial de Git\n"
-            )
+            f.write("3. Considera usar BFG Repo-Cleaner para limpiar el historial de Git\n")
             f.write("   https://rtyley.github.io/bfg-repo-cleaner/\n\n")
         else:
-            f.write(
-                "✅ No se encontraron credenciales expuestas en el historial de Git\n\n"
-            )
+            f.write("✅ No se encontraron credenciales expuestas en el historial de Git\n\n")
 
     print(f"\n📋 Reporte guardado en: {report_file}")
 

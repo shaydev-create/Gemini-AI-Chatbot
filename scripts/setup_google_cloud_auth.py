@@ -7,9 +7,7 @@ import sys
 from pathlib import Path
 
 # Configurar logging
-logging.basicConfig(
-    level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
-)
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
 
 
@@ -54,9 +52,7 @@ def get_project_root() -> Path:
 
     # Buscar hacia arriba hasta encontrar requirements.txt o .git
     while current_path.parent != current_path:
-        if (current_path / "requirements.txt").exists() or (
-            current_path / ".git"
-        ).exists():
+        if (current_path / "requirements.txt").exists() or (current_path / ".git").exists():
             return current_path
         current_path = current_path.parent
 
@@ -274,9 +270,7 @@ def show_current_config() -> None:
         if value:
             # Ocultar claves sensibles
             if "key" in var.lower() or "credentials" in var.lower():
-                display_value = (
-                    f"{value[:10]}...{value[-4:]}" if len(value) > 14 else "***"
-                )
+                display_value = f"{value[:10]}...{value[-4:]}" if len(value) > 14 else "***"
             else:
                 display_value = value
             logger.info(f"  {var}: {display_value}")
@@ -288,21 +282,11 @@ def main():
     """Función principal."""
     import argparse
 
-    parser = argparse.ArgumentParser(
-        description="Configurar autenticación de Google Cloud y Vertex AI"
-    )
-    parser.add_argument(
-        "--verify", action="store_true", help="Verificar configuración actual"
-    )
-    parser.add_argument(
-        "--setup", action="store_true", help="Configurar directorios y templates"
-    )
-    parser.add_argument(
-        "--guide", action="store_true", help="Mostrar guía de configuración"
-    )
-    parser.add_argument(
-        "--config", action="store_true", help="Mostrar configuración actual"
-    )
+    parser = argparse.ArgumentParser(description="Configurar autenticación de Google Cloud y Vertex AI")
+    parser.add_argument("--verify", action="store_true", help="Verificar configuración actual")
+    parser.add_argument("--setup", action="store_true", help="Configurar directorios y templates")
+    parser.add_argument("--guide", action="store_true", help="Mostrar guía de configuración")
+    parser.add_argument("--config", action="store_true", help="Mostrar configuración actual")
 
     args = parser.parse_args()
 

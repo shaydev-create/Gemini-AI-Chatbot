@@ -54,9 +54,7 @@ class ChromeExtensionPackager:
             # Description length check
             description = manifest.get("description", "")
             if len(description) > 132:
-                self.validation_errors.append(
-                    f"Description too long: {len(description)}/132 characters"
-                )
+                self.validation_errors.append(f"Description too long: {len(description)}/132 characters")
 
             # Icons check
             if "icons" not in manifest:
@@ -85,9 +83,7 @@ class ChromeExtensionPackager:
                 missing_icons.append(icon)
 
         if missing_icons:
-            self.validation_errors.extend(
-                [f"Missing icon: {icon}" for icon in missing_icons]
-            )
+            self.validation_errors.extend([f"Missing icon: {icon}" for icon in missing_icons])
             return False
 
         return True
@@ -121,9 +117,7 @@ class ChromeExtensionPackager:
                 missing_files.append(file)
 
         if missing_files:
-            self.validation_errors.extend(
-                [f"Missing required file: {file}" for file in missing_files]
-            )
+            self.validation_errors.extend([f"Missing required file: {file}" for file in missing_files])
             return False
 
         return True

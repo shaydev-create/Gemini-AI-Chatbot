@@ -14,9 +14,7 @@ def run_command(command, description, check=True):
     """Ejecuta un comando con manejo de errores."""
     print(f"🔄 {description}...")
     try:
-        result = subprocess.run(
-            command, shell=True, check=check, capture_output=True, text=True
-        )
+        result = subprocess.run(command, shell=True, check=check, capture_output=True, text=True)
         if result.stdout:
             print(f"   ✅ {result.stdout.strip()}")
         return True

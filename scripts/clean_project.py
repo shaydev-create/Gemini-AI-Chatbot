@@ -233,9 +233,7 @@ class ProjectCleaner:
         print("\n🗑️  Eliminando directorios vacíos...")
 
         # Iterar desde los directorios más profundos hacia arriba
-        for path in sorted(
-            self.project_root.rglob("*"), key=lambda p: len(p.parts), reverse=True
-        ):
+        for path in sorted(self.project_root.rglob("*"), key=lambda p: len(p.parts), reverse=True):
             if path.is_dir() and path != self.project_root:
                 try:
                     # Verificar si está vacío

@@ -28,28 +28,23 @@ def main():
 
     try:
         # Configurar variables de entorno básicas
-        os.environ.setdefault('FLASK_ENV', 'development')
-        os.environ.setdefault('FLASK_DEBUG', '1')
-        
+        os.environ.setdefault("FLASK_ENV", "development")
+        os.environ.setdefault("FLASK_DEBUG", "1")
+
         # Importar y crear la aplicación Flask
         from app.core.application import get_flask_app
-        
+
         # Crear la aplicación
         app = get_flask_app("development")
-        
+
         print("✅ Aplicación iniciada correctamente")
         print("🌐 Servidor disponible en: http://127.0.0.1:5000")
         print("🛑 Presiona Ctrl+C para detener el servidor")
         print()
-        
+
         # Ejecutar el servidor
-        app.run(
-            host='127.0.0.1',
-            port=5000,
-            debug=True,
-            use_reloader=True
-        )
-        
+        app.run(host="127.0.0.1", port=5000, debug=True, use_reloader=True)
+
     except ImportError as e:
         print(f"❌ Error de importación: {e}")
         print("Asegúrate de que todas las dependencias estén instaladas:")

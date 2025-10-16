@@ -14,9 +14,7 @@ def run_command(command, description, check=True):
     """Ejecuta un comando del sistema con manejo de errores."""
     print(f"📦 {description}...")
     try:
-        result = subprocess.run(
-            command, shell=True, check=check, capture_output=True, text=True
-        )
+        result = subprocess.run(command, shell=True, check=check, capture_output=True, text=True)
         if result.stdout:
             print(f"   ✅ {result.stdout.strip()}")
         return True
@@ -68,9 +66,7 @@ def main():
 
     # Inicializar base de datos
     print("🗄️ Configurando base de datos...")
-    run_command(
-        "poetry run flask db upgrade", "Aplicando migraciones de DB", check=False
-    )
+    run_command("poetry run flask db upgrade", "Aplicando migraciones de DB", check=False)
 
     print("\n🎉 ¡Configuración completada!")
     print("📋 Próximos pasos:")

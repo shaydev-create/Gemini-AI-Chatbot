@@ -121,9 +121,7 @@ def test_chat_api():
             }
 
             start_time = time.time()
-            response = requests.post(
-                API_URL, json=payload, headers=headers, verify=False, timeout=30
-            )
+            response = requests.post(API_URL, json=payload, headers=headers, verify=False, timeout=30)
             response_time = time.time() - start_time
 
             if response.status_code == 200:
@@ -207,8 +205,7 @@ def test_chat_page():
                 functionalities = [
                     (
                         "Función sendMessage",
-                        "function sendMessage" in content
-                        or "async function sendMessage" in content,
+                        "function sendMessage" in content or "async function sendMessage" in content,
                     ),
                     ("Botones de acción", "action-btn" in content),
                     ("Indicador de escritura", "typing-indicator" in content),
@@ -296,9 +293,7 @@ def test_chrome_extension_package():
         import zipfile
 
         base_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-        zip_path = os.path.join(
-            base_path, "gemini-ai-chatbot-chrome-20250715_145314.zip"
-        )
+        zip_path = os.path.join(base_path, "gemini-ai-chatbot-chrome-20250715_145314.zip")
 
         if not os.path.exists(zip_path):
             print_error("Archivo ZIP de la extensión no encontrado")
@@ -339,15 +334,9 @@ def test_chrome_extension_package():
                     manifest_content = zip_file.read("manifest.json").decode("utf-8")
                     manifest_data = json.loads(manifest_content)
 
-                    print_info(
-                        f"Nombre: {manifest_data.get('name', 'No especificado')}"
-                    )
-                    print_info(
-                        f"Versión: {manifest_data.get('version', 'No especificada')}"
-                    )
-                    print_info(
-                        f"Descripción: {manifest_data.get('description', 'No especificada')[:50]}..."
-                    )
+                    print_info(f"Nombre: {manifest_data.get('name', 'No especificado')}")
+                    print_info(f"Versión: {manifest_data.get('version', 'No especificada')}")
+                    print_info(f"Descripción: {manifest_data.get('description', 'No especificada')[:50]}...")
 
                 except Exception as e:
                     print_warning(f"No se pudo leer manifest.json: {str(e)}")
@@ -382,16 +371,12 @@ def generate_test_report(results):
     print(f"\n{Colors.BOLD}Recomendaciones:{Colors.END}")
 
     if passed_tests == total_tests:
-        print_success(
-            "🎉 ¡Todas las pruebas pasaron! El sistema está listo para el lanzamiento."
-        )
+        print_success("🎉 ¡Todas las pruebas pasaron! El sistema está listo para el lanzamiento.")
         print_info("✅ Puedes proceder con la publicación en Chrome Web Store")
         print_info("✅ Todas las funcionalidades están operativas")
         print_info("✅ La estructura de archivos es correcta")
     elif passed_tests >= total_tests * 0.8:
-        print_warning(
-            "⚠️ La mayoría de pruebas pasaron, pero hay algunos problemas menores"
-        )
+        print_warning("⚠️ La mayoría de pruebas pasaron, pero hay algunos problemas menores")
         print_info("🔧 Revisa los errores reportados antes del lanzamiento")
         print_info("📋 Considera hacer pruebas manuales adicionales")
     else:
@@ -411,9 +396,7 @@ def generate_test_report(results):
             f.write(f"Total de pruebas: {total_tests}\n")
             f.write(f"Pruebas exitosas: {passed_tests}\n")
             f.write(f"Pruebas fallidas: {total_tests - passed_tests}\n")
-            f.write(
-                f"Porcentaje de éxito: {(passed_tests / total_tests) * 100:.1f}%\n\n"
-            )
+            f.write(f"Porcentaje de éxito: {(passed_tests / total_tests) * 100:.1f}%\n\n")
 
             f.write("DETALLE POR PRUEBA:\n")
             for test_name, result in results.items():

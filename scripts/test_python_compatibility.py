@@ -41,9 +41,7 @@ def check_python_version():
     print(f"🐍 Python actual: {version.major}.{version.minor}.{version.micro}")
 
     if version[:2] not in [(3, 11), (3, 12), (3, 13)]:
-        print(
-            f"⚠️  Advertencia: Versión {version.major}.{version.minor} no está en el rango soportado"
-        )
+        print(f"⚠️  Advertencia: Versión {version.major}.{version.minor} no está en el rango soportado")
         return False
     return True
 
@@ -138,9 +136,7 @@ def run_compatibility_tests():
 
     if failed == 0:
         print("\n🎉 ¡TODOS LOS TESTS DE COMPATIBILIDAD PASARON!")
-        print(
-            f"✅ El proyecto es compatible con Python {sys.version_info.major}.{sys.version_info.minor}"
-        )
+        print(f"✅ El proyecto es compatible con Python {sys.version_info.major}.{sys.version_info.minor}")
         return True
     else:
         print(f"\n⚠️  {failed} test(s) fallaron. Revisar errores arriba.")

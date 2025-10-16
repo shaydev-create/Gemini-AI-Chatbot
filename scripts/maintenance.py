@@ -107,9 +107,7 @@ class MaintenanceManager:
         # Eliminar tokens de más de 7 días
         cutoff_date = datetime.now(timezone.utc) - timedelta(days=7)
 
-        expired_tokens = TokenBlacklist.query.filter(
-            TokenBlacklist.revoked_at < cutoff_date
-        ).all()
+        expired_tokens = TokenBlacklist.query.filter(TokenBlacklist.revoked_at < cutoff_date).all()
 
         for token in expired_tokens:
             db.session.delete(token)
@@ -125,9 +123,7 @@ class MaintenanceManager:
         # Archivar sesiones de más de 90 días
         cutoff_date = datetime.now(timezone.utc) - timedelta(days=90)
 
-        old_sessions = ChatSession.query.filter(
-            ChatSession.created_at < cutoff_date, ChatSession.status != "archived"
-        ).all()
+        old_sessions = ChatSession.query.filter(ChatSession.created_at < cutoff_date, ChatSession.status != "archived").all()
 
         for session in old_sessions:
             session.status = "archived"
@@ -188,9 +184,7 @@ class MaintenanceManager:
         reports_dir = Path("logs/reports")
         reports_dir.mkdir(exist_ok=True)
 
-        report_file = (
-            reports_dir / f"usage_report_{datetime.now().strftime('%Y%m%d_%H%M%S')}.txt"
-        )
+        report_file = reports_dir / f"usage_report_{datetime.now().strftime('%Y%m%d_%H%M%S')}.txt"
         report_file.write_text(report)
 
         logger.info(f"  📄 Reporte guardado: {report_file}")

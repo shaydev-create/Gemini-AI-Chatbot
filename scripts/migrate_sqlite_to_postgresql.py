@@ -12,9 +12,7 @@ from urllib.parse import urlparse
 import psycopg2
 
 # Configurar logging
-logging.basicConfig(
-    level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
-)
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
 
 
@@ -28,9 +26,7 @@ def get_project_root() -> Path:
 
     # Buscar hacia arriba hasta encontrar requirements.txt o .git
     while current_path.parent != current_path:
-        if (current_path / "requirements.txt").exists() or (
-            current_path / ".git"
-        ).exists():
+        if (current_path / "requirements.txt").exists() or (current_path / ".git").exists():
             return current_path
         current_path = current_path.parent
 
@@ -152,9 +148,7 @@ def get_sqlite_tables(conn: sqlite3.Connection) -> List[str]:
     return tables
 
 
-def get_table_schema(
-    conn: sqlite3.Connection, table_name: str
-) -> List[Tuple[str, str]]:
+def get_table_schema(conn: sqlite3.Connection, table_name: str) -> List[Tuple[str, str]]:
     """Obtener esquema de una tabla SQLite.
 
     Args:
@@ -360,14 +354,10 @@ def verify_migration(
         pg_cursor.close()
 
         if sqlite_count == pg_count:
-            logger.info(
-                f"✅ Verificación exitosa para {table_name}: {sqlite_count} filas"
-            )
+            logger.info(f"✅ Verificación exitosa para {table_name}: {sqlite_count} filas")
             return True
         else:
-            logger.error(
-                f"❌ Verificación fallida para {table_name}: SQLite={sqlite_count}, PostgreSQL={pg_count}"
-            )
+            logger.error(f"❌ Verificación fallida para {table_name}: SQLite={sqlite_count}, PostgreSQL={pg_count}")
             return False
 
     except Exception as e:
@@ -409,23 +399,15 @@ def parse_args():
         "--postgresql-url",
         help="URL de PostgreSQL (ej: postgresql://user:pass@localhost/dbname)",
     )
-    parser.add_argument(
-        "--dry-run", action="store_true", help="Solo mostrar qué se haría, sin ejecutar"
-    )
-    parser.add_argument(
-        "--backup", action="store_true", help="Crear backup de SQLite antes de migrar"
-    )
-    parser.add_argument(
-        "--verify", action="store_true", help="Verificar migración después de completar"
-    )
+    parser.add_argument("--dry-run", action="store_true", help="Solo mostrar qué se haría, sin ejecutar")
+    parser.add_argument("--backup", action="store_true", help="Crear backup de SQLite antes de migrar")
+    parser.add_argument("--verify", action="store_true", help="Verificar migración después de completar")
     return parser.parse_args()
 
 
 def log_databases(sqlite_path, pg_config):
     logger.info(f"📂 SQLite: {sqlite_path}")
-    logger.info(
-        f"🐘 PostgreSQL: {pg_config['host']}:{pg_config['port']}/{pg_config['database']}"
-    )
+    logger.info(f"🐘 PostgreSQL: {pg_config['host']}:{pg_config['port']}/{pg_config['database']}")
 
 
 def connect_databases(sqlite_path, pg_config, dry_run):

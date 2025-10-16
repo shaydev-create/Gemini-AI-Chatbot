@@ -62,16 +62,12 @@ def create_placeholder_screenshot(
             x = center_x - 200 + i * 100
             y = center_y + 100 + j * 40
             radius = 8
-            draw.ellipse(
-                [x - radius, y - radius, x + radius, y + radius], fill=accent_color
-            )
+            draw.ellipse([x - radius, y - radius, x + radius, y + radius], fill=accent_color)
 
             # Connect dots with lines
             if i < 4:
                 next_x = x + 100
-                draw.line(
-                    [(x + radius, y), (next_x - radius, y)], fill=accent_color, width=2
-                )
+                draw.line([(x + radius, y), (next_x - radius, y)], fill=accent_color, width=2)
 
     # Add "Gemini AI" branding
     brand_text = "Gemini AI Futuristic Chatbot"

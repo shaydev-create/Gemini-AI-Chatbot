@@ -77,9 +77,7 @@ def main():
     if response.lower() in ["s", "si", "sí", "y", "yes"]:
         open_github_actions()
     else:
-        print(
-            "🔗 URL manual: https://github.com/shaydev-create/Gemini-AI-Chatbot/actions"
-        )
+        print("🔗 URL manual: https://github.com/shaydev-create/Gemini-AI-Chatbot/actions")
 
     print("\n" + "=" * 50)
     print("🎉 RESUMEN:")

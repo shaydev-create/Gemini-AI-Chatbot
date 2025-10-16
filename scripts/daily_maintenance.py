@@ -15,9 +15,7 @@ from pathlib import Path
 from typing import List, Tuple
 
 
-def run_command_with_timeout(
-    command: List[str], description: str, timeout: int = 300
-) -> Tuple[bool, str]:
+def run_command_with_timeout(command: List[str], description: str, timeout: int = 300) -> Tuple[bool, str]:
     """Ejecuta un comando con timeout."""
     try:
         print(f"🔄 {description}...")
@@ -37,9 +35,7 @@ def run_command_with_timeout(
             print(f"   ✅ {description} completado ({elapsed:.1f}s)")
             return True, result.stdout
         else:
-            print(
-                f"   ⚠️  {description} terminó con código {result.returncode} ({elapsed:.1f}s)"
-            )
+            print(f"   ⚠️  {description} terminó con código {result.returncode} ({elapsed:.1f}s)")
             return False, result.stderr
 
     except subprocess.TimeoutExpired:
@@ -90,9 +86,7 @@ def main():
 
     # Verificar salud inicial
     initial_health = check_project_health()
-    print(
-        f"📊 Estado inicial: {initial_health['files_count']} archivos, {initial_health['project_size_mb']} MB"
-    )
+    print(f"📊 Estado inicial: {initial_health['files_count']} archivos, {initial_health['project_size_mb']} MB")
 
     project_root = Path(__file__).parent.parent
     os_command = "python" if sys.platform == "win32" else "python3"
