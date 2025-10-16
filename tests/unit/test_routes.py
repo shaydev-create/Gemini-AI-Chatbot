@@ -82,7 +82,8 @@ def test_sitemap_xml_route(client):
     """Prueba que la ruta '/static/sitemap.xml' devuelve XML."""
     response = client.get("/static/sitemap.xml")
     assert response.status_code == 200
-    assert response.content_type == "text/xml; charset=utf-8"
+    # Aceptar ambos tipos MIME válidos para XML según la plataforma/versión de Flask
+    assert response.content_type in ["text/xml; charset=utf-8", "application/xml; charset=utf-8"]
 
 
 @patch("app.main.routes.send_from_directory")
@@ -101,7 +102,8 @@ def test_favicon_not_found(client):
     """Prueba que la ruta '/favicon.ico' devuelve el contenido correcto."""
     response = client.get("/favicon.ico")
     assert response.status_code == 200
-    assert response.content_type == "image/x-icon"  # Flask detecta la extensión .ico
+    # Aceptar ambos tipos MIME válidos para ICO según la plataforma/versión de Flask
+    assert response.content_type in ["image/x-icon", "image/vnd.microsoft.icon"]
 
 
 # --- Pruebas para Rutas API (api_bp) ---
