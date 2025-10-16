@@ -1,112 +1,63 @@
-name: 🚀 CI/CD Pipelinename: 🚀 CI/CD Pipeline
+name: CI/CD Pipeline
 
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
 
+env:
+  PYTHON_VERSION: '3.12'
 
-on:on:
+jobs:
+  test:
+    name: Tests & Quality
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-  push:  push:
-
-    branches: [ main, develop ]    branches: [ main, develop ]
-
-  pull_request:  pull_request:
-
-    branches: [ main ]    branches: [ main ]
-
-
-
-env:env:
-
-  PYTHON_VERSION: '3.12'  PYTHON_VERSION: '3.12'
-
-
-
-jobs:jobs:
-
-  test:  test:
-
-    name: 🧪 Tests & Quality    name: 🧪 Tests & Quality
-
-    runs-on: ubuntu-latest    runs-on: ubuntu-latest
-
-    timeout-minutes: 15    timeout-minutes: 15
-
-        
-
-    steps:    steps:
-
-      - name: 📥 Checkout code      - name: 📥 Checkout code
-
-        uses: actions/checkout@v4        uses: actions/checkout@v4
-
-
-
-      - name: 🐍 Set up Python ${{ env.PYTHON_VERSION }}      - name: 🐍 Set up Python ${{ env.PYTHON_VERSION }}
-
-        uses: actions/setup-python@v4        uses: actions/setup-python@v4
-
-        with:        with:
-
-          python-version: ${{ env.PYTHON_VERSION }}          python-version: ${{ env.PYTHON_VERSION }}
-
-
-
-      - name: 📦 Cache Poetry dependencies      - name: 📦 Cache Poetry dependencies
-
-        uses: actions/cache@v3        uses: actions/cache@v3
-
-        with:        with:
-
-          path: ~/.cache/pypoetry          path: ~/.cache/pypoetry
-
-          key: ${{ runner.os }}-poetry-${{ hashFiles('**/poetry.lock') }}          key: ${{ runner.os }}-poetry-${{ hashFiles('**/poetry.lock') }}
-
-
-
-      - name: 🎨 Install Poetry      - name: 🎨 Install Poetry
-
-        uses: snok/install-poetry@v1        uses: snok/install-poetry@v1
-
+      - name: Set up Python ${{ env.PYTHON_VERSION }}
+        uses: actions/setup-python@v4
         with:
+          python-version: ${{ env.PYTHON_VERSION }}
 
-          version: latest      - name: 📋 Install dependencies
+      - name: Cache Poetry dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/pypoetry
+          key: ${{ runner.os }}-poetry-${{ hashFiles('**/poetry.lock') }}
 
-          virtualenvs-create: true        run: poetry install --with dev --no-interaction
-
+      - name: Install Poetry
+        uses: snok/install-poetry@v1
+        with:
+          version: latest
+          virtualenvs-create: true
           virtualenvs-in-project: true
 
-      - name: 🔧 Format & Lint
+      - name: Install dependencies
+        run: poetry install --with dev --no-interaction
 
-      - name: 📋 Install dependencies        run: |
-
-        run: poetry install --with dev --no-interaction          poetry run ruff format --check app/ tests/
-
-          poetry run ruff check app/ tests/
-
-      - name: 🗄️ Set up test database
-
-        run: |      - name: 🧪 Run tests with coverage
-
-          mkdir -p instance        run: poetry run pytest tests/ -v --cov=app --cov-report=xml --maxfail=5
-
+      - name: Set up test database
+        run: |
+          mkdir -p instance
           touch instance/test.db
 
-      - name: 📤 Upload coverage
+      - name: Format & Lint
+        run: |
+          poetry run ruff format --check app/ tests/
+          poetry run ruff check app/ tests/
 
-      - name: 🔧 Format & Lint        uses: codecov/codecov-action@v4
-
-        run: |        with:
-
-          poetry run ruff format --check app/ tests/          file: ./coverage.xml
-
-          poetry run ruff check app/ tests/        continue-on-error: true
-
-      - name: 🧪 Run tests with coverage
+      - name: Run tests with coverage
         env:
           FLASK_ENV: testing
           DATABASE_URL: sqlite:///instance/test.db
-        run: poetry run pytest tests/ -v --cov=app --cov-report=xml
+          GEMINI_API_KEY: test-api-key-for-testing
+        run: poetry run pytest tests/ -v --cov=app --cov-report=xml --maxfail=5
 
-      - name: 📤 Upload coverage
+      - name: Upload coverage
         uses: codecov/codecov-action@v4
         with:
           file: ./coverage.xml
