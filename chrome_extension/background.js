@@ -7,7 +7,7 @@
 const CHATBOT_CONFIG = {
     name: '🚀 Gemini AI Futuristic Chatbot',
     version: '2.0.0', // Sincronizado con manifest.json
-    serverUrl: 'http://127.0.0.1:5000', // URL del backend local
+    serverUrl: 'http://127.0.0.1:3000', // URL del backend local (puerto 3000 funcional)
 };
 
 const WELCOME_URL = chrome.runtime.getURL('welcome.html');
@@ -47,13 +47,29 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     const handler = messageHandlers[request.action];
 
     if (handler) {
+        // Verificar que sendResponse esté disponible
+        if (typeof sendResponse !== 'function') {
+            log('error', 'sendResponse no es una función válida');
+            return false;
+        }
+
         // Usar async/await para manejar promesas de forma limpia
         (async () => {
             try {
                 const response = await handler(request.data, sender);
+                // Verificar que el puerto aún esté abierto antes de enviar respuesta
+                if (chrome.runtime.lastError) {
+                    log('warn', 'Puerto cerrado antes de enviar respuesta:', chrome.runtime.lastError.message);
+                    return;
+                }
                 sendResponse({ success: true, data: response });
             } catch (error) {
                 log('error', `Error en la acción '${request.action}':`, error.message);
+                // Verificar que el puerto aún esté abierto antes de enviar error
+                if (chrome.runtime.lastError) {
+                    log('warn', 'Puerto cerrado antes de enviar error:', chrome.runtime.lastError.message);
+                    return;
+                }
                 sendResponse({ success: false, error: error.message });
             }
         })();

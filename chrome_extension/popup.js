@@ -86,16 +86,28 @@ const state = {
 const api = {
     sendMessage: (action, data = {}) => {
         return new Promise((resolve, reject) => {
-            chrome.runtime.sendMessage({ action, data }, (response) => {
-                if (chrome.runtime.lastError) {
-                    return reject(chrome.runtime.lastError);
-                }
-                if (response && response.success) {
-                    resolve(response.data);
-                } else {
-                    reject(new Error(response ? response.error : 'Respuesta inválida del Service Worker'));
-                }
-            });
+            try {
+                chrome.runtime.sendMessage({ action, data }, (response) => {
+                    // Verificar error de runtime primero
+                    if (chrome.runtime.lastError) {
+                        console.warn('Chrome runtime error:', chrome.runtime.lastError.message);
+                        return reject(new Error(`Runtime error: ${chrome.runtime.lastError.message}`));
+                    }
+                    
+                    // Verificar que la respuesta sea válida
+                    if (!response) {
+                        return reject(new Error('No se recibió respuesta del Service Worker'));
+                    }
+                    
+                    if (response.success) {
+                        resolve(response.data);
+                    } else {
+                        reject(new Error(response.error || 'Error desconocido del Service Worker'));
+                    }
+                });
+            } catch (error) {
+                reject(new Error(`Error enviando mensaje: ${error.message}`));
+            }
         });
     },
 };

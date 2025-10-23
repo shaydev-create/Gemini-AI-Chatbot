@@ -12,8 +12,6 @@
 #
 # ===============================================================================
 
-version: '3.9'
-
 services:
   # -------------------------------------------------------------------------------
   # Servicio de la Aplicación (Plantilla)
@@ -65,7 +63,7 @@ services:
   cache:
     image: redis:7-alpine
     container_name: gemini-cache
-    command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD}
+    command: redis-server --appendonly yes
     env_file:
       - .env
     volumes:
@@ -74,7 +72,7 @@ services:
       - gemini-network
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD}", "ping"]
+      test: ["CMD", "redis-cli", "ping"]
       interval: 10s
       timeout: 5s
       retries: 5

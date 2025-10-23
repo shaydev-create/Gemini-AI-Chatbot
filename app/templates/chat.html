@@ -1608,6 +1608,66 @@
             color: var(--text-primary) !important;
             cursor: pointer;
             transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .ai-tool-btn::after {
+            content: '🔵';
+            position: absolute;
+            top: 8px;
+            right: 12px;
+            font-size: 12px;
+            opacity: 0.7;
+        }
+
+        .ai-tool-btn.chrome-ai-full::after {
+            content: '🧠';
+            color: #00ff00;
+        }
+
+        .ai-tool-btn.chrome-ai-prompt::after {
+            content: '🔵';
+            color: #00ccff;
+        }
+
+        .ai-tool-btn.gemini-fallback::after {
+            content: '🌐';
+            color: #ff9500;
+        }
+
+        .ai-tool-btn:hover::after {
+            animation: pulse-brain 1.5s infinite;
+        }
+
+        @keyframes pulse-brain {
+            0%, 100% { transform: scale(1); opacity: 0.6; }
+            50% { transform: scale(1.2); opacity: 1; }
+        }
+
+        /* Status indicator styling */
+        #ai-status-indicator {
+            position: relative;
+            overflow: hidden;
+        }
+
+        #ai-status-indicator::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            animation: shimmer 2s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+
+        .ai-tool-btn {
             text-align: left;
             width: 100%;
             box-sizing: border-box;
@@ -2031,6 +2091,21 @@
     </div>
     <!-- El selector de idioma se ha movido a los botones de acción del chat -->
     <script>
+        // === GLOBAL ERROR HANDLERS ===
+        // Prevent uncaught promise rejections and async listener errors
+        window.addEventListener('unhandledrejection', function(event) {
+            console.warn('Unhandled promise rejection:', event.reason);
+            event.preventDefault(); // Prevent the default browser behavior
+        });
+        
+        window.addEventListener('error', function(event) {
+            if (event.message && event.message.includes('message channel closed')) {
+                console.warn('Chrome extension message channel error (ignored):', event.message);
+                event.preventDefault();
+                return false;
+            }
+        });
+
         // === CONFIGURACIÓN OPTIMIZADA Y VARIABLES GLOBALES ===
         let messagesContainer, messageInput, sendButton, typingIndicator, charCounter;
         let currentUtterance = null;
@@ -2550,20 +2625,26 @@
                 // Always add AI mode selector, regardless of Chrome AI availability
                 addAIModeSelector();
                 
+                // Actualizar indicadores de estado
+                updateAIStatusIndicator();
+                updateAIButtonsVisibility();
+                
                 if (chromeAIAvailable) {
-                    console.log('🚀 Chrome Built-in AI disponible (se iniciará al primer uso)');
+                    console.log('🚀 Chrome Built-in AI Local disponible');
                     
-                    // Listen for download progress
-                    document.addEventListener('chrome-ai-download-progress', (e) => {
-                        showAIDownloadProgress(e.detail.progress);
-                    });
+                    // Check which APIs are available (simple check)
+                    const capabilities = chromeAI.getCapabilities();
+                    const hasPrompt = capabilities.prompt || false;
                     
-                    // Show notification about Chrome AI availability
-                    showNotification('🧠 Chrome Built-in AI disponible! Se activará cuando envíes tu primer mensaje.', 'success');
+                    if (hasPrompt) {
+                        showNotification('🧠 Chrome AI Local listo para usar offline!', 'success');
+                    } else {
+                        showNotification('🧠 Chrome Built-in AI detectado. Inicializando...', 'info');
+                    }
                     
                 } else {
                     console.log('Chrome Built-in AI not available on this device');
-                    showNotification('ℹ️ Chrome Built-in AI no disponible. Usa Chrome Canary para activarlo.', 'info');
+                    showNotification('ℹ️ Chrome Built-in AI no disponible. Usando solo Gemini API.', 'info');
                 }
                 
             } catch (error) {
@@ -2834,38 +2915,29 @@
                 
                 // Show initialization message on first use
                 if (!chromeAI.promptSession) {
-                    showNotification('🚀 Activando Chrome AI...', 'info');
+                    showNotification('🚀 Activando Chrome AI Local...', 'info');
                 }
                 
-                // Get current language
-                const currentLang = getCurrentLanguage();
+                console.log('🧠 Sending message to Chrome AI Local:', message);
                 
-                // Try non-streaming first for better reliability
-                console.log('🧠 Sending message to Chrome AI:', message);
+                // Simple Chrome AI call without extra options
+                const response = await chromeAI.prompt(message, { 
+                    streaming: false
+                });
                 
-                try {
-                    const response = await chromeAI.prompt(message, { 
-                        streaming: false,
-                        language: currentLang
-                    });
-                    
-                    console.log('🧠 Chrome AI response received:', response);
-                    
-                    if (response) {
-                        addMessage(response, 'bot');
-                        return response;
-                    }
-                    
-                    throw new Error('No response from Chrome AI');
-                    
-                } catch (streamError) {
-                    console.warn('Non-streaming failed, fallback not needed:', streamError);
-                    throw streamError; // Don't try streaming fallback to avoid duplication
+                console.log('🧠 Chrome AI Local response received:', response);
+                
+                if (response && response.trim()) {
+                    addMessage(response, 'bot');
+                    return response;
                 }
+                
+                throw new Error('No valid response from Chrome AI');
                 
             } catch (error) {
-                console.error('Chrome AI error:', error);
-                throw error;
+                console.error('❌ Chrome AI Local error:', error);
+                // Re-throw to trigger fallback
+                throw new Error(`Chrome AI failed: ${error.message}`);
             }
         }
         
@@ -3053,16 +3125,23 @@
                     retryCount = 0;
                 }
             } finally {
-                // Rehabilitar input y garantizar interactividad
-                isLoading = false;
-                isProcessingMessage = false; // Reset processing flag
-                if (messageInput) {
-                    messageInput.disabled = false;
-                    messageInput.focus();
-                }
-                if (sendButton) {
-                    sendButton.disabled = false;
-                    sendButton.innerHTML = '<span>Enviar</span><span>📤</span>';
+                // Always cleanup - prevent hanging promises
+                try {
+                    isLoading = false;
+                    isProcessingMessage = false;
+                    
+                    if (messageInput) {
+                        messageInput.disabled = false;
+                        messageInput.focus();
+                    }
+                    if (sendButton) {
+                        sendButton.disabled = false;
+                        sendButton.innerHTML = '<span>Enviar</span><span>📤</span>';
+                    }
+                    
+                    hideTyping(); // Ensure typing indicator is hidden
+                } catch (cleanupError) {
+                    console.warn('Cleanup error:', cleanupError);
                 }
             }
         }
@@ -4639,12 +4718,105 @@
             }
         }
 
+        // Actualizar indicador de estado del sistema híbrido
+        function updateAIStatusIndicator() {
+            const statusIndicator = document.getElementById('ai-status-indicator');
+            const statusText = document.getElementById('ai-status-text');
+            const chromeAIStatus = document.getElementById('chrome-ai-status');
+            const geminiStatus = document.getElementById('gemini-status');
+            const performanceStats = document.getElementById('performance-stats');
+
+            if (!statusIndicator) return;
+
+            const capabilities = chromeAI.getCapabilities();
+            const hasAnyChrome = Object.values(capabilities).some(cap => cap);
+            const hasPrompt = capabilities.prompt || false;
+            const availableAPIs = Object.keys(capabilities).filter(api => capabilities[api]);
+            
+            if (hasAnyChrome) {
+                if (hasPrompt && availableAPIs.length === 1) {
+                    // Solo Prompt API disponible - Optimizado para velocidad
+                    statusIndicator.style.background = 'linear-gradient(135deg, rgba(0, 200, 255, 0.1), rgba(100, 150, 255, 0.1))';
+                    statusIndicator.style.border = '1px solid rgba(0, 200, 255, 0.3)';
+                    statusText.textContent = '⚡ Chrome AI Ultra-Rápido (Prompt + Cache)';
+                    chromeAIStatus.textContent = '⚡ Optimizado';
+                } else {
+                    // Múltiples APIs disponibles
+                    statusIndicator.style.background = 'linear-gradient(135deg, rgba(0, 255, 0, 0.1), rgba(0, 200, 255, 0.1))';
+                    statusIndicator.style.border = '1px solid rgba(0, 255, 100, 0.3)';
+                    statusText.textContent = '🟢 Sistema Híbrido Completo';
+                    chromeAIStatus.textContent = '✅ Múltiples APIs';
+                }
+            } else {
+                statusIndicator.style.background = 'linear-gradient(135deg, rgba(255, 165, 0, 0.1), rgba(255, 100, 0, 0.1))';
+                statusIndicator.style.border = '1px solid rgba(255, 165, 0, 0.3)';
+                statusText.textContent = '🟡 Solo Gemini API (Optimizado)';
+                chromeAIStatus.textContent = '❌ No disponible';
+            }
+
+            // Mostrar estadísticas de rendimiento en tiempo real
+            if (chromeAI && performanceStats) {
+                updatePerformanceDisplay();
+            }
+
+            // Agregar información adicional para Prompt API
+            if (hasPrompt && availableAPIs.length === 1) {
+                const additionalInfo = document.createElement('div');
+                additionalInfo.style.fontSize = '0.75rem';
+                additionalInfo.style.color = 'var(--text-secondary)';
+                additionalInfo.style.marginTop = '5px';
+                additionalInfo.textContent = '� Ultra-optimizado: Cache + Sesiones pre-inicializadas + Prompts cortos';
+                
+                // Limpiar información adicional previa
+                const existing = statusIndicator.querySelector('.additional-info');
+                if (existing) existing.remove();
+                
+                additionalInfo.className = 'additional-info';
+                statusIndicator.appendChild(additionalInfo);
+            }
+        }
+
+        // Actualizar estadísticas de rendimiento en tiempo real
+        function updatePerformanceDisplay() {
+            const performanceStats = document.getElementById('performance-stats');
+            if (!performanceStats || !chromeAI) return;
+
+            try {
+                const stats = chromeAI.getPerformanceStats();
+                let statsText = '';
+                
+                if (stats['chrome-ai']) {
+                    statsText += `Chrome AI: ${stats['chrome-ai'].averageMs}ms`;
+                }
+                
+                if (stats['gemini'] || stats['gemini-fallback']) {
+                    const geminiStats = stats['gemini'] || stats['gemini-fallback'];
+                    if (statsText) statsText += ' | ';
+                    statsText += `Gemini: ${geminiStats.averageMs}ms`;
+                }
+                
+                if (statsText) {
+                    performanceStats.textContent = statsText;
+                } else {
+                    performanceStats.textContent = 'Esperando métricas...';
+                }
+            } catch (error) {
+                performanceStats.textContent = 'Error en métricas';
+            }
+        }
+
+        // Actualizar estadísticas cada 3 segundos
+        setInterval(updatePerformanceDisplay, 3000);
+
         // Configurar event listeners para modales de IA
         function setupAIEventListeners() {
             // Botones para abrir modales (ahora desde el modal de personalización)
             const writerBtn = document.querySelector('.ai-writer-btn');
             const correctorBtn = document.querySelector('.ai-corrector-btn');
             const translatorBtn = document.querySelector('.ai-translator-btn');
+            const summarizerBtn = document.querySelector('.ai-summarizer-btn');
+            const rewriterBtn = document.querySelector('.ai-rewriter-btn');
+            const proofreaderBtn = document.querySelector('.ai-proofreader-btn');
             
             // Event listeners para abrir modales AI
             writerBtn?.addEventListener('click', () => {
@@ -4658,6 +4830,18 @@
             translatorBtn?.addEventListener('click', () => {
                 closeModal();
                 setTimeout(() => openAIModal('translatorModal'), 300);
+            });
+            summarizerBtn?.addEventListener('click', () => {
+                closeModal();
+                setTimeout(() => openAIModal('summarizerModal'), 300);
+            });
+            rewriterBtn?.addEventListener('click', () => {
+                closeModal();
+                setTimeout(() => openAIModal('rewriterModal'), 300);
+            });
+            proofreaderBtn?.addEventListener('click', () => {
+                closeModal();
+                setTimeout(() => openAIModal('proofreaderModal'), 300);
             });
 
             // Botones para cerrar modales
@@ -4702,23 +4886,40 @@
 
         // Actualizar visibilidad de botones según capacidades
         function updateAIButtonsVisibility() {
-            const writerBtn = document.querySelector('.ai-writer-btn');
-            const correctorBtn = document.querySelector('.ai-corrector-btn');
-            const translatorBtn = document.querySelector('.ai-translator-btn');
+            const capabilities = chromeAI ? chromeAI.getCapabilities() : {};
+            const hasPrompt = capabilities.prompt || false;
+            
+            const buttons = [
+                { btn: document.querySelector('.ai-writer-btn'), api: 'writer' },
+                { btn: document.querySelector('.ai-corrector-btn'), api: 'proofreader' },
+                { btn: document.querySelector('.ai-translator-btn'), api: 'translator' },
+                { btn: document.querySelector('.ai-summarizer-btn'), api: 'summarizer' },
+                { btn: document.querySelector('.ai-rewriter-btn'), api: 'rewriter' }
+            ];
 
-            // Mostrar botones por defecto - solo ocultar si específicamente no están disponibles
-            if (writerBtn) {
-                const shouldShow = (aiCapabilities.writer !== false);
-                writerBtn.style.display = shouldShow ? 'flex' : 'none';
-            }
-            if (correctorBtn) {
-                const shouldShow = (aiCapabilities.proofreader !== false);
-                correctorBtn.style.display = shouldShow ? 'flex' : 'none';
-            }
-            if (translatorBtn) {
-                const shouldShow = (aiCapabilities.translator !== false);
-                translatorBtn.style.display = shouldShow ? 'flex' : 'none';
-            }
+            buttons.forEach(({ btn, api }) => {
+                if (!btn) return;
+                
+                // Mostrar todos los botones (siempre hay fallback)
+                btn.style.display = 'flex';
+                
+                // Actualizar clases según disponibilidad
+                btn.classList.remove('chrome-ai-full', 'chrome-ai-prompt', 'gemini-fallback');
+                
+                if (capabilities[api]) {
+                    // API específica disponible
+                    btn.classList.add('chrome-ai-full');
+                    btn.title = `${btn.getAttribute('aria-label')} - Chrome AI nativo`;
+                } else if (hasPrompt) {
+                    // Solo Prompt API disponible
+                    btn.classList.add('chrome-ai-prompt');
+                    btn.title = `${btn.getAttribute('aria-label')} - Chrome AI Prompt + Gemini`;
+                } else {
+                    // Solo Gemini disponible
+                    btn.classList.add('gemini-fallback');
+                    btn.title = `${btn.getAttribute('aria-label')} - Gemini API`;
+                }
+            });
         }
 
         // === ESCRITOR AI ===
@@ -4734,31 +4935,57 @@
                 return;
             }
 
-            if (!aiCapabilities.writer) {
-                alert('Writer API no está disponible en este navegador.');
-                return;
-            }
-
             try {
+                const startTime = performance.now();
+                
                 // Mostrar loading
-                outputDiv.innerHTML = '<div class="ai-loading">Generando texto...</div>';
+                outputDiv.innerHTML = '<div class="ai-loading">⚡ Generando texto...</div>';
                 resultDiv.style.display = 'block';
 
-                // Crear prompt completo
-                const fullPrompt = `Escribe un texto ${tone} de longitud ${length} sobre: ${prompt}`;
+                // Crear prompt para escritor AI
+                const fullPrompt = `Escribe un texto con tono ${tone} y longitud ${length} sobre: ${prompt}`;
 
-                // Usar Chrome AI Writer
-                const result = await chromeAIExtended.write(fullPrompt, {
-                    tone: tone,
-                    length: length
-                });
+                let result;
+
+                // Usar Chrome AI si está disponible
+                if (chromeAI && chromeAIAvailable) {
+                    try {
+                        // Intentar con Writer API específico
+                        if (chromeAI.getCapabilities().writer) {
+                            result = await chromeAI.writer(prompt, { tone, length });
+                        } else {
+                            // Fallback a Prompt API
+                            result = await chromeAI.prompt(fullPrompt);
+                        }
+                    } catch (chromeError) {
+                        console.warn('Chrome AI failed, using server:', chromeError);
+                        // Fallback to server
+                        const response = await fetch('/api/chat/send', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ message: fullPrompt })
+                        });
+                        const data = await response.json();
+                        result = data.response;
+                    }
+                } else {
+                    // Usar servidor directamente
+                    const response = await fetch('/api/chat/send', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ message: fullPrompt })
+                    });
+                    const data = await response.json();
+                    result = data.response;
+                }
 
                 // Mostrar resultado
-                outputDiv.textContent = result;
+                const duration = performance.now() - startTime;
+                outputDiv.innerHTML = `<div style="margin-bottom: 10px; font-size: 0.8rem; color: var(--text-secondary);">✅ Generado en ${duration.toFixed(0)}ms</div><div>${result}</div>`;
 
             } catch (error) {
                 console.error('Error generating text:', error);
-                outputDiv.innerHTML = '<div style="color: var(--error-color);">Error al generar el texto. Inténtalo de nuevo.</div>';
+                outputDiv.innerHTML = '<div style="color: var(--error-color);">❌ Error al generar el texto. Inténtalo de nuevo.</div>';
             }
         }
 
@@ -4778,25 +5005,57 @@
                 return;
             }
 
-            if (!aiCapabilities.proofreader) {
-                alert('Proofreader API no está disponible en este navegador.');
-                return;
-            }
-
             try {
+                const startTime = performance.now();
+                
                 // Mostrar loading
-                outputDiv.innerHTML = '<div class="ai-loading">Corrigiendo texto...</div>';
+                outputDiv.innerHTML = '<div class="ai-loading">⚡ Corrigiendo texto...</div>';
                 resultDiv.style.display = 'block';
 
-                // Usar Chrome AI Proofreader
-                const result = await chromeAIExtended.proofread(text);
+                // Crear prompt para corrección
+                const fullPrompt = `Corrige la gramática y ortografía del siguiente texto: ${text}`;
+
+                let result;
+
+                // Usar Chrome AI si está disponible
+                if (chromeAI && chromeAIAvailable) {
+                    try {
+                        // Intentar con Proofreader API específico
+                        if (chromeAI.getCapabilities().proofreader) {
+                            result = await chromeAI.proofreader(text);
+                        } else {
+                            // Fallback a Prompt API
+                            result = await chromeAI.prompt(fullPrompt);
+                        }
+                    } catch (chromeError) {
+                        console.warn('Chrome AI failed, using server:', chromeError);
+                        // Fallback to server
+                        const response = await fetch('/api/chat/send', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ message: fullPrompt })
+                        });
+                        const data = await response.json();
+                        result = data.response;
+                    }
+                } else {
+                    // Usar servidor directamente
+                    const response = await fetch('/api/chat/send', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ message: fullPrompt })
+                    });
+                    const data = await response.json();
+                    result = data.response;
+                }
 
                 // Mostrar resultado
-                outputDiv.textContent = result;
+                const duration = performance.now() - startTime;
+                outputDiv.innerHTML = `<div style="margin-bottom: 10px; font-size: 0.8rem; color: var(--text-secondary);">✅ Corregido en ${duration.toFixed(0)}ms</div><div>${result}</div>`;
 
             } catch (error) {
                 console.error('Error correcting text:', error);
-                outputDiv.innerHTML = '<div style="color: var(--error-color);">Error al corregir el texto. Inténtalo de nuevo.</div>';
+                outputDiv.innerHTML = '<div style="color: var(--error-color);">❌ Error al corregir el texto. Inténtalo de nuevo.</div>';
             }
         }
 
@@ -4823,25 +5082,60 @@
                 return;
             }
 
-            if (!aiCapabilities.translator) {
-                alert('Translator API no está disponible en este navegador.');
-                return;
-            }
-
             try {
+                const startTime = performance.now();
+                
                 // Mostrar loading
-                outputDiv.innerHTML = '<div class="ai-loading">Traduciendo...</div>';
+                outputDiv.innerHTML = '<div class="ai-loading">⚡ Traduciendo...</div>';
                 resultDiv.style.display = 'block';
 
-                // Usar Chrome AI Translator
-                const result = await chromeAIExtended.translate(text, sourceLang, targetLang);
+                // Crear prompt para traducción
+                const fullPrompt = `Traduce el siguiente texto de ${sourceLang === 'auto' ? 'detección automática' : sourceLang} a ${targetLang}: ${text}`;
+
+                let result;
+
+                // Usar Chrome AI si está disponible
+                if (chromeAI && chromeAIAvailable) {
+                    try {
+                        // Intentar con Translator API específico
+                        if (chromeAI.getCapabilities().translator) {
+                            result = await chromeAI.translator(text, { 
+                                sourceLanguage: sourceLang, 
+                                targetLanguage: targetLang 
+                            });
+                        } else {
+                            // Fallback a Prompt API
+                            result = await chromeAI.prompt(fullPrompt);
+                        }
+                    } catch (chromeError) {
+                        console.warn('Chrome AI failed, using server:', chromeError);
+                        // Fallback to server
+                        const response = await fetch('/api/chat/send', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ message: fullPrompt })
+                        });
+                        const data = await response.json();
+                        result = data.response;
+                    }
+                } else {
+                    // Usar servidor directamente
+                    const response = await fetch('/api/chat/send', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ message: fullPrompt })
+                    });
+                    const data = await response.json();
+                    result = data.response;
+                }
 
                 // Mostrar resultado
-                outputDiv.textContent = result;
+                const duration = performance.now() - startTime;
+                outputDiv.innerHTML = `<div style="margin-bottom: 10px; font-size: 0.8rem; color: var(--text-secondary);">✅ Traducido en ${duration.toFixed(0)}ms</div><div>${result}</div>`;
 
             } catch (error) {
                 console.error('Error translating text:', error);
-                outputDiv.innerHTML = '<div style="color: var(--error-color);">Error al traducir el texto. Inténtalo de nuevo.</div>';
+                outputDiv.innerHTML = '<div style="color: var(--error-color);">❌ Error al traducir el texto. Inténtalo de nuevo.</div>';
             }
         }
 
@@ -4859,6 +5153,240 @@
         function clearTranslator() {
             document.getElementById('translatorText').value = '';
             document.getElementById('translatorResult').style.display = 'none';
+        }
+
+        // === RESUMIDOR ===
+        async function summarizeText() {
+            const text = document.getElementById('summarizerText').value.trim();
+            const summaryType = document.getElementById('summaryType').value;
+            const outputDiv = document.getElementById('summarizerOutput');
+            const resultDiv = document.getElementById('summarizerResult');
+
+            if (!text) {
+                alert('Por favor, introduce el texto que quieres resumir.');
+                return;
+            }
+
+            try {
+                const startTime = performance.now();
+                
+                // Mostrar loading
+                outputDiv.innerHTML = '<div class="ai-loading">⚡ Resumiendo...</div>';
+                resultDiv.style.display = 'block';
+
+                // Crear prompt para resumen
+                const summaryTypeText = summaryType === 'bullets' ? 'en puntos clave' : 
+                                       summaryType === 'short' ? 'en forma corta' : 
+                                       summaryType === 'detailed' ? 'de forma detallada' : 'de forma concisa';
+                const fullPrompt = `Resume el siguiente texto ${summaryTypeText}: ${text}`;
+
+                let result;
+
+                // Usar Chrome AI si está disponible
+                if (chromeAI && chromeAIAvailable) {
+                    try {
+                        // Intentar con Summarizer API específico
+                        if (chromeAI.getCapabilities().summarizer) {
+                            const options = {
+                                type: summaryType === 'bullets' ? 'key-points' : 'tl;dr',
+                                length: summaryType === 'short' ? 'short' : summaryType === 'detailed' ? 'long' : 'medium'
+                            };
+                            result = await chromeAI.summarizer(text, options);
+                        } else {
+                            // Fallback a Prompt API
+                            result = await chromeAI.prompt(fullPrompt);
+                        }
+                    } catch (chromeError) {
+                        console.warn('Chrome AI failed, using server:', chromeError);
+                        // Fallback to server
+                        const response = await fetch('/api/chat/send', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ message: fullPrompt })
+                        });
+                        const data = await response.json();
+                        result = data.response;
+                    }
+                } else {
+                    // Usar servidor directamente
+                    const response = await fetch('/api/chat/send', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ message: fullPrompt })
+                    });
+                    const data = await response.json();
+                    result = data.response;
+                }
+
+                // Mostrar resultado
+                const duration = performance.now() - startTime;
+                outputDiv.innerHTML = `<div style="margin-bottom: 10px; font-size: 0.8rem; color: var(--text-secondary);">✅ Resumido en ${duration.toFixed(0)}ms</div><div>${result}</div>`;
+
+            } catch (error) {
+                console.error('Error summarizing text:', error);
+                outputDiv.innerHTML = '<div style="color: var(--error-color);">❌ Error al resumir el texto. Inténtalo de nuevo.</div>';
+            }
+        }
+
+        function clearSummarizer() {
+            document.getElementById('summarizerText').value = '';
+            document.getElementById('summarizerResult').style.display = 'none';
+        }
+
+        // === REESCRITOR ===
+        async function rewriteText() {
+            const text = document.getElementById('rewriterText').value.trim();
+            const style = document.getElementById('rewriterStyle').value;
+            const outputDiv = document.getElementById('rewriterOutput');
+            const resultDiv = document.getElementById('rewriterResult');
+
+            if (!text) {
+                alert('Por favor, introduce el texto que quieres reescribir.');
+                return;
+            }
+
+            try {
+                const startTime = performance.now();
+                
+                // Mostrar loading
+                outputDiv.innerHTML = '<div class="ai-loading">⚡ Reescribiendo...</div>';
+                resultDiv.style.display = 'block';
+
+                // Crear prompt para reescritura
+                const styleText = style === 'formal' ? 'de manera formal' : 
+                                 style === 'casual' ? 'de manera casual' : 
+                                 style === 'concise' ? 'de manera concisa' : 
+                                 style === 'detailed' ? 'de manera detallada' : 'mejorando el estilo';
+                const fullPrompt = `Reescribe el siguiente texto ${styleText}: ${text}`;
+
+                let result;
+
+                // Usar Chrome AI si está disponible
+                if (chromeAI && chromeAIAvailable) {
+                    try {
+                        // Intentar con Rewriter API específico
+                        if (chromeAI.getCapabilities().rewriter) {
+                            const options = {
+                                tone: style === 'formal' ? 'formal' : style === 'casual' ? 'casual' : 'as-is',
+                                length: style === 'concise' ? 'shorter' : style === 'detailed' ? 'longer' : 'as-is'
+                            };
+                            result = await chromeAI.rewriter(text, options);
+                        } else {
+                            // Fallback a Prompt API
+                            result = await chromeAI.prompt(fullPrompt);
+                        }
+                    } catch (chromeError) {
+                        console.warn('Chrome AI failed, using server:', chromeError);
+                        // Fallback to server
+                        const response = await fetch('/api/chat/send', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ message: fullPrompt })
+                        });
+                        const data = await response.json();
+                        result = data.response;
+                    }
+                } else {
+                    // Usar servidor directamente
+                    const response = await fetch('/api/chat/send', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ message: fullPrompt })
+                    });
+                    const data = await response.json();
+                    result = data.response;
+                }
+
+                // Mostrar resultado
+                const duration = performance.now() - startTime;
+                outputDiv.innerHTML = `<div style="margin-bottom: 10px; font-size: 0.8rem; color: var(--text-secondary);">✅ Reescrito en ${duration.toFixed(0)}ms</div><div>${result}</div>`;
+
+            } catch (error) {
+                console.error('Error rewriting text:', error);
+                outputDiv.innerHTML = '<div style="color: var(--error-color);">❌ Error al reescribir el texto. Inténtalo de nuevo.</div>';
+            }
+        }
+
+        function clearRewriter() {
+            document.getElementById('rewriterText').value = '';
+            document.getElementById('rewriterResult').style.display = 'none';
+        }
+
+        // === CORRECTOR DE PRUEBAS ===
+        async function proofreadText() {
+            const text = document.getElementById('proofreaderText').value.trim();
+            const level = document.getElementById('proofreadingLevel').value;
+            const outputDiv = document.getElementById('proofreaderOutput');
+            const resultDiv = document.getElementById('proofreaderResult');
+
+            if (!text) {
+                alert('Por favor, introduce el texto que quieres revisar.');
+                return;
+            }
+
+            try {
+                const startTime = performance.now();
+                
+                // Mostrar loading
+                outputDiv.innerHTML = '<div class="ai-loading">⚡ Revisando texto...</div>';
+                resultDiv.style.display = 'block';
+
+                // Crear prompt para revisión
+                const levelText = level === 'academic' ? 'nivel académico' : 
+                                 level === 'creative' ? 'nivel creativo' : 
+                                 'nivel general';
+                const fullPrompt = `Revisa y corrige el siguiente texto a ${levelText}, buscando errores gramaticales, ortográficos y de estilo: ${text}`;
+
+                let result;
+
+                // Usar Chrome AI si está disponible
+                if (chromeAI && chromeAIAvailable) {
+                    try {
+                        // Intentar con Proofreader API específico
+                        if (chromeAI.getCapabilities().proofreader) {
+                            const options = {
+                                context: level === 'academic' ? 'academic' : level === 'creative' ? 'creative' : 'general'
+                            };
+                            result = await chromeAI.proofreader(text, options);
+                        } else {
+                            // Fallback a Prompt API
+                            result = await chromeAI.prompt(fullPrompt);
+                        }
+                    } catch (chromeError) {
+                        console.warn('Chrome AI failed, using server:', chromeError);
+                        // Fallback to server
+                        const response = await fetch('/api/chat/send', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ message: fullPrompt })
+                        });
+                        const data = await response.json();
+                        result = data.response;
+                    }
+                } else {
+                    // Usar servidor directamente
+                    const response = await fetch('/api/chat/send', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ message: fullPrompt })
+                    });
+                    const data = await response.json();
+                    result = data.response;
+                }
+
+                // Mostrar resultado
+                const duration = performance.now() - startTime;
+                outputDiv.innerHTML = `<div style="margin-bottom: 10px; font-size: 0.8rem; color: var(--text-secondary);">✅ Revisado en ${duration.toFixed(0)}ms</div><div>${result}</div>`;
+
+            } catch (error) {
+                console.error('Error proofreading text:', error);
+                outputDiv.innerHTML = '<div style="color: var(--error-color);">❌ Error al revisar el texto. Inténtalo de nuevo.</div>';
+            }
+        }
+
+        function clearProofreader() {
+            document.getElementById('proofreaderText').value = '';
+            document.getElementById('proofreaderResult').style.display = 'none';
         }
 
         // === UTILIDADES COMUNES ===
@@ -4984,11 +5512,31 @@
                     </div>
                 </div>
 
+                <!-- Chrome AI Configuration -->
+                <div class="customize-section">
+                    <h4>⚙️ Configuración Chrome AI</h4>
+                    <p style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 15px;">
+                        Configura Chrome Built-in AI para usar las funciones localmente
+                    </p>
+                    <div style="text-align: center; margin-bottom: 20px;">
+                        <a href="/chrome-ai-setup" target="_blank" class="ai-btn primary" style="text-decoration: none; display: inline-block; padding: 10px 20px; margin: 5px;">
+                            🤖 Configurar Chrome AI
+                        </a>
+                    </div>
+                </div>
+
                 <!-- Chrome AI Tools -->
                 <div class="customize-section">
                     <h4>🧠 Herramientas Chrome AI</h4>
+                    <div id="ai-status-indicator" style="margin-bottom: 15px; padding: 10px; border-radius: 8px; font-size: 0.85rem;">
+                        <div>Estado: <span id="ai-status-text">Inicializando...</span></div>
+                        <div>Chrome AI: <span id="chrome-ai-status">❓</span> | Gemini Fallback: <span id="gemini-status">✅</span></div>
+                        <div id="performance-indicator" style="font-size: 0.75rem; margin-top: 5px; opacity: 0.8;">
+                            Rendimiento: <span id="performance-stats">Midiendo...</span>
+                        </div>
+                    </div>
                     <p style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 15px;">
-                        Herramientas de IA que funcionan localmente en tu navegador
+                        Sistema híbrido: Chrome AI local + Gemini API como respaldo
                     </p>
                     <div class="chrome-ai-tools">
                         <button class="ai-tool-btn ai-writer-btn" aria-label="Escritor AI" style="display: flex !important; visibility: visible !important;">
@@ -5010,6 +5558,27 @@
                             <div class="ai-tool-info">
                                 <strong>Traductor</strong>
                                 <small>Traduce a 9 idiomas instantáneamente</small>
+                            </div>
+                        </button>
+                        <button class="ai-tool-btn ai-summarizer-btn" aria-label="Resumidor AI" style="display: flex !important; visibility: visible !important;">
+                            <span class="ai-tool-icon">📄</span>
+                            <div class="ai-tool-info">
+                                <strong>Resumidor</strong>
+                                <small>Resume textos largos automáticamente</small>
+                            </div>
+                        </button>
+                        <button class="ai-tool-btn ai-rewriter-btn" aria-label="Reescritor AI" style="display: flex !important; visibility: visible !important;">
+                            <span class="ai-tool-icon">🖊️</span>
+                            <div class="ai-tool-info">
+                                <strong>Reescritor</strong>
+                                <small>Mejora y reformula el texto</small>
+                            </div>
+                        </button>
+                        <button class="ai-tool-btn ai-proofreader-btn" aria-label="Corrector de Pruebas AI" style="display: flex !important; visibility: visible !important;">
+                            <span class="ai-tool-icon">📖</span>
+                            <div class="ai-tool-info">
+                                <strong>Corrector de Pruebas</strong>
+                                <small>Revisa gramática y estilo</small>
                             </div>
                         </button>
                     </div>
@@ -5150,6 +5719,120 @@
                     <div class="ai-actions">
                         <button class="ai-btn" onclick="copyToClipboard('translatorOutput')">📋 Copiar</button>
                         <button class="ai-btn" onclick="insertToChat('translatorOutput')">💬 Enviar al Chat</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal Resumidor AI -->
+    <div id="summarizerModal" class="ai-modal" style="display: none;">
+        <div class="ai-modal-content">
+            <div class="ai-modal-header">
+                <h3>📄 Resumidor AI</h3>
+                <button class="close-ai-modal" data-modal="summarizerModal">&times;</button>
+            </div>
+            <div class="ai-modal-body">
+                <div class="ai-section">
+                    <label for="summarizerText">Texto a resumir:</label>
+                    <textarea id="summarizerText" placeholder="Pega aquí el texto que quieres resumir..." rows="8"></textarea>
+                </div>
+                <div class="ai-section">
+                    <label for="summaryType">Tipo de resumen:</label>
+                    <select id="summaryType">
+                        <option value="short">Resumen corto</option>
+                        <option value="medium">Resumen mediano</option>
+                        <option value="detailed">Resumen detallado</option>
+                        <option value="bullets">Puntos clave</option>
+                    </select>
+                </div>
+                <div class="ai-actions">
+                    <button class="ai-btn primary" onclick="summarizeText()">📄 Resumir</button>
+                    <button class="ai-btn secondary" onclick="clearSummarizer()">🗑️ Limpiar</button>
+                </div>
+                <div class="ai-result" id="summarizerResult" style="display: none;">
+                    <h4>📄 Resumen:</h4>
+                    <div class="ai-output" id="summarizerOutput"></div>
+                    <div class="ai-actions">
+                        <button class="ai-btn" onclick="copyToClipboard('summarizerOutput')">📋 Copiar</button>
+                        <button class="ai-btn" onclick="insertToChat('summarizerOutput')">💬 Enviar al Chat</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal Reescritor AI -->
+    <div id="rewriterModal" class="ai-modal" style="display: none;">
+        <div class="ai-modal-content">
+            <div class="ai-modal-header">
+                <h3>🖊️ Reescritor AI</h3>
+                <button class="close-ai-modal" data-modal="rewriterModal">&times;</button>
+            </div>
+            <div class="ai-modal-body">
+                <div class="ai-section">
+                    <label for="rewriterText">Texto a reescribir:</label>
+                    <textarea id="rewriterText" placeholder="Escribe o pega el texto que quieres mejorar..." rows="6"></textarea>
+                </div>
+                <div class="ai-section">
+                    <label for="rewriterStyle">Estilo de reescritura:</label>
+                    <select id="rewriterStyle">
+                        <option value="improve">Mejorar claridad</option>
+                        <option value="formal">Más formal</option>
+                        <option value="casual">Más casual</option>
+                        <option value="concise">Más conciso</option>
+                        <option value="detailed">Más detallado</option>
+                        <option value="professional">Profesional</option>
+                        <option value="creative">Creativo</option>
+                    </select>
+                </div>
+                <div class="ai-actions">
+                    <button class="ai-btn primary" onclick="rewriteText()">🖊️ Reescribir</button>
+                    <button class="ai-btn secondary" onclick="clearRewriter()">🗑️ Limpiar</button>
+                </div>
+                <div class="ai-result" id="rewriterResult" style="display: none;">
+                    <h4>🖊️ Texto Reescrito:</h4>
+                    <div class="ai-output" id="rewriterOutput"></div>
+                    <div class="ai-actions">
+                        <button class="ai-btn" onclick="copyToClipboard('rewriterOutput')">📋 Copiar</button>
+                        <button class="ai-btn" onclick="insertToChat('rewriterOutput')">💬 Enviar al Chat</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal Corrector de Pruebas AI -->
+    <div id="proofreaderModal" class="ai-modal" style="display: none;">
+        <div class="ai-modal-content">
+            <div class="ai-modal-header">
+                <h3>📖 Corrector de Pruebas AI</h3>
+                <button class="close-ai-modal" data-modal="proofreaderModal">&times;</button>
+            </div>
+            <div class="ai-modal-body">
+                <div class="ai-section">
+                    <label for="proofreaderText">Texto a revisar:</label>
+                    <textarea id="proofreaderText" placeholder="Escribe o pega el texto que quieres revisar..." rows="6"></textarea>
+                </div>
+                <div class="ai-section">
+                    <label for="proofreadingLevel">Nivel de corrección:</label>
+                    <select id="proofreadingLevel">
+                        <option value="basic">Básico (Gramática y ortografía)</option>
+                        <option value="advanced">Avanzado (Estilo y claridad)</option>
+                        <option value="academic">Académico (Formal y preciso)</option>
+                        <option value="creative">Creativo (Fluidez y expresión)</option>
+                    </select>
+                </div>
+                <div class="ai-actions">
+                    <button class="ai-btn primary" onclick="proofreadText()">📖 Revisar</button>
+                    <button class="ai-btn secondary" onclick="clearProofreader()">🗑️ Limpiar</button>
+                </div>
+                <div class="ai-result" id="proofreaderResult" style="display: none;">
+                    <h4>📖 Texto Corregido:</h4>
+                    <div class="ai-output" id="proofreaderOutput"></div>
+                    <div class="ai-actions">
+                        <button class="ai-btn" onclick="copyToClipboard('proofreaderOutput')">📋 Copiar</button>
+                        <button class="ai-btn" onclick="insertToChat('proofreaderOutput')">💬 Enviar al Chat</button>
                     </div>
                 </div>
             </div>

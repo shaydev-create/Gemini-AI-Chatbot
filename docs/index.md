@@ -20,12 +20,18 @@ Gemini AI Chatbot es una extensión de Chrome que integra el poder de Gemini AI 
 
 ## Documentación
 
+### Documentación de Usuario
 - [Guía de Usuario](USER_GUIDE.html)
 - [Documentación del Sistema](SYSTEM_DOCUMENTATION.html)
 - [Estructura del Proyecto](PROJECT_STRUCTURE.html)
 - [Guía de Instalación](INSTALLATION.html)
 - [Política de Privacidad](PRIVACY_POLICY.html)
 - [Seguridad de Credenciales](SEGURIDAD_CREDENCIALES.html)
+
+### Documentación Académica
+- [📋 Índice de Documentación Académica](DOCUMENTACION_ACADEMICA_INDEX.html)
+- [🎓 Evidencia Académica de Publicación](EVIDENCIA_ACADEMICA_PUBLICACION.html)
+- [🔬 Análisis Técnico Complementario](ANALISIS_TECNICO_COMPLEMENTARIO.html)
 
 ## Contribuir al Proyecto
 

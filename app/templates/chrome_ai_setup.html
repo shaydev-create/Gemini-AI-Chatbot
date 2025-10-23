@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chrome Built-in AI Setup - Gemini Assistant</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        .setup-container {
+            max-width: 1000px;
+            margin: 20px auto;
+            padding: 20px;
+            background: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            border: 1px solid #e0e0e0;
+        }
+
+        .setup-header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 30px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 12px;
+        }
+
+        .setup-step {
+            background: white;
+            margin: 20px 0;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            border-left: 5px solid #667eea;
+        }
+
+        .step-number {
+            background: #667eea;
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-right: 15px;
+        }
+
+        .step-title {
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+        }
+
+        .step-content {
+            margin-left: 45px;
+            line-height: 1.6;
+            color: #2c3e50;
+            font-size: 1rem;
+        }
+        
+        .step-content p {
+            color: #34495e;
+            margin-bottom: 12px;
+        }
+        
+        .step-content strong {
+            color: #2c3e50;
+            font-weight: 600;
+        }
+
+        .chrome-flags {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 15px 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .chrome-flags h4 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+        }
+
+        .flag-item {
+            margin: 12px 0;
+            padding: 15px;
+            background: white;
+            border-radius: 6px;
+            border-left: 4px solid #28a745;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+        
+        .flag-item strong {
+            color: #1e3a8a;
+            font-size: 0.95rem;
+            display: block;
+            margin-bottom: 5px;
+        }
+        
+        .flag-item em {
+            color: #64748b;
+            font-size: 0.9rem;
+            display: block;
+            margin: 3px 0;
+        }
+
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+
+        .status-unknown { background-color: #ffc107; }
+        .status-available { background-color: #28a745; }
+        .status-unavailable { background-color: #dc3545; }
+
+        .test-section {
+            margin-top: 30px;
+            padding: 25px;
+            background: #e8f4fd;
+            border-radius: 8px;
+            border: 2px solid #b8daff;
+        }
+
+        .api-status {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .api-card {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .btn-test {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1.1em;
+            margin: 10px;
+            transition: background 0.3s;
+        }
+
+        .btn-test:hover {
+            background: #5a6fd8;
+        }
+
+        .btn-test:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        .warning-box {
+            background: #fef3c7;
+            border: 2px solid #f59e0b;
+            color: #92400e;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            box-shadow: 0 2px 8px rgba(245, 158, 11, 0.1);
+        }
+        
+        .warning-box h3 {
+            color: #92400e !important;
+            margin-bottom: 10px;
+        }
+        
+        .warning-box p, .warning-box strong {
+            color: #92400e !important;
+        }
+
+        .success-box {
+            background: #d1fae5;
+            border: 2px solid #10b981;
+            color: #065f46;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            box-shadow: 0 2px 8px rgba(16, 185, 129, 0.1);
+        }
+        
+        .success-box h3 {
+            color: #065f46 !important;
+            margin-bottom: 10px;
+        }
+        
+        .success-box p, .success-box strong {
+            color: #065f46 !important;
+        }
+
+        .back-link {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: #667eea;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 20px;
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+
+        .back-link:hover {
+            background: #5a6fd8;
+            transform: translateY(-2px);
+        }
+
+        .code-block {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 18px;
+            border-radius: 8px;
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            margin: 15px 0;
+            overflow-x: auto;
+            border: 1px solid #334155;
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+
+        /* Mejorar la legibilidad general */
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        /* Asegurar contraste adecuado para todos los textos */
+        .setup-step p, .setup-step li, .setup-step span {
+            color: #2c3e50 !important;
+            font-weight: 400;
+        }
+        
+        .setup-step ul li {
+            margin: 8px 0;
+            color: #34495e !important;
+        }
+        
+        /* Mejorar visibilidad de los indicadores de estado */
+        .status-indicator {
+            border: 2px solid #fff;
+            box-shadow: 0 0 0 1px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body>
+    <a href="{{ url_for('main.index') }}" class="back-link">← Volver al Chat</a>
+
+    <div class="setup-container">
+        <div class="setup-header">
+            <h1>🤖 Chrome Built-in AI Setup</h1>
+            <p>Configure Chrome to use the new Built-in AI APIs for enhanced privacy and performance</p>
+            <p><strong>🏆 Required for Google Chrome AI Hackathon 2025!</strong></p>
+        </div>
+
+        <div class="warning-box">
+            <h3>⚠️ Important Requirements</h3>
+            <p><strong>Chrome Version:</strong> You need Chrome 125+ or Chrome Canary/Dev channel</p>
+            <p><strong>Competition Note:</strong> Chrome Built-in AI APIs are required for the Google Chrome AI Hackathon 2025 submission</p>
+        </div>
+
+        <!-- Step 1: Check Chrome Version -->
+        <div class="setup-step">
+            <div class="step-title">
+                <span class="step-number">1</span>
+                Check Your Chrome Version
+            </div>
+            <div class="step-content">
+                <p>First, verify you're using a compatible Chrome version:</p>
+                <div class="code-block">
+                    1. Type in address bar: chrome://version/
+                    2. Check version number is 125 or higher
+                    3. If not, download Chrome Canary or Dev channel
+                </div>
+                <p><strong>Current Browser:</strong> <span id="browser-info">Detecting...</span></p>
+            </div>
+        </div>
+
+        <!-- Step 2: Enable Flags -->
+        <div class="setup-step">
+            <div class="step-title">
+                <span class="step-number">2</span>
+                Enable Chrome Flags
+            </div>
+            <div class="step-content">
+                <p>Open Chrome flags and enable the following experimental features:</p>
+                
+                <div class="chrome-flags">
+                    <h4>🚩 Required Chrome Flags:</h4>
+                    
+                    <div class="flag-item">
+                        <strong>chrome://flags/#built-in-ai-api</strong><br>
+                        <em>Status:</em> Enabled<br>
+                        <em>Description:</em> Enables the built-in AI API
+                    </div>
+                    
+                    <div class="flag-item">
+                        <strong>chrome://flags/#language-model-api</strong><br>
+                        <em>Status:</em> Enabled<br>
+                        <em>Description:</em> Enables the Language Model API
+                    </div>
+                    
+                    <div class="flag-item">
+                        <strong>chrome://flags/#summarization-api-for-gemini-nano</strong><br>
+                        <em>Status:</em> Enabled<br>
+                        <em>Description:</em> Enables text summarization
+                    </div>
+                    
+                    <div class="flag-item">
+                        <strong>chrome://flags/#writer-api</strong><br>
+                        <em>Status:</em> Enabled<br>
+                        <em>Description:</em> Enables content writing assistance
+                    </div>
+                    
+                    <div class="flag-item">
+                        <strong>chrome://flags/#rewriter-api</strong><br>
+                        <em>Status:</em> Enabled<br>
+                        <em>Description:</em> Enables content rewriting
+                    </div>
+                    
+                    <div class="flag-item">
+                        <strong>chrome://flags/#translation-api</strong><br>
+                        <em>Status:</em> Enabled<br>
+                        <em>Description:</em> Enables translation services
+                    </div>
+                </div>
+
+                <div class="warning-box">
+                    <p><strong>After enabling flags:</strong> You MUST restart Chrome completely</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 3: Model Download -->
+        <div class="setup-step">
+            <div class="step-title">
+                <span class="step-number">3</span>
+                Model Download & Initialization
+            </div>
+            <div class="step-content">
+                <p>Chrome will automatically download the Gemini Nano model when first used:</p>
+                <ul>
+                    <li>🔄 Model size: ~1.7GB (downloads in background)</li>
+                    <li>⏱️ First initialization: 30-60 seconds</li>
+                    <li>🚀 Subsequent uses: Instant</li>
+                    <li>🔒 All processing happens locally (private)</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Step 4: API Status Check -->
+        <div class="setup-step">
+            <div class="step-title">
+                <span class="step-number">4</span>
+                Check API Availability
+            </div>
+            <div class="step-content">
+                <p>Test which Chrome Built-in AI APIs are available:</p>
+                
+                <div class="api-status">
+                    <div class="api-card">
+                        <h4>🧠 Prompt API</h4>
+                        <span class="status-indicator status-unknown" id="prompt-status"></span>
+                        <span id="prompt-text">Checking...</span>
+                    </div>
+                    
+                    <div class="api-card">
+                        <h4>📝 Summarizer</h4>
+                        <span class="status-indicator status-unknown" id="summarizer-status"></span>
+                        <span id="summarizer-text">Checking...</span>
+                    </div>
+                    
+                    <div class="api-card">
+                        <h4>✍️ Writer</h4>
+                        <span class="status-indicator status-unknown" id="writer-status"></span>
+                        <span id="writer-text">Checking...</span>
+                    </div>
+                    
+                    <div class="api-card">
+                        <h4>🔄 Rewriter</h4>
+                        <span class="status-indicator status-unknown" id="rewriter-status"></span>
+                        <span id="rewriter-text">Checking...</span>
+                    </div>
+                    
+                    <div class="api-card">
+                        <h4>🌍 Translator</h4>
+                        <span class="status-indicator status-unknown" id="translator-status"></span>
+                        <span id="translator-text">Checking...</span>
+                    </div>
+                    
+                    <div class="api-card">
+                        <h4>📖 Proofreader</h4>
+                        <span class="status-indicator status-unknown" id="proofreader-status"></span>
+                        <span id="proofreader-text">Checking...</span>
+                    </div>
+                </div>
+                
+                <div style="text-align: center; margin-top: 20px;">
+                    <button class="btn-test" onclick="checkAllAPIs()">🔍 Check API Status</button>
+                    <button class="btn-test" onclick="testPromptAPI()" id="test-prompt-btn" disabled>🧠 Test Prompt API</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Test Section -->
+        <div class="test-section">
+            <h3>🧪 Live Testing</h3>
+            <p>Once APIs are available, test them here:</p>
+            
+            <div style="margin: 20px 0;">
+                <textarea id="test-input" placeholder="Enter test message..." 
+                         style="width: 100%; height: 100px; padding: 10px; border-radius: 5px; border: 1px solid #ddd;"></textarea>
+            </div>
+            
+            <div style="text-align: center;">
+                <button class="btn-test" onclick="testAllAPIs()" id="test-all-btn" disabled>🚀 Test All Available APIs</button>
+            </div>
+            
+            <div id="test-results" style="margin-top: 20px;"></div>
+        </div>
+
+        <!-- Success Box -->
+        <div class="success-box" id="success-message" style="display: none;">
+            <h3>🎉 Chrome Built-in AI Ready!</h3>
+            <p>All APIs are configured and working. You can now use Chrome Built-in AI in the chat interface!</p>
+            <p><strong>Hackathon Ready:</strong> Your application now supports all required Chrome Built-in AI APIs for the Google Chrome AI Hackathon 2025.</p>
+        </div>
+    </div>
+
+    <!-- Load Chrome AI Manager -->
+    <script src="{{ url_for('static', filename='js/chrome-ai-manager.js') }}"></script>
+    
+    <script>
+        let chromeAI = null;
+        let apiStatus = {};
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', async () => {
+            detectBrowser();
+            await initializeChromeAI();
+        });
+
+        function detectBrowser() {
+            const userAgent = navigator.userAgent;
+            const browserInfo = document.getElementById('browser-info');
+            
+            if (userAgent.includes('Chrome')) {
+                const version = userAgent.match(/Chrome\/(\d+)/);
+                const versionNumber = version ? parseInt(version[1]) : 0;
+                
+                if (versionNumber >= 125) {
+                    browserInfo.innerHTML = `✅ Chrome ${versionNumber} (Compatible)`;
+                    browserInfo.style.color = 'green';
+                } else {
+                    browserInfo.innerHTML = `❌ Chrome ${versionNumber} (Need 125+)`;
+                    browserInfo.style.color = 'red';
+                }
+            } else {
+                browserInfo.innerHTML = '❌ Not Chrome (Chrome required)';
+                browserInfo.style.color = 'red';
+            }
+        }
+
+        async function initializeChromeAI() {
+            try {
+                if (typeof ChromeAIManager === 'undefined') {
+                    console.log('ChromeAIManager not loaded');
+                    return;
+                }
+                
+                chromeAI = new ChromeAIManager();
+                await chromeAI.initialize();
+                
+                // Automatically check API status after initialization
+                setTimeout(checkAllAPIs, 500);
+                
+            } catch (error) {
+                console.error('Failed to initialize ChromeAI:', error);
+            }
+        }
+
+        async function checkAllAPIs() {
+            if (!chromeAI) {
+                alert('Chrome AI not initialized. Please reload the page.');
+                return;
+            }
+
+            const capabilities = chromeAI.getCapabilities();
+            const apis = ['prompt', 'summarizer', 'writer', 'rewriter', 'translator', 'proofreader'];
+            
+            apis.forEach(api => {
+                const statusElement = document.getElementById(`${api}-status`);
+                const textElement = document.getElementById(`${api}-text`);
+                
+                if (capabilities[api]) {
+                    statusElement.className = 'status-indicator status-available';
+                    textElement.textContent = 'Available';
+                    textElement.style.color = 'green';
+                } else {
+                    statusElement.className = 'status-indicator status-unavailable';
+                    textElement.textContent = 'Not Available';
+                    textElement.style.color = 'red';
+                }
+                
+                apiStatus[api] = capabilities[api];
+            });
+
+            // Enable test buttons if Prompt API is available
+            document.getElementById('test-prompt-btn').disabled = !capabilities.prompt;
+            document.getElementById('test-all-btn').disabled = !capabilities.prompt;
+
+            // Show success message if any APIs are available
+            const hasAnyAPI = Object.values(capabilities).some(available => available);
+            if (hasAnyAPI) {
+                document.getElementById('success-message').style.display = 'block';
+            }
+        }
+
+        async function testPromptAPI() {
+            if (!chromeAI || !apiStatus.prompt) {
+                alert('Prompt API not available');
+                return;
+            }
+
+            try {
+                const testMessage = "Say 'Chrome Built-in AI is working!' in Spanish";
+                const response = await chromeAI.prompt(testMessage);
+                
+                alert(`✅ Prompt API Test Result:\n\n${response}`);
+                
+            } catch (error) {
+                alert(`❌ Prompt API Test Failed:\n\n${error.message}`);
+            }
+        }
+
+        async function testAllAPIs() {
+            const testText = document.getElementById('test-input').value || 'This is a test message for Chrome Built-in AI APIs.';
+            const resultsDiv = document.getElementById('test-results');
+            resultsDiv.innerHTML = '<h4>🔄 Testing APIs...</h4>';
+
+            const results = [];
+
+            // Test Prompt API
+            if (apiStatus.prompt) {
+                try {
+                    const response = await chromeAI.prompt(`Respond to this briefly: ${testText}`);
+                    results.push(`<div style="margin: 10px 0; padding: 10px; background: #d4edda; border-radius: 5px;">
+                                   <strong>✅ Prompt API:</strong> ${response}
+                                 </div>`);
+                } catch (error) {
+                    results.push(`<div style="margin: 10px 0; padding: 10px; background: #f8d7da; border-radius: 5px;">
+                                   <strong>❌ Prompt API:</strong> ${error.message}
+                                 </div>`);
+                }
+            }
+
+            // Test other APIs if available
+            const otherAPIs = [
+                { name: 'Summarizer', key: 'summarizer', method: 'summarize' },
+                { name: 'Writer', key: 'writer', method: 'write' },
+                { name: 'Rewriter', key: 'rewriter', method: 'rewrite' },
+                { name: 'Translator', key: 'translator', method: 'translate' },
+                { name: 'Proofreader', key: 'proofreader', method: 'proofread' }
+            ];
+
+            for (const api of otherAPIs) {
+                if (apiStatus[api.key]) {
+                    try {
+                        let response;
+                        if (api.key === 'translator') {
+                            response = await chromeAI[api.method](testText, 'en', 'es');
+                        } else {
+                            response = await chromeAI[api.method](testText);
+                        }
+                        
+                        results.push(`<div style="margin: 10px 0; padding: 10px; background: #d4edda; border-radius: 5px;">
+                                       <strong>✅ ${api.name} API:</strong> ${response}
+                                     </div>`);
+                    } catch (error) {
+                        results.push(`<div style="margin: 10px 0; padding: 10px; background: #fff3cd; border-radius: 5px;">
+                                       <strong>⚠️ ${api.name} API:</strong> ${error.message}
+                                     </div>`);
+                    }
+                }
+            }
+
+            resultsDiv.innerHTML = `<h4>🧪 API Test Results:</h4>${results.join('')}`;
+        }
+    </script>
+</body>
+</html>

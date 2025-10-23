@@ -10,28 +10,26 @@
 #
 # ===============================================================================
 
-version: '3.9'
-
 services:
   # -------------------------------------------------------------------------------
   # Servicio de la Aplicación (Desarrollo)
   # -------------------------------------------------------------------------------
   # Sobrescribe el servicio 'app' del archivo base.
   app:
-    # Construye la imagen usando el Dockerfile pero sin un target específico,
-    # lo que permite instalar dependencias de desarrollo si se definen.
+    # Construye la imagen usando el Dockerfile específico para desarrollo
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.dev
     # El comando para desarrollo usa el servidor de Flask con auto-recarga.
-    # Gunicorn no se usa aquí.
-    command: flask run --host=0.0.0.0 --port=5000
+    # El Dockerfile.dev ya configura el comando por defecto
     ports:
-      - "5000:5000" # Expone el puerto de Flask al host.
+      - "3000:3000" # Expone el puerto de Flask al host (puerto 3000 funcional).
       - "5678:5678" # Expone el puerto para el depurador remoto (ej. debugpy).
     environment:
       - FLASK_ENV=development # Activa el modo de desarrollo de Flask.
       - FLASK_DEBUG=1         # Activa el depurador interactivo.
+      - FLASK_RUN_PORT=3000   # Puerto interno del contenedor
+      - PYTHONPATH=/app/.venv/lib/python3.12/site-packages:/app
     volumes:
       # Monta el código fuente completo en el contenedor.
       # Cualquier cambio en el host se refleja inmediatamente, activando el live-reload.

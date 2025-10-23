@@ -284,11 +284,7 @@ class SystemMonitor:
             print(f"   👥 Usuarios totales: {metrics.get('users', {}).get('total', 0)}")
             print(f"   ✅ Usuarios activos: {metrics.get('users', {}).get('active', 0)}")
             print(f"   💬 Sesiones totales: {metrics.get('sessions', {}).get('total', 0)}")
-            print(
-                f"   🔄 Sesiones activas: {
-                    metrics.get('sessions', {}).get('active', 0)
-                }"
-            )
+            print(f"   🔄 Sesiones activas: {metrics.get('sessions', {}).get('active', 0)}")
 
         print("=" * 60)
 

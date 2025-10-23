@@ -157,7 +157,7 @@ def create_summary_report():
 
 ## ❌ Problema Original:
 ```
-pyproject.toml changed significantly since poetry.lock was last generated. 
+pyproject.toml changed significantly since poetry.lock was last generated.
 Run `poetry lock` to fix the lock file.
 Error: Process completed with exit code 1.
 ```
@@ -178,7 +178,7 @@ Error: Process completed with exit code 1.
 
 ## 🎯 Estado Actual:
 - ✅ Poetry funciona localmente
-- ✅ Dependencias se instalan correctamente  
+- ✅ Dependencias se instalan correctamente
 - ✅ CI/CD actualizado con Python 3.13
 - ✅ Error completamente solucionado
 

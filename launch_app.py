@@ -109,9 +109,9 @@ def main():
         app, socketio = create_app()
 
         # Configuración del servidor
-        host = "127.0.0.1"
-        port = 5000
-        debug = True
+        host = os.environ.get("FLASK_RUN_HOST", "127.0.0.1")
+        port = int(os.environ.get("FLASK_RUN_PORT", "5000"))
+        debug = os.environ.get("FLASK_DEBUG", "1") == "1"
 
         safe_print("\n🚀 INICIANDO SERVIDOR")
         safe_print(f"   📍 URL: http://{host}:{port}")

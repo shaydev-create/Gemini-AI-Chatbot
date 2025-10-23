@@ -106,7 +106,6 @@ class Python311312Compatibility:
 
     def fix_test_configuration(self, content: str, file_path: Path) -> str:
         """Corrige configuración específica de tests."""
-        original_content = content
 
         # Configuración específica para pytest.ini
         if file_path.name == "pytest.ini":
@@ -131,7 +130,6 @@ class Python311312Compatibility:
 
     def fix_import_compatibility(self, content: str) -> str:
         """Corrige problemas de imports entre versiones."""
-        original_content = content
 
         # Python 3.12 puede tener diferentes paths para algunos imports
         compatibility_imports = [

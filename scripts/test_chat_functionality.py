@@ -128,18 +128,10 @@ def test_chat_api():
                 data = response.json()
                 if data.get("success"):
                     print_success(f"Respuesta recibida en {response_time:.2f}s")
-                    print(
-                        f"   🤖 Respuesta: '{
-                            data.get('message', 'Sin mensaje')[:100]
-                        }...'"
-                    )
+                    print(f"   🤖 Respuesta: '{data.get('message', 'Sin mensaje')[:100]}...'")
                     success_count += 1
                 else:
-                    print_error(
-                        f"API respondió con error: {
-                            data.get('message', 'Error desconocido')
-                        }"
-                    )
+                    print_error(f"API respondió con error: {data.get('message', 'Error desconocido')}")
             else:
                 print_error(f"Error HTTP: {response.status_code}")
 

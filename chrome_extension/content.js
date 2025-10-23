@@ -52,28 +52,44 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 
     const handler = messageHandlers[request.action];
     if (handler) {
+        // Verificar que sendResponse esté disponible
+        if (typeof sendResponse !== 'function') {
+            log('error', 'sendResponse no es una función válida');
+            return false;
+        }
+
         try {
             // Check if it's an async handler
             const result = handler(request.data);
             if (result instanceof Promise) {
                 result.then(data => {
-                    if (sendResponse) sendResponse({ success: true, data });
+                    // Verificar que el puerto aún esté abierto
+                    if (chrome.runtime.lastError) {
+                        log('warn', 'Puerto cerrado antes de enviar respuesta:', chrome.runtime.lastError.message);
+                        return;
+                    }
+                    sendResponse({ success: true, data });
                 }).catch(error => {
-                    if (sendResponse) sendResponse({ success: false, error: error.message });
+                    // Verificar que el puerto aún esté abierto
+                    if (chrome.runtime.lastError) {
+                        log('warn', 'Puerto cerrado antes de enviar error:', chrome.runtime.lastError.message);
+                        return;
+                    }
+                    sendResponse({ success: false, error: error.message });
                 });
                 return true; // Will respond asynchronously
             } else {
-                if (sendResponse) sendResponse({ success: true, data: result });
+                sendResponse({ success: true, data: result });
                 return false;
             }
         } catch (error) {
             log('error', `Error en la acción '${request.action}':`, error.message);
-            if (sendResponse) sendResponse({ success: false, error: error.message });
+            sendResponse({ success: false, error: error.message });
             return false;
         }
     } else {
         log('warn', 'Acción no reconocida:', request.action);
-        if (sendResponse) sendResponse({ success: false, error: 'Acción no reconocida en content.js' });
+        sendResponse({ success: false, error: 'Acción no reconocida en content.js' });
         return false;
     }
 });

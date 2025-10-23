@@ -4,8 +4,8 @@
 **Gemini AI Futuristic Chatbot** - Enhanced with Chrome Built-in AI APIs
 
 ## Target Categories
-- **Primary:** Most Helpful - Chrome Extension ($14,000)
-- **Secondary:** Best Hybrid AI Application ($9,000)
+- **Primary:** Most Helpful - Chrome Extension
+- **Secondary:** Best Hybrid AI Application
 
 ## Chrome Built-in AI APIs Integration
 

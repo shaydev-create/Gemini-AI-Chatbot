@@ -75,9 +75,7 @@ class LaunchReadinessChecker:
             self.log_result(
                 "Estructura de Archivos",
                 True,
-                f"Todos los archivos principales están presentes ({
-                    len(existing_files)
-                }/{len(required_files)})",
+                f"Todos los archivos principales están presentes ({len(existing_files)}/{len(required_files)})",
                 existing_files,
             )
         else:
@@ -129,9 +127,7 @@ class LaunchReadinessChecker:
             self.log_result(
                 "Extensión Chrome - Archivos",
                 True,
-                f"Todos los archivos de extensión están presentes ({
-                    len(existing_ext_files)
-                }/{len(required_extension_files)})",
+                f"Todos los archivos de extensión están presentes ({len(existing_ext_files)}/{len(required_extension_files)})",
             )
         else:
             self.log_result(
@@ -186,8 +182,7 @@ class LaunchReadinessChecker:
             self.log_result(
                 "Extensión Chrome - Paquete",
                 True,
-                f"Paquete ZIP disponible: {latest_zip.name} ({
-                    zip_size:,        } bytes)",
+                f"Paquete ZIP disponible: {latest_zip.name} ({zip_size:,        } bytes)",
             )
         else:
             self.log_result(

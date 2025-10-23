@@ -13,6 +13,12 @@ def chat() -> None:
     return render_template("chat.html")
 
 
+@main.route("/chrome-ai-setup")
+def chrome_ai_setup() -> None:
+    """Chrome Built-in AI setup and configuration page"""
+    return render_template("chrome_ai_setup.html")
+
+
 @main.route("/privacy_policy")
 def privacy_policy() -> None:
     """Privacy policy - now serving English version by default"""

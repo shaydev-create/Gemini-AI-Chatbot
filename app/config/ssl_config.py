@@ -300,7 +300,7 @@ SECURITY_HEADERS = {
         "upgrade-insecure-requests"
     ),
     "Permissions-Policy": (
-        "geolocation=(), microphone=(), camera=(), payment=(), usb=(), " "magnetometer=(), gyroscope=(), accelerometer=()"
+        "geolocation=(), microphone=(), camera=(), payment=(), usb=(), magnetometer=(), gyroscope=(), accelerometer=()"
     ),
 }
 
