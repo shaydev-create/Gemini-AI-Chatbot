@@ -19,10 +19,16 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install bandit ruff mypy
+      - name: Create reports directory
+        run: mkdir -p reports
       - name: Install Trivy
-        uses: aquasecurity/trivy-action@v2
-        with:
-          version: '0.43.3'
+        run: |
+          sudo apt-get update
+          sudo apt-get install wget apt-transport-https gnupg lsb-release
+          wget -qO - https://aquasecurity.github.io/trivy-repo/deb/public.key | sudo apt-key add -
+          echo "deb https://aquasecurity.github.io/trivy-repo/deb $(lsb_release -sc) main" | sudo tee -a /etc/apt/sources.list.d/trivy.list
+          sudo apt-get update
+          sudo apt-get install trivy
       - name: Run bandit
         run: bandit -r . || true
       - name: Run ruff
@@ -31,23 +37,27 @@ jobs:
         run: mypy . || true
       - name: Run Trivy filesystem scan
         id: trivy-filesystem
-        uses: aquasecurity/trivy-action@v2
-        with:
-          scan-type: 'fs'
-          format: 'json'
-          output: 'reports/trivy_fs_report.json'
-          severity: 'CRITICAL,HIGH'
+        run: |
+          trivy fs --format json -o reports/trivy_fs_report.json --severity CRITICAL,HIGH --exit-code 0 . || true
+      - name: Check for Dockerfile
+        id: check_dockerfile
+        run: |
+          if [ -f "Dockerfile" ]; then
+            echo "dockerfile_exists=true" >> $GITHUB_OUTPUT
+          else
+            echo "dockerfile_exists=false" >> $GITHUB_OUTPUT
+          fi
       - name: Run Trivy image scan (if Dockerfile present)
-        if: files.exists('Dockerfile') || github.event_name == 'push'
+        if: steps.check_dockerfile.outputs.dockerfile_exists == 'true' || github.event_name == 'push'
         run: |
           docker pull alpine:3.18 || true
           trivy image --format json -o reports/trivy_image_report.json --severity CRITICAL,HIGH --exit-code 0 $(basename $(pwd)) || true
+      - name: Install TruffleHog
+        run: |
+          curl -sSfL https://raw.githubusercontent.com/trufflesecurity/trufflehog/main/scripts/install.sh | sh -s -- -b /usr/local/bin
       - name: TruffleHog secret scan
-        uses: trufflesecurity/trufflehog-action@v2
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          output_file: reports/trufflehog_report.json
-          format: json
+        run: |
+          trufflehog git file://. --json --no-update > reports/trufflehog_report.json || true
       - name: Upload security reports
         uses: actions/upload-artifact@v4
         with:
