@@ -2,13 +2,13 @@
 Rutas API del Gemini AI Chatbot.
 """
 
-import time
-import io
 import base64
+import io
+import time
 from typing import Any, Tuple
+
 import bleach
 import PyPDF2
-
 from flask import Blueprint, current_app, jsonify, request
 
 from app.auth import get_current_user_from_jwt
@@ -21,28 +21,28 @@ def extract_text_from_pdf(pdf_base64: str) -> str:
     try:
         # Decodificar base64 a bytes
         # Manejar posibles prefijos como "data:application/pdf;base64,"
-        if ',' in pdf_base64:
-            pdf_base64 = pdf_base64.split(',')[1]
-            
+        if "," in pdf_base64:
+            pdf_base64 = pdf_base64.split(",")[1]
+
         pdf_bytes = base64.b64decode(pdf_base64)
         pdf_file = io.BytesIO(pdf_bytes)
-        
+
         # Leer PDF
         pdf_reader = PyPDF2.PdfReader(pdf_file)
         text = []
-        
+
         # Extraer texto de todas las páginas
         for page in pdf_reader.pages:
             text.append(page.extract_text())
-            
+
         return "\n".join(text)
     except Exception as e:
         current_app.logger.error(f"Error extracting text from PDF: {str(e)}")
-        raise Exception(f"No se pudo leer el PDF: {str(e)}")
+        raise Exception(f"No se pudo leer el PDF: {str(e)}") from e
 
 
 @api_bp.route("/chat/send", methods=["POST"])
-def send_message() -> Tuple:
+def send_message() -> Tuple:  # noqa: C901
     """
     Endpoint para enviar un mensaje al chatbot y recibir una respuesta.
     Soporta contexto de imagen y documentos PDF.
@@ -53,11 +53,11 @@ def send_message() -> Tuple:
 
     # 🔒 SECURITY: Sanitizar entrada del usuario para prevenir XSS/Injection
     user_message = bleach.clean(data["message"].strip())
-    
+
     session_id = data.get("session_id", "anonymous")
     image_context = data.get("image_context", None)
     pdf_context = data.get("pdf_context", None)
-    history = data.get("history", []) # Recibir historial
+    history = data.get("history", [])  # Recibir historial
     language = data.get("language", "es")
 
     if not user_message:
@@ -112,7 +112,7 @@ Contexto de imagen:
 Por favor, analiza la imagen proporcionada y responde a la pregunta del usuario de manera detallada y útil.
 """
             current_app.logger.info(f"Processing message with image context: {image_name}")
-            
+
             # Reset history for image requests to avoid multimodal conflicts
             history = []
 
@@ -122,10 +122,10 @@ Por favor, analiza la imagen proporcionada y responde a la pregunta del usuario 
             pdf_name = pdf_context.get("pdf_name", "documento.pdf")
             pdf_data = pdf_context.get("pdf_data")
             pdf_text = extract_text_from_pdf(pdf_data)
-            
+
             if len(pdf_text) > 30000:
                 pdf_text = pdf_text[:30000] + "\n...[Texto truncado]..."
-            
+
             if language == "en":
                 final_prompt = f"""
 Document Context (Extracted from PDF '{pdf_name}'):
@@ -149,7 +149,7 @@ Pregunta del Usuario: {user_message}
 Instrucciones: Responde a la pregunta basándote estrictamente en el contexto del documento.
 """
             current_app.logger.info(f"Processing message with PDF context: {pdf_name}")
-            
+
             # Reset history for PDF requests
             history = []
 
@@ -158,7 +158,7 @@ Instrucciones: Responde a la pregunta basándote estrictamente en el contexto de
             user_id=user_id,
             prompt=final_prompt,
             image_data=image_context.get("image_data") if image_context else None,
-            history=history, # Pasar historial
+            history=history,  # Pasar historial
             language=language,
         )
         return jsonify({"response": response_text, "session_id": session_id}), 200
