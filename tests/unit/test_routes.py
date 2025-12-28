@@ -184,17 +184,18 @@ def test_send_message_internal_error(client, app):
         app.config["GEMINI_SERVICE"] = mock_service
         response = client.post("/api/chat/send", json={"message": "Hola"})
         # Dependiendo de cómo se maneje la excepción globalmente, puede devolver 500 o un mensaje de error específico.
-        # En la implementación actual de routes.py, el try-except alrededor de la llamada al servicio devuelve la respuesta de error directamente
-        # o propaga la excepción que luego es manejada por el handler global.
-        
-        # Si el error es manejado dentro de routes.py (que no lo es actualmente para excepciones generales), 
+        # En la implementación actual de routes.py, el try-except alrededor de la llamada al servicio
+        # devuelve la respuesta de error directamente o propaga la excepción.
+
+        # Si el error es manejado dentro de routes.py (que no lo es actualmente para excepciones generales),
         # o si hay un manejador de errores global para Exception:
         if response.status_code == 500:
-             assert "message" in response.json
-             # Ajustar la aserción al mensaje real devuelto por el manejador de errores global
-             # Flask devuelve "Internal Server Error" por defecto en modo producción, o el mensaje de la excepción en desarrollo/test
-             error_msg = response.json.get("message", "")
-             assert "Error interno" in error_msg or "Internal Error" in error_msg or "ocurrido un error" in error_msg
+            assert "message" in response.json
+            # Ajustar la aserción al mensaje real devuelto por el manejador de errores global
+            # Flask devuelve "Internal Server Error" por defecto en modo producción,
+            # o el mensaje de la excepción en desarrollo/test
+            error_msg = response.json.get("message", "")
+            assert "Error interno" in error_msg or "Internal Error" in error_msg or "ocurrido un error" in error_msg
         else:
             # Si se captura y devuelve otro código
             assert response.status_code in [500, 503]

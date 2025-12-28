@@ -70,11 +70,11 @@ class TestGeminiService:
         mock_chat = MagicMock()
         mock_response = MagicMock()
         mock_response.text = "Respuesta de prueba"
-        
+
         # Configurar el chat mock
         mock_chat.send_message.return_value = mock_response
         mock_model.start_chat.return_value = mock_chat
-        
+
         mock_genai.GenerativeModel.return_value = mock_model
 
         # Ejecutar
@@ -114,7 +114,7 @@ class TestGeminiService:
         mock_chat = MagicMock()
         mock_response = MagicMock()
         mock_response.text = "Test response"
-        
+
         mock_chat.send_message.return_value = mock_response
         mock_model.start_chat.return_value = mock_chat
         mock_genai.GenerativeModel.return_value = mock_model
@@ -124,7 +124,7 @@ class TestGeminiService:
         result = service.generate_response(message="Hello", language="en")
 
         # Verificar
-        # En el nuevo servicio no se añade prefijo de idioma al prompt de texto puro, 
+        # En el nuevo servicio no se añade prefijo de idioma al prompt de texto puro,
         # sino que se confía en el System Instruction.
         # Por tanto, solo verificamos que se llame con el mensaje original.
         mock_chat.send_message.assert_called()
@@ -138,11 +138,11 @@ class TestGeminiService:
         os.environ["GEMINI_API_KEY"] = self.api_key
         mock_model = MagicMock()
         mock_chat = MagicMock()
-        
+
         # Simular error en send_message
         mock_chat.send_message.side_effect = Exception("API error 429")
         mock_model.start_chat.return_value = mock_chat
-        
+
         mock_genai.GenerativeModel.return_value = mock_model
 
         # Ejecutar
@@ -201,7 +201,7 @@ class TestGeminiService:
         mock_chat = MagicMock()
         mock_response = MagicMock()
         mock_response.text = "Respuesta desde prompt"
-        
+
         mock_chat.send_message.return_value = mock_response
         mock_model.start_chat.return_value = mock_chat
         mock_genai.GenerativeModel.return_value = mock_model
@@ -223,11 +223,11 @@ class TestGeminiService:
         os.environ["GEMINI_API_KEY"] = self.api_key
         mock_model = MagicMock()
         mock_chat = MagicMock()
-        
+
         # Simular error de quota
         mock_chat.send_message.side_effect = Exception("quota exceeded")
         mock_model.start_chat.return_value = mock_chat
-        
+
         mock_genai.GenerativeModel.return_value = mock_model
 
         # Ejecutar
@@ -245,11 +245,11 @@ class TestGeminiService:
         os.environ["GEMINI_API_KEY"] = self.api_key
         mock_model = MagicMock()
         mock_chat = MagicMock()
-        
+
         # Simular error de API Key
         mock_chat.send_message.side_effect = Exception("API_KEY_INVALID")
         mock_model.start_chat.return_value = mock_chat
-        
+
         mock_genai.GenerativeModel.return_value = mock_model
 
         # Ejecutar
