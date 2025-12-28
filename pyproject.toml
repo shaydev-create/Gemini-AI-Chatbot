@@ -59,6 +59,7 @@ Pillow = "^10.3.0"
 # Seguridad y formularios
 bleach = "^6.1.0"
 flask-wtf = "^1.2.1"
+pypdf2 = "^3.0.1"
 
 
 [tool.poetry.group.dev.dependencies]
