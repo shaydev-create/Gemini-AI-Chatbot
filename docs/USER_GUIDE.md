@@ -1,32 +1,103 @@
-# Guía de Usuario - Gemini AI Chatbot
+# Guía de Usuario - Gemini AI Chatbot con Chrome AI APIs
 
-## 🚀 Bienvenido a Gemini AI
+## 🚀 Bienvenido al Futuro de la IA
 
-¡Bienvenido al futuro de la inteligencia artificial! Esta guía te ayudará a aprovechar al máximo tu experiencia con Gemini AI Chatbot.
+¡Bienvenido al **Gemini AI Chatbot** con **6 Chrome Built-in AI APIs** integradas! Esta guía te ayudará a aprovechar al máximo todas las funcionalidades.
 
 ## 🌟 Primeros Pasos
 
-### 1. Acceso a la Aplicación
+### 🎯 **Método Recomendado - Chrome Extension + Localhost**
 
-#### Usando Docker (Recomendado)
-1.  Abre una terminal en la raíz del proyecto.
-2.  Ejecuta `docker-compose up -d`.
-3.  Abre tu navegador y ve a `http://localhost:8000`.
+#### **1. Ejecutar Aplicación Local**
+```bash
+# En la carpeta del proyecto:
+python run.py
+```
+✅ **Verás**: `🌐 Servidor disponible en: http://localhost:3000`
 
-#### Desarrollo Local (Sin Docker)
-1.  Asegúrate de tener Poetry instalado y las dependencias listas (`poetry install`).
-2.  Activa el entorno virtual (`poetry shell`).
-3.  Ejecuta `flask run`.
-4.  Abre tu navegador y ve a `http://localhost:5000`.
+#### **2. Instalar Chrome Extension**
+1. Ve a `chrome://extensions/`
+2. Activa **"Modo desarrollador"**
+3. Clic **"Cargar extensión sin empaquetar"**
+4. Selecciona carpeta `chrome_extension/`
 
-### 2. Primera Conversación
+#### **3. Usar la Extensión**
+1. 🖱️ **Clic** en el icono 🚀 de la extensión
+2. ⚡ **Se abre automáticamente**: http://localhost:3000/chat
+3. 🎉 **¡Acceso completo** a todas las funcionalidades!
 
-1.  **Escribe tu mensaje** en el campo de texto en la parte inferior.
-2.  **Presiona Enter** o haz clic en el botón de enviar (icono de avión de papel).
-3.  La respuesta de Gemini aparecerá en la ventana de chat.
-4.  ¡Continúa la conversación! El historial se mantiene para dar contexto.
+### 🐳 **Método Alternativo - Docker**
+```bash
+docker-compose up -d
+# Abre: http://localhost:8000
+```
+
+## 🧠 Chrome Built-in AI APIs - ¡6 APIs Disponibles!
+
+### **✨ Prompt API - Generación de Texto**
+- 📍 **Ubicación**: Sección "Chrome AI Tools"
+- 🎯 **Uso**: Genera contenido creativo y respuestas avanzadas
+- **Ejemplo**: "Escribe un artículo sobre IA"
+
+### **🔍 Writer API - Corrección de Texto**
+- 📍 **Ubicación**: Botón "🔍 Corregir Texto"
+- 🎯 **Uso**: Mejora gramática, estilo y claridad
+- **Ejemplo**: Corrige errores en textos
+
+### **🌐 Translator API - Traducción**
+- 📍 **Ubicación**: Botón "🌐 Traducir"
+- 🎯 **Uso**: Traduce entre múltiples idiomas
+- **Ejemplo**: Español → Inglés instantáneo
+
+### **📄 Summarizer API - Resúmenes**
+- 📍 **Ubicación**: Botón "📄 Resumir"
+- 🎯 **Uso**: Crea resúmenes de textos largos
+- **Ejemplo**: Resume artículos o documentos
+
+### **🖊️ Rewriter API - Reescritura**
+- 📍 **Ubicación**: Botón "🖊️ Reescribir"
+- 🎯 **Uso**: Cambia el estilo y tono del texto
+- **Ejemplo**: Formal → Casual, Técnico → Simple
+
+### **📖 Proofreader API - Revisión**
+- 📍 **Ubicación**: Botón "📖 Revisar"
+- 🎯 **Uso**: Revisa ortografía y gramática
+- **Ejemplo**: Detecta y corrige errores
+
+## 💎 Funcionalidades Avanzadas
+
+### **💬 Chat con Google Gemini**
+- **Conversaciones naturales** con IA avanzada
+- **Memoria de contexto** para conversaciones largas
+- **Análisis de documentos** e imágenes
+
+### **💾 Exportar Conversaciones**
+- 📍 **Ubicación**: Botón "💾 Exportar"
+- **Formatos**: PDF, JSON, TXT
+- **Uso**: Guarda conversaciones importantes
+
+### **🎤 Control de Voz**
+- 📍 **Ubicación**: Botón "🎤 Voz"
+- **Función**: Reconocimiento de voz para dictado
+- **Uso**: Habla en lugar de escribir
+
+### **📎 Carga de Archivos**
+- 📍 **Ubicación**: Botón "📎 Archivo"
+- **Soporta**: Imágenes, documentos, PDFs
+- **Uso**: Analiza contenido con IA
+
+### **⚙️ Personalización**
+- 📍 **Ubicación**: Botón "⚙️ Personalizar"
+- **6 Temas**: Diferentes estilos futuristas
+- **Configuración**: Personaliza tu experiencia
 
 ## 💬 Cómo Usar el Chat
+
+### **Flujo Básico:**
+1. **Escribe tu mensaje** en el campo de texto
+2. **Presiona Enter** o clic en enviar
+3. **Gemini responde** con IA avanzada
+4. **Usa Chrome AI Tools** para tareas específicas
 
 ### Tipos de Mensajes
 

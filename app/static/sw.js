@@ -1,9 +1,9 @@
 // Service Worker para Gemini AI Chatbot PWA
-// Versión: 1.0.0
-
-const CACHE_NAME = 'gemini-chatbot-v1.0.0';
-const STATIC_CACHE = 'gemini-static-v1.0.0';
-const DYNAMIC_CACHE = 'gemini-dynamic-v1.0.0';
+// Versión: 2.1.0
+ 
+const CACHE_NAME = 'gemini-chatbot-v2.1.0';
+const STATIC_CACHE = 'gemini-static-v2.1.0';
+const DYNAMIC_CACHE = 'gemini-dynamic-v2.1.0';
 
 // Archivos estáticos para cachear
 const STATIC_FILES = [

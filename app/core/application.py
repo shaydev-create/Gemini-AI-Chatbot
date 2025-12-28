@@ -2,6 +2,7 @@ import os
 
 from flask import Flask
 from flask_babel import Babel
+from flask_compress import Compress
 
 from app.api.admin import admin_bp as admin_blueprint
 from app.api.auth import auth_bp as auth_blueprint

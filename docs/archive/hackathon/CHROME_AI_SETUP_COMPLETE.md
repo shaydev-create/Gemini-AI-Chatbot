@@ -6,11 +6,11 @@
 1. Abre Chrome y navega a: `chrome://flags/`
 2. Busca y habilita los siguientes flags:
 
-### **🧠 Flags requeridos para Chrome AI APIs:**
+### **🧠 Flags requeridos para Chrome AI APIs (Actualizado 2025):**
 
 ```
 chrome://flags/#optimization-guide-on-device-model
-Estado: Enabled
+Estado: Enabled BypassPerfRequirement
 
 chrome://flags/#prompt-api-for-gemini-nano  
 Estado: Enabled
@@ -43,40 +43,37 @@ Después de habilitar los flags, **REINICIA Chrome completamente**.
 ```javascript
 // En la consola de Chrome (F12):
 
-// 1. Verificar Prompt API
-console.log('Prompt API:', 'ai' in window && 'languageModel' in window.ai);
+// 1. Verificar Prompt API (Nuevo namespace estándar)
+console.log('Prompt API:', window.ai && window.ai.languageModel);
 
 // 2. Verificar Summarizer API  
-console.log('Summarizer API:', 'ai' in window && 'summarizer' in window.ai);
+console.log('Summarizer API:', window.ai && window.ai.summarizer);
 
 // 3. Verificar Writer API
-console.log('Writer API:', 'ai' in window && 'writer' in window.ai);
+console.log('Writer API:', window.ai && window.ai.writer);
 
 // 4. Verificar Rewriter API
-console.log('Rewriter API:', 'ai' in window && 'rewriter' in window.ai);
+console.log('Rewriter API:', window.ai && window.ai.rewriter);
 
 // 5. Verificar Translator API
-console.log('Translator API:', 'translation' in window);
+console.log('Translator API:', window.ai && window.ai.translator);
 
 // 6. Verificar Language Detection
-console.log('Language Detection:', 'translation' in window && 'languageDetector' in window.translation);
+console.log('Language Detection:', window.ai && window.ai.languageDetector);
 ```
 
-**Resultado esperado:** `true` para todas las APIs
+**Resultado esperado:** Objetos definidos para todas las APIs.
 
 ---
 
 ## 📱 **Paso 3: Verificar versión de Chrome**
 
 ### **Requisitos mínimos:**
-- **Chrome Canary**: Versión 127+ (recomendado)
-- **Chrome Dev**: Versión 126+  
-- **Chrome Beta**: Versión 125+
-- **Chrome Stable**: Puede no estar disponible aún
+- **Chrome Canary**: Versión 128+ (recomendado para Hackathon)
+- **Chrome Dev**: Versión 127+  
 
 ### **Verificar tu versión:**
 1. Ir a: `chrome://settings/help`
-2. Debe mostrar Chrome 125+ para soporte completo
 
 ---
 
@@ -86,13 +83,19 @@ console.log('Language Detection:', 'translation' in window && 'languageDetector'
 
 ```javascript
 // Ejecutar en DevTools para forzar descarga:
-await window.ai.languageModel.create();
+await window.ai.languageModel.create({
+    monitor(m) {
+        m.addEventListener('downloadprogress', (e) => {
+            console.log(`Descargando: ${Math.round((e.loaded / e.total) * 100)}%`);
+        });
+    }
+});
 ```
 
 ### **O manualmente:**
 1. Ir a: `chrome://components/`
 2. Buscar: "Optimization Guide On Device Model"
-3. Click "Check for update" si está disponible
+3. Click "Check for update" si está disponible. Si dice "Component not updated", intenta forzar la descarga desde la consola como se muestra arriba.
 
 ---
 
@@ -101,37 +104,14 @@ await window.ai.languageModel.create();
 ### **Código de prueba en DevTools:**
 
 ```javascript
-// Test básico de todas las APIs
+// Test básico de Prompt API
 async function testChromeAI() {
   try {
-    // 1. Prompt API
-    const session = await window.ai.languageModel.create();
+    const session = await window.ai.languageModel.create({
+        systemPrompt: "You are a helpful assistant."
+    });
     const response = await session.prompt("Hello Chrome AI!");
     console.log('Prompt API works:', response);
-    
-    // 2. Summarizer API
-    const summarizer = await window.ai.summarizer.create();
-    const summary = await summarizer.summarize("This is a long text to summarize...");
-    console.log('Summarizer works:', summary);
-    
-    // 3. Writer API
-    const writer = await window.ai.writer.create();
-    const written = await writer.write("Write a short email");
-    console.log('Writer works:', written);
-    
-    // 4. Rewriter API  
-    const rewriter = await window.ai.rewriter.create();
-    const rewritten = await rewriter.rewrite("Make this formal", {tone: "formal"});
-    console.log('Rewriter works:', rewritten);
-    
-    // 5. Translator API
-    const translator = await window.translation.createTranslator({
-      sourceLanguage: 'en',
-      targetLanguage: 'es'
-    });
-    const translated = await translator.translate("Hello world");
-    console.log('Translator works:', translated);
-    
   } catch (error) {
     console.error('Chrome AI Error:', error);
   }

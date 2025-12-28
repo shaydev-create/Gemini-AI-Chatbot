@@ -253,10 +253,26 @@ class ChromeAIManager {
         return await this.callGeminiAPI(prompt);
     }
 
-    // 🔗 Llamada a Gemini API como fallback
+    // 🔗 Llamada Híbrida Inteligente (Offline First / Fallback)
     async callGeminiAPI(prompt) {
+        // 1. Intentar usar Chrome AI (Offline) si está disponible y es una tarea simple
+        if (this.promptSession) {
+            try {
+                console.log('⚡ Usando Chrome AI Offline...');
+                const result = await this.promptSession.prompt(prompt);
+                return result;
+            } catch (error) {
+                console.warn('⚠️ Falló Chrome AI, intentando API Nube...', error);
+            }
+        }
+
+        // 2. Si no hay internet y no hay Chrome AI, error
+        if (!navigator.onLine) {
+            return '⚠️ Estás desconectado y Chrome AI no está disponible. Configúralo en /chrome-ai-setup';
+        }
+
+        // 3. Fallback a la API de Nube (Backend)
         try {
-            // Aquí usas tu implementación existente de Gemini API
             const response = await fetch('/api/chat/send', {
                 method: 'POST',
                 headers: {

@@ -1,33 +1,71 @@
-# 🚀 Gemini AI Futuristic Chatbot - Chrome Extension
+# 🚀 Gemini AI Futuristic Chatbot - Chrome Extension v2.0.1
 
 ## 📋 Descripción
 
-Extensión de Chrome que proporciona acceso directo a Google Gemini AI con una interfaz moderna y futurista. Funciona de forma completamente independiente sin necesidad de servidores locales.
+Extensión de Chrome que proporciona acceso completo a Google Gemini AI con **TODAS las 6 Chrome Built-in AI APIs** en una interfaz moderna y futurística. **Actualización Mayor v2.0.1**: Ahora abre la aplicación web completa para una experiencia AI sin limitaciones.
 
-## ✨ Características
+## ✨ Características Principales
 
-- 🤖 **Chat con IA**: Conversaciones naturales con Google Gemini
-- 🧠 **Resumen Inteligente**: Resume cualquier página web con un solo clic usando la IA integrada de Chrome (Gemini Nano).
-- 🔒 **Privacidad Total**: No recopilamos ni almacenamos datos personales. El resumen se procesa localmente en tu dispositivo.
-- ⚡ **Respuestas Rápidas**: Conexión directa con la API de Google para el chat y procesamiento local para resúmenes.
-- 🎨 **Interfaz Moderna**: Diseño futurista con gradientes y animaciones
-- 🔑 **Configuración Simple**: Solo necesitas tu API Key de Google para la función de chat.
+### � **6 Chrome Built-in AI APIs Integradas**
+- ✨ **Prompt API**: Generación de texto avanzada
+- 🔍 **Writer API**: Corrección y mejora de textos
+- 🌐 **Translator API**: Traducción instantánea
+- 📄 **Summarizer API**: Resúmenes inteligentes
+- 🖊️ **Rewriter API**: Reescritura de contenido
+- 📖 **Proofreader API**: Revisión y corrección
 
-## 🚀 Cómo Usar
+### 🚀 **Experiencia Completa**
+- � **Chat Avanzado**: Conversaciones naturales con Google Gemini
+- 💾 **Exportación**: Guarda conversaciones en PDF, JSON, TXT
+- 🎤 **Control por Voz**: Reconocimiento de voz integrado
+- 📎 **Carga de Archivos**: Análisis de imágenes y documentos
+- ⚙️ **Personalización**: 6 temas futuristas incluidos
+- 🌈 **PWA Support**: Experiencia de aplicación nativa
+- � **Privacidad Total**: Sin recopilación de datos personales
 
-### Chat con IA
+## 🚀 Cómo Usar (v2.0.1)
 
-1. **Configura tu API Key** de Google AI Studio.
-2. Abre la extensión y comienza a chatear con Gemini.
+### **Nueva Experiencia Mejorada**
 
-### Resumen Inteligente
+1. **Instala la extensión** desde Chrome Web Store
+2. **Haz clic en el icono 🚀** de la extensión
+3. **Se abre automáticamente** la aplicación web completa
+4. **¡Disfruta de todas las funcionalidades AI!**
 
-1. Navega a cualquier página web con contenido de texto.
-2. Abre la extensión.
-3. Haz clic en el botón **"Resumir Página"**.
-4. ¡Obtén un resumen al instante!
+### **Funcionalidades Disponibles**
 
-**Nota:** La función de Resumen Inteligente requiere un dispositivo compatible y que la IA integrada de Chrome esté habilitada. Puedes verificarlo en `chrome://settings/ai`.
+#### 🧠 **Chrome AI Tools**
+- **Generar Texto**: Crea contenido con IA
+- **Corregir Texto**: Mejora y corrige escritos
+- **Traducir**: Traduce a múltiples idiomas
+- **Resumir**: Resume textos largos
+- **Reescribir**: Transforma el estilo de escritura
+- **Revisar**: Corrige gramática y ortografía
+
+#### 💬 **Chat Avanzado**
+- Conversaciones naturales con Gemini AI
+- Análisis de documentos e imágenes
+- Memoria de conversación inteligente
+
+#### 🎛️ **Controles Avanzados**
+- **Exportar**: Guarda conversaciones
+- **Voz**: Control por reconocimiento de voz
+- **Archivos**: Sube y analiza documentos
+- **Personalizar**: Cambia temas y configuraciones
+
+## 🔧 **¿Cómo Funciona la Nueva Versión?**
+
+```
+Usuario hace clic en extensión → Popup profesional → Se abre aplicación completa
+                                     ↓
+                               Todas las AI APIs disponibles
+```
+
+**Beneficios del nuevo diseño:**
+- ✅ **Sin limitaciones** de tamaño de popup
+- ✅ **Mejor experiencia** visual y funcional  
+- ✅ **Todas las APIs** en un solo lugar
+- ✅ **Interfaz futurística** completa
 
 ## 🛠️ Instalación para Desarrollo
 

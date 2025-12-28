@@ -1,43 +1,70 @@
 // 🚀 Gemini AI Futuristic Chatbot - popup.js
-// Lógica de la interfaz de usuario para la extensión
+// Abre la aplicación web COMPLETA con TODAS las funcionalidades
 
 'use strict';
 
-// --- Elementos del DOM ---
-const dom = {
-    views: {
-        settings: document.getElementById('settingsView'),
-        chat: document.getElementById('chatView'),
-    },
-    buttons: {
-        settings: document.getElementById('settingsButton'),
-        saveApiKey: document.getElementById('saveApiKey'),
-        backToChat: document.getElementById('backToChat'),
-        send: document.getElementById('sendButton'),
-        instantTranslate: document.getElementById('instantTranslateBtn'),
-    },
-    inputs: {
-        apiKey: document.getElementById('apiKeyInput'),
-        message: document.getElementById('messageInput'),
-        translatorInput: document.getElementById('translatorInput'),
-        sourceLang: document.getElementById('sourceLang'),
-        targetLang: document.getElementById('targetLang'),
-    },
-    containers: {
-        messages: document.getElementById('chatMessages'),
-    },
-    status: {
-        server: {
-            light: document.querySelector('#serverStatus .status-light'),
-            text: document.getElementById('serverStatusText'),
-        },
-        connection: {
-            light: document.getElementById('connectionLight'),
-            text: document.getElementById('connectionText'),
-        },
-    },
-    translatorResult: document.getElementById('translatorResult'),
-};
+document.addEventListener('DOMContentLoaded', async function() {
+    // URL por defecto (fallback)
+    let localUrl = 'http://localhost:3000';
+    
+    try {
+        // Intentar obtener configuración dinámica del background
+        if (chrome && chrome.runtime) {
+            const response = await new Promise(resolve => {
+                chrome.runtime.sendMessage({ action: 'getConfig' }, (res) => resolve(res));
+            });
+            
+            if (response && response.success && response.data && response.data.serverUrl) {
+                localUrl = response.data.serverUrl;
+                // Ajustar URL si es 127.0.0.1 para que sea localhost (opcional, pero consistente)
+                if (localUrl.includes('127.0.0.1')) {
+                    localUrl = localUrl.replace('127.0.0.1', 'localhost');
+                }
+            }
+        }
+    } catch (e) {
+        console.warn('⚠️ No se pudo cargar la configuración, usando default:', e);
+    }
+
+    // Función para abrir la aplicación COMPLETA con todas las funcionalidades
+    function openFullApp() {
+        const targetUrl = localUrl + '/chat';
+        
+        if (chrome && chrome.tabs) {
+            // Solo usar localhost (aplicación local)
+            chrome.tabs.create({ 
+                url: targetUrl,  // Ir directamente al chat
+                active: true 
+            }, () => {
+                // Cerrar popup después de abrir
+                setTimeout(() => window.close(), 300);
+            });
+        } else {
+            // Fallback directo
+            window.open(targetUrl, '_blank');
+            setTimeout(() => window.close(), 300);
+        }
+    }
+    
+    // Ejecutar inmediatamente al cargar
+    setTimeout(openFullApp, 500);
+    
+    // Agregar evento al botón fallback
+    const fallbackButton = document.getElementById('fallbackLink');
+    if (fallbackButton) {
+        fallbackButton.addEventListener('click', function(e) {
+            e.preventDefault();
+            openFullApp();
+        });
+    }
+    
+    // Agregar evento a toda la ventana como respaldo
+    document.body.addEventListener('click', function(e) {
+        if (!e.target.closest('.fallback-button')) {
+            openFullApp();
+        }
+    });
+});
 // --- Instant Translator Handler ---
 async function handleInstantTranslate() {
     const text = dom.inputs.translatorInput.value.trim();

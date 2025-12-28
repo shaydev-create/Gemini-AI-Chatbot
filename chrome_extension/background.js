@@ -6,7 +6,7 @@
 // --- Configuración y Constantes ---
 const CHATBOT_CONFIG = {
     name: '🚀 Gemini AI Futuristic Chatbot',
-    version: '2.0.0', // Sincronizado con manifest.json
+    version: '2.1.0', // Sincronizado con manifest.json
     serverUrl: 'http://127.0.0.1:3000', // URL del backend local (puerto 3000 funcional)
 };
 

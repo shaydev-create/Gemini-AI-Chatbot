@@ -1,13 +1,181 @@
-# Documentación API - Gemini AI Chatbot
+# API Documentation - Gemini AI Chatbot + Chrome Built-in AI APIs
 
-## 🌐 Endpoints Principales
+## 🧠 Chrome Built-in AI APIs - Core Features
 
-### Base URL
-- **Desarrollo (Docker)**: `http://localhost:8000/api`
-- **Desarrollo (Local)**: `http://localhost:5000/api`
-- **Producción**: `https://tu-dominio.com/api`
+### **Base URL**
+- **Desarrollo**: `http://localhost:3000`
+- **Chrome Extension**: Conecta automáticamente a localhost:3000
+- **Docker**: `http://localhost:8000`
 
-## 📡 API Endpoints
+---
+
+## 🚀 Chrome Built-in AI APIs
+
+### **✨ 1. Prompt API**
+```javascript
+// Función: generateText()
+// Ubicación: chrome-ai-manager.js línea ~50
+async function generateText() {
+    const session = await ai.assistant.create();
+    const result = await session.prompt(userInput);
+    return result;
+}
+```
+- **Descripción**: Generación de texto avanzada con IA
+- **Uso**: Crear contenido, responder preguntas complejas
+- **Input**: Texto libre del usuario
+- **Output**: Respuesta generada por IA
+
+### **🔍 2. Writer API**
+```javascript
+// Función: correctText()
+// Ubicación: chat.html línea ~4998
+async function correctText() {
+    const writer = await ai.writer.create();
+    const result = await writer.write(text, {
+        tone: 'formal',
+        format: 'plain-text'
+    });
+    return result;
+}
+```
+- **Descripción**: Corrección y mejora de textos
+- **Parámetros**: `tone`, `format`, `length`
+- **Uso**: Mejorar gramática, estilo y claridad
+
+### **🌐 3. Translator API**
+```javascript
+// Función: translateText()
+// Ubicación: chat.html línea ~5068
+async function translateText() {
+    const translator = await ai.translator.create({
+        sourceLanguage: 'es',
+        targetLanguage: 'en'
+    });
+    const result = await translator.translate(text);
+    return result;
+}
+```
+- **Descripción**: Traducción entre idiomas
+- **Idiomas**: es, en, fr, de, it, pt, ja, ko, zh
+- **Uso**: Traducción instantánea y precisa
+
+### **📄 4. Summarizer API**
+```javascript
+// Función: summarizeText()
+// Ubicación: chat.html línea ~5159
+async function summarizeText() {
+    const summarizer = await ai.summarizer.create({
+        type: 'key-points',
+        format: 'markdown',
+        length: 'medium'
+    });
+    const result = await summarizer.summarize(text);
+    return result;
+}
+```
+- **Tipos**: `key-points`, `tl;dr`, `teaser`, `headline`
+- **Formatos**: `plain-text`, `markdown`
+- **Longitudes**: `short`, `medium`, `long`
+
+### **🖊️ 5. Rewriter API**
+```javascript
+// Función: rewriteText()
+// Ubicación: chat.html línea ~5237
+async function rewriteText() {
+    const rewriter = await ai.rewriter.create({
+        tone: 'casual',
+        format: 'plain-text',
+        length: 'as-is'
+    });
+    const result = await rewriter.rewrite(text);
+    return result;
+}
+```
+- **Tonos**: `formal`, `casual`, `enthusiastic`, `informational`
+- **Uso**: Cambiar estilo y tono del contenido
+
+### **📖 6. Proofreader API**
+```javascript
+// Función: proofreadText()
+// Ubicación: chat.html línea ~5316
+async function proofreadText() {
+    const proofreader = await ai.proofreader.create();
+    const result = await proofreader.proofread(text);
+    return result;
+}
+```
+- **Descripción**: Revisión ortográfica y gramatical
+- **Uso**: Detectar y corregir errores
+
+---
+
+## 🌐 Flask API Endpoints (Backend)
+
+### **Base URLs**
+- **Desarrollo Local**: `http://localhost:3000/api`
+- **Docker**: `http://localhost:8000/api`
+
+### **Rutas Principales**
+
+#### **📍 GET /**
+- **Descripción**: Página principal futurística
+- **Respuesta**: `index.html` con PWA y meta tags
+
+#### **📍 GET /chat**
+- **Descripción**: Interfaz de chat completa con Chrome AI APIs
+- **Respuesta**: `chat.html` (5877 líneas de funcionalidad)
+- **Incluye**: Todas las 6 Chrome AI APIs integradas
+
+#### **📍 GET /chrome-ai-setup**
+- **Descripción**: Página de configuración Chrome AI
+- **Respuesta**: `chrome_ai_setup.html`
+- **Uso**: Configurar y verificar APIs
+
+#### **📍 GET /privacy_policy**
+- **Descripción**: Política de privacidad (inglés)
+- **Respuesta**: `privacy_policy_en.html`
+- **Uso**: Cumplimiento Chrome Web Store
+
+---
+
+## 🔧 Chrome Extension Integration
+
+### **Manifest Configuration**
+```json
+{
+  "permissions": ["storage", "activeTab", "tabs", "offscreen"],
+  "host_permissions": ["https://generativelanguage.googleapis.com/*"],
+  "privacy_policy": "http://localhost:3000/privacy_policy"
+}
+```
+
+### **Extension Flow**
+1. **popup.js**: Detecta localhost:3000
+2. **chrome.tabs.create()**: Abre aplicación completa  
+3. **Acceso completo**: Todas las APIs disponibles
+
+---
+
+## 🛠️ API Availability Checking
+
+### **Chrome AI Availability**
+```javascript
+// Verificar disponibilidad de APIs
+const checkAvailability = async () => {
+    const capabilities = await ai.assistant.capabilities();
+    if (capabilities.available === 'readily') {
+        // API lista para usar
+        return true;
+    }
+    return false;
+};
+```
+
+### **Error Handling**
+- **API no disponible**: Fallback a Google Gemini
+- **Rate limiting**: Manejo automático de límites
+- **Offline**: Funcionalidad degradada elegante
 
 ### Autenticación
 

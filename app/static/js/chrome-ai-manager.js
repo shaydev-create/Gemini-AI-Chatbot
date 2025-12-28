@@ -80,13 +80,22 @@ class ChromeAIManager {
         console.log('🔍 Checking Chrome Built-in AI API availability...');
         
         // Check Prompt API (LanguageModel)
-        if ('LanguageModel' in window) {
+        // Intentar usar window.ai.languageModel primero (estándar nuevo)
+        if (window.ai && window.ai.languageModel) {
+             try {
+                const availability = await window.ai.languageModel.availability();
+                this.capabilities.prompt = availability !== 'no'; // 'readily' | 'after-download' | 'no'
+                console.log('✅ Prompt API (window.ai.languageModel) availability:', availability);
+            } catch (error) {
+                console.log('❌ Prompt API error:', error.message);
+            }
+        } else if ('LanguageModel' in window) { // Fallback antiguo
             try {
                 const availability = await LanguageModel.availability();
                 this.capabilities.prompt = availability !== 'unavailable';
-                console.log('✅ Prompt API (LanguageModel) availability:', availability);
+                console.log('✅ Prompt API (LanguageModel legacy) availability:', availability);
             } catch (error) {
-                console.log('❌ Prompt API not available:', error.message);
+                console.log('❌ Prompt API legacy not available:', error.message);
             }
         } else {
             console.log('❌ LanguageModel not found in window');
@@ -178,17 +187,44 @@ class ChromeAIManager {
             console.log('LanguageModel params:', params);
 
             // Create session - NO especificar temperature ni topK para usar defaults
-            this.promptSession = await LanguageModel.create({
+            // IMPORTANTE: Especificar initialPrompts con idioma para evitar warning y mejorar calidad
+            const sessionOptions = {
                 systemPrompt: 'Eres un asistente AI útil. Responde en español de manera clara y concisa.',
                 monitor(m) {
                     m.addEventListener('downloadprogress', (e) => {
-                        console.log(`📥 Descargando modelo: ${Math.round(e.loaded * 100)}%`);
-                        document.dispatchEvent(new CustomEvent('chrome-ai-download-progress', {
-                            detail: { progress: e.loaded * 100 }
-                        }));
+                        const progress = Math.round((e.loaded / e.total) * 100);
+                        console.log(`📥 Descargando modelo: ${progress}%`);
+                        
+                        // Emitir evento global para que la UI lo capture
+                        const event = new CustomEvent('chrome-ai-download-progress', {
+                            detail: { progress: progress }
+                        });
+                        window.dispatchEvent(event);
+                        document.dispatchEvent(event);
                     });
                 }
-            });
+            };
+
+            // Intentar añadir initialPrompts si la API lo soporta (Chrome Canary nuevo)
+            // Esto soluciona el warning: "No output language was specified"
+            try {
+                sessionOptions.initialPrompts = [
+                    { role: 'system', content: 'Language: es' },
+                    { role: 'user', content: 'Hola' },
+                    { role: 'assistant', content: 'Hola, ¿en qué puedo ayudarte?' }
+                ];
+            } catch (e) {
+                console.warn('initialPrompts not supported in this version');
+            }
+
+            // Crear sesión usando la API disponible
+            if (window.ai && window.ai.languageModel) {
+                this.promptSession = await window.ai.languageModel.create(sessionOptions);
+            } else if (typeof LanguageModel !== 'undefined') {
+                this.promptSession = await LanguageModel.create(sessionOptions);
+            } else {
+                throw new Error('No LanguageModel API found');
+            }
 
             console.log('✅ Chrome AI Prompt API inicializada correctamente (MODO LOCAL)');
             return true;

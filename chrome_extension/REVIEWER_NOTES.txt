@@ -1,0 +1,47 @@
+**NOTAS PARA EL REVISOR - Chrome Web Store**
+
+Estimado revisor,
+
+Esta extensión (v2.0.1) proporciona acceso completo a una aplicación con las 6 Chrome Built-in AI APIs:
+
+**FUNCIONALIDAD PRINCIPAL:**
+- Extensión abre aplicación web local con todas las Chrome AI APIs integradas
+- Usuario debe ejecutar: python run.py (servidor Flask local)
+- Extensión conecta con: http://localhost:3000
+
+**6 CHROME AI APIs INCLUIDAS:**
+✅ Prompt API - Generación de texto
+✅ Writer API - Corrección de texto
+✅ Translator API - Traducción instantánea  
+✅ Summarizer API - Resúmenes inteligentes
+✅ Rewriter API - Reescritura de contenido
+✅ Proofreader API - Revisión y corrección
+
+**NUEVO PERMISO "tabs":**
+- Propósito: Abrir localhost:3000 cuando usuario hace clic
+- Uso: chrome.tabs.create() para experiencia completa
+- Beneficio: Acceso a todas las AI APIs sin limitaciones de popup
+
+**FLUJO DE USUARIO:**
+1. Usuario ejecuta: python run.py
+2. Servidor Flask inicia en localhost:3000
+3. Clic en extensión → Abre aplicación completa
+4. Acceso a todas las Chrome AI APIs + interfaz futurística
+
+**SEGURIDAD:**
+✅ Solo conecta con localhost (servidor del usuario)
+✅ NO recopila datos personales
+✅ Procesamiento local de Chrome AI APIs
+✅ Sin comunicación externa no autorizada
+
+**PARA PRUEBAS:**
+1. Instalar extensión
+2. Ejecutar: python run.py (desde código fuente)
+3. Hacer clic en icono de extensión
+4. Se abre: http://localhost:3000/chat
+
+Esta extensión democratiza el acceso a Chrome AI APIs mediante una interfaz moderna.
+
+Gracias por su revisión.
+
+**Equipo Gemini AI Chatbot**

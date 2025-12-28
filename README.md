@@ -31,15 +31,54 @@ Un chatbot de IA avanzado y seguro, potenciado por Google Gemini, con una interf
 ## ✨ Características Principales
 
 - **🤖 Inteligencia Artificial Avanzada**: Integración nativa con **Google Gemini** y preparado para **Vertex AI** con sistema de fallback automático.
-- **🧠 Chrome AI Ready**: Totalmente compatible con Chrome AI APIs para experiencias de IA más rápidas y offline.
-- **🌐 Interfaz Moderna y Accesible**: UI futurista y responsiva, con soporte PWA para instalación en escritorio/móvil y funcionamiento offline básico.
+- **🧠 6 Chrome Built-in AI APIs**: **Prompt**, **Writer**, **Translator**, **Summarizer**, **Rewriter**, y **Proofreader** completamente integradas.
+- **🚀 Chrome Extension Funcional**: Acceso directo desde el navegador que abre la aplicación completa en localhost:3000.
+- **🌐 Interfaz Futurística Completa**: UI moderna con chat avanzado, exportación, control de voz, carga de archivos y personalización.
+- **⚡ Experiencia Localhost**: Aplicación completa ejecutándose en http://localhost:3000 con todas las funcionalidades.
 - **🔒 Seguridad Robusta**: Autenticación JWT, protección CSRF/XSS, cabeceras de seguridad, y rate limiting.
 - **🐳 Dockerizado**: Entornos consistentes para desarrollo y producción con Docker Compose.
 - **✅ Cobertura de Pruebas Sólida**: 71% de cobertura de código con 254 tests pasando para garantizar la estabilidad.
-- **🌐 Extensión de Chrome**: Acceso rápido al chatbot directamente desde el navegador con funciones Chrome AI integradas.
 - **📊 Panel de Administración**: Métricas y estado del sistema en tiempo real (protegido por rol).
 - **🌍 Multi-idioma**: Soporte para inglés y español, fácilmente extensible.
 - **🏆 Hackathon Ready**: Preparado para competencias y presentaciones con todas las funciones Chrome AI implementadas.
+- **⚙️ Setup de Diagnóstico**: Herramienta integrada en `/chrome-ai-setup` para verificar flags y estado de Chrome AI.
+
+---
+
+## 🚀 Guía de Despliegue (Production)
+
+Para desplegar esta aplicación en producción (Vercel, Render, Heroku), consulta la guía detallada:
+
+👉 **[Ver DEPLOYMENT.md](DEPLOYMENT.md)**
+
+---
+
+## 🧠 Chrome Built-in AI APIs - Hackathon 2025
+
+### **6 APIs Completamente Integradas:**
+- ✨ **Prompt API**: Generación de texto avanzada
+- 🔍 **Writer API**: Corrección y mejora de textos
+- 🌐 **Translator API**: Traducción instantánea entre idiomas
+- 📄 **Summarizer API**: Resúmenes inteligentes de contenido
+- 🖊️ **Rewriter API**: Reescritura y transformación de estilo
+- 📖 **Proofreader API**: Revisión gramatical y ortográfica
+
+### **🚀 Chrome Extension + Localhost:**
+```bash
+# 1. Ejecutar aplicación local:
+python run.py
+
+# 2. Instalar Chrome Extension desde chrome_extension/
+# 3. Clic en icono 🚀 → Se abre automáticamente localhost:3000
+# 4. ¡Acceso completo a todas las APIs!
+```
+
+### **💎 Experiencia Completa:**
+- **Chat Avanzado**: Conversaciones con Google Gemini
+- **Exportación**: Guarda conversaciones en PDF, JSON, TXT
+- **Control de Voz**: Reconocimiento de voz integrado
+- **Carga de Archivos**: Análisis de documentos e imágenes
+- **Personalización**: 6 temas futuristas incluidos
 
 ---
 
@@ -51,7 +90,41 @@ Un chatbot de IA avanzado y seguro, potenciado por Google Gemini, con una interf
 
 ---
 
-## ⚡ Inicio Rápido (Docker)
+## ⚡ Inicio Rápido - Chrome AI Hackathon 2025
+
+### **🚀 Método Recomendado (Localhost + Chrome Extension):**
+
+1.  **Clona el repositorio:**
+    ```bash
+    git clone https://github.com/shaydev-create/Gemini-AI-Chatbot.git
+    cd Gemini-AI-Chatbot
+    ```
+
+2.  **Configura tu API Key:**
+    ```bash
+    echo "GEMINI_API_KEY=tu_api_key_aqui" > .env
+    ```
+
+3.  **Ejecuta la aplicación:**
+    ```bash
+    python run.py
+    ```
+    ✅ **Se abre en**: http://localhost:3000
+
+4.  **Instala Chrome Extension:**
+    - Ve a `chrome://extensions/`
+    - Activa "Modo desarrollador"
+    - Clic "Cargar extensión sin empaquetar"
+    - Selecciona carpeta `chrome_extension/`
+
+5.  **¡Usa la extensión!**
+    - 🖱️ Clic en icono 🚀 de la extensión
+    - ⚡ Se abre automáticamente la aplicación completa
+    - 🧠 ¡Acceso a todas las 6 Chrome AI APIs!
+
+---
+
+## ⚡ Inicio Rápido (Docker - Alternativo)
 
 Este es el método recomendado para levantar el proyecto en menos de un minuto.
 

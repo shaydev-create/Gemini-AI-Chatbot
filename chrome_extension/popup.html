@@ -3,110 +3,271 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gemini AI Chatbot</title>
-    <link rel="stylesheet" href="popup.css">
+    <title>Gemini AI Futuristic Chatbot</title>
+    <style>
+        body {
+            width: 450px;
+            height: 380px;
+            margin: 0;
+            background: 
+                linear-gradient(135deg, #0f0f23 0%, #1a1a2e 30%, #16213e 70%, #0f0f23 100%),
+                radial-gradient(circle at 30% 30%, rgba(120, 119, 198, 0.2) 0%, transparent 50%),
+                radial-gradient(circle at 70% 70%, rgba(255, 119, 198, 0.2) 0%, transparent 50%);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            overflow: hidden;
+            position: relative;
+            cursor: pointer;
+        }
+        
+        /* Partículas animadas */
+        body::before {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                radial-gradient(2px 2px at 20px 30px, rgba(255,255,255,0.3), transparent),
+                radial-gradient(2px 2px at 40px 70px, rgba(0,212,255,0.3), transparent),
+                radial-gradient(1px 1px at 90px 40px, rgba(255,255,255,0.2), transparent),
+                radial-gradient(1px 1px at 130px 80px, rgba(0,255,255,0.2), transparent);
+            background-repeat: repeat;
+            background-size: 150px 100px;
+            animation: sparkle 4s linear infinite;
+        }
+        
+        @keyframes sparkle {
+            from { transform: translateY(0px); }
+            to { transform: translateY(-100px); }
+        }
+        
+        .container {
+            position: relative;
+            z-index: 10;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+        
+        .container:hover {
+            transform: translateY(-5px);
+        }
+        
+        .logo-wrapper {
+            position: relative;
+            margin-bottom: 25px;
+        }
+        
+        .logo {
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(45deg, #00d4ff, #5b86e5, #667eea, #764ba2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 42px;
+            font-weight: bold;
+            margin: 0 auto;
+            animation: logoFloat 3s ease-in-out infinite;
+            box-shadow: 
+                0 0 40px rgba(0, 212, 255, 0.4),
+                inset 0 0 20px rgba(255, 255, 255, 0.1);
+            position: relative;
+        }
+        
+        .logo::before {
+            content: '';
+            position: absolute;
+            width: 120%;
+            height: 120%;
+            border-radius: 50%;
+            border: 2px solid rgba(0, 212, 255, 0.3);
+            animation: pulse 2s infinite;
+        }
+        
+        .logo::after {
+            content: '';
+            position: absolute;
+            width: 140%;
+            height: 140%;
+            border-radius: 50%;
+            border: 1px solid rgba(0, 212, 255, 0.2);
+            animation: pulse 2s infinite 1s;
+        }
+        
+        .title {
+            font-size: 28px;
+            font-weight: 800;
+            margin-bottom: 12px;
+            background: linear-gradient(45deg, #00d4ff, #5b86e5, #667eea);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 0 30px rgba(0, 212, 255, 0.3);
+            letter-spacing: 1px;
+        }
+        
+        .subtitle {
+            font-size: 14px;
+            opacity: 0.9;
+            margin-bottom: 20px;
+            letter-spacing: 0.8px;
+            color: #64b5f6;
+        }
+        
+        .status {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 25px;
+            font-size: 14px;
+            color: #4caf50;
+        }
+        
+        .status::before {
+            content: '●';
+            animation: blink 1.5s infinite;
+            color: #4caf50;
+        }
+        
+        .features-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin-bottom: 25px;
+            font-size: 11px;
+            opacity: 0.8;
+        }
+        
+        .feature {
+            padding: 6px 10px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            border: 1px solid rgba(0, 212, 255, 0.2);
+        }
+        
+        .action-button {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            border: none;
+            color: white;
+            padding: 15px 35px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 700;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            box-shadow: 
+                0 6px 20px rgba(102, 126, 234, 0.4),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .action-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.6s;
+        }
+        
+        .action-button:hover::before {
+            left: 100%;
+        }
+        
+        .action-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 
+                0 8px 25px rgba(102, 126, 234, 0.5),
+                inset 0 1px 0 rgba(255, 255, 255, 0.3);
+        }
+        
+        .info-text {
+            position: absolute;
+            bottom: 15px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 10px;
+            opacity: 0.6;
+            animation: fadeInOut 3s infinite;
+        }
+        
+        @keyframes logoFloat {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-10px) rotate(5deg); }
+        }
+        
+        @keyframes pulse {
+            0%, 100% { 
+                transform: scale(1); 
+                opacity: 1; 
+            }
+            50% { 
+                transform: scale(1.1); 
+                opacity: 0.7; 
+            }
+        }
+        
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+        
+        @keyframes fadeInOut {
+            0%, 100% { opacity: 0.6; }
+            50% { opacity: 0.3; }
+        }
+    </style>
 </head>
 <body>
-
-    <!-- Main Header -->
-    <header class="header">
-        <div class="header-title">
+    <div class="container">
+        <div class="logo-wrapper">
             <div class="logo">G</div>
-            <h1>Gemini AI</h1>
         </div>
-        <button id="settingsButton" class="icon-button" title="Settings">⚙️</button>
-    </header>
-
-    <!-- Settings View (Initially hidden) -->
-    <div id="settingsView" class="view">
-        <h2>Settings</h2>
-        <div class="form-group">
-            <label for="apiKeyInput">Google Gemini API Key</label>
-            <input type="password" id="apiKeyInput" class="input-field" placeholder="Enter your API Key">
+        
+        <div class="title">GEMINI AI</div>
+        <div class="subtitle">EL FUTURO DE LA INTELIGENCIA ARTIFICIAL</div>
+        
+        <div class="status">
+            ⚡ Starting Local Server...
         </div>
-        <button id="saveApiKey" class="button">Save Key</button>
-        <div class="form-group" style="margin-top: 20px;">
-            <label>Backend Server Status</label>
-            <div id="serverStatus" class="status-text">
-                <span class="status-light"></span>
-                <span id="serverStatusText">Verificando...</span>
-            </div>
+        
+        <div class="features-grid">
+            <div class="feature">🧠 6 Chrome AI APIs</div>
+            <div class="feature">💬 Advanced Chat</div>
+            <div class="feature">🎨 Futuristic UI</div>
+            <div class="feature">🌐 Multilingual</div>
+            <div class="feature">💾 Export Options</div>
+            <div class="feature">🎤 Voice Control</div>
         </div>
-        <button id="backToChat" class="button" style="margin-top: auto;">Volver al Chat</button>
-    </div>
-
-    <!-- Vista de Chat (Vista principal) -->
-    <div id="chatView" class="view active">
-        <!-- Chrome AI Quick Actions -->
-        <div class="chrome-ai-section">
-            <h3 class="section-title">🧠 Chrome AI Tools</h3>
-            <div class="ai-buttons">
-                <button id="summarizeBtn" class="ai-button" title="Summarize current page">📄 Summarize</button>
-                <button id="keyInfoBtn" class="ai-button" title="Extract key information">🔑 Key Info</button>
-                <button id="translateBtn" class="ai-button" title="Translate page content">🌐 Translate</button>
-                <button id="sentimentBtn" class="ai-button" title="Analyze sentiment">😊 Sentiment</button>
-                <button id="questionsBtn" class="ai-button" title="Generate questions">❓ Questions</button>
-                <button id="proofreadBtn" class="ai-button" title="Proofread selected text">✏️ Proofread</button>
-            </div>
-            <div id="aiStatus" class="ai-status">
-                <span id="aiStatusText">Checking Chrome AI availability...</span>
-            </div>
-
-            <!-- Instant Translator Section -->
-            <div class="translator-section" style="margin-top: 18px;">
-                <h4>🌐 Instant Translator</h4>
-                <textarea id="translatorInput" class="input-field" rows="2" placeholder="Enter text to translate..."></textarea>
-                <div style="display: flex; gap: 8px; margin: 8px 0;">
-                    <select id="sourceLang" class="input-field" style="width: 45%;">
-                        <option value="auto">Detect language</option>
-                        <option value="en">English</option>
-                        <option value="es">Spanish</option>
-                        <option value="fr">French</option>
-                        <option value="de">German</option>
-                        <option value="it">Italian</option>
-                        <option value="pt">Portuguese</option>
-                        <option value="ja">Japanese</option>
-                        <option value="ko">Korean</option>
-                        <option value="zh">Chinese</option>
-                    </select>
-                    <span style="align-self: center;">→</span>
-                    <select id="targetLang" class="input-field" style="width: 45%;">
-                        <option value="en">English</option>
-                        <option value="es">Spanish</option>
-                        <option value="fr">French</option>
-                        <option value="de">German</option>
-                        <option value="it">Italian</option>
-                        <option value="pt">Portuguese</option>
-                        <option value="ja">Japanese</option>
-                        <option value="ko">Korean</option>
-                        <option value="zh">Chinese</option>
-                    </select>
-                </div>
-                <button id="instantTranslateBtn" class="button" style="width: 100%;">🌐 Translate Instantly</button>
-                <div id="translatorResult" class="ai-result" style="display:none; margin-top:8px;"></div>
+        
+        <div style="background: rgba(255,193,7,0.1); border: 1px solid rgba(255,193,7,0.3); border-radius: 8px; padding: 12px; margin: 15px 0; font-size: 12px; text-align: center;">
+            <div style="color: #ffc107; font-weight: bold; margin-bottom: 8px;">⚡ REQUIRED FOR HACKATHON:</div>
+            <div style="color: #fff3cd; line-height: 1.4;">
+                1. Execute: <code style="background: rgba(0,0,0,0.3); padding: 2px 6px; border-radius: 4px;">python run.py</code><br>
+                2. Open: <code style="background: rgba(0,0,0,0.3); padding: 2px 6px; border-radius: 4px;">http://localhost:3000</code><br>
+                3. Click extension icon for full experience
             </div>
         </div>
         
-        <div class="chat-messages" id="chatMessages">
-            <!-- Los mensajes se insertarán aquí dinámicamente -->
-        </div>
-        <div class="input-container">
-            <div class="input-group">
-                <input type="text" id="messageInput" class="input-field" placeholder="Escribe tu mensaje...">
-                <button id="sendButton" class="button">➤</button>
-            </div>
-        </div>
+        <button class="action-button" id="fallbackLink">
+            🚀 Launch Full Application
+        </button>
     </div>
-
-    <!-- Barra de Estado -->
-    <footer class="status-bar">
-        <div id="connectionStatus" class="status-text">
-            <span id="connectionLight" class="status-light"></span>
-            <span id="connectionText"></span>
-        </div>
-        <div class="version-info">v2.0.0</div>
-    </footer>
-
+    
+    <div class="info-text">
+        Opens localhost:3000 • All Chrome AI APIs included
+    </div>
     <script src="popup.js"></script>
 </body>
 </html>

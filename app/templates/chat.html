@@ -6,7 +6,7 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
-    <meta name="cache-buster" content="v1.0.1-20250112-fix">
+    <meta name="cache-buster" content="v2.1.0">
     <meta name="description" content="Chat con Gemini AI - Experimenta conversaciones inteligentes con la IA más avanzada. Interfaz moderna y respuestas instantáneas.">
     <meta name="keywords" content="chat AI, Gemini, conversación inteligente, chatbot, asistente virtual">
     <meta name="author" content="Gemini AI Team">
@@ -36,6 +36,17 @@
     
     
     <title>{{ translate('title') }}</title>
+    
+    <!-- FontAwesome (Iconos) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Markdown Support -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    
+    <!-- Syntax Highlighting -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    
     <!-- jsPDF library for PDF export -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     
@@ -650,6 +661,26 @@
             background: rgba(0, 245, 255, 0.2);
             transform: translateY(-2px);
             box-shadow: 0 4px 15px rgba(0, 245, 255, 0.4);
+        }
+
+        /* Indicador de fuente de IA */
+        .ai-source-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-left: 10px;
+            backdrop-filter: blur(4px);
+            border: 1px solid rgba(255,255,255,0.1);
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-5px); }
+            to { opacity: 1; transform: translateY(0); }
         }
         
         /* Scrollbar personalizada */
@@ -2028,6 +2059,61 @@
 
         <!-- Único contenedor requerido por E2E Selenium y la app -->
         <div id="chatContainer" class="chat-container" role="main">
+        
+        <!-- Chrome AI Model Download Progress -->
+        <div id="model-download-progress" class="model-progress-container" style="display: none;">
+            <div class="model-progress-info">
+                <span class="model-progress-title">📥 Downloading Chrome AI Model...</span>
+                <span class="model-progress-percent" id="model-progress-percent">0%</span>
+            </div>
+            <div class="model-progress-bar-bg">
+                <div class="model-progress-bar-fill" id="model-progress-bar-fill"></div>
+            </div>
+            <div class="model-progress-note">First time setup only (~1.7GB). Processing happens locally.</div>
+        </div>
+
+        <style>
+            .model-progress-container {
+                background: rgba(0, 0, 0, 0.8);
+                backdrop-filter: blur(10px);
+                border: 1px solid var(--primary);
+                border-radius: 12px;
+                padding: 15px;
+                margin: 10px 20px;
+                box-shadow: 0 4px 15px rgba(0, 245, 255, 0.2);
+                animation: slideDown 0.5s ease-out;
+            }
+            .model-progress-info {
+                display: flex;
+                justify-content: space-between;
+                margin-bottom: 8px;
+                color: var(--text-primary);
+                font-weight: bold;
+            }
+            .model-progress-bar-bg {
+                background: rgba(255, 255, 255, 0.1);
+                height: 8px;
+                border-radius: 4px;
+                overflow: hidden;
+            }
+            .model-progress-bar-fill {
+                background: linear-gradient(90deg, var(--primary), var(--accent));
+                height: 100%;
+                width: 0%;
+                transition: width 0.3s ease;
+                box-shadow: 0 0 10px var(--primary);
+            }
+            .model-progress-note {
+                font-size: 0.8rem;
+                color: var(--text-secondary);
+                margin-top: 8px;
+                text-align: center;
+            }
+            @keyframes slideDown {
+                from { transform: translateY(-20px); opacity: 0; }
+                to { transform: translateY(0); opacity: 1; }
+            }
+        </style>
             <header class="chat-header">
                 <div class="chat-header-content">
                     <h1><span class="title-emoji">🤖</span> <span class="title-text">Gemini AI Chat</span></h1>
@@ -2108,9 +2194,20 @@
 
         // === CONFIGURACIÓN OPTIMIZADA Y VARIABLES GLOBALES ===
         let messagesContainer, messageInput, sendButton, typingIndicator, charCounter;
+        
+        // Variables globales para manejo de imágenes y estado
+        let selectedImage = null;
+        let selectedFileName = null;
+        let selectedPdf = null;
+        let selectedPdfName = null;
+        let uploadedImages = [];
+        let currentImageIndex = 0;
+        
+        // Otras variables de estado
         let currentUtterance = null;
         let isPaused = false;
         let pendingText = '';
+        // Variable isVoiceEnabled is already declared above; skip re-declaration
         let isVoiceEnabled = false;
         let chatHistory = [];
         let isLoading = false;
@@ -2129,8 +2226,12 @@
         let lastParticleTime = 0;
         const PARTICLE_INTERVAL = 150; // Aumentado para reducir carga
         
-        // Chrome Built-in AI variables
+        // Chrome Built-in AI variables (MOVED TO TOP)
+        // Ensure this is declared before any usage
         let chromeAI = null;
+        let chromeAIAvailable = false;
+        let currentAIMode = 'hybrid'; // Default mode: hybrid, server, chrome
+
         
         // === SISTEMA DE TRADUCCIONES E IDIOMAS ===
         const translations = {
@@ -2162,6 +2263,16 @@
                 // Contexto de imagen para IA
                 contextMessage: 'El usuario ha subido una imagen llamada "{imageName}" y está preguntando: "{message}". Por favor analiza la imagen y responde a su pregunta.',
                 
+                // Prompts de PDF
+                summarizePdf: 'Resume este documento PDF',
+                keyPointsPdf: 'Extrae los puntos clave de este PDF',
+                analyzePdf: 'Analiza el contenido de este PDF',
+                
+                // Botones de PDF
+                summarizeButton: '📑 Resumir',
+                keyPointsButton: '🔑 Puntos Clave',
+                analyzePdfButton: '🔍 Analizar PDF',
+
                 // Botones de modo AI
                 aiModeHybrid: '🔄 Híbrido',
                 aiModeServer: '☁️ Nube', 
@@ -2201,6 +2312,16 @@
                 // Contexto de imagen para IA
                 contextMessage: 'The user has uploaded an image called "{imageName}" and is asking: "{message}". Please analyze the image and respond to their question.',
                 
+                // Prompts de PDF
+                summarizePdf: 'Summarize this PDF document',
+                keyPointsPdf: 'Extract key points from this PDF',
+                analyzePdf: 'Analyze the content of this PDF',
+                
+                // Botones de PDF
+                summarizeButton: '📑 Summarize',
+                keyPointsButton: '🔑 Key Points',
+                analyzePdfButton: '🔍 Analyze PDF',
+
                 // Botones de modo AI
                 aiModeHybrid: '🔄 Hybrid',
                 aiModeServer: '☁️ Cloud', 
@@ -2237,14 +2358,9 @@
             return text;
         }
         
-        // Chrome Built-in AI variables
-        let chromeAIAvailable = false;
-        let preferChromeAI = false; // User preference for Chrome AI vs Server AI
-        let currentAIMode = 'hybrid'; // 'chrome', 'server', 'hybrid'
-        
         // Image context management
-        let uploadedImages = []; // Store uploaded images with metadata
-        let currentImageIndex = 0; // Track current image for analysis
+        // uploadedImages array is already declared globally; do not redeclare
+        // currentImageIndex is already declared globally; do not redeclare
         
         // requestAnimationFrame loop to guarantee input is always enabled
         function forceEnableInput() {
@@ -2381,6 +2497,14 @@
                 // Procesar texto según el remitente
                 if (sender === 'bot') {
                     content.innerHTML = formatBotResponse(text);
+                    
+                    // Aplicar Syntax Highlighting y Botón de Copiar
+                    if (typeof hljs !== 'undefined') {
+                        content.querySelectorAll('pre code').forEach((block) => {
+                            hljs.highlightElement(block);
+                            addCopyButton(block);
+                        });
+                    }
                 } else {
                     content.textContent = text;
                 }
@@ -2495,6 +2619,36 @@
                 const statusText = document.querySelector('.chat-status span');
                 if (statusText) statusText.textContent = 'Asistente en línea';
             }
+        }
+
+        function updateAISourceBadge(source) {
+            // Buscar o crear el badge
+            let badge = document.querySelector('.ai-source-badge');
+            const statusContainer = document.querySelector('.chat-status');
+            
+            if (!badge && statusContainer) {
+                badge = document.createElement('span');
+                badge.className = 'ai-source-badge';
+                statusContainer.appendChild(badge);
+            }
+            
+            if (!badge) return; // Si no hay contenedor, salir
+            
+            // Actualizar contenido según la fuente
+            if (source === 'local') {
+                badge.innerHTML = '⚡ Local (Chrome AI)';
+                badge.style.background = 'rgba(255, 215, 0, 0.2)'; // Dorado suave
+                badge.style.borderColor = 'rgba(255, 215, 0, 0.4)';
+                badge.title = 'Procesado localmente en tu dispositivo';
+            } else {
+                badge.innerHTML = '☁️ Nube (Gemini API)';
+                badge.style.background = 'rgba(0, 245, 255, 0.1)'; // Cyan suave
+                badge.style.borderColor = 'rgba(0, 245, 255, 0.2)';
+                badge.title = 'Procesado en los servidores de Google';
+            }
+            
+            // Mostrar badge
+            badge.style.display = 'inline-flex';
         }
         
         // Setup drag and drop functionality
@@ -2670,6 +2824,43 @@
                 position: relative;
                 display: inline-block;
             `;
+
+            // Barra de progreso de descarga (oculta por defecto)
+            const progressBarContainer = document.createElement('div');
+            progressBarContainer.id = 'chrome-ai-download-bar';
+            progressBarContainer.style.cssText = `
+                position: absolute;
+                bottom: -25px;
+                left: 0;
+                width: 100%;
+                height: 4px;
+                background: rgba(255,255,255,0.1);
+                border-radius: 2px;
+                overflow: hidden;
+                display: none;
+            `;
+            const progressBarFill = document.createElement('div');
+            progressBarFill.style.cssText = `
+                width: 0%;
+                height: 100%;
+                background: var(--accent-color);
+                transition: width 0.3s ease;
+            `;
+            progressBarContainer.appendChild(progressBarFill);
+            aiModeContainer.appendChild(progressBarContainer);
+
+            // Escuchar eventos de progreso
+            document.addEventListener('chrome-ai-download-progress', (e) => {
+                const progress = e.detail.progress;
+                progressBarContainer.style.display = 'block';
+                progressBarFill.style.width = `${progress}%`;
+                
+                if (progress >= 100) {
+                    setTimeout(() => {
+                        progressBarContainer.style.display = 'none';
+                    }, 1000);
+                }
+            });
             
             // Create main Chrome AI button
             const mainButton = document.createElement('button');
@@ -2972,179 +3163,171 @@
         let isProcessingMessage = false; // Flag to prevent duplicate processing
         
         async function sendMessage() {
-            const messageInput = getElement('messageInput') || document.getElementById('messageInput');
-            const sendButton = getElement('sendButton') || document.getElementById('sendButton');
+            const messageInput = document.getElementById('messageInput');
+            const sendButton = document.getElementById('sendButton');
             
             if (!messageInput || !sendButton) return;
             
             const message = messageInput.value.trim();
             
-            if (!message || isLoading || isProcessingMessage) return;
+            // Prevenir envío si está vacío o ya está cargando
+            if ((!message && !selectedImage && !selectedPdf) || isLoading) return;
             
             if (message.length > 1000) {
                 showNotification('El mensaje es demasiado largo (máximo 1000 caracteres)', 'warning');
                 return;
             }
 
-            // Set processing flag
-            isProcessingMessage = true;
-            const startTime = performance.now();
-            
-            // Solo deshabilitar el botón, nunca el input
+            // --- UI START STATE ---
             isLoading = true;
-            // Forzar input siempre habilitado
-            messageInput.disabled = false;
+            const originalButtonContent = sendButton.innerHTML;
             sendButton.disabled = true;
-            sendButton.innerHTML = '<span>Enviando...</span><span>⏳</span>';
+            sendButton.innerHTML = '<span>...</span>';
             
-            // Agregar mensaje del usuario
+            // Add user message to UI
             addMessage(message, 'user');
+            
+            // Clear input
             messageInput.value = '';
-            autoResizeTextarea(messageInput); // Resetear tamaño del textarea
+            autoResizeTextarea(messageInput);
             updateCharCounter();
             
-            // Mostrar indicador de escritura
             showTyping();
             
+            let responseText = null;
+            let usedSource = 'cloud';
+            const startTime = performance.now();
+
             try {
-                // Check if we should use Chrome AI
-                if (shouldUseChromeAI(message)) {
-                    console.log('🧠 Using Chrome Built-in AI for response');
-                    
+                // 1. DETERMINE IF WE CAN/SHOULD USE LOCAL AI
+                const isOffline = !navigator.onLine;
+                // Local AI solo soporta texto puro por ahora (sin imágenes ni PDFs)
+                const canUseLocal = (typeof chromeAI !== 'undefined' && chromeAIAvailable && !selectedImage && !selectedPdf);
+                const userWantsLocal = (currentAIMode === 'chrome');
+                const userWantsHybrid = (currentAIMode === 'hybrid');
+                
+                // Logic: Try Local if (Local OR Hybrid OR Offline) AND Available
+                const tryLocal = canUseLocal && (userWantsLocal || userWantsHybrid || isOffline);
+
+                if (tryLocal) {
                     try {
-                        const chromeResponse = await sendMessageWithChromeAI(message);
+                        console.log('⚡ Attempting Local AI...');
                         
-                        // Actualizar métricas de rendimiento
-                        const responseTime = performance.now() - startTime;
-                        updateClientMetrics(responseTime);
+                        // Timeout logic:
+                        // If Offline/Local-Only -> Long wait (60s) for model load
+                        // If Hybrid -> Short wait (5s) to failover quickly
+                        const timeoutMs = (isOffline || userWantsLocal) ? 60000 : 5000;
                         
-                        hideTyping();
+                        const timeoutPromise = new Promise((_, reject) => 
+                            setTimeout(() => reject(new Error('Timeout')), timeoutMs)
+                        );
                         
-                        if (chromeResponse) {
-                            retryCount = 0;
-                            
-                            // Síntesis de voz si está habilitada
-                            if (isVoiceEnabled && 'speechSynthesis' in window) {
-                                speakText(chromeResponse);
-                            }
-                            
-                            // Success with Chrome AI, return early
-                            return;
+                        // Execute prompt with race against timeout
+                        const result = await Promise.race([
+                            chromeAI.prompt(message),
+                            timeoutPromise
+                        ]);
+                        
+                        if (result && typeof result === 'string' && result.length > 0) {
+                            responseText = result;
+                            usedSource = 'local';
+                            console.log('✅ Local AI Success');
                         }
+                    } catch (localError) {
+                        console.warn('⚠️ Local AI Failed:', localError);
                         
-                    } catch (chromeError) {
-                        console.warn('Chrome AI failed, falling back to server:', chromeError);
-                        // Fall through to server AI
+                        // Critical Failures:
+                        if (isOffline) {
+                            throw new Error('Modo Offline: Chrome AI falló. ' + localError.message);
+                        }
+                        if (userWantsLocal) {
+                            throw new Error('Modo Local Estricto: Chrome AI falló. ' + localError.message);
+                        }
+                        // If Hybrid, we just continue to Cloud...
                     }
                 }
-                
-                console.log('☁️ Using Server AI for response');
-                
-                const apiUrl = '/api/chat/send';
-                
-                // Prepare message payload with image context if needed
-                const messagePayload = { 
-                    message: message,
-                    conversation_id: conversationId || 'default',
-                    stream: false,
-                    language: getCurrentLanguage() // Agregar idioma seleccionado
-                };
-                
-                // Add image context if user is asking about an image
-                if (hasImageAnalysisRequest(message) && uploadedImages.length > 0) {
-                    const imageContext = getCurrentImageContext();
-                    if (imageContext) {
-                        messagePayload.image_context = {
+
+                // 2. FALLBACK TO CLOUD (If no response yet)
+                if (!responseText) {
+                    if (isOffline) {
+                        throw new Error('Sin conexión a internet.');
+                    }
+                    
+                    console.log('☁️ Attempting Cloud API...');
+                    
+                    // Preparar historial (últimos 20 mensajes)
+                    // Gemini API espera: [{ role: 'user'|'model', parts: [{ text: '...' }] }]
+                    const history = chatHistory.slice(-20).map(msg => ({
+                        role: msg.sender === 'user' ? 'user' : 'model',
+                        parts: [{ text: msg.text }]
+                    }));
+
+                    // Preparar payload
+                    const payload = {
+                        message: message,
+                        history: history, // Enviar historial
+                        image_context: selectedImage ? {
                             has_image: true,
-                            image_name: imageContext.imageName,
-                            image_data: imageContext.imageData,
-                            context_message: t('contextMessage', { 
-                                imageName: imageContext.imageName, 
-                                message: message 
-                            })
-                        };
-                        
-                        // Mark image as analyzed
-                        uploadedImages[currentImageIndex].analyzed = true;
-                        
-                        console.log('🖼️ Including image context in request');
-                    }
-                }
-                
-                const response = await fetch(apiUrl, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-Requested-With': 'XMLHttpRequest'
-                    },
-                    body: JSON.stringify(messagePayload),
-                    credentials: 'same-origin'
-                });
-                
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                
-                const data = await response.json();
-                
-                // Actualizar métricas de rendimiento
-                const responseTime = performance.now() - startTime;
-                updateClientMetrics(responseTime);
-                
-                hideTyping();
-                
-                // =================== CÓDIGO CORREGIDO ===================
-                if (data.response) {
-                    // Usamos 'data.response' directamente como devuelve nuestra API
-                    addMessage(data.response, 'bot');
-                    retryCount = 0; // Reset retry count on success
+                            image_data: selectedImage,
+                            image_name: selectedFileName
+                        } : null,
+                        pdf_context: selectedPdf ? {
+                            has_pdf: true,
+                            pdf_data: selectedPdf,
+                            pdf_name: selectedPdfName
+                        } : null
+                    };
+
+                    const response = await fetch('/api/chat/send', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(payload)
+                    });
                     
-                    // Síntesis de voz si está habilitada
-                    if (isVoiceEnabled && 'speechSynthesis' in window) {
-                        speakText(data.response);
+                    const data = await response.json();
+                    
+                    if (!response.ok) {
+                        throw new Error(data.message || 'Error del servidor');
                     }
-                } else {
-                    // Si no hay response, mostramos error
-                    addMessage('❌ Error: ' + (data.message || 'Error desconocido del servidor'), 'bot');
-                    showNotification('Error al procesar el mensaje', 'error');
+                    
+                    responseText = data.response;
+                    usedSource = 'cloud';
                 }
-                // =================== FIN DE LA CORRECCIÓN ===================
+
+                // 3. SUCCESS UI UPDATE
+                updateAISourceBadge(usedSource);
+                addMessage(responseText, 'bot');
                 
+                // Metrics
+                const duration = performance.now() - startTime;
+                updateClientMetrics(duration);
+
             } catch (error) {
-                hideTyping();
-                console.error('Error:', error);
-                
-                if (retryCount < MAX_RETRIES) {
-                    retryCount++;
-                    showNotification(`Error de conexión. Reintentando... (${retryCount}/${MAX_RETRIES})`, 'warning');
-                    setTimeout(() => sendMessage(), RETRY_DELAY * retryCount);
-                    return;
-                } else {
-                    addMessage('🔌 Error de conexión: ' + error.message, 'bot');
-                    showNotification('Error de conexión', 'error');
-                    retryCount = 0;
-                }
+                console.error('❌ Message Error:', error);
+                showNotification(error.message, 'error');
+                addMessage('❌ Error: ' + error.message, 'bot');
             } finally {
-                // Always cleanup - prevent hanging promises
-                try {
-                    isLoading = false;
-                    isProcessingMessage = false;
-                    
-                    if (messageInput) {
-                        messageInput.disabled = false;
-                        messageInput.focus();
-                    }
-                    if (sendButton) {
-                        sendButton.disabled = false;
-                        sendButton.innerHTML = '<span>Enviar</span><span>📤</span>';
-                    }
-                    
-                    hideTyping(); // Ensure typing indicator is hidden
-                } catch (cleanupError) {
-                    console.warn('Cleanup error:', cleanupError);
+                // --- UI CLEANUP ---
+                hideTyping();
+                isLoading = false;
+                sendButton.disabled = false;
+                sendButton.innerHTML = '<span>Enviar</span><span aria-hidden="true">📤</span>';
+                
+                if (selectedImage) {
+                    clearImageSelection();
                 }
+                if (selectedPdf) {
+                    clearPdfSelection();
+                }
+                
+                // Refocus
+                if (messageInput) messageInput.focus();
             }
         }
+            
+
         
         // Actualizar métricas del cliente
         function updateClientMetrics(responseTime) {
@@ -3493,39 +3676,63 @@
         
         function showNotification(message, type = 'info') {
             const notification = document.createElement('div');
+            notification.className = 'toast-notification';
+            
+            const icons = {
+                success: '<i class="fas fa-check-circle"></i>',
+                error: '<i class="fas fa-exclamation-circle"></i>',
+                warning: '<i class="fas fa-exclamation-triangle"></i>',
+                info: '<i class="fas fa-info-circle"></i>'
+            };
+
+            const colors = {
+                success: 'var(--success-color, #28a745)',
+                error: 'var(--error-color, #dc3545)',
+                warning: 'var(--warning-color, #ffc107)',
+                info: 'var(--primary, #007bff)'
+            };
+
             notification.style.cssText = `
                 position: fixed;
                 top: 20px;
                 right: 20px;
-                padding: 12px 20px;
-                border-radius: 8px;
+                padding: 16px 24px;
+                border-radius: 12px;
                 color: white;
-                font-weight: 500;
-                z-index: 1000;
-                animation: slideIn 0.3s ease;
-                max-width: 300px;
+                font-weight: 600;
+                z-index: 9999;
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+                transform: translateX(120%);
+                transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+                background: ${colors[type] || colors.info};
+                min-width: 300px;
+                border-left: 5px solid rgba(0,0,0,0.2);
+                font-family: 'Segoe UI', system-ui, sans-serif;
             `;
             
-            const colors = {
-                success: 'var(--success-color)',
-                error: 'var(--error-color)',
-                warning: 'var(--warning-color)',
-                info: 'var(--primary)'
-            };
-            
-            notification.style.background = colors[type] || colors.info;
-            notification.textContent = message;
+            notification.innerHTML = `
+                <div style="font-size: 1.2rem;">${icons[type] || icons.info}</div>
+                <div>${message}</div>
+            `;
             
             document.body.appendChild(notification);
             
+            // Trigger animation
+            requestAnimationFrame(() => {
+                notification.style.transform = 'translateX(0)';
+            });
+            
             setTimeout(() => {
-                notification.style.animation = 'slideOut 0.3s ease';
+                notification.style.transform = 'translateX(120%)';
                 setTimeout(() => {
                     if (notification.parentNode) {
                         notification.parentNode.removeChild(notification);
                     }
                 }, 300);
-            }, 3000);
+            }, 4000);
         }
         
         
@@ -3537,40 +3744,190 @@
         
         function handleFileUpload(files) {
             if (!files || files.length === 0) return;
-            
+            handleFiles(files);
+        }
+
+        function handleFiles(files) {
             Array.from(files).forEach(file => {
-                // Validar tamaño del archivo (máximo 10MB)
-                if (file.size > 10 * 1024 * 1024) {
-                    showNotification(`El archivo ${file.name} es demasiado grande (máximo 10MB)`, 'error');
-                    return;
-                }
-                
-                // Validar tipo de archivo
-                const allowedTypes = ['text/plain', 'application/pdf', 'application/msword', 
-                                    'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-                                    'image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
-                
-                if (!allowedTypes.includes(file.type)) {
-                    showNotification(`Tipo de archivo no soportado: ${file.name}`, 'error');
-                    return;
-                }
-                
-                // Mostrar archivo cargado en el chat
-                const fileInfo = `📎 Archivo cargado: ${file.name} (${formatFileSize(file.size)})`;
-                addMessage(fileInfo, 'user');
-                
-                // Procesar archivo según su tipo
-                if (file.type.startsWith('text/')) {
-                    readTextFile(file);
-                } else if (file.type.startsWith('image/')) {
+                if (file.type.startsWith('image/')) {
                     processImageFile(file);
+                } else if (file.type === 'application/pdf') {
+                    handlePdfUpload(file);
                 } else {
-                    // Para PDF y documentos, mostrar información básica
-                    addMessage(`📄 Documento recibido: ${file.name}. El bot puede ayudarte con preguntas sobre este archivo.`, 'bot');
+                    showNotification('Formato no soportado: ' + file.name, 'warning');
                 }
-                
-                showNotification(`Archivo ${file.name} cargado exitosamente`, 'success');
             });
+        }
+
+        function handlePdfUpload(file) {
+            if (file.size > 10 * 1024 * 1024) { // 10MB limit
+                showNotification('El PDF es demasiado grande (máx 10MB)', 'warning');
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                selectedPdf = e.target.result; // Base64 del PDF
+                selectedPdfName = file.name;
+                
+                // Mostrar indicador visual de PDF
+                showPdfPreview(file.name);
+                showNotification('PDF cargado: ' + file.name, 'success');
+                
+                // Mostrar mensaje en el chat
+                addMessage(`📄 PDF seleccionado: ${file.name}`, 'user');
+                
+                // Mostrar botones de análisis rápido para PDF
+                addPdfAnalysisButtons(file.name);
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function addPdfAnalysisButtons(filename) {
+            const messages = document.getElementById('messages');
+            if (!messages) return;
+
+            const buttonsContainer = document.createElement('div');
+            buttonsContainer.className = 'pdf-analysis-buttons';
+            buttonsContainer.style.cssText = `
+                display: flex;
+                flex-wrap: wrap;
+                gap: 8px;
+                margin-top: 12px;
+                padding: 12px;
+                background: rgba(255, 68, 68, 0.1);
+                border-radius: 8px;
+                border-left: 3px solid #ff4444;
+                margin-bottom: 16px;
+                animation: fadeIn 0.3s ease;
+            `;
+            
+            const buttons = [
+                { text: t('summarizeButton'), action: t('summarizePdf') },
+                { text: t('keyPointsButton'), action: t('keyPointsPdf') },
+                { text: t('analyzePdfButton'), action: t('analyzePdf') }
+            ];
+            
+            buttons.forEach(btn => {
+                const button = document.createElement('button');
+                button.textContent = btn.text;
+                button.style.cssText = `
+                    background: linear-gradient(135deg, #ff4444, #cc0000);
+                    border: none;
+                    border-radius: 6px;
+                    color: white;
+                    padding: 8px 16px;
+                    font-size: 13px;
+                    cursor: pointer;
+                    transition: all 0.3s ease;
+                    flex: 1;
+                    min-width: 100px;
+                    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+                `;
+                
+                button.onmouseover = () => {
+                    button.style.transform = 'translateY(-2px)';
+                    button.style.boxShadow = '0 4px 12px rgba(255, 68, 68, 0.4)';
+                };
+                
+                button.onmouseout = () => {
+                    button.style.transform = 'translateY(0)';
+                    button.style.boxShadow = '0 2px 5px rgba(0,0,0,0.2)';
+                };
+                
+                button.onclick = () => {
+                    // Auto-send the analysis request
+                    const messageInput = document.getElementById('messageInput');
+                    if (messageInput) {
+                        messageInput.value = btn.action;
+                        // Trigger input event to resize textarea
+                        messageInput.dispatchEvent(new Event('input'));
+                        
+                        // Optional: Auto-submit
+                        const form = document.getElementById('chat-form');
+                        if (form) form.dispatchEvent(new Event('submit'));
+                    }
+                };
+                
+                buttonsContainer.appendChild(button);
+            });
+            
+            // Append to the last message (which should be the user's "PDF seleccionado" message)
+            // Or create a new bot message suggesting actions
+            
+            const suggestionDiv = document.createElement('div');
+            suggestionDiv.className = 'message bot';
+            
+            const avatar = document.createElement('div');
+            avatar.className = 'message-avatar';
+            avatar.innerHTML = '🤖';
+            
+            const contentWrapper = document.createElement('div');
+            const content = document.createElement('div');
+            content.className = 'message-content';
+            content.innerHTML = `<div>He detectado el documento <strong>${filename}</strong>. ¿Qué te gustaría hacer con él?</div>`;
+            content.appendChild(buttonsContainer);
+            
+            const timeDiv = document.createElement('div');
+            timeDiv.className = 'message-time';
+            timeDiv.textContent = new Date().toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+            
+            contentWrapper.appendChild(content);
+            contentWrapper.appendChild(timeDiv);
+            suggestionDiv.appendChild(avatar);
+            suggestionDiv.appendChild(contentWrapper);
+            
+            messages.appendChild(suggestionDiv);
+            messages.scrollTop = messages.scrollHeight;
+        }
+
+        function showPdfPreview(filename) {
+            // Eliminar preview anterior si existe
+            const existingPreview = document.getElementById('pdf-preview-container');
+            if (existingPreview) existingPreview.remove();
+            
+            const previewContainer = document.createElement('div');
+            previewContainer.id = 'pdf-preview-container';
+            previewContainer.className = 'file-preview-container';
+            previewContainer.style.cssText = `
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                padding: 8px 12px;
+                background: rgba(255, 68, 68, 0.1);
+                border: 1px solid rgba(255, 68, 68, 0.3);
+                border-radius: 8px;
+                margin-bottom: 10px;
+                animation: fadeIn 0.3s ease;
+            `;
+            
+            previewContainer.innerHTML = `
+                <span style="font-size: 1.2rem;">📄</span>
+                <span style="flex: 1; font-size: 0.9rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${filename}</span>
+                <button onclick="clearPdfSelection()" style="background: none; border: none; color: #ff4444; cursor: pointer; font-size: 1.1rem;">&times;</button>
+            `;
+            
+            // Intentar insertar en .chat-input-container (donde está el input)
+            let container = document.querySelector('.chat-input-container');
+            if (!container) container = document.querySelector('.input-area');
+            
+            if (container) {
+                 const messageInput = document.getElementById('messageInput');
+                 if (messageInput) {
+                      container.insertBefore(previewContainer, messageInput);
+                 } else {
+                      container.prepend(previewContainer);
+                 }
+            }
+        }
+
+        function clearPdfSelection() {
+            selectedPdf = null;
+            selectedPdfName = null;
+            const preview = document.getElementById('pdf-preview-container');
+            if (preview) preview.remove();
+            const fileInput = document.getElementById('fileInput');
+            if (fileInput) fileInput.value = '';
         }
         
         function readTextFile(file) {
@@ -3586,6 +3943,10 @@
         function processImageFile(file) {
             const reader = new FileReader();
             reader.onload = function(e) {
+                // UPDATE GLOBAL STATE FOR SENDING
+                selectedImage = e.target.result;
+                selectedFileName = file.name;
+
                 // Store image in context for future analysis
                 const imageData = {
                     id: Date.now() + Math.random(), // Unique ID
@@ -5843,6 +6204,41 @@
     <script src="{{ url_for('static', filename='js/chrome-ai-manager.js') }}"></script>
     <script src="{{ url_for('static', filename='js/chat.js') }}"></script>
     
+    <!-- Chrome AI Progress Handler -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const progressContainer = document.getElementById('model-download-progress');
+            const progressBar = document.getElementById('model-progress-bar-fill');
+            const progressPercent = document.getElementById('model-progress-percent');
+            
+            // Listen for the custom event dispatched by chrome-ai-manager.js
+            document.addEventListener('chrome-ai-download-progress', (e) => {
+                const progress = e.detail.progress;
+                
+                // Show container if hidden
+                if (progressContainer && progressContainer.style.display === 'none') {
+                    progressContainer.style.display = 'block';
+                }
+                
+                // Update bar
+                if (progressBar) progressBar.style.width = `${progress}%`;
+                if (progressPercent) progressPercent.textContent = `${Math.round(progress)}%`;
+                
+                // Hide when complete
+                if (progress >= 100 && progressContainer) {
+                    setTimeout(() => {
+                        progressContainer.style.opacity = '0';
+                        progressContainer.style.transition = 'opacity 1s ease';
+                        setTimeout(() => {
+                            progressContainer.style.display = 'none';
+                            progressContainer.style.opacity = '1'; // Reset for next time
+                        }, 1000);
+                    }, 2000);
+                }
+            });
+        });
+    </script>
+
     <!-- DEBUG CHROME AI BUTTONS -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
